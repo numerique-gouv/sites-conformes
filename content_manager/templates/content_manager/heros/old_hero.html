@@ -1,8 +1,7 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
-
 {% if value.header_image or value.header_color_class %}
   {% image value.header_image fill-1200x350 as bg_img %}
-  <div class="cmsfr-hero cmsfr-hero-position--center{% if value.header_large %} cmsfr-hero-large{% endif %}{% if value.header_darken %} cmsfr-background-dark{% endif %}"
+  <div class="cmsfr-hero cmsfr-hero-position__center {% if value.header_large %} cmsfr-hero-large {% endif %}{% if value.header_darken %} cmsfr-background-dark {% endif %}"
        style="{% if value.header_image %}background-image: {% if value.header_darken %}linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),{% endif %}url({{ bg_img.url }});
               {% elif value.header_color_class %}background-color: var(--background-alt-{{ value.header_color_class }});
               {% endif %} min-height: 350px">
@@ -12,19 +11,16 @@
           <div class="fr-col fr-col-12{% if not value.header_large %}fr-col-md-6{% endif %}">
             {% if value.header_with_title %}
               <h1 {% if block.value.large %}class="fr-display--sm"{% endif %}>
-                {{ value.header_title }}
+                {{ page.title }}
                 {% if extra_title %}: {{ extra_title }}{% endif %}
                 {% include "content_manager/blocks/page_visibility.html" %}
               </h1>
             {% endif %}
             {% if value.header_cta_text %}{{ value.header_cta_text|richtext }}{% endif %}
-            {% if value.buttons %}
-                 <ul class="cmsfr-hero-btns cmsfr-hero-btns--left fr-btns-group fr-btns-group--inline-lg {% if icons_side == 'fr-btn--icon-left' %} fr-btns-group--icon-left {% elif icons_side == 'fr-btn--icon-right' %} fr-btns-group--icon-right {% endif %}">
-                {% for button in value.buttons %}
-                <li>{% include "content_manager/blocks/button.html" with button=button %}</li>
-                {% endfor %}
-                </ul>
-       
+             {% if value.header_cta_buttons %}
+              {% for block in page.header_cta_buttons %}
+                {% include_block block %}
+              {% endfor %}
             {% endif %}
           </div>
         </div>

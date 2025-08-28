@@ -1,7 +1,7 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
-{% if page.header_image or page.header_color_class %}
+<!-- {% if page.header_image or page.header_color_class %}
   {% image page.header_image fill-1200x350 as bg_img %}
-  <div class="cmsfr-hero cmsfr-hero-position__center{% if page.header_large %} cmsfr-hero-large{% endif %}{% if page.header_darken %} cmsfr-background-dark{% endif %}"
+  <div class="cmsfr-hero cmsfr-hero-position__center {% if page.header_large %} cmsfr-hero-large{% endif %}{% if page.header_darken %} cmsfr-background-dark{% endif %}"
        style="{% if page.header_image %}background-image: {% if page.header_darken %}linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),{% endif %}url({{ bg_img.url }});
               {% elif page.header_color_class %}background-color: var(--background-alt-{{ page.header_color_class }});
               {% endif %} min-height: 350px">
@@ -29,7 +29,6 @@
   </div>
 {% endif %}
 
-<p> FIN DU HEADER DE BASE </p>
-{% if page.hero %}
-  {% include "content_manager/blocks/blocks_stream.html" with stream=page.hero %}
-{% endif %}
+<p> FIN DU HEADER DE BASE </p> -->
+{% include "content_manager/blocks/blocks_stream.html" with stream=page.hero %}
+

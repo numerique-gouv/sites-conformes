@@ -31,7 +31,7 @@
     <div class="fr-container cmsfr-block-markdown">{{ block.value|markdown }}</div>
   {% elif block.block_type == "html" %}
     <div class="fr-container cmsfr-block-raw-html">{{ block.value|safe }}</div>
-  {% elif block.block_type == "header_1" or block.block_type == "header_2" or block.block_type == "header_3" or block.block_type == "header_4" or block.block_type == "header_5" %}
+ {% elif block.block_type in "header_1,header_2,header_3,header_4,header_5,old_hero" %}
    {% include_block block %}
   {% else %}
     <div class="fr-container cmsfr-block-{{ block.block_type }}">{% include_block block %}</div>
