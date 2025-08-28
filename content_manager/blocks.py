@@ -1768,7 +1768,6 @@ class HeroBackgroundImageBlock(blocks.StructBlock):
 class OldHero(blocks.StructBlock):
     header_with_title = blocks.BooleanBlock(label=_("Show title in header image?"), required=False)
     header_image = ImageChooserBlock(label=_("Header image"), required=False)
-    header_title = blocks.CharBlock(label=_("title"), required=False)
     header_color_class = blocks.ChoiceBlock(
         label=_("Background color"),
         choices=COLOR_CHOICES,
@@ -1783,7 +1782,7 @@ class OldHero(blocks.StructBlock):
         null=True,
         blank=True,
     )
-    buttons = ButtonsHorizontalListBlock(required=False)
+    header_cta_buttons = ButtonsHorizontalListBlock(required=False)
 
     class Meta:
         icon = "minus"
