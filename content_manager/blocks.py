@@ -1777,20 +1777,32 @@ class OldHero(blocks.StructBlock):
 
     header_large = blocks.BooleanBlock(label=_("Full width"), required=False)
     header_darken = blocks.BooleanBlock(label=_("Darken background image"), required=False)
-    header_cta_text = blocks.RichTextBlock(
-        label=_("Call to action text"),
-        null=True,
-        blank=True,
-    )
+    header_cta_text = blocks.RichTextBlock(label=_("Call to action text"), null=True, blank=True, required=False)
     header_cta_buttons = ButtonsHorizontalListBlock(required=False)
 
     class Meta:
         icon = "minus"
-        admin_text = (
+        help_text = (
             "Ce bloc récupère les données des anciennes en-têtes mais n'est pas configurable. "
             "Veuillez choisir un autre modèle d'en-tête."
         )
         template = "content_manager/heros/old_hero.html"
+
+
+class OldHeroAdapter(StructBlockAdapter):
+    js_constructor = "blocks.OldHero"
+
+    @cached_property
+    def media(self):
+        from django import forms
+
+        structblock_media = super().media
+        return forms.Media(
+            js=structblock_media._js + ["js/old-hero-block.js"],
+        )
+
+
+register(OldHeroAdapter(), OldHero)
 
 
 HERO_STREAMFIELD_BLOCKS = [
