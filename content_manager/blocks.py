@@ -9,6 +9,7 @@ from wagtail.blocks.struct_block import StructBlockAdapter, StructBlockValidatio
 from wagtail.contrib.typed_table_block.blocks import TypedTableBlock
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageBlock, ImageChooserBlock
+from wagtail.images.models import Image
 from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.telepath import register
 from wagtailmarkdown.blocks import MarkdownBlock
@@ -1547,6 +1548,14 @@ class HeroImageBlockWithMask(HeroImageBlock):
         value_class = HeroImageStructValue
 
 
+def get_default_hero_image(file_name):
+    try:
+        image = Image.objects.get(title=file_name)
+        return image
+    except Image.DoesNotExist:
+        return None
+
+
 class HeroImageAndTextBlock(blocks.StructBlock):
     def __init__(self, position_default="left", **kwargs):
         local_blocks = (
@@ -1610,7 +1619,12 @@ class HeroImageAndTextBlock(blocks.StructBlock):
                     ],
                 ),
             ),
-            ("image", ImageChooserBlock(label=_("Hero image"))),
+            (
+                "image",
+                ImageChooserBlock(
+                    label=_("Hero image"), default=get_default_hero_image("Illustration Homme Ordinateur")
+                ),
+            ),
             ("layout", LayoutBlock(label=_("Layout"))),
         )
         super().__init__(local_blocks, **kwargs)
