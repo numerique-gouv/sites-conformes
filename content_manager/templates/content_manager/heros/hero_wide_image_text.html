@@ -2,8 +2,8 @@
 <div 
 style="{% if value.layout.background_color %}background-color: var(--background-alt-{{  value.layout.background_color }});
        {% endif %} min-height: 350px">
-<div class="fr-py-3w cmsfr-hero-column">
-    <div class="{{ value.layout.vertical_margin }} cmsfr-hero-column {% if value.text_content.position ==  'top' %} cmsfr-order__2 {% endif %}">
+<div class="cmsfr-hero-column">
+    <div class="{{ value.layout.vertical_margin }} cmsfr-hero-column {% if value.text_content.position ==  'top' %} cmsfr-order__2  {% endif %}">
     <div class="fr-col-12 fr-col-md-9 cmsfr-text-content--center">
         {% include "content_manager/heros/_hero_text_content.html" %}
     <ul class="fr-btns-group fr-btns-group--inline-lg cmsfr-hero-btns--center {% if icons_side == 'fr-btn--icon-left' %} fr-btns-group--icon-left{% elif icons_side == 'fr-btn--icon-right' %} fr-btns-group--icon-right {% endif %}">
@@ -14,21 +14,10 @@ style="{% if value.layout.background_color %}background-color: var(--background-
   </div>
     </div>
     <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="">
-    <div class="fr-content-media {{ value.image.image_width }}">
-      <figure class="fr-content-media__img">
+    <figure class="fr-content-media {{ value.image.image_width }} {% if value.text_content.position ==  'top' %} cmsfr-without-margin {% endif %}">
+      <div class="fr-content-media__img">
         {% image value.image.image original class=value.image.extra_classes alt="" %}
-      </figure>
-  </div>
+      </div>
+    </figure>
 </div>
 </div>
-</div>
-   <div class="fr-container fr-pt-4w">
-    {% include "content_manager/blocks/breadcrumbs.html" %}
-    {% if not value.header_with_title %}
-      <h1>
-        {{ page.title }}
-        {% include "content_manager/blocks/page_visibility.html" %}
-      </h1>
-    {% endif %}
-  </div>

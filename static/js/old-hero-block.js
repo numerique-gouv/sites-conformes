@@ -5,7 +5,7 @@ class OldHeroBlockDefinition extends window.wagtailStreamField.blocks
     console.log(block);
 
     block.container[0]
-      .querySelectorAll("input, textarea, select, button")
+      .querySelectorAll("input, textarea, select, button, label")
       .forEach((el) => {
         el.setAttribute("readonly", "true");
         el.style.pointerEvents = "none";

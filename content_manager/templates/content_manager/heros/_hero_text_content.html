@@ -1,6 +1,6 @@
 {% load static wagtailcore_tags wagtail_dsfr_tags %}
 
 <div>
-    <h1 class="fr-display--sm">{{ value.text_content.hero_title }}</h1>
+    <h1 class="fr-display--sm">{{ value.text_content.hero_title }} {% include "content_manager/blocks/page_visibility.html" %}</h1>
     {{ value.text_content.hero_subtitle|richtext_p_add_class:"fr-text--lead" }}
 </div>

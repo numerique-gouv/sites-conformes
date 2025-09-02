@@ -85,6 +85,11 @@
     color: white
 }
 
+/* This style rule prevents user agents from applying a margin-top to the figure tag while complying with dsfr */
+.cmsfr-without-margin {
+    margin-top: -40px;
+}
+
 :root[data-fr-theme=light] .cmsfr-background-dark .fr-btn--secondary {
     background-color: rgba(255, 255, 255, 0.3)
 }

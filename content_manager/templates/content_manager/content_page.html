@@ -35,6 +35,15 @@
 
 {% block content %}
   {% include "content_manager/blocks/heading.html" %}
+  <div class="fr-container fr-pt-4w">
+    {% include "content_manager/blocks/breadcrumbs.html" %}
+    {% if not page.hero %}
+      <h1>
+        {{ page.title }}
+        {% include "content_manager/blocks/page_visibility.html" %}
+      </h1>
+    {% endif %}
+  </div>
 
   {% include "content_manager/blocks/messages.html" %}
 

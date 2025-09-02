@@ -27,13 +27,4 @@
       </div>
     {% endif %}
   </div>
-   <div class="fr-container fr-pt-4w">
-    {% include "content_manager/blocks/breadcrumbs.html" %}
-    {% if not value.header_with_title %}
-      <h1>
-        {{ page.title }}
-        {% include "content_manager/blocks/page_visibility.html" %}
-      </h1>
-    {% endif %}
-  </div>
 {% endif %}

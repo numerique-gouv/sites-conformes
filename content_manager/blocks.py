@@ -1458,11 +1458,15 @@ class TextContentBlock(blocks.StructBlock):
 
 
 class TextContentLeftRight(TextContentBlock):
-    position = blocks.ChoiceBlock(choices=ALIGN_HORIZONTAL_CHOICES, position_default="")
+    position = blocks.ChoiceBlock(
+        choices=ALIGN_HORIZONTAL_CHOICES, label=_("Text content position"), position_default=""
+    )
 
 
 class TextContentAllAlignments(TextContentBlock):
-    position = blocks.ChoiceBlock(choices=ALIGN_HORIZONTAL_CHOICES_EXTENDED, default="center")
+    position = blocks.ChoiceBlock(
+        choices=ALIGN_HORIZONTAL_CHOICES_EXTENDED, label=_("Text content position"), default="center"
+    )
 
 
 class HeroImageStructValue(StructValue):
@@ -1590,7 +1594,8 @@ class HeroImageAndTextBlock(blocks.StructBlock):
                             blocks.ChoiceBlock(
                                 choices=ALIGN_HORIZONTAL_CHOICES,
                                 default=position_default,
-                                label=_("Position"),
+                                label=_("Text content position"),
+                                help_text=_("Position of text relative to image"),
                             ),
                         ),
                     ],
@@ -1668,7 +1673,8 @@ class HeroWideImageAndTextBlock(blocks.StructBlock):
                             blocks.ChoiceBlock(
                                 choices=ALIGN_VERTICAL_CHOICES,
                                 default=position_default,
-                                label=_("Text content Position"),
+                                label=_("Text content position"),
+                                help_text=_("Position of text relative to image"),
                             ),
                         ),
                     ],
@@ -1745,6 +1751,7 @@ class HeroWideImageAndTextBlock(blocks.StructBlock):
                     default={
                         "image_ratio": "fr-ratio-32x9",
                         "image_width": "",
+                        "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
                     },
                 ),
             ),
@@ -1777,7 +1784,13 @@ class HeroBackgroundImageBlock(blocks.StructBlock):
             },
         ],
     )
-    image = HeroImageBlockWithMask(label=_("Hero image"))
+    image = HeroImageBlockWithMask(
+        label=_("Hero image"),
+        default={
+            "image_positioning": "top",
+            "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
+        },
+    )
 
     class Meta:
         icon = "minus"
