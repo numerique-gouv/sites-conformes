@@ -111,7 +111,7 @@ class LinkWithoutLabelBlock(blocks.StructBlock):
 
     link_type = blocks.ChoiceBlock(
         choices=LINK_TYPE_CHOICES,
-        required=True,
+        required=False,
         label=_("Link type"),
         help_text=_("Select the type of link."),
     )
