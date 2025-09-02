@@ -1441,7 +1441,10 @@ class LayoutBlock(MarginBlock):
 class TextContentBlock(blocks.StructBlock):
     hero_title = blocks.CharBlock(
         label=_("Title header"),
-        help_text=_("The title that will appear in the header of your page"),
+        required=False,
+        help_text=_(
+            "The title that will appear in the header of your page. If there is none, the page title will appear."
+        ),
         default=_("The title of your header"),
     )
     hero_subtitle = blocks.RichTextBlock(
@@ -1555,6 +1558,7 @@ class HeroImageAndTextBlock(blocks.StructBlock):
                             "hero_title",
                             blocks.CharBlock(
                                 label=_("Title header"),
+                                required=False,
                                 help_text=_("The title that will appear " "in the header of your page"),
                                 default=_("The title of your header"),
                             ),
@@ -1627,6 +1631,7 @@ class HeroWideImageAndTextBlock(blocks.StructBlock):
                             "hero_title",
                             blocks.CharBlock(
                                 label=_("Title header"),
+                                required=False,
                                 help_text=_("The title that will appear " "in the header of your page"),
                                 default=_("The title of your header"),
                             ),
