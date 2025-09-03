@@ -1458,15 +1458,17 @@ class TextContentBlock(blocks.StructBlock):
 
 
 class TextContentLeftRight(TextContentBlock):
-    position = blocks.ChoiceBlock(
-        choices=ALIGN_HORIZONTAL_CHOICES, label=_("Text content position"), position_default=""
-    )
+    position = blocks.ChoiceBlock(choices=ALIGN_HORIZONTAL_CHOICES, label=_("Text content position"), default="left")
 
 
 class TextContentAllAlignments(TextContentBlock):
     position = blocks.ChoiceBlock(
         choices=ALIGN_HORIZONTAL_CHOICES_EXTENDED, label=_("Text content position"), default="center"
     )
+
+
+class TextContentHorizontalAlignments(TextContentBlock):
+    position = blocks.ChoiceBlock(choices=ALIGN_VERTICAL_CHOICES, label=_("Text content position"), default="center")
 
 
 class HeroImageStructValue(StructValue):
@@ -1488,7 +1490,7 @@ class HeroImageStructValue(StructValue):
 
 
 class HeroImageBlock(blocks.StructBlock):
-    image = ImageChooserBlock(label=_("Image"))
+    image = ImageBlock(label=_("Image"))
     image_positioning = blocks.ChoiceBlock(
         choices=ALIGN_VERTICAL_CHOICES + ALIGN_HORIZONTAL_CHOICES,
         label=_("Image positioning"),
@@ -1561,78 +1563,28 @@ def get_default_hero_image(file_name):
 
 
 class HeroImageAndTextBlock(blocks.StructBlock):
-    def __init__(self, position_default="left", **kwargs):
-        local_blocks = (
-            (
-                "text_content",
-                blocks.StructBlock(
-                    [
-                        (
-                            "hero_title",
-                            blocks.CharBlock(
-                                label=_("Title header"),
-                                required=False,
-                                help_text=_("The title that will appear " "in the header of your page"),
-                                default=_("The title of your header"),
-                            ),
-                        ),
-                        (
-                            "hero_subtitle",
-                            blocks.RichTextBlock(
-                                features=LIMITED_RICHTEXTFIELD_FEATURES,
-                                required=False,
-                                label=_("Text"),
-                                help_text=_("To give a brief description of what you do"),
-                                default=_(
-                                    "Add a short description of "
-                                    "your organisation here to help visitors easily understand what you do."
-                                ),
-                            ),
-                        ),
-                        (
-                            "position",
-                            blocks.ChoiceBlock(
-                                choices=ALIGN_HORIZONTAL_CHOICES,
-                                default=position_default,
-                                label=_("Text content position"),
-                                help_text=_("Position of text relative to image"),
-                            ),
-                        ),
-                    ],
-                    label=_("Text content"),
-                ),
-            ),
-            (
-                "buttons",
-                blocks.ListBlock(
-                    ButtonBlock(),
-                    default=[
-                        {
-                            "link_type": "external_url",
-                            "text": "Nous contacter",
-                            "external_url": "https://sites.beta.gouv.fr/contactez-nous/",
-                            "button_type": "fr-btn",
-                            "icon_side": "--",
-                        },
-                        {
-                            "link_type": "external_url",
-                            "text": "Voir la vidéo",
-                            "external_url": "http://google.com",
-                            "button_type": "fr-btn fr-btn--secondary",
-                            "icon_side": "--t",
-                        },
-                    ],
-                ),
-            ),
-            (
-                "image",
-                ImageChooserBlock(
-                    label=_("Hero image"), default=get_default_hero_image("Illustration Homme Ordinateur")
-                ),
-            ),
-            ("layout", LayoutBlock(label=_("Layout"))),
-        )
-        super().__init__(local_blocks, **kwargs)
+    text_content = TextContentLeftRight()
+    buttons = blocks.ListBlock(
+        ButtonBlock(),
+        default=[
+            {
+                "link_type": "external_url",
+                "text": "Nous contacter",
+                "external_url": "https://sites.beta.gouv.fr/contactez-nous/",
+                "button_type": "fr-btn",
+                "icon_side": "--",
+            },
+            {
+                "link_type": "external_url",
+                "text": "Voir la vidéo",
+                "external_url": "http://google.com",
+                "button_type": "fr-btn fr-btn--secondary",
+                "icon_side": "--t",
+            },
+        ],
+    )
+    image = ImageBlock(label=_("Hero image"), default=get_default_hero_image("Illustration Homme Ordinateur"))
+    layout = LayoutBlock(label=_("Layout"))
 
     class Meta:
         icon = "minus"
@@ -1640,123 +1592,37 @@ class HeroImageAndTextBlock(blocks.StructBlock):
 
 
 class HeroWideImageAndTextBlock(blocks.StructBlock):
-    def __init__(self, position_default="left", **kwargs):
-        local_blocks = (
-            (
-                "text_content",
-                blocks.StructBlock(
-                    [
-                        (
-                            "hero_title",
-                            blocks.CharBlock(
-                                label=_("Title header"),
-                                required=False,
-                                help_text=_("The title that will appear " "in the header of your page"),
-                                default=_("The title of your header"),
-                            ),
-                        ),
-                        (
-                            "hero_subtitle",
-                            blocks.RichTextBlock(
-                                features=LIMITED_RICHTEXTFIELD_FEATURES,
-                                required=False,
-                                label=_("Text"),
-                                help_text=_("To give a brief description of what you do"),
-                                default=_(
-                                    "Add a short description of your "
-                                    "organisation here to help visitors easily understand what you do."
-                                ),
-                            ),
-                        ),
-                        (
-                            "position",
-                            blocks.ChoiceBlock(
-                                choices=ALIGN_VERTICAL_CHOICES,
-                                default=position_default,
-                                label=_("Text content position"),
-                                help_text=_("Position of text relative to image"),
-                            ),
-                        ),
-                    ],
-                    label=_("Text content"),
-                ),
-            ),
-            (
-                "layout",
-                blocks.StructBlock(
-                    [
-                        (
-                            "top_margin",
-                            blocks.IntegerBlock(
-                                label=_("Spacing above text content"),
-                                min_value=0,
-                                max_value=15,
-                                default=5,
-                                required=False,
-                            ),
-                        ),
-                        (
-                            "bottom_margin",
-                            blocks.IntegerBlock(
-                                label=_("Spacing below text content"),
-                                min_value=0,
-                                max_value=15,
-                                default=5,
-                                required=False,
-                            ),
-                        ),
-                        (
-                            "background_color",
-                            BackgroundColorChoiceBlock(
-                                label=_("Background color"),
-                                required=False,
-                                help_text=_(
-                                    "Uses the French Design System colors.<br>"
-                                    "If you want to design a classic website, "
-                                    "choose the colour ‘white’ or ‘French blue’."
-                                ),
-                            ),
-                        ),
-                    ],
-                    label=_(""),
-                    value_class=BlockMarginStructValue,
-                ),
-            ),
-            (
-                "buttons",
-                blocks.ListBlock(
-                    ButtonBlock(),
-                    default=[
-                        {
-                            "link_type": "external_url",
-                            "text": "Nous contacter",
-                            "external_url": "https://sites.beta.gouv.fr/contactez-nous/",
-                            "button_type": "fr-btn",
-                            "icon_side": "--",
-                        },
-                        {
-                            "link_type": "external_url",
-                            "text": "Voir la vidéo",
-                            "external_url": "http://google.com",
-                            "button_type": "fr-btn fr-btn--secondary",
-                            "icon_side": "--",
-                        },
-                    ],
-                ),
-            ),
-            (
-                "image",
-                HeroImageBlockWithRatioWidth(
-                    label=_("Hero image"),
-                    default={
-                        "image_ratio": "fr-ratio-32x9",
-                        "image_width": "",
-                        "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
-                    },
-                ),
-            ),
-        )
-        super().__init__(local_blocks, **kwargs)
+    text_content = TextContentHorizontalAlignments()
+    layout = LayoutBlock(label=_("Layout"))
+    buttons = blocks.ListBlock(
+        ButtonBlock(),
+        default=[
+            {
+                "link_type": "external_url",
+                "text": "Nous contacter",
+                "external_url": "https://sites.beta.gouv.fr/contactez-nous/",
+                "button_type": "fr-btn",
+                "icon_side": "--",
+            },
+            {
+                "link_type": "external_url",
+                "text": "Voir la vidéo",
+                "external_url": "http://google.com",
+                "button_type": "fr-btn fr-btn--secondary",
+                "icon_side": "--",
+            },
+        ],
+    )
+    image = (
+        HeroImageBlockWithRatioWidth(
+            label=_("Hero image"),
+            default={
+                "image_ratio": "fr-ratio-32x9",
+                "image_width": "",
+                "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
+            },
+        ),
+    )
 
     class Meta:
         icon = "minus"
@@ -1799,7 +1665,7 @@ class HeroBackgroundImageBlock(blocks.StructBlock):
 
 class OldHero(blocks.StructBlock):
     header_with_title = blocks.BooleanBlock(label=_("Show title in header image?"), required=False)
-    header_image = ImageChooserBlock(label=_("Header image"), required=False)
+    header_image = ImageBlock(label=_("Header image"), required=False)
     header_color_class = blocks.ChoiceBlock(
         label=_("Background color"),
         choices=COLOR_CHOICES,

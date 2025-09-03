@@ -93,21 +93,6 @@ class SitesFacilesBasePage(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel("hero", heading=_("Hero")),
-        MultiFieldPanel(
-            [
-                FieldPanel("header_with_title"),
-                FieldPanel("header_image"),
-                FieldPanel("header_color_class"),
-                FieldPanel("header_large"),
-                FieldPanel("header_darken"),
-                FieldPanel("header_cta_text"),
-                FieldPanel(
-                    "header_cta_buttons",
-                    heading=_("Call-to-action buttons"),
-                ),
-            ],
-            heading=_("Header options"),
-        ),
         FieldPanel("body", heading=_("Body")),
     ]
 
