@@ -1654,7 +1654,9 @@ class HeroBackgroundImageBlock(blocks.StructBlock):
         label=_("Hero image"),
         default={
             "image_positioning": "top",
-            "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
+            "image": {
+                "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
+            },
         },
     )
 
@@ -1704,10 +1706,8 @@ register(OldHeroAdapter(), OldHero)
 
 
 HERO_STREAMFIELD_BLOCKS = [
-    ("header_1", HeroImageAndTextBlock(position_default="left", label=_("En-tête 1"))),
-    ("header_2", HeroImageAndTextBlock(position_default="right", label=_("En-tête 2"))),
-    ("header_3", HeroWideImageAndTextBlock(position_default="top", label=_("En-tête 3"))),
-    ("header_4", HeroWideImageAndTextBlock(position_default="bottom", label=_("En-tête 4"))),
-    ("header_5", HeroBackgroundImageBlock(label=_("En-tête 5"))),
+    ("header_1", HeroImageAndTextBlock(label=_("En-tête 1"))),
+    ("header_2", HeroWideImageAndTextBlock(label=_("En-tête 3"))),
+    ("header_3", HeroBackgroundImageBlock(label=_("En-tête 5"))),
     ("old_hero", OldHero(label=_("Ancienne en-tête"))),
 ]
