@@ -29,11 +29,11 @@ class Command(BaseCommand):
             image_exists = Image.objects.filter(title=base_file_title).first()
             if image_exists:
                 file_hash = image_exists.get_file_hash()
-                self.stdout.write(f"A file named {base_file_title} already exists, skipping (file_hash: {file_hash})")
+                self.stdout.write(f"A image named {base_file_title} already exists, skipping (file_hash: {file_hash})")
                 continue
 
             image = import_image(full_path=file_path, title=base_file_title)
             image.collection = collection
             image.save()
             image.get_file_hash()
-            self.stdout.write(f"File {base_file_title} imported")
+            self.stdout.write(f"Image {base_file_title} imported")

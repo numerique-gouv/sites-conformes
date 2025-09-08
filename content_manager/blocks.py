@@ -1438,6 +1438,9 @@ class LayoutBlock(MarginBlock):
         ),
     )
 
+    class Meta:
+        help_text = _("This part allow you to choose the layout of your block (background, margin..) ")
+
 
 class TextContentBlock(blocks.StructBlock):
     hero_title = blocks.CharBlock(
@@ -1458,17 +1461,32 @@ class TextContentBlock(blocks.StructBlock):
 
 
 class TextContentLeftRight(TextContentBlock):
-    position = blocks.ChoiceBlock(choices=ALIGN_HORIZONTAL_CHOICES, label=_("Text content position"), default="left")
+    position = blocks.ChoiceBlock(
+        choices=ALIGN_HORIZONTAL_CHOICES,
+        label=_("Text content position"),
+        default="left",
+        help_text=_("This field allows you to define the placement of text relative to adjacent content."),
+    )
 
 
 class TextContentAllAlignments(TextContentBlock):
     position = blocks.ChoiceBlock(
-        choices=ALIGN_HORIZONTAL_CHOICES_EXTENDED, label=_("Text content position"), default="center"
+        choices=ALIGN_HORIZONTAL_CHOICES_EXTENDED,
+        label=_("Text content position"),
+        default="center",
+        help_text=_("This field allows you to define the placement of text."),
     )
 
 
-class TextContentHorizontalAlignments(TextContentBlock):
-    position = blocks.ChoiceBlock(choices=ALIGN_VERTICAL_CHOICES, label=_("Text content position"), default="center")
+class TextContentVerticalAlignments(TextContentBlock):
+    position = blocks.ChoiceBlock(
+        choices=ALIGN_VERTICAL_CHOICES,
+        label=_("Text content position"),
+        default="center",
+        help_text=_(
+            "This field allows you to define the placement of text relative to adjacent content in vertical position."
+        ),
+    )
 
 
 class HeroImageStructValue(StructValue):
@@ -1527,6 +1545,7 @@ class HeroImageBlockWithRatioWidth(HeroImageBlock):
 
 
 class HeroImageBlockWithMask(HeroImageBlock):
+    # Overriding image_positioning to offer fewer options than in HeroImageBlock
     image_positioning = blocks.ChoiceBlock(
         choices=[
             ("top", _("Top")),
@@ -1583,7 +1602,10 @@ class HeroImageAndTextBlock(blocks.StructBlock):
             },
         ],
     )
-    image = ImageBlock(label=_("Hero image"), default=get_default_hero_image("Illustration Homme Ordinateur"))
+    image = ImageBlock(
+        label=_("Hero image"),
+        default={"image": get_default_hero_image("Illustration Homme Ordinateur"), "decorative": True},
+    )
     layout = LayoutBlock(label=_("Layout"))
 
     class Meta:
@@ -1592,7 +1614,7 @@ class HeroImageAndTextBlock(blocks.StructBlock):
 
 
 class HeroWideImageAndTextBlock(blocks.StructBlock):
-    text_content = TextContentHorizontalAlignments()
+    text_content = TextContentVerticalAlignments()
     layout = LayoutBlock(label=_("Layout"))
     buttons = blocks.ListBlock(
         ButtonBlock(),
@@ -1613,15 +1635,16 @@ class HeroWideImageAndTextBlock(blocks.StructBlock):
             },
         ],
     )
-    image = (
-        HeroImageBlockWithRatioWidth(
-            label=_("Hero image"),
-            default={
-                "image_ratio": "fr-ratio-32x9",
-                "image_width": "",
+    image = HeroImageBlockWithRatioWidth(
+        label=_("Hero image"),
+        default={
+            "image_ratio": "fr-ratio-32x9",
+            "image_width": "",
+            "image": {
                 "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
+                "decorative": True,
             },
-        ),
+        },
     )
 
     class Meta:
@@ -1656,6 +1679,7 @@ class HeroBackgroundImageBlock(blocks.StructBlock):
             "image_positioning": "top",
             "image": {
                 "image": get_default_hero_image("Vue Paris Dimitri Iakymuk Unsplash"),
+                "decorative": True,
             },
         },
     )
@@ -1707,7 +1731,7 @@ register(OldHeroAdapter(), OldHero)
 
 HERO_STREAMFIELD_BLOCKS = [
     ("header_1", HeroImageAndTextBlock(label=_("En-tête 1"))),
-    ("header_2", HeroWideImageAndTextBlock(label=_("En-tête 3"))),
-    ("header_3", HeroBackgroundImageBlock(label=_("En-tête 5"))),
+    ("header_2", HeroWideImageAndTextBlock(label=_("En-tête 2"))),
+    ("header_3", HeroBackgroundImageBlock(label=_("En-tête 3"))),
     ("old_hero", OldHero(label=_("Ancienne en-tête"))),
 ]
