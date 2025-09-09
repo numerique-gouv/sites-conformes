@@ -10,13 +10,10 @@ p:empty {
     display: none;
 }
 
-<<<<<<< HEAD
 .flex {
     display: flex;
 }
-=======
 /*** Prefix the classes defined here with cmsfr- ***/
->>>>>>> main
 
 .cmsfr-hero {
     background-size: cover;
@@ -143,14 +140,8 @@ p:empty {
 }
 
 @media all and (max-width: 575px) {
-<<<<<<< HEAD
     .cmsfr-order-mobile__2 {
-        order: 2
-=======
-    .cmsfr-order__2 {
         order: 2;
->>>>>>> main
-    }
 }
 
 .cmsfr-order__2 {
