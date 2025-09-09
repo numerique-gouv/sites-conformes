@@ -38,4 +38,4 @@ class Migration(migrations.Migration):
         ("blog", "0045_alter_blogentrypage_body_alter_blogindexpage_body_and_more"),
     ]
 
-    operations = [migrations.RunPython(migrate_obsolete_fields)]
+    operations = [migrations.RunPython(migrate_obsolete_fields, elidable=True)]

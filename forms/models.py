@@ -52,6 +52,10 @@ class SitesFacilesCustomForm(BaseForm):
         for visible in self.visible_fields():
             dsfr_input_class_attr(visible)
 
+        for field in self.errors.keys():
+            self.fields[field].widget.attrs.update({"autofocus": ""})
+            break
+
     @property
     def default_renderer(self):
         return DsfrDjangoTemplates

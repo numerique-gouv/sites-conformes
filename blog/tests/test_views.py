@@ -45,9 +45,9 @@ class BlogTestCase(WagtailPageTestCase):
         response = self.client.get(self.blog_index_page.url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertContains(
-            response,
+        self.assertInHTML(
             "<title>Actualités — Titre du site</title>",
+            response.content.decode(),
         )
 
     def test_blog_index_page_has_posts(self):

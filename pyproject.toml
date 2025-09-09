@@ -66,6 +66,7 @@ extend-exclude = '''
 omit = [
     "manage.py",
     "config/settings_test.py",
+    "config/asgi.py",
     "config/wsgi.py",
     "*/__init__.py",
     "*/migrations/*.py",

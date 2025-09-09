@@ -1,8 +1,33 @@
 {% extends "base.html" %}
-{% load static dsfr_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags wagtail_dsfr_tags i18n %}
+{% load static dsfr_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags wagtail_dsfr_tags i18n humanize %}
 
 {% block title %}
-  <title>{{ page.seo_title|default:page.title }} — {{ settings.content_manager.CmsDsfrConfig.site_title }}</title>
+  <title>
+    {{ page.seo_title|default:page.title }}
+    {% if extra_title %}: {{ extra_title }}{% endif %}
+    {% if current_category %}
+      — {% translate "Category:" %} {{ current_category }}
+    {% endif %}
+    {% if current_tag %}
+      - {% translate "Tag:" %} {{ current_tag }}
+    {% endif %}
+    {% if current_author %}
+      - {% translate "Author:" %} {{ current_author }}
+    {% endif %}
+    {% if current_source %}
+      - {% translate "Source:" %} {{ current_source }}
+    {% endif %}
+    {% if current_date_from %}
+      - {% translate "Start date:" %} {{ current_date_from|naturalday }}
+    {% endif %}
+    {% if current_date_to %}
+      - {% translate "End date:" %} {{ current_date_to|naturalday }}
+    {% endif %}
+
+    {% if paginator.num_pages > 1 %}- Page {{ posts.number }}  / {{ paginator.num_pages }}{% endif %}
+
+    — {{ settings.content_manager.CmsDsfrConfig.site_title }}
+  </title>
 {% endblock title %}
 
 {% if page.search_description %}
@@ -63,20 +88,21 @@
                     aria-controls="fr-sidemenu-wrapper-{{ page.slug }}"
                     aria-expanded="false">{% translate "Filters" %}</button>
             <div class="fr-collapse" id="fr-sidemenu-wrapper-{{ page.slug }}">
-              <div class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters and export" %}</div>
+              <h2 class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters and export" %}</h2>
 
-              <h2 class="fr-h6">{% translate "Filter by date" %}</h2>
+              <h3 class="fr-h6">{% translate "Filter by date" %}</h3>
 
               {{ form }}
 
               {% if categories and page.filter_by_category %}
                 <div class="fr-my-3w">
-                  <h2 class="fr-h6">{% translate "Filter by category" %}</h2>
+                  <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
                   <ul class="fr-tags-group fr-mt-1w">
                     {% for category in categories %}
                       <li>
-                        <a class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter category=category %}"
+                        <a type="button"
+                           class="fr-tag"
+                           href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
                            {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
                           {{ category.name }}
                         </a>
@@ -88,12 +114,13 @@
 
               {% if tags and page.filter_by_tag %}
                 <div class="fr-my-3w">
-                  <h2 class="fr-h6">{% translate "Filter by tag" %}</h2>
+                  <h3 class="fr-h6">{% translate "Filter by tag" %}</h3>
                   <ul class="fr-tags-group fr-mt-1w">
                     {% for tag in tags %}
                       <li>
-                        <a class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter tag=tag %}"
+                        <a type="button"
+                           class="fr-tag"
+                           href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
                            {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
                           {{ tag }}
                         </a>
@@ -105,12 +132,13 @@
 
               {% if authors and page.filter_by_author %}
                 <div class="fr-my-3w">
-                  <h2 class="fr-h6">{% translate "Filter by author" %}</h2>
+                  <h3 class="fr-h6">{% translate "Filter by author" %}</h3>
                   <ul class="fr-tags-group fr-mt-1w">
                     {% for author in authors %}
                       <li>
-                        <a class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter author=author %}"
+                        <a type="button"
+                           class="fr-tag"
+                           href="{% pageurl page %}{% toggle_url_filter author=author %}#posts-list"
                            {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
                       </li>
                     {% endfor %}
@@ -120,12 +148,13 @@
 
               {% if sources and page.filter_by_source %}
                 <div class="fr-my-3w">
-                  <h2 class="fr-h6">{% translate "Filter by source" %}</h2>
+                  <h3 class="fr-h6">{% translate "Filter by source" %}</h3>
                   <ul class="fr-tags-group fr-mt-1w">
                     {% for source in sources %}
                       <li>
-                        <a class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter source=source %}"
+                        <a type="button"
+                           class="fr-tag"
+                           href="{% pageurl page %}{% toggle_url_filter source=source %}#posts-list"
                            {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
                       </li>
                     {% endfor %}
@@ -133,16 +162,17 @@
                 </div>
               {% endif %}
 
-              <h2 class="fr-h6">{% translate "Export" %}</h2>
+              <h3 class="fr-h6">{% translate "Export" %}</h3>
               <ul class="fr-btns-group fr-mt-1w">
                 <li>
-                  <a href="{% routablepageurl page 'ical_view' %}"
+                  <a type="button"
+                     href="{% routablepageurl page 'ical_view' %}"
                      class="fr-btn fr-btn--secondary">{% translate "Add to your calendar (iCal)" %}</a>
                 </li>
               </ul>
 
               {% if page.past_events.count %}
-                <h2 class="fr-h6">{% translate "Archives" %}</h2>
+                <h3 class="fr-h6">{% translate "Archives" %}</h3>
 
                 <ul class="fr-btns-group fr-mt-1w">
                   <li>
@@ -157,7 +187,8 @@
         </nav>
       </div>
 
-      <div class="fr-col fr-col-md-8 fr-col-12">
+      <div class="fr-col fr-col-md-8 fr-col-12" id="posts-list">
+        <h2>{% translate "Events" %}</h2>
         <div class="fr-grid-row fr-grid-row--gutters">{% include "events/blocks/events_index_posts_list.html" %}</div>
         {% if posts.paginator.num_pages > 1 %}
           <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>

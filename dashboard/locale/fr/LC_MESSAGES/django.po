@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-09 16:06+0200\n"
+"POT-Creation-Date: 2025-09-09 16:47+0200\n"
 "PO-Revision-Date: 2025-06-16 18:34+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -78,7 +78,7 @@ msgstr "Réinitialisez votre mot de passe"
 
 #: dashboard/templates/wagtailadmin/home.html:5
 msgid "Sites faciles"
-msgstr ""
+msgstr "Sites faciles"
 
 #: dashboard/templates/wagtailadmin/home/account_summary.html:15
 msgid "Account"
@@ -127,11 +127,11 @@ msgstr "Vidéos"
 #, fuzzy
 #| msgid "Tutorials"
 msgid "Tutorial"
-msgstr "Tutoriels"
+msgstr "Tutoriel"
 
 #: dashboard/templates/wagtailadmin/home/panels/_tutorials.html:34
 msgid "of"
-msgstr ""
+msgstr "de"
 
 #: dashboard/templates/wagtailadmin/login.html:5
 #: dashboard/templates/wagtailadmin/login.html:15

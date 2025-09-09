@@ -10,6 +10,7 @@ function set_param_value(param, value) {
         } else {
             searchParams.delete(param);
         }
+        window.location.hash = "#posts-list"
         window.location.search = searchParams.toString();
     }
 }

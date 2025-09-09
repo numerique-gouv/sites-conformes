@@ -2,7 +2,16 @@
 {% load static dsfr_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags wagtail_dsfr_tags i18n %}
 
 {% block title %}
-  <title>{{ page.seo_title|default:page.title }} — {{ settings.content_manager.CmsDsfrConfig.site_title }}</title>
+  <title>
+    {{ page.seo_title|default:page.title }}
+    {% if extra_title %}: {{ extra_title }}{% endif %}
+    {% if current_year %}
+      — {% translate "Year:" %} {{ current_year }}
+    {% endif %}
+    {% if paginator.num_pages > 1 %}- Page {{ posts.number }}  / {{ paginator.num_pages }}{% endif %}
+
+    — {{ settings.content_manager.CmsDsfrConfig.site_title }}
+  </title>
 {% endblock title %}
 
 {% if page.search_description %}
@@ -63,15 +72,15 @@
                     aria-controls="fr-sidemenu-wrapper-{{ page.slug }}"
                     aria-expanded="false">{% translate "Filters" %}</button>
             <div class="fr-collapse" id="fr-sidemenu-wrapper-{{ page.slug }}">
-              <div class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters and export" %}</div>
+              <h2 class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters and export" %}</h2>
 
               <div class="fr-my-3w">
-                <h2 class="fr-h6">{% translate "Filter by year" %}</h2>
+                <h3 class="fr-h6">{% translate "Filter by year" %}</h3>
                 <ul class="fr-tags-group fr-mt-1w">
                   {% for year in years %}
                     <li>
                       <a class="fr-tag"
-                         href="{% routablepageurl page 'archives_view' %}{% toggle_url_filter year=year %}"
+                         href="{% routablepageurl page 'archives_view' %}{% toggle_url_filter year=year %}#posts-list"
                          {% if year == current_year %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
                         {{ year }}
                       </a>
@@ -84,7 +93,8 @@
         </nav>
       </div>
 
-      <div class="fr-col fr-col-md-8 fr-col-12">
+      <div class="fr-col fr-col-md-8 fr-col-12" id="posts-list">
+        <h2>{% translate "Events" %}</h2>
         <div class="fr-grid-row fr-grid-row--gutters">{% include "events/blocks/events_index_posts_list.html" %}</div>
         {% if posts.paginator.num_pages > 1 %}
           <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>

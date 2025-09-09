@@ -7,18 +7,16 @@ docker_cmd := if env("USE_DOCKER", "0") == "1" { "docker compose exec -ti web" }
 host_url := env("HOST_URL", "localhost")
 host_port := env("HOST_PORT", "8000")
 
-# Default recipe
+#### Default recipe
+
+# List all recipes
 default:
     @just --list
 
-# Other recipes
+#### Main recipes
+
 collectstatic:
     {{docker_cmd}} {{uv_run}} python manage.py collectstatic --noinput
-
-coverage app="":
-    {{uv_run}} coverage run --source='.' manage.py test {{app}}
-    {{uv_run}} coverage html
-    firefox htmlcov/index.html
 
 createsuperuser:
     {{docker_cmd}} {{uv_run}} python manage.py createsuperuser
@@ -74,6 +72,12 @@ alias rs := runserver
 runserver host_url=host_url host_port=host_port:
     {{docker_cmd}} {{uv_run}} python manage.py runserver {{host_url}}:{{host_port}}
 
+scalingo-postdeploy:
+    python manage.py migrate
+    python manage.py create_starter_pages
+    python manage.py import_page_templates
+    python manage.py update_index
+
 shell:
     {{docker_cmd}} {{uv_run}} python manage.py shell
 
@@ -94,3 +98,26 @@ upgrade:
 
 web-prompt:
     {{docker_cmd}} bash
+
+#### Audit-related recipes
+
+# Count lines of code per app
+cloc:
+    @for d in "config" "blog" "content_manager" "dashboard" "events" "forms" "proconnect" "templates" ; do \
+    (cd "$d" && echo "$d" && cloc --vcs git); \
+    done
+
+# Evaluate test coverage then generate and open a HTML report
+coverage app="":
+    {{uv_run}} coverage run --source='.' manage.py test {{app}}
+    {{uv_run}} coverage html
+    firefox htmlcov/index.html
+
+# Gives a rough estimate of the number of internal and external routes
+routes-count:
+    @{{uv_run}} python manage.py shell -v 0 -c "from django.urls import get_resolver ; \
+    routes = set(v[1] for k,v in get_resolver().reverse_dict.items()) ; \
+    print('Total: ' + str(len(routes))) ; \
+    print('Internal: ' + str(len(list(filter(lambda k: '-admin' in k, routes))) - 3)) ; \
+    print('External: ' + str(len(list(filter(lambda k: '-admin' not in k, routes))) + 3)) ;"
+    @# (manually adjusting for login/logout and password reset routes)

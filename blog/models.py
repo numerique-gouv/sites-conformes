@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import BooleanField, Count, QuerySet
@@ -314,16 +314,11 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             extra_title = _("Posts published in %(year)s") % {"year": year}
 
         # Pagination
-        page = request.GET.get("page")
+        page_number = request.GET.get("page")
         page_size = self.posts_per_page
 
         paginator = Paginator(posts, page_size)  # Show <page_size> posts per page
-        try:
-            posts = paginator.page(page)
-        except PageNotAnInteger:
-            posts = paginator.page(1)
-        except EmptyPage:
-            posts = paginator.page(paginator.num_pages)
+        posts = paginator.get_page(page_number)
 
         context["posts"] = posts
         context["current_category"] = category

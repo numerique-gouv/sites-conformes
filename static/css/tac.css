@@ -236,7 +236,6 @@ body #tarteaucitronRoot div#tarteaucitronAlertBig {
     width: 100%;
     padding: 1rem;
     color: var(--g700);
-    background: var(--g200);
     box-shadow: inset 0 0 0 1px var(--g400);
     z-index: 2147483645;
     max-height: 73vh;
@@ -1016,7 +1015,7 @@ ul[style="display: block;"] .tarteaucitronLine {
 }
 
 #tarteaucitronAlertSmall #tarteaucitronCookiesListContainer #tarteaucitronClosePanelCookie::before {
-    font-family: dsfr-tac-icons !important;
+    font-family: dsfr-tac-icons, sans-serif !important;
     font-style: normal;
     font-weight: normal !important;
     font-variant: normal;

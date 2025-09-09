@@ -1,4 +1,4 @@
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.forms.widgets import Textarea, mark_safe
@@ -99,16 +99,11 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             extra_title = _("Pages tagged with %(tag)s") % {"tag": tag}
 
         # Pagination
-        page = request.GET.get("page")
+        page_number = request.GET.get("page")
         page_size = self.entries_per_page
 
         paginator = Paginator(entries, page_size)  # Show <page_size> entries per page
-        try:
-            entries = paginator.page(page)
-        except PageNotAnInteger:
-            entries = paginator.page(1)
-        except EmptyPage:
-            entries = paginator.page(paginator.num_pages)
+        entries = paginator.get_page(page_number)
 
         context["entries"] = entries
         context["current_tag"] = tag

@@ -8,13 +8,13 @@ class EventSearchForm(SitesFacilesBaseForm):
     """Main form for events page list."""
 
     date_from = forms.DateField(
-        label=_("From…"),
+        label=_("Start date"),
         required=False,
         widget=forms.TextInput(attrs={"type": "date"}),
     )
 
     date_to = forms.DateField(
-        label=_("To…"),
+        label=_("End date"),
         required=False,
         widget=forms.TextInput(attrs={"type": "date"}),
     )

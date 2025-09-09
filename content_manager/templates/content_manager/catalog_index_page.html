@@ -2,7 +2,25 @@
 {% load static dsfr_tags wagtailcore_tags wagtailimages_tags wagtail_dsfr_tags i18n %}
 
 {% block title %}
-  <title>{{ page.seo_title|default:page.title }} —  {{ settings.content_manager.CmsDsfrConfig.site_title }}</title>
+  <title>
+    {{ page.seo_title|default:page.title }}
+    {% if current_category %}
+      — {% translate "Category:" %} {{ current_category }}
+    {% endif %}
+    {% if current_tag %}
+      - {% translate "Tag:" %} {{ current_tag }}
+    {% endif %}
+    {% if current_author %}
+      - {% translate "Author:" %} {{ current_author }}
+    {% endif %}
+    {% if current_source %}
+      - {% translate "Source:" %} {{ current_source }}
+    {% endif %}
+
+    {% if paginator.num_pages > 1 %}- Page {{ entries.number }}  / {{ paginator.num_pages }}{% endif %}
+
+    — {{ settings.content_manager.CmsDsfrConfig.site_title }}
+  </title>
 {% endblock title %}
 
 {% if page.search_description %}
@@ -65,15 +83,16 @@
                       aria-controls="fr-sidemenu-wrapper-{{ page.slug }}"
                       aria-expanded="false">{% translate "Filters" %}</button>
               <div class="fr-collapse" id="fr-sidemenu-wrapper-{{ page.slug }}">
-                <div class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters" %}</div>
+                <h2 class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters" %}</h2>
                 {% if categories and page.filter_by_category %}
                   <div class="fr-my-3w">
-                    <h2 class="fr-h6">{% translate "Filter by category" %}</h2>
+                    <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
                     <ul class="fr-tags-group">
                       {% for category in categories %}
                         <li>
                           <a class="fr-tag"
-                             href="{% pageurl page %}{% toggle_url_filter category=category %}"
+                             type="button"
+                             href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
                              {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
                             {{ category.name }}
                           </a>
@@ -85,12 +104,13 @@
 
                 {% if tags and page.filter_by_tag %}
                   <div class="fr-my-3w">
-                    <h2 class="fr-h6">{% translate "Filter by tag" %}</h2>
+                    <h3 class="fr-h6">{% translate "Filter by tag" %}</h3>
                     <ul class="fr-tags-group">
                       {% for tag in tags %}
                         <li>
                           <a class="fr-tag"
-                             href="{% pageurl page %}{% toggle_url_filter tag=tag %}"
+                             type="button"
+                             href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
                              {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
                             {{ tag }}
                           </a>
@@ -102,12 +122,13 @@
 
                 {% if authors and page.filter_by_author %}
                   <div class="fr-my-3w">
-                    <h2 class="fr-h6">{% translate "Filter by author" %}</h2>
+                    <h3 class="fr-h6">{% translate "Filter by author" %}</h3>
                     <ul class="fr-tags-group">
                       {% for author in authors %}
                         <li>
                           <a class="fr-tag"
-                             href="{% pageurl page %}{% toggle_url_filter author=author %}"
+                             type="button"
+                             href="{% pageurl page %}{% toggle_url_filter author=author %}#posts-list"
                              {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
                         </li>
                       {% endfor %}
@@ -117,12 +138,13 @@
 
                 {% if sources and page.filter_by_source %}
                   <div class="fr-my-3w">
-                    <h2 class="fr-h6">{% translate "Filter by source" %}</h2>
+                    <h3 class="fr-h6">{% translate "Filter by source" %}</h3>
                     <ul class="fr-tags-group">
                       {% for source in sources %}
                         <li>
                           <a class="fr-tag"
-                             href="{% pageurl page %}{% toggle_url_filter source=source %}"
+                             type="button"
+                             href="{% pageurl page %}{% toggle_url_filter source=source %}#posts-list"
                              {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
                         </li>
                       {% endfor %}
@@ -134,7 +156,8 @@
           </nav>
         </div>
 
-        <div class="fr-col fr-col-md-8 fr-col-12">
+        <div class="fr-col fr-col-md-8 fr-col-12" id="posts-list">
+          <h2>{% translate "Pages" %}</h2>
           <div class="fr-grid-row fr-grid-row--gutters">
             {% include "content_manager/blocks/catalog_index_entries_list.html" %}
           </div>
@@ -144,12 +167,15 @@
         </div>
       </div>
     {% else %}
-      <div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
-        {% include "content_manager/blocks/catalog_index_entries_list.html" %}
+      <div id="posts-list">
+        <h2>{% translate "Pages" %}</h2>
+        <div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
+          {% include "content_manager/blocks/catalog_index_entries_list.html" %}
+        </div>
+        {% if entries.paginator.num_pages > 1 %}
+          <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination entries %}</div>
+        {% endif %}
       </div>
-      {% if entries.paginator.num_pages > 1 %}
-        <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination entries %}</div>
-      {% endif %}
     {% endif %}
   </div>
 {% endblock content %}

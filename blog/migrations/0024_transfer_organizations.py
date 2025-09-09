@@ -22,5 +22,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(link_organizations),
+        migrations.RunPython(link_organizations, elidable=True),
     ]

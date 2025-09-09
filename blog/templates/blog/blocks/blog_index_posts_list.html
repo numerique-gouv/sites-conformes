@@ -4,9 +4,9 @@
     <div class="fr-card fr-enlarge-link">
       <div class="fr-card__body">
         <div class="fr-card__content">
-          <h2 class="fr-card__title">
+          <h3 class="fr-card__title">
             <a href="{{ post.url }}">{{ post.title }}</a>
-          </h2>
+          </h3>
           <p class="fr-card__desc">Publié le {{ post.date |date:'l j F Y' }}</p>
           {% if post.blog_categories.all %}
             <div class="fr-card__start">

@@ -2,7 +2,7 @@
 {% load wagtailcore_tags dsfr_tags i18n honeypot_tags static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/honeypot.css' %}">
+  <link rel="stylesheet" href="{% static 'css/honeypot.css' %}">
 {% endblock extra_css %}
 
 {% block title %}
@@ -21,7 +21,7 @@
   <div class="fr-container fr-pb-6w">
     {{ page.intro|richtext }}
 
-    <form action="{% pageurl page %}" method="post">
+    <form action="{% pageurl page %}" method="post" autocomplete="on">
       <div class="fr-fieldset__element">
         {% if page.all_fields_required %}
           <p class="fr-text--sm">{% translate "All fields are mandatory." %}</p>
@@ -36,10 +36,13 @@
           {{ form.non_field_errors }}
         </section>
       {% endif %}
+
       {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
       {% for field in form.visible_fields %}
         <div class="fr-fieldset__element">{% dsfr_form_field field %}</div>
       {% endfor %}
+
       {% honeypot_fields page.honeypot %}
       <div class="fr-fieldset__element">
         <input class="fr-btn" type="submit" value="{{ submit_form }}" />
@@ -47,6 +50,7 @@
     </form>
   </div>
 {% endblock content %}
+
 {% block extra_js %}
-<script src="{% static 'js/honeypot.js' %}"></script>
+  <script src="{% static 'js/honeypot.js' %}"></script>
 {% endblock extra_js %}

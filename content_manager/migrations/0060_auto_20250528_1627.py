@@ -39,4 +39,4 @@ class Migration(migrations.Migration):
         ("content_manager", "0059_alter_cmsdsfrconfig_operator_logo_width"),
     ]
 
-    operations = [migrations.RunPython(migrate_obsolete_fields)]
+    operations = [migrations.RunPython(migrate_obsolete_fields, elidable=True)]

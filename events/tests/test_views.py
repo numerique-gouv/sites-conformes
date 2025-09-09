@@ -64,9 +64,9 @@ class EventsTestCase(WagtailPageTestCase):
         response = self.client.get(self.events_index_page.url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertContains(
-            response,
+        self.assertInHTML(
             "<title>Agenda — Titre du site</title>",
+            response.content.decode(),
         )
 
     def test_events_index_page_has_current_and_future_events(self):

@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_header_fields),
+        migrations.RunPython(update_header_fields, elidable=True),
         MigrateStreamData(
             app_name="content_manager",
             model_name="ContentPage",

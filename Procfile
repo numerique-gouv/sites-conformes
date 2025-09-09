@@ -1,2 +1,2 @@
-postdeploy: python manage.py migrate && python manage.py create_starter_pages && python manage.py import_page_templates && python manage.py update_index
+postdeploy: just --timestamp scalingo-postdeploy
 web: gunicorn config.wsgi --log-file -
