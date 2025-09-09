@@ -1730,8 +1730,8 @@ register(OldHeroAdapter(), OldHero)
 
 
 HERO_STREAMFIELD_BLOCKS = [
-    ("header_1", HeroImageAndTextBlock(label=_("En-tête 1"))),
-    ("header_2", HeroWideImageAndTextBlock(label=_("En-tête 2"))),
-    ("header_3", HeroBackgroundImageBlock(label=_("En-tête 3"))),
-    ("old_hero", OldHero(label=_("Ancienne en-tête"))),
+    ("hero_text_image", HeroImageAndTextBlock(label=_("Header with an image and text"))),
+    ("hero_text_wide_image", HeroWideImageAndTextBlock(label=_("Vertical header with a banner and text"))),
+    ("hero_text_background_image", HeroBackgroundImageBlock(label=_("Header with background"))),
+    ("old_hero", OldHero(label=_("Old hero"))),
 ]
