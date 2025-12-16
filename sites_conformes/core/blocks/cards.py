@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from dsfr.constants import IMAGE_RATIOS
 from wagtail import blocks
 from wagtail.blocks import StructValue
-from wagtail.images.blocks import ImageBlock, ImageChooserBlock
+from wagtail.images.blocks import ImageBlock
 
 from sites_conformes.core.blocks.badges_tags import BadgesListBlock, TagListBlock
 from sites_conformes.core.constants import (
@@ -176,7 +176,7 @@ class TileBlock(blocks.StructBlock):
     description = blocks.RichTextBlock(
         label=_("Content"), features=LIMITED_RICHTEXTFIELD_FEATURES_WITHOUT_LINKS, required=False
     )
-    image = ImageChooserBlock(label=_("Image"), help_text=_("Prefer SVG files."), required=False)
+    image = ImageBlock(label=_("Image"), help_text=_("Prefer SVG files."), required=False)
     link = LinkWithoutLabelBlock(
         label=_("Link"),
         required=False,

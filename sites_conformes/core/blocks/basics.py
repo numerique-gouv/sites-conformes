@@ -3,7 +3,7 @@ from dsfr.constants import COLOR_CHOICES_ILLUSTRATION, IMAGE_RATIOS
 from wagtail import blocks
 from wagtail.blocks import StructValue
 from wagtail.images import get_image_model
-from wagtail.images.blocks import ImageBlock, ImageChooserBlock
+from wagtail.images.blocks import ImageBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.blocks.badges_tags import TagListBlock
@@ -206,7 +206,7 @@ class CenteredImageBlock(blocks.StructBlock):
         default="h3",
         help_text=_("Adapt to the page layout. Defaults to heading 3."),
     )
-    image = ImageChooserBlock(label=_("Image"))
+    image = ImageBlock(label=_("Image"))
     alt = blocks.CharBlock(
         label=_("Alternative text (textual description of the image)"),
         required=False,
@@ -233,7 +233,7 @@ class CenteredImageBlock(blocks.StructBlock):
 
 
 class QuoteBlock(blocks.StructBlock):
-    image = ImageChooserBlock(label=_("Image"), required=False)
+    image = ImageBlock(label=_("Image"), required=False)
     quote = blocks.CharBlock(label=_("Quote"))
     author_name = blocks.CharBlock(label=_("Author name"), required=False)
     author_title = blocks.CharBlock(label=_("Author title"), required=False)
@@ -373,7 +373,7 @@ class VerticalContactCardBlock(blocks.StructBlock):
     role = blocks.CharBlock(label=_("Role"), max_length=255, required=False)
     organization = blocks.CharBlock(label=_("Organization"), max_length=255, required=False)
     contact_info = blocks.CharBlock(label=_("Contact info"), max_length=500, required=False)
-    image = ImageChooserBlock(label="Image", required=False)
+    image = ImageBlock(label="Image", required=False)
     tags = TagListBlock(label=_("Tags"), required=False)
 
     class Meta:

@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock
 
 from sites_conformes.core.blocks.basics import ImageAndTextBlock, QuoteBlock
 from sites_conformes.core.blocks.layout import MultiColumnsWithTitleBlock
@@ -11,7 +11,7 @@ class ContactCardBlock(blocks.StructBlock):
     role = blocks.CharBlock(label=_("Role"), max_length=255)
     organization = blocks.CharBlock(label=_("Organization"), max_length=255)
     contact_info = blocks.CharBlock(label=_("Contact info"), max_length=500, required=False)
-    image = ImageChooserBlock(label="Image")
+    image = ImageBlock(label="Image")
 
     class Meta:
         icon = "user"

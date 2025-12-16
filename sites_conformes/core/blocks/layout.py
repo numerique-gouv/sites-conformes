@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
 from wagtail import blocks
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock
 from wagtailmarkdown.blocks import MarkdownBlock
 
 from sites_conformes.core.constants import (
@@ -214,7 +214,7 @@ class MultiColumnsBlock(CommonStreamBlock):
 
 
 class MultiColumnsWithTitleBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageBlock(label=_("Background image"), required=False)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
@@ -263,7 +263,7 @@ class FullWidthBlock(CommonStreamBlock):
 
 
 class FullWidthBackgroundBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageBlock(label=_("Background image"), required=False)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
@@ -312,7 +312,7 @@ class SideMenuBlock(blocks.StreamBlock):
 
 
 class FullWidthBackgroundWithSidemenuBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageBlock(label=_("Background image"), required=False)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
