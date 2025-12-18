@@ -171,6 +171,7 @@ class ImageAndTextBlock(blocks.StructBlock):
             ("6", "6/12"),
         ],
         default="3",
+        help_text=_("Defines the width of the image relative to the text, based on a 12-column grid."),
     )
     text = blocks.RichTextBlock(label=_("Rich text"))
     link = SingleLinkBlock(
@@ -206,9 +207,13 @@ class CenteredImageBlock(blocks.StructBlock):
         default="h3",
         help_text=_("Adapt to the page layout. Defaults to heading 3."),
     )
-    image = ImageBlock(label=_("Image"))
+    image = ImageBlock(label=_("Image"), help_text=_("Recommended minimum size: 900x600 pixels"))
     alt = blocks.CharBlock(
         label=_("Alternative text (textual description of the image)"),
+        help_text=_(
+            "This field is obsolete and will be removed in the near future. "
+            "Please use the alt field of the image itself."
+        ),
         required=False,
     )
     width = blocks.ChoiceBlock(
@@ -216,12 +221,20 @@ class CenteredImageBlock(blocks.StructBlock):
         choices=MEDIA_WIDTH_CHOICES,
         required=False,
         default="",
+        help_text=_(
+            "Allows you to adjust the width of the image on the page. "
+            "In ‘large’ mode, the image occupies the entire available width."
+        ),
     )
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
         choices=IMAGE_RATIOS,
         required=False,
         default="h3",
+        help_text=_(
+            "Image ratio is the ratio between width and height of the image. "
+            "By changing it, you can adjust the image display (square, horizontal or vertical)"
+        ),
     )
     caption = blocks.CharBlock(label=_("Caption"), required=False)
     url = blocks.URLBlock(label=_("Link"), required=False)
