@@ -246,7 +246,11 @@ class CenteredImageBlock(blocks.StructBlock):
 
 
 class QuoteBlock(blocks.StructBlock):
-    image = ImageBlock(label=_("Image"), required=False)
+    image = ImageBlock(
+        label=_("Image"),
+        required=False,
+        help_text=_("Optional image of the author. The image will be adjusted to a square format (1:1) of 184px."),
+    )
     quote = blocks.CharBlock(label=_("Quote"))
     author_name = blocks.CharBlock(label=_("Author name"), required=False)
     author_title = blocks.CharBlock(label=_("Author title"), required=False)
