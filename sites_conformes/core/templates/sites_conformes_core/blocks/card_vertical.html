@@ -49,7 +49,7 @@
   </div>
   <div class="fr-card__header">
     {% if value.image %}
-      <div class="fr-card__img">{% image value.image width-1200 class=value.image_classes alt="" %}</div>
+      <div class="fr-card__img">{% picture value.image width-1200 format-{avif,webp,jpeg} preserve-svg class=value.image_classes alt="" %}</div>
       {% if value.image_badge %}
         <ul class="fr-badges-group">
           {% for badge in value.image_badge %}
