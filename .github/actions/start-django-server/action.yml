@@ -1,0 +1,24 @@
+name: Start Django Server
+description: Start Django dev server and wait for it to be ready
+
+inputs:
+  base-url:
+    description: "URL to poll for readiness"
+    required: false
+    default: "http://127.0.0.1:8000"
+  timeout:
+    description: "Milliseconds to wait (passed to wait-on)"
+    required: false
+    default: "30000"
+
+runs:
+  using: composite
+  steps:
+    - name: Run server
+      shell: bash
+      # Debug is required to get media working
+      run: DEBUG=True uv run python manage.py runserver 127.0.0.1:8000 &
+
+    - name: Wait for server to be ready
+      shell: bash
+      run: npx wait-on ${{ inputs.base-url }} --timeout ${{ inputs.timeout }}
