@@ -17,7 +17,15 @@ from sites_conformes.core.services.accessors import (
 from sites_conformes.core.utils import get_default_site, import_image
 from sites_conformes.forms.models import FormField, FormPage
 
-ALL_ALLOWED_SLUGS = ["blog_index", "publications", "menu_page", "form", "common_blocks", "hero_blocks", "image_examples"]
+ALL_ALLOWED_SLUGS = [
+    "blog_index",
+    "publications",
+    "menu_page",
+    "form",
+    "common_blocks",
+    "hero_blocks",
+    "image_examples",
+]
 
 fake = Faker("fr_FR")
 
