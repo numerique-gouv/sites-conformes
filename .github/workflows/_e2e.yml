@@ -1,0 +1,136 @@
+name: End-to-end test job
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      compare:
+        required: true
+        type: boolean
+
+env:
+  DJANGO_SETTINGS_MODULE: config.settings_test
+  SCREENSHOTS_BASE_PATH: __screenshots__
+
+jobs:
+  end-to-end:
+    name: Playwright (${{ inputs.ref }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: dju
+          POSTGRES_PASSWORD: djpwd
+          POSTGRES_DB: djdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 1s
+          --health-timeout 5s
+          --health-retries 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      # When running against main, overlay current-branch test files so both
+      # baseline and comparison jobs use the same test definitions.
+      - name: Checkout E2E files from PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          sparse-checkout: |
+            playwright.config.ts
+            pyproject.toml
+            e2e/
+            .github/
+            .env.test
+            justfile
+            scripts/
+          path: __e2e_overlay__
+
+      - name: Overlay E2E files onto working tree
+        shell: bash
+        run: |
+          shopt -s dotglob
+          cp -r __e2e_overlay__/* .
+          rm -rf __e2e_overlay__
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install Python dependencies
+        run: uv sync --no-group dev
+
+      - name: Copy .env.test to .env
+        run: cp .env.test .env
+
+      - name: Collect static files
+        run: just collectstatic
+
+      - name: Deploy starter content + demo pages
+        run: |
+          just init
+          uv run python manage.py create_demo_pages
+
+      - name: Setup E2E tools
+        uses: ./.github/actions/setup-e2e
+
+      - name: Start Django server
+        uses: ./.github/actions/start-django-server
+
+      - name: Download baseline screenshots
+        if: inputs.compare
+        uses: actions/download-artifact@v4
+        with:
+          name: regression-screenshots
+          path: ${{ env.SCREENSHOTS_BASE_PATH }}
+
+      - name: Run Playwright tests (full suite + generate snapshots)
+        if: ${{ !inputs.compare }}
+        run: npx playwright test --update-snapshots
+
+      - name: Run Playwright tests (regression comparison only)
+        if: inputs.compare
+        run: npx playwright test --grep=@regression
+
+      - name: Upload baseline screenshots
+        if: ${{ !inputs.compare }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-screenshots
+          path: ${{ env.SCREENSHOTS_BASE_PATH }}
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() && !inputs.compare }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload diff images on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-diffs
+          path: |
+            **/*-expected.png
+            **/*-actual.png
+            **/*-diff.png
+
+permissions:
+  contents: read
