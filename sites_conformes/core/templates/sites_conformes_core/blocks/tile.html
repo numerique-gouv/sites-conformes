@@ -52,7 +52,7 @@
           </svg>
         </div>
       {% else %}
-        <div class="fr-tile__img">{% image value.image width-80 alt="" %}</div>
+        <div class="fr-tile__img">{% picture value.image width-80 format-{avif,webp,jpeg} preserve-svg alt="" %}</div>
       {% endif %}
     </div>
   {% endif %}

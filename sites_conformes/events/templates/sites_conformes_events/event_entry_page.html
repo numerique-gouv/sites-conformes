@@ -138,8 +138,7 @@
       <div class="fr-card__header">
         <div class="fr-card__img">
           {% if page.cover %}
-            {% image page.cover width-450 as header_image %}
-            <img class="fr-responsive-img" src="{{ header_image.url}}" alt="" />
+            {% picture page.cover width-450 format-{avif,webp,jpeg} preserve-svg class="fr-responsive-img" alt="" %}
           {% else %}
             <img class="fr-responsive-img"
                  src="{% static 'dsfr/dist/artwork/pictograms/digital/calendar.svg' %}"
