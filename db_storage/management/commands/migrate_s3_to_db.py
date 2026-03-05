@@ -1,11 +1,10 @@
 import mimetypes
 
 import boto3
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import models
-from wagtail.fields import RichTextField, StreamField
-from wagtail.models import Page, Revision
+from wagtail.fields import RichTextField
+from wagtail.models import Revision
 
 from db_storage.models import StoredFile
 
@@ -58,9 +57,9 @@ class Command(BaseCommand):
         if not skip_urls:
             self._update_urls(s3_base_url, dry_run)
 
-    # ──────────────────────────────────────────────
+    # ─────────────────────────────────────
     # S3 configuration helpers
-    # ──────────────────────────────────────────────
+    # ─────────────────────────────────────
 
     def _get_s3_config(self):
         """Read S3 configuration from environment (same vars as settings.py)."""
@@ -103,9 +102,9 @@ class Command(BaseCommand):
             region_name=s3_config["region_name"],
         )
 
-    # ──────────────────────────────────────────────
+    # ─────────────────────────────────────
     # Step 1: Transfer files from S3 → StoredFile
-    # ──────────────────────────────────────────────
+    # ─────────────────────────────────────
 
     def _transfer_files(self, s3_config, dry_run):
         self.stdout.write(self.style.MIGRATE_HEADING("Step 1: Transferring files from S3 to database..."))
@@ -172,9 +171,7 @@ class Command(BaseCommand):
         self.stdout.write("")
         if dry_run:
             self.stdout.write(
-                self.style.SUCCESS(
-                    f"  [DRY RUN] Would transfer {transferred} file(s), {skipped} already in DB."
-                )
+                self.style.SUCCESS(f"  [DRY RUN] Would transfer {transferred} file(s), {skipped} already in DB.")
             )
         else:
             msg = f"  Transferred {transferred} file(s), {skipped} skipped (already in DB)."
@@ -183,9 +180,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(msg))
         self.stdout.write("")
 
-    # ──────────────────────────────────────────────
+    # ─────────────────────────────────────
     # Step 2: Update hardcoded S3 URLs in content
-    # ──────────────────────────────────────────────
+    # ─────────────────────────────────────
 
     def _update_urls(self, s3_base_url, dry_run):
         self.stdout.write(self.style.MIGRATE_HEADING("Step 2: Updating hardcoded S3 URLs in content..."))
@@ -261,16 +258,11 @@ class Command(BaseCommand):
                     new_value = old_value.replace(s3_base_url, "/db-storage/serve?name=")
 
                     if dry_run:
-                        self.stdout.write(
-                            f"  [DRY RUN] Would update {model_name}.{field_name} "
-                            f"(pk={obj.pk})"
-                        )
+                        self.stdout.write(f"  [DRY RUN] Would update {model_name}.{field_name} " f"(pk={obj.pk})")
                     else:
                         setattr(obj, field_name, new_value)
                         obj.save(update_fields=[field_name])
-                        self.stdout.write(
-                            f"  Updated {model_name}.{field_name} (pk={obj.pk})"
-                        )
+                        self.stdout.write(f"  Updated {model_name}.{field_name} (pk={obj.pk})")
                     updates += 1
 
         # Also scan RichTextField content on live pages
@@ -305,16 +297,11 @@ class Command(BaseCommand):
                     new_value = old_value.replace(s3_base_url, "/db-storage/serve?name=")
 
                     if dry_run:
-                        self.stdout.write(
-                            f"  [DRY RUN] Would update {model_name}.{field_name} "
-                            f"(pk={obj.pk})"
-                        )
+                        self.stdout.write(f"  [DRY RUN] Would update {model_name}.{field_name} " f"(pk={obj.pk})")
                     else:
                         setattr(obj, field_name, new_value)
                         obj.save(update_fields=[field_name])
-                        self.stdout.write(
-                            f"  Updated {model_name}.{field_name} (pk={obj.pk})"
-                        )
+                        self.stdout.write(f"  Updated {model_name}.{field_name} (pk={obj.pk})")
                     updates += 1
 
         return updates

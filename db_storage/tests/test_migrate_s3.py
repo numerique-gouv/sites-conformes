@@ -2,9 +2,16 @@ from unittest.mock import MagicMock, patch
 
 from django.core.management import call_command
 from django.test import TestCase
-from wagtail.models import Revision
 
 from db_storage.models import StoredFile
+
+S3_ENV = {
+    "S3_HOST": "s3.example.com",
+    "S3_BUCKET_NAME": "bucket",
+    "S3_KEY_ID": "k",
+    "S3_KEY_SECRET": "s",
+    "S3_LOCATION": "media",
+}
 
 
 class MigrateS3ToDbCommandTestCase(TestCase):
@@ -32,7 +39,7 @@ class MigrateS3ToDbCommandTestCase(TestCase):
             call_command("migrate_s3_to_db", "--skip-urls")
 
     @patch("db_storage.management.commands.migrate_s3_to_db.boto3")
-    @patch.dict("os.environ", {"S3_HOST": "s3.example.com", "S3_BUCKET_NAME": "bucket", "S3_KEY_ID": "k", "S3_KEY_SECRET": "s", "S3_LOCATION": "media"})
+    @patch.dict("os.environ", S3_ENV)
     def test_transfer_files_dry_run(self, mock_boto3):
         """Dry run should not create StoredFile entries."""
         mock_client = MagicMock()
@@ -54,7 +61,7 @@ class MigrateS3ToDbCommandTestCase(TestCase):
         self.assertEqual(StoredFile.objects.count(), 0)
 
     @patch("db_storage.management.commands.migrate_s3_to_db.boto3")
-    @patch.dict("os.environ", {"S3_HOST": "s3.example.com", "S3_BUCKET_NAME": "bucket", "S3_KEY_ID": "k", "S3_KEY_SECRET": "s", "S3_LOCATION": "media"})
+    @patch.dict("os.environ", S3_ENV)
     def test_transfer_files(self, mock_boto3):
         """Files should be transferred from S3 to StoredFile."""
         mock_client = MagicMock()
@@ -84,7 +91,7 @@ class MigrateS3ToDbCommandTestCase(TestCase):
         self.assertEqual(stored.size, 4)
 
     @patch("db_storage.management.commands.migrate_s3_to_db.boto3")
-    @patch.dict("os.environ", {"S3_HOST": "s3.example.com", "S3_BUCKET_NAME": "bucket", "S3_KEY_ID": "k", "S3_KEY_SECRET": "s", "S3_LOCATION": "media"})
+    @patch.dict("os.environ", S3_ENV)
     def test_skip_existing_files(self, mock_boto3):
         """Already existing StoredFile entries should be skipped."""
         StoredFile.objects.create(
