@@ -16,13 +16,14 @@ urlpatterns = [
     path("sitemap.xml", sitemap, name="xml_sitemap"),
     path(settings.WAGTAILADMIN_PATH, include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
+    path("db-storage/", include("db_storage.urls")),
     path("api/v2/", api_router.urls),
     path("favicon.ico", RedirectView.as_view(url="/static/dsfr/dist/favicon/favicon.ico", permanent=True)),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=getattr(settings, "MEDIA_ROOT", ""))
 
 # Only add this on a dev machine, outside of tests
 if not settings.TESTING and settings.DEBUG and "localhost" in settings.HOST_URL:
