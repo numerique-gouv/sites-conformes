@@ -154,10 +154,10 @@ class ImageAndTextBlock(blocks.StructBlock):
     image = ImageBlock(
         label=_("Image"),
         help_text=_("""The recommended image size depends on the width of the image selected below:<br>
-- 3 columns: 270 × 175 px<br>
-- 4 columns: 360 × 233 px<br>
-- 5 columns: 450 × 292 px<br>
-- 6 columns: 540 × 350 px<br>
+- 3 columns: 238 × 158 px<br>
+- 4 columns: 336 × 224 px<br>
+- 5 columns: 434 × 289 px<br>
+- 6 columns: 532 × 354 px<br>
 💡 Tip: choose a slightly larger image to avoid blurring when resizing."""),
     )
     image_side = blocks.ChoiceBlock(
