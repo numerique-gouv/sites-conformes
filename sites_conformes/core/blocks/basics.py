@@ -1,7 +1,8 @@
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES_ILLUSTRATION, IMAGE_RATIOS
 from wagtail import blocks
-from wagtail.blocks import StructValue
+from wagtail.blocks import StructBlockValidationError, StructValue
 from wagtail.images import get_image_model
 from wagtail.snippets.blocks import SnippetChooserBlock
 
@@ -153,7 +154,7 @@ class HighlightBlock(blocks.StructBlock):
 class ImageAndTextBlock(blocks.StructBlock):
     image = CustomImageBlock(
         label=_("Image"),
-        help_text=_("""The recommended image size depends on the width of the image selected below:<br>
+        help_text=_("""Recommended image size depends on the width of the image selected below:<br>
 - 3/12: 238 × 158 px<br>
 - 4/12: 336 × 224 px<br>
 - 5/12: 434 × 289 px<br>
@@ -215,7 +216,13 @@ class CenteredImageBlock(blocks.StructBlock):
         default="h3",
         help_text=_("Adapt to the page layout. Defaults to heading 3."),
     )
-    image = CustomImageBlock(label=_("Image"), help_text=_("Recommended minimum size: 900x600 pixels"))
+    image = CustomImageBlock(
+        label=_("Image"),
+        help_text=_("""Recommended width: minimum 900 px.<br>
+            Then adjust the image width according to the option selected below: 
+            900 px (small), 1200 px (medium) or 1500 px (large), 
+            and depending on the image ratio."""),
+    )
     alt = blocks.CharBlock(
         label=_("Alternative text (textual description of the image)"),
         help_text=_(
@@ -246,6 +253,23 @@ class CenteredImageBlock(blocks.StructBlock):
     )
     caption = blocks.CharBlock(label=_("Caption"), required=False)
     url = blocks.URLBlock(label=_("Link"), required=False)
+
+    def clean(self, value):
+        value = super().clean(value)
+
+        if value.get("alt"):
+            raise StructBlockValidationError(
+                block_errors={
+                    "alt": ValidationError(
+                        _(
+                            "This field is obsolete and will be removed in the near future. "
+                            "Please use the alt field of the image itself."
+                        )
+                    )
+                }
+            )
+
+        return value
 
     class Meta:
         icon = "image"
