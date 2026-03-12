@@ -18,7 +18,7 @@ from sites_conformes.core.constants import (
 from .basics import TextContentAllAlignments, TextContentLeftRight, TextContentVerticalAlignments
 from .buttons_links import ButtonBlock, ButtonsHorizontalListBlock
 from .layout import BackgroundColorChoiceBlock, LayoutBlock
-from .medias import CustomImageBlock, ImageBlockWithDefault
+from .medias import ImageBlock, ImageBlockWithDefault
 
 
 class HeroImageStructValue(StructValue):
@@ -234,7 +234,7 @@ class OldHero(blocks.StructBlock):
         label=_("Show title in header image?"),
         required=False,
     )
-    header_image = CustomImageBlock(label=_("Header image"), required=False)
+    header_image = ImageBlock(label=_("Header image"), required=False)
     header_color_class = blocks.ChoiceBlock(
         label=_("Background color"),
         choices=COLOR_CHOICES,

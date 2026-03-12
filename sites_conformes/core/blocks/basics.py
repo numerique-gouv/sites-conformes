@@ -3,6 +3,7 @@ from dsfr.constants import COLOR_CHOICES_ILLUSTRATION, IMAGE_RATIOS
 from wagtail import blocks
 from wagtail.blocks import StructValue
 from wagtail.images import get_image_model
+from wagtail.images.blocks import ImageBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.blocks.badges_tags import TagListBlock
@@ -24,7 +25,6 @@ from .buttons_links import (
     LinkWithoutLabelBlock,
     SingleLinkBlock,
 )
-from .medias import CustomImageBlock
 
 Image = get_image_model()
 
@@ -151,13 +151,13 @@ class HighlightBlock(blocks.StructBlock):
 
 
 class ImageAndTextBlock(blocks.StructBlock):
-    image = CustomImageBlock(
+    image = ImageBlock(
         label=_("Image"),
         help_text=_("""The recommended image size depends on the width of the image selected below:<br>
-- 3/12: 238 × 158 px<br>
-- 4/12: 336 × 224 px<br>
-- 5/12: 434 × 289 px<br>
-- 6/12: 532 × 354 px<br>
+- 3 columns: 238 × 158 px<br>
+- 4 columns: 336 × 224 px<br>
+- 5 columns: 434 × 289 px<br>
+- 6 columns: 532 × 354 px<br>
 💡 Tip: choose a slightly larger image to avoid blurring when resizing."""),
     )
     image_side = blocks.ChoiceBlock(
@@ -215,7 +215,7 @@ class CenteredImageBlock(blocks.StructBlock):
         default="h3",
         help_text=_("Adapt to the page layout. Defaults to heading 3."),
     )
-    image = CustomImageBlock(label=_("Image"), help_text=_("Recommended minimum size: 900x600 pixels"))
+    image = ImageBlock(label=_("Image"), help_text=_("Recommended minimum size: 900x600 pixels"))
     alt = blocks.CharBlock(
         label=_("Alternative text (textual description of the image)"),
         help_text=_(
@@ -254,7 +254,7 @@ class CenteredImageBlock(blocks.StructBlock):
 
 
 class QuoteBlock(blocks.StructBlock):
-    image = CustomImageBlock(
+    image = ImageBlock(
         label=_("Image"),
         required=False,
         help_text=_("Optional image of the author. The image will be adjusted to a square format (1:1) of 184px."),
@@ -398,7 +398,7 @@ class VerticalContactCardBlock(blocks.StructBlock):
     role = blocks.CharBlock(label=_("Role"), max_length=255, required=False)
     organization = blocks.CharBlock(label=_("Organization"), max_length=255, required=False)
     contact_info = blocks.CharBlock(label=_("Contact info"), max_length=500, required=False)
-    image = CustomImageBlock(label="Image", required=False)
+    image = ImageBlock(label="Image", required=False)
     tags = TagListBlock(label=_("Tags"), required=False)
 
     class Meta:

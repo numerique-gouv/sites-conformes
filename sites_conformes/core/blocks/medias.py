@@ -12,10 +12,13 @@ Image = get_image_model()
 
 
 ## Image
-
-
-class CustomImageBlock(ImageBlock):
-    def __init__(self, *args, **kwargs):
+class ImageBlockWithDefault(ImageBlock):
+    def __init__(
+        self, *args, default_image_title=None, default_image_decorative=True, default_image_alt_text="", **kwargs
+    ):
+        self._default_image_title = default_image_title
+        self._default_image_alt_text = default_image_alt_text
+        self._default_image_decorative = default_image_decorative
         super().__init__(*args, **kwargs)
 
         if "decorative" in self.child_blocks:
@@ -27,16 +30,6 @@ class CustomImageBlock(ImageBlock):
                 "Used by screen readers if the image is not marked as decorative."
                 "Describe the content or purpose of the image in a short, clear sentence."
             )
-
-
-class ImageBlockWithDefault(CustomImageBlock):
-    def __init__(
-        self, *args, default_image_title=None, default_image_decorative=True, default_image_alt_text="", **kwargs
-    ):
-        self._default_image_title = default_image_title
-        self._default_image_alt_text = default_image_alt_text
-        self._default_image_decorative = default_image_decorative
-        super().__init__(*args, **kwargs)
 
     def get_default(self):
         if self._default_image_title:
