@@ -137,11 +137,20 @@ class CardBlock(blocks.StructBlock):
 
 
 class HorizontalCardBlock(CardBlock):
+    image = CustomImageBlock(
+        label=_("Image"),
+        required=False,
+        help_text=_("""Recommended width according to the chosen ratio: <br>
+                    - 50/50: 599 × 336 px <br>
+                    - 1/3: 399 × 224 px <br>
+                    Adjust the width if necessary depending on the display format.
+        """),
+    )
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
         choices=HORIZONTAL_CARD_IMAGE_RATIOS,
         required=False,
-        default="h3",
+        default="fr-card--horizontal-half",
     )
     bottom_detail_text = blocks.CharBlock(
         label=_("Bottom detail: text"),
@@ -159,6 +168,16 @@ class HorizontalCardBlock(CardBlock):
 
 
 class VerticalCardBlock(CardBlock):
+    image = CustomImageBlock(
+        label=_("Image"),
+        required=False,
+        help_text=_(
+            "Recommended width: minimum 1200 px. "
+            "This width corresponds to a single-column layout (the widest)."
+            "The ideal width decreases if you use multiple columns."
+        ),
+    )
+
     class Meta:
         icon = "tablet-alt"
         template = "sites_conformes_core/blocks/card_vertical.html"
