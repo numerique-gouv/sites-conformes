@@ -1,7 +1,6 @@
 import mimetypes
 import os
 import posixpath
-from io import BytesIO
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import Storage
