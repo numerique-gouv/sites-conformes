@@ -22,7 +22,7 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-] + static(settings.MEDIA_URL, document_root=getattr(settings, "MEDIA_ROOT", ""))
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Only add this on a dev machine, outside of tests
 if not settings.TESTING and settings.DEBUG and "localhost" in settings.HOST_URL:
