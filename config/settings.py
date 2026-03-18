@@ -109,9 +109,11 @@ INSTALLED_APPS = [
     "menus",
     "wagtail_honeypot",
     "dashboard",
-    "db_storage",
     "wagtail.admin",
 ]
+
+if SF_USE_DB_STORAGE:
+    INSTALLED_APPS.insert(-1, "db_storage")
 
 if SF_USE_WHITENOISE:
     INSTALLED_APPS.insert(0, "whitenoise.runserver_nostatic")
