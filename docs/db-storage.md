@@ -6,11 +6,11 @@ Sur les plateformes PaaS (Scalingo, Heroku, Clever Cloud) ou les déploiements D
 
 Sites Conformes propose trois backends de stockage pour les médias :
 
-| Priorité | Backend | Variable d'activation | Cas d'usage |
-|----------|---------|----------------------|-------------|
-| 1 | **S3** (Object Storage) | `S3_HOST` | Production avec stockage S3 compatible |
-| 2 | **PostgreSQL** (DB Storage) | `SF_USE_DB_STORAGE=1` | PaaS sans S3, Docker, Plesk |
-| 3 | **Système de fichiers** | _(par défaut)_ | Développement local |
+| Backend | Variable d'activation | Cas d'usage |
+|---------|----------------------|-------------|
+| **Système de fichiers** | _(par défaut)_ | Développement local, VPS, hébergement dédié |
+| **S3** (Object Storage) | `S3_HOST` | Production avec stockage S3 compatible |
+| **PostgreSQL** (DB Storage) | `SF_USE_DB_STORAGE=1` | PaaS sans S3, Docker, Plesk |
 
 > **⚠️ Ce mode de stockage n'est pas recommandé au-delà de 1 Go de médias.**
 > Pour les sites avec beaucoup d'images ou de documents, préférez un stockage S3 compatible.
