@@ -12,6 +12,10 @@ Sites Conformes propose trois backends de stockage pour les médias :
 | 2 | **PostgreSQL** (DB Storage) | `SF_USE_DB_STORAGE=1` | PaaS sans S3, Docker, Plesk |
 | 3 | **Système de fichiers** | _(par défaut)_ | Développement local |
 
+> **⚠️ Ce mode de stockage n'est pas recommandé au-delà de 1 Go de médias.**
+> Pour les sites avec beaucoup d'images ou de documents, préférez un stockage S3 compatible.
+> Au-delà de cette limite, les performances se dégradent (temps de réponse, sauvegardes, consommation mémoire).
+
 ## Activation
 
 Ajoutez dans votre fichier `.env` :
@@ -86,9 +90,35 @@ python manage.py migrate_files_to_db
 Options :
 - `--dry-run` : simule la migration sans modifier la base
 
+## Migration depuis la DB vers S3
+
+Si votre volume de médias dépasse 1 Go ou que vous souhaitez passer à S3 :
+
+```bash
+python manage.py migrate_db_to_s3
+```
+
+Cette commande :
+- Lit tous les fichiers stockés dans la table `StoredFile`
+- Les uploade vers le bucket S3 configuré dans votre `.env`
+- Ignore les fichiers déjà présents sur S3 (par nom)
+
+Options :
+```bash
+# Simulation sans modification
+python manage.py migrate_db_to_s3 --dry-run
+```
+
+Après la migration, modifiez votre `.env` pour désactiver le DB storage :
+```env
+SF_USE_DB_STORAGE=0
+S3_HOST=s3.example.com
+# ... autres variables S3
+```
+
 ## Limitations
 
-- **Performance** : Le stockage en base est plus lent que S3 ou le système de fichiers pour les gros volumes. Adapté aux sites avec un volume modéré de médias (quelques centaines de fichiers, moins de 500 Mo).
+- **Volume maximum recommandé : 1 Go.** Au-delà, les performances se dégradent sensiblement (temps de réponse, sauvegardes, consommation mémoire). Préférez S3 pour les sites avec beaucoup de médias.
 - **Taille de la base** : Les fichiers augmentent la taille de la base PostgreSQL et donc des sauvegardes.
 - **Pas de CDN** : Contrairement au S3, les fichiers ne bénéficient pas d'un CDN. Le header `Cache-Control` permet toutefois la mise en cache côté navigateur.
 
@@ -102,5 +132,6 @@ db_storage/
 ├── urls.py       # Route /db-storage/serve/
 └── management/commands/
     ├── migrate_files_to_db.py  # Migration filesystem → DB
-    └── migrate_s3_to_db.py     # Migration S3 → DB
+    ├── migrate_s3_to_db.py     # Migration S3 → DB
+    └── migrate_db_to_s3.py     # Migration DB → S3
 ```

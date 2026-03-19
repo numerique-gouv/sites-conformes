@@ -60,6 +60,7 @@ SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 
 # Allow storing media files in PostgreSQL instead of the filesystem (disabled by default)
 # Useful for PaaS deployments with ephemeral filesystems (Scalingo, Heroku, etc.)
+# /!\ Not recommended beyond 1 GB of media — prefer S3 for larger volumes.
 # Priority: S3 > DB Storage > FileSystem
 SF_USE_DB_STORAGE = getenv_bool("SF_USE_DB_STORAGE", False)
 
