@@ -14,7 +14,7 @@ class TopMenu(TranslatableMixin, models.Model):
     The menu in the top right corner of a site.
     """
 
-    site = models.OneToOneField(
+    site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
         verbose_name=_("Site"),
@@ -30,7 +30,7 @@ class TopMenu(TranslatableMixin, models.Model):
     )
     help_panel_content = [
         _("The top menu of the website, displayed in the top right corner."),
-        _("There can only be one top menu per site."),
+        _("There can only be one top menu per site and per locale."),
         _("It can contain up to three links."),
     ]
     panels = [
@@ -42,6 +42,7 @@ class TopMenu(TranslatableMixin, models.Model):
     class Meta(TranslatableMixin.Meta):
         verbose_name = _("Top menu")
         verbose_name_plural = _("Top menus")
+        unique_together = [*TranslatableMixin.Meta.unique_together, ("site", "locale")]
 
     def __str__(self):
         return _("Top menu for site {hostname}").format(hostname=self.site.hostname)
@@ -53,7 +54,7 @@ class FooterBottomMenu(TranslatableMixin, models.Model):
     This menu contains the legal links: Terms of Service, Privacy Policy, etc.
     """
 
-    site = models.OneToOneField(
+    site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
         verbose_name=_("Site"),
@@ -69,7 +70,7 @@ class FooterBottomMenu(TranslatableMixin, models.Model):
 
     help_panel_content = [
         _("The footer bottom menu of the website, displayed at the bottom of the footer."),
-        _("There can only be one footer bottom menu per site."),
+        _("There can only be one footer bottom menu per site and per locale."),
         _("This menu contains the legal links: Terms of Service, Privacy Policy, etc."),
     ]
     panels = [
@@ -81,6 +82,7 @@ class FooterBottomMenu(TranslatableMixin, models.Model):
     class Meta(TranslatableMixin.Meta):
         verbose_name = _("Footer bottom menu")
         verbose_name_plural = _("Footer bottom menus")
+        unique_together = [*TranslatableMixin.Meta.unique_together, ("site", "locale")]
 
     def __str__(self):
         return _("Footer bottom menu for site {hostname}").format(hostname=self.site.hostname)
@@ -91,7 +93,7 @@ class MainMenu(TranslatableMixin, models.Model):
     The main menu of a site.
     """
 
-    site = models.OneToOneField(
+    site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
         verbose_name=_("Site"),
@@ -108,7 +110,7 @@ class MainMenu(TranslatableMixin, models.Model):
 
     help_panel_content = [
         _("The main menu of the website, displayed in the main navigation area."),
-        _("There can only be one main menu per site."),
+        _("There can only be one main menu per site and per locale."),
         _("It can contain links, submenus, and mega menus."),
         _("It is recommended to avoid mixing submenus and mega menus."),
     ]
@@ -121,6 +123,7 @@ class MainMenu(TranslatableMixin, models.Model):
     class Meta(TranslatableMixin.Meta):
         verbose_name = _("Main menu")
         verbose_name_plural = _("Main menus")
+        unique_together = [*TranslatableMixin.Meta.unique_together, ("site", "locale")]
 
     def __str__(self):
         return _("Main menu for site {hostname}").format(hostname=self.site.hostname)

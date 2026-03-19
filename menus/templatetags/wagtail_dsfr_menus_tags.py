@@ -1,6 +1,6 @@
 from django import template
 from django.template.context import Context
-from wagtail.models import Site
+from wagtail.models import Locale, Site
 
 from menus.models import FooterBottomMenu, MainMenu, TopMenu
 
@@ -15,7 +15,8 @@ def top_menu(context: Context) -> dict:
     request = context.get("request", None)
     site = Site.find_for_request(request)
 
-    top_menu = TopMenu.objects.filter(site=site).first()
+    locale = Locale.get_active()
+    top_menu = TopMenu.objects.filter(site=site, locale=locale).first() or TopMenu.objects.filter(site=site).first()
 
     current_page = context.get("page", None)
 
@@ -30,7 +31,11 @@ def footer_bottom_menu(context: Context) -> dict:
     request = context.get("request", None)
     site = Site.find_for_request(request)
 
-    footer_bottom_menu = FooterBottomMenu.objects.filter(site=site).first()
+    locale = Locale.get_active()
+    footer_bottom_menu = (
+        FooterBottomMenu.objects.filter(site=site, locale=locale).first()
+        or FooterBottomMenu.objects.filter(site=site).first()
+    )
 
     current_page = context.get("page", None)
 
@@ -45,7 +50,8 @@ def main_menu(context: Context) -> dict:
     request = context.get("request", None)
     site = Site.find_for_request(request)
 
-    main_menu = MainMenu.objects.filter(site=site).first()
+    locale = Locale.get_active()
+    main_menu = MainMenu.objects.filter(site=site, locale=locale).first() or MainMenu.objects.filter(site=site).first()
 
     current_page = context.get("page", None)
 
