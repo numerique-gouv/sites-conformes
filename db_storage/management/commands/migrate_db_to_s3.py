@@ -68,9 +68,7 @@ class Command(BaseCommand):
     # ─────────────────────────────────────
 
     def _transfer_files(self, s3_config, dry_run):
-        self.stdout.write(
-            self.style.MIGRATE_HEADING("Transferring files from database to S3...")
-        )
+        self.stdout.write(self.style.MIGRATE_HEADING("Transferring files from database to S3..."))
 
         client = self._get_s3_client(s3_config)
         bucket = s3_config["bucket_name"]
@@ -104,9 +102,7 @@ class Command(BaseCommand):
 
             if dry_run:
                 size_kb = stored_file.size / 1024 if stored_file.size else 0
-                self.stdout.write(
-                    f"  [DRY RUN] Would upload: {stored_file.name} ({size_kb:.1f} KB)"
-                )
+                self.stdout.write(f"  [DRY RUN] Would upload: {stored_file.name} ({size_kb:.1f} KB)")
                 transferred += 1
                 continue
 
@@ -123,23 +119,15 @@ class Command(BaseCommand):
 
             except Exception as e:
                 errors += 1
-                self.stderr.write(
-                    self.style.ERROR(f"  Error on {stored_file.name}: {e}")
-                )
+                self.stderr.write(self.style.ERROR(f"  Error on {stored_file.name}: {e}"))
 
         self.stdout.write("")
         if dry_run:
             self.stdout.write(
-                self.style.SUCCESS(
-                    f"  [DRY RUN] Would upload {transferred} file(s), "
-                    f"{skipped} already on S3."
-                )
+                self.style.SUCCESS(f"  [DRY RUN] Would upload {transferred} file(s), " f"{skipped} already on S3.")
             )
         else:
-            msg = (
-                f"  Uploaded {transferred} file(s), "
-                f"{skipped} skipped (already on S3)."
-            )
+            msg = f"  Uploaded {transferred} file(s), {skipped} skipped (already on S3)."
             if errors:
                 msg += f" {errors} error(s)."
             self.stdout.write(self.style.SUCCESS(msg))

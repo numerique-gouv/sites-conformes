@@ -60,12 +60,8 @@ class MigrateDbToS3CommandTestCase(TestCase):
 
         # Simulate file not existing on S3
         error_response = {"Error": {"Code": "404"}}
-        mock_client.exceptions.ClientError = type(
-            "ClientError", (Exception,), {}
-        )
-        mock_client.head_object.side_effect = (
-            mock_client.exceptions.ClientError(error_response, "HeadObject")
-        )
+        mock_client.exceptions.ClientError = type("ClientError", (Exception,), {})
+        mock_client.head_object.side_effect = mock_client.exceptions.ClientError(error_response, "HeadObject")
 
         call_command("migrate_db_to_s3")
 
