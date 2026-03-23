@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 16:18+0100\n"
+"POT-Creation-Date: 2026-03-23 16:30+0100\n"
 "PO-Revision-Date: 2025-05-13 12:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,6 +18,1023 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.4.2\n"
+
+msgid "$ZodError"
+msgstr ""
+
+msgid "ZodMiniType"
+msgstr ""
+
+msgid "ZodMiniString"
+msgstr ""
+
+msgid "ZodMiniStringFormat"
+msgstr ""
+
+msgid "ZodMiniNumber"
+msgstr ""
+
+msgid "ZodMiniBoolean"
+msgstr ""
+
+msgid "ZodMiniBigInt"
+msgstr ""
+
+msgid "ZodMiniDate"
+msgstr ""
+
+msgid "ZodMiniISODateTime"
+msgstr ""
+
+msgid "ZodMiniISODate"
+msgstr ""
+
+msgid "ZodMiniISOTime"
+msgstr ""
+
+msgid "ZodMiniISODuration"
+msgstr ""
+
+msgid "ZodISODateTime"
+msgstr ""
+
+msgid "ZodISODate"
+msgstr ""
+
+msgid "ZodISOTime"
+msgstr ""
+
+msgid "ZodISODuration"
+msgstr ""
+
+msgid "ZodError"
+msgstr ""
+
+msgid "ZodType"
+msgstr ""
+
+msgid "_ZodString"
+msgstr ""
+
+msgid "ZodString"
+msgstr ""
+
+msgid "ZodStringFormat"
+msgstr ""
+
+msgid "ZodEmail"
+msgstr ""
+
+msgid "ZodGUID"
+msgstr ""
+
+msgid "ZodUUID"
+msgstr ""
+
+msgid "ZodURL"
+msgstr ""
+
+msgid "ZodEmoji"
+msgstr ""
+
+msgid "ZodNanoID"
+msgstr ""
+
+msgid "ZodCUID"
+msgstr ""
+
+msgid "ZodCUID2"
+msgstr ""
+
+msgid "ZodULID"
+msgstr ""
+
+msgid "ZodXID"
+msgstr ""
+
+msgid "ZodKSUID"
+msgstr ""
+
+msgid "ZodIPv4"
+msgstr ""
+
+msgid "ZodMAC"
+msgstr ""
+
+msgid "ZodIPv6"
+msgstr ""
+
+msgid "ZodCIDRv4"
+msgstr ""
+
+msgid "ZodCIDRv6"
+msgstr ""
+
+msgid "ZodBase64"
+msgstr ""
+
+msgid "ZodBase64URL"
+msgstr ""
+
+msgid "ZodE164"
+msgstr ""
+
+msgid "ZodJWT"
+msgstr ""
+
+msgid "ZodCustomStringFormat"
+msgstr ""
+
+msgid "ZodNumber"
+msgstr ""
+
+msgid "ZodNumberFormat"
+msgstr ""
+
+msgid "ZodBoolean"
+msgstr ""
+
+msgid "ZodBigInt"
+msgstr ""
+
+msgid "ZodBigIntFormat"
+msgstr ""
+
+msgid "ZodSymbol"
+msgstr ""
+
+msgid "ZodUndefined"
+msgstr ""
+
+msgid "ZodNull"
+msgstr ""
+
+msgid "ZodAny"
+msgstr ""
+
+msgid "ZodUnknown"
+msgstr ""
+
+msgid "ZodNever"
+msgstr ""
+
+msgid "ZodVoid"
+msgstr ""
+
+msgid "ZodDate"
+msgstr ""
+
+msgid "ZodArray"
+msgstr ""
+
+msgid "ZodObject"
+msgstr ""
+
+msgid "ZodUnion"
+msgstr ""
+
+msgid "ZodXor"
+msgstr ""
+
+msgid "ZodDiscriminatedUnion"
+msgstr ""
+
+msgid "ZodIntersection"
+msgstr ""
+
+msgid "ZodTuple"
+msgstr ""
+
+msgid "ZodRecord"
+msgstr ""
+
+msgid "ZodMap"
+msgstr ""
+
+msgid "ZodSet"
+msgstr ""
+
+msgid "ZodEnum"
+msgstr ""
+
+msgid "ZodLiteral"
+msgstr ""
+
+msgid "ZodFile"
+msgstr ""
+
+msgid "ZodTransform"
+msgstr ""
+
+msgid "ZodOptional"
+msgstr ""
+
+msgid "ZodExactOptional"
+msgstr ""
+
+msgid "ZodNullable"
+msgstr ""
+
+msgid "ZodDefault"
+msgstr ""
+
+msgid "ZodPrefault"
+msgstr ""
+
+msgid "ZodNonOptional"
+msgstr ""
+
+msgid "ZodSuccess"
+msgstr ""
+
+msgid "ZodCatch"
+msgstr ""
+
+msgid "ZodNaN"
+msgstr ""
+
+msgid "ZodPipe"
+msgstr ""
+
+msgid "ZodCodec"
+msgstr ""
+
+msgid "ZodReadonly"
+msgstr ""
+
+msgid "ZodTemplateLiteral"
+msgstr ""
+
+msgid "ZodLazy"
+msgstr ""
+
+msgid "ZodPromise"
+msgstr ""
+
+msgid "ZodFunction"
+msgstr ""
+
+msgid "ZodCustom"
+msgstr ""
+
+msgid "arrayExpression"
+msgstr ""
+
+msgid "assignmentExpression"
+msgstr ""
+
+msgid "binaryExpression"
+msgstr ""
+
+msgid "interpreterDirective"
+msgstr ""
+
+msgid "directive"
+msgstr ""
+
+msgid "directiveLiteral"
+msgstr ""
+
+msgid "blockStatement"
+msgstr ""
+
+msgid "breakStatement"
+msgstr ""
+
+msgid "callExpression"
+msgstr ""
+
+msgid "catchClause"
+msgstr ""
+
+msgid "conditionalExpression"
+msgstr ""
+
+msgid "continueStatement"
+msgstr ""
+
+msgid "debuggerStatement"
+msgstr ""
+
+msgid "doWhileStatement"
+msgstr ""
+
+msgid "emptyStatement"
+msgstr ""
+
+msgid "expressionStatement"
+msgstr ""
+
+msgid "file"
+msgstr ""
+
+msgid "forInStatement"
+msgstr ""
+
+msgid "forStatement"
+msgstr ""
+
+msgid "functionDeclaration"
+msgstr ""
+
+msgid "functionExpression"
+msgstr ""
+
+msgid "identifier"
+msgstr ""
+
+msgid "ifStatement"
+msgstr ""
+
+msgid "labeledStatement"
+msgstr ""
+
+msgid "stringLiteral"
+msgstr ""
+
+msgid "numericLiteral"
+msgstr ""
+
+msgid "nullLiteral"
+msgstr ""
+
+msgid "booleanLiteral"
+msgstr ""
+
+msgid "regExpLiteral"
+msgstr ""
+
+msgid "logicalExpression"
+msgstr ""
+
+msgid "memberExpression"
+msgstr ""
+
+msgid "newExpression"
+msgstr ""
+
+msgid "program"
+msgstr ""
+
+msgid "objectExpression"
+msgstr ""
+
+msgid "objectMethod"
+msgstr ""
+
+msgid "objectProperty"
+msgstr ""
+
+msgid "restElement"
+msgstr ""
+
+msgid "returnStatement"
+msgstr ""
+
+msgid "sequenceExpression"
+msgstr ""
+
+msgid "parenthesizedExpression"
+msgstr ""
+
+msgid "switchCase"
+msgstr ""
+
+msgid "switchStatement"
+msgstr ""
+
+msgid "thisExpression"
+msgstr ""
+
+msgid "throwStatement"
+msgstr ""
+
+msgid "tryStatement"
+msgstr ""
+
+msgid "unaryExpression"
+msgstr ""
+
+msgid "updateExpression"
+msgstr ""
+
+msgid "variableDeclaration"
+msgstr ""
+
+msgid "variableDeclarator"
+msgstr ""
+
+msgid "whileStatement"
+msgstr ""
+
+msgid "withStatement"
+msgstr ""
+
+msgid "assignmentPattern"
+msgstr ""
+
+msgid "arrayPattern"
+msgstr ""
+
+msgid "arrowFunctionExpression"
+msgstr ""
+
+msgid "classBody"
+msgstr ""
+
+msgid "classExpression"
+msgstr ""
+
+msgid "classDeclaration"
+msgstr ""
+
+msgid "exportAllDeclaration"
+msgstr ""
+
+msgid "exportDefaultDeclaration"
+msgstr ""
+
+msgid "exportNamedDeclaration"
+msgstr ""
+
+msgid "exportSpecifier"
+msgstr ""
+
+msgid "forOfStatement"
+msgstr ""
+
+msgid "importDeclaration"
+msgstr ""
+
+msgid "importDefaultSpecifier"
+msgstr ""
+
+msgid "importNamespaceSpecifier"
+msgstr ""
+
+msgid "importSpecifier"
+msgstr ""
+
+msgid "importExpression"
+msgstr ""
+
+msgid "metaProperty"
+msgstr ""
+
+msgid "classMethod"
+msgstr ""
+
+msgid "objectPattern"
+msgstr ""
+
+msgid "spreadElement"
+msgstr ""
+
+msgid "super"
+msgstr ""
+
+msgid "taggedTemplateExpression"
+msgstr ""
+
+msgid "templateElement"
+msgstr ""
+
+msgid "templateLiteral"
+msgstr ""
+
+msgid "yieldExpression"
+msgstr ""
+
+msgid "awaitExpression"
+msgstr ""
+
+msgid "import"
+msgstr ""
+
+msgid "bigIntLiteral"
+msgstr ""
+
+msgid "exportNamespaceSpecifier"
+msgstr ""
+
+msgid "optionalMemberExpression"
+msgstr ""
+
+msgid "optionalCallExpression"
+msgstr ""
+
+msgid "classProperty"
+msgstr ""
+
+msgid "classAccessorProperty"
+msgstr ""
+
+msgid "classPrivateProperty"
+msgstr ""
+
+msgid "classPrivateMethod"
+msgstr ""
+
+msgid "privateName"
+msgstr ""
+
+msgid "staticBlock"
+msgstr ""
+
+msgid "importAttribute"
+msgstr ""
+
+msgid "anyTypeAnnotation"
+msgstr ""
+
+msgid "arrayTypeAnnotation"
+msgstr ""
+
+msgid "booleanTypeAnnotation"
+msgstr ""
+
+msgid "booleanLiteralTypeAnnotation"
+msgstr ""
+
+msgid "nullLiteralTypeAnnotation"
+msgstr ""
+
+msgid "classImplements"
+msgstr ""
+
+msgid "declareClass"
+msgstr ""
+
+msgid "declareFunction"
+msgstr ""
+
+msgid "declareInterface"
+msgstr ""
+
+msgid "declareModule"
+msgstr ""
+
+msgid "declareModuleExports"
+msgstr ""
+
+msgid "declareTypeAlias"
+msgstr ""
+
+msgid "declareOpaqueType"
+msgstr ""
+
+msgid "declareVariable"
+msgstr ""
+
+msgid "declareExportDeclaration"
+msgstr ""
+
+msgid "declareExportAllDeclaration"
+msgstr ""
+
+msgid "declaredPredicate"
+msgstr ""
+
+msgid "existsTypeAnnotation"
+msgstr ""
+
+msgid "functionTypeAnnotation"
+msgstr ""
+
+msgid "functionTypeParam"
+msgstr ""
+
+msgid "genericTypeAnnotation"
+msgstr ""
+
+msgid "inferredPredicate"
+msgstr ""
+
+msgid "interfaceExtends"
+msgstr ""
+
+msgid "interfaceDeclaration"
+msgstr ""
+
+msgid "interfaceTypeAnnotation"
+msgstr ""
+
+msgid "intersectionTypeAnnotation"
+msgstr ""
+
+msgid "mixedTypeAnnotation"
+msgstr ""
+
+msgid "emptyTypeAnnotation"
+msgstr ""
+
+msgid "nullableTypeAnnotation"
+msgstr ""
+
+msgid "numberLiteralTypeAnnotation"
+msgstr ""
+
+msgid "numberTypeAnnotation"
+msgstr ""
+
+msgid "objectTypeAnnotation"
+msgstr ""
+
+msgid "objectTypeInternalSlot"
+msgstr ""
+
+msgid "objectTypeCallProperty"
+msgstr ""
+
+msgid "objectTypeIndexer"
+msgstr ""
+
+msgid "objectTypeProperty"
+msgstr ""
+
+msgid "objectTypeSpreadProperty"
+msgstr ""
+
+msgid "opaqueType"
+msgstr ""
+
+msgid "qualifiedTypeIdentifier"
+msgstr ""
+
+msgid "stringLiteralTypeAnnotation"
+msgstr ""
+
+msgid "stringTypeAnnotation"
+msgstr ""
+
+msgid "symbolTypeAnnotation"
+msgstr ""
+
+msgid "thisTypeAnnotation"
+msgstr ""
+
+msgid "tupleTypeAnnotation"
+msgstr ""
+
+msgid "typeofTypeAnnotation"
+msgstr ""
+
+msgid "typeAlias"
+msgstr ""
+
+msgid "typeAnnotation"
+msgstr ""
+
+msgid "typeCastExpression"
+msgstr ""
+
+msgid "typeParameter"
+msgstr ""
+
+msgid "typeParameterDeclaration"
+msgstr ""
+
+msgid "typeParameterInstantiation"
+msgstr ""
+
+msgid "unionTypeAnnotation"
+msgstr ""
+
+msgid "variance"
+msgstr ""
+
+msgid "voidTypeAnnotation"
+msgstr ""
+
+msgid "enumDeclaration"
+msgstr ""
+
+msgid "enumBooleanBody"
+msgstr ""
+
+msgid "enumNumberBody"
+msgstr ""
+
+msgid "enumStringBody"
+msgstr ""
+
+msgid "enumSymbolBody"
+msgstr ""
+
+msgid "enumBooleanMember"
+msgstr ""
+
+msgid "enumNumberMember"
+msgstr ""
+
+msgid "enumStringMember"
+msgstr ""
+
+msgid "enumDefaultedMember"
+msgstr ""
+
+msgid "indexedAccessType"
+msgstr ""
+
+msgid "optionalIndexedAccessType"
+msgstr ""
+
+msgid "jsxAttribute"
+msgstr ""
+
+msgid "jsxClosingElement"
+msgstr ""
+
+msgid "jsxElement"
+msgstr ""
+
+msgid "jsxEmptyExpression"
+msgstr ""
+
+msgid "jsxExpressionContainer"
+msgstr ""
+
+msgid "jsxSpreadChild"
+msgstr ""
+
+msgid "jsxIdentifier"
+msgstr ""
+
+msgid "jsxMemberExpression"
+msgstr ""
+
+msgid "jsxNamespacedName"
+msgstr ""
+
+msgid "jsxOpeningElement"
+msgstr ""
+
+msgid "jsxSpreadAttribute"
+msgstr ""
+
+msgid "jsxText"
+msgstr ""
+
+msgid "jsxFragment"
+msgstr ""
+
+msgid "jsxOpeningFragment"
+msgstr ""
+
+msgid "jsxClosingFragment"
+msgstr ""
+
+msgid "noop"
+msgstr ""
+
+msgid "placeholder"
+msgstr ""
+
+msgid "v8IntrinsicIdentifier"
+msgstr ""
+
+msgid "argumentPlaceholder"
+msgstr ""
+
+msgid "bindExpression"
+msgstr ""
+
+msgid "decorator"
+msgstr ""
+
+msgid "doExpression"
+msgstr ""
+
+msgid "exportDefaultSpecifier"
+msgstr ""
+
+msgid "recordExpression"
+msgstr ""
+
+msgid "tupleExpression"
+msgstr ""
+
+msgid "decimalLiteral"
+msgstr ""
+
+msgid "moduleExpression"
+msgstr ""
+
+msgid "topicReference"
+msgstr ""
+
+msgid "pipelineTopicExpression"
+msgstr ""
+
+msgid "pipelineBareFunction"
+msgstr ""
+
+msgid "pipelinePrimaryTopicReference"
+msgstr ""
+
+msgid "voidPattern"
+msgstr ""
+
+msgid "tsParameterProperty"
+msgstr ""
+
+msgid "tsDeclareFunction"
+msgstr ""
+
+msgid "tsDeclareMethod"
+msgstr ""
+
+msgid "tsQualifiedName"
+msgstr ""
+
+msgid "tsCallSignatureDeclaration"
+msgstr ""
+
+msgid "tsConstructSignatureDeclaration"
+msgstr ""
+
+msgid "tsPropertySignature"
+msgstr ""
+
+msgid "tsMethodSignature"
+msgstr ""
+
+msgid "tsIndexSignature"
+msgstr ""
+
+msgid "tsAnyKeyword"
+msgstr ""
+
+msgid "tsBooleanKeyword"
+msgstr ""
+
+msgid "tsBigIntKeyword"
+msgstr ""
+
+msgid "tsIntrinsicKeyword"
+msgstr ""
+
+msgid "tsNeverKeyword"
+msgstr ""
+
+msgid "tsNullKeyword"
+msgstr ""
+
+msgid "tsNumberKeyword"
+msgstr ""
+
+msgid "tsObjectKeyword"
+msgstr ""
+
+msgid "tsStringKeyword"
+msgstr ""
+
+msgid "tsSymbolKeyword"
+msgstr ""
+
+msgid "tsUndefinedKeyword"
+msgstr ""
+
+msgid "tsUnknownKeyword"
+msgstr ""
+
+msgid "tsVoidKeyword"
+msgstr ""
+
+msgid "tsThisType"
+msgstr ""
+
+msgid "tsFunctionType"
+msgstr ""
+
+msgid "tsConstructorType"
+msgstr ""
+
+msgid "tsTypeReference"
+msgstr ""
+
+msgid "tsTypePredicate"
+msgstr ""
+
+msgid "tsTypeQuery"
+msgstr ""
+
+msgid "tsTypeLiteral"
+msgstr ""
+
+msgid "tsArrayType"
+msgstr ""
+
+msgid "tsTupleType"
+msgstr ""
+
+msgid "tsOptionalType"
+msgstr ""
+
+msgid "tsRestType"
+msgstr ""
+
+msgid "tsNamedTupleMember"
+msgstr ""
+
+msgid "tsUnionType"
+msgstr ""
+
+msgid "tsIntersectionType"
+msgstr ""
+
+msgid "tsConditionalType"
+msgstr ""
+
+msgid "tsInferType"
+msgstr ""
+
+msgid "tsParenthesizedType"
+msgstr ""
+
+msgid "tsTypeOperator"
+msgstr ""
+
+msgid "tsIndexedAccessType"
+msgstr ""
+
+msgid "tsMappedType"
+msgstr ""
+
+msgid "tsTemplateLiteralType"
+msgstr ""
+
+msgid "tsLiteralType"
+msgstr ""
+
+msgid "tsExpressionWithTypeArguments"
+msgstr ""
+
+msgid "tsInterfaceDeclaration"
+msgstr ""
+
+msgid "tsInterfaceBody"
+msgstr ""
+
+msgid "tsTypeAliasDeclaration"
+msgstr ""
+
+msgid "tsInstantiationExpression"
+msgstr ""
+
+msgid "tsAsExpression"
+msgstr ""
+
+msgid "tsSatisfiesExpression"
+msgstr ""
+
+msgid "tsTypeAssertion"
+msgstr ""
+
+msgid "tsEnumBody"
+msgstr ""
+
+msgid "tsEnumDeclaration"
+msgstr ""
+
+msgid "tsEnumMember"
+msgstr ""
+
+msgid "tsModuleDeclaration"
+msgstr ""
+
+msgid "tsModuleBlock"
+msgstr ""
+
+msgid "tsImportType"
+msgstr ""
+
+msgid "tsImportEqualsDeclaration"
+msgstr ""
+
+msgid "tsExternalModuleReference"
+msgstr ""
+
+msgid "tsNonNullExpression"
+msgstr ""
+
+msgid "tsExportAssignment"
+msgstr ""
+
+msgid "tsNamespaceExportDeclaration"
+msgstr ""
+
+msgid "tsTypeAnnotation"
+msgstr ""
+
+msgid "tsTypeParameterInstantiation"
+msgstr ""
+
+msgid "tsTypeParameterDeclaration"
+msgstr ""
+
+msgid "tsTypeParameter"
+msgstr ""
 
 msgid ""
 "Warning: this URL is longer than the 2000 character limit for URL fields."
