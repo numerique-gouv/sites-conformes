@@ -88,11 +88,13 @@
   {% endwith %}
 
   <div class="fr-container fr-my-4w">
-    {% for tag in page.tags.all|dictsort:"slug" %}
-      <a class="fr-tag"
-         target="_self"
-         href="{% pageurl page.get_parent %}{% toggle_url_filter tag=tag %}">{{ tag }}</a>
-    {% endfor %}
+    <ul>
+      {% for tag in page.tags.all|dictsort:"slug" %}
+        <a class="fr-tag"
+           target="_self"
+           href="{% pageurl page.get_parent %}{% toggle_url_filter tag=tag %}">{{ tag }}</a>
+      {% endfor %}
+    </ul>
   </div>
 
   {% if settings.sites_conformes_core.CmsDsfrConfig.show_share_links and settings.sites_conformes_core.CmsDsfrConfig.share_links_blog_posts %}
