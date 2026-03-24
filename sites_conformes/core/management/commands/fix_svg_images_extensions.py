@@ -31,7 +31,15 @@ class Command(BaseCommand):
     This script is inspired by https://github.com/wagtail/wagtail/blob/f96b1fb829b107d1f90bcc6fee2fbf8c9d82263f/wagtail/images/tests/tests.py#L388C1-L388C51 
     """
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Preview changes without applying them.",
+        )
+
     def handle(self, *args, **kwargs):
+        dry_run = kwargs["dry_run"]
         for image in get_image_model().objects.all():
             if not image.is_svg():
                 with image.get_willow_image() as willow_image:
@@ -41,4 +49,5 @@ class Command(BaseCommand):
                         filename = f"{image.file.name}.svg"
                         print(f"After: {filename}")
 
-                        rename_wagtail_image(image, filename)
+                        if not dry_run:
+                            rename_wagtail_image(image, filename)
