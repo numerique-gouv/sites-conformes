@@ -7,8 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD:sites_conformes/core/locale/fr/LC_MESSAGES/django.po
 "POT-Creation-Date: 2026-04-29 16:53+0200\n"
 "PO-Revision-Date: 2026-04-29 16:56+0200\n"
+=======
+"POT-Creation-Date: 2026-03-26 13:53+0100\n"
+"PO-Revision-Date: 2026-03-26 13:58+0100\n"
+>>>>>>> 3c61fd4 (i18n):content_manager/locale/fr/LC_MESSAGES/django.po
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -280,6 +285,9 @@ msgstr "Détail"
 
 msgid "Step"
 msgstr "Étape"
+
+msgid "Adapt to the page layout. Defaults to heading 2."
+msgstr "À adapter à la structure de la page. Par défaut en-tête 2."
 
 msgid "Number of steps"
 msgstr "Nombre d’étapes"
@@ -784,9 +792,6 @@ msgstr "Colonne ajustable"
 
 msgid "Background image"
 msgstr "Image de fond"
-
-msgid "Adapt to the page layout. Defaults to heading 2."
-msgstr "À adapter à la structure de la page. Par défaut en-tête 2."
 
 msgid "Columns"
 msgstr "Colonnes"
@@ -1481,6 +1486,12 @@ msgstr "Source :"
 
 msgid "Filters"
 msgstr "Filtres"
+
+msgid "selected"
+msgstr "étiquette sélectionnée"
+
+msgid "unselected"
+msgstr "étiquette non-sélectionnée"
 
 msgid "Pages"
 msgstr "Pages"
