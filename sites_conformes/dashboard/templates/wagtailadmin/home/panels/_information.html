@@ -1,13 +1,7 @@
 {% load i18n wagtailcore_tags wagtailadmin_tags static %}
-{% block extra_css %}
-  <style>
-    /* Reset tout ce que DSFR pourrait écraser hors du panneau */
-    .sf-info-panel-scope * { all: revert; }
-  </style>
-  <link rel="stylesheet" href="{% static 'dsfr/dist/dsfr/dsfr.min.css' %}">
-{% endblock %}
+{% block extra_css %}{% endblock %}
 {% for item in information_items %}
-  <div class="sf-info-panel-scopre fr-notice fr-notice--info"
+  <div class="fr-notice fr-notice--{{ item.type|default:"info" }}"
        style="margin-bottom: 1rem;
               border-radius: 4px;
               overflow: hidden">
