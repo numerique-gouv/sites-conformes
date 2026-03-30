@@ -101,3 +101,157 @@
 .sf-tutorials-display tr td {
     vertical-align: baseline;
 }
+
+/* sf_admin/static/sf_admin/css/notice.css */
+
+.fr-notice {
+    --title-spacing: 0;
+    --text-spacing: 0;
+    background-color: var(--background-contrast-grey, #eee);
+    color: var(--text-title-grey, #161616);
+    padding: 1rem;
+    position: relative;
+}
+
+.fr-notice__body {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: relative;
+}
+
+.fr-notice__title {
+    font-weight: 700;
+    margin-right: .25rem;
+    position: relative;
+}
+
+.fr-notice__title:before {
+    --icon-size: 1.5rem;
+    background-color: currentColor;
+    content: "";
+    display: inline-block;
+    flex: 0 0 auto;
+    height: var(--icon-size);
+    margin-right: .5rem;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    vertical-align: calc((.75em - var(--icon-size)) * .5);
+    width: var(--icon-size);
+}
+
+.fr-notice__desc {
+    margin-right: .25rem;
+}
+
+.fr-notice__desc,
+.fr-notice__title {
+    display: block;
+}
+
+.fr-notice__desc,
+.fr-notice__link,
+.fr-notice__title {
+    font-size: .875rem;
+    line-height: 1.5rem;
+}
+
+.fr-notice p,
+.fr-notice__title {
+    margin: 0;
+}
+
+.fr-notice--no-icon .fr-notice__title:before {
+    display: none;
+}
+
+/* Bouton fermer */
+.fr-notice .fr-btn--close {
+    color: inherit;
+    font-size: .875rem;
+    line-height: 1.5rem;
+    margin-left: .25rem;
+    margin-top: -.25rem;
+    max-height: 2rem;
+    max-width: 2rem;
+    min-height: 2rem;
+    overflow: hidden;
+    padding: .25rem .5rem;
+    white-space: nowrap;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.fr-notice .fr-btn--close:before {
+    --icon-size: 1rem;
+    background-color: currentColor;
+    content: "";
+    display: inline-block;
+    height: var(--icon-size);
+    margin-left: 0;
+    margin-right: .5rem;
+    -webkit-mask-image: url("../dsfr/dist/icons/system/close-line.svg");
+    mask-image: url("../dsfr/dist/icons/system/close-line.svg");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    vertical-align: calc((.75em - var(--icon-size)) * .5);
+    width: var(--icon-size);
+}
+
+/* Info */
+.fr-notice--info {
+    background-color: var(--background-contrast-info, #e8edff);
+    color: var(--text-default-info, #0063cb);
+}
+
+.fr-notice--info .fr-notice__title:not([class^=fr-icon-]):not([class*=" fr-icon-"]):before {
+    -webkit-mask-image: url("../dsfr/dist/icons/system/fr--info-fill.svg");
+    mask-image: url("../dsfr/dist/icons/system/fr--info-fill.svg");
+}
+
+/* Warning */
+.fr-notice--warning {
+    background-color: var(--background-contrast-warning, #ffe9e6);
+    color: var(--text-default-warning, #b34000);
+}
+
+.fr-notice--warning .fr-notice__title:not([class^=fr-icon-]):not([class*=" fr-icon-"]):before {
+    -webkit-mask-image: url("../dsfr/dist/icons/system/fr--warning-fill.svg");
+    mask-image: url("../dsfr/dist/icons/system/fr--warning-fill.svg");
+}
+
+/* Alert */
+.fr-notice--alert {
+    background-color: var(--background-contrast-error, #ffe9e9);
+    color: var(--text-default-error, #ce0500);
+}
+
+.fr-notice--alert .fr-notice__title:not([class^=fr-icon-]):not([class*=" fr-icon-"]):before {
+    -webkit-mask-image: url("../dsfr/dist/icons/system/error-warning-fill.svg");
+    mask-image: url("../dsfr/dist/icons/system/error-warning-fill.svg");
+}
+
+/* Responsive */
+@media (min-width: 576px) {
+
+    .fr-notice__desc,
+    .fr-notice__title {
+        display: inline;
+    }
+}
+
+@media (min-width: 768px) {
+
+    .fr-notice__desc,
+    .fr-notice__link,
+    .fr-notice__title {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    .fr-notice .fr-btn--close {
+        margin-left: 1rem;
+    }
+}

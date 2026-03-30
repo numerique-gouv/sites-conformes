@@ -1,16 +1,6 @@
 {% extends "wagtailadmin/home.html" %}
-
 {% load i18n wagtailadmin_tags %}
 
 {% block branding_welcome %}
   {% translate "Sites Conformes" %}
-{% endblock %}
-
-{% block content %}
-  {% for panel in panels %}
-    {% if panel.panel_id == "information" %}
-      {% component panel %}
-    {% endif %}
-  {% endfor %}
-  {{ block.super }}
 {% endblock %}

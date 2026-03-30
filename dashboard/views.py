@@ -77,7 +77,7 @@ tutorials_panel = TutorialsPanel()
 INFORMATION = {
     "items": [
         {
-            "type": "news",
+            "type": "info",
             "title": "Exemple de nouveauté",
             "description": "Description courte de la fonctionnalité.",
             "url": "https://github.com/numerique-gouv/sites-faciles/releases",
@@ -86,7 +86,7 @@ INFORMATION = {
         },
         {
             "type": "alert",
-            "title": "Exemple de nouveauté",
+            "title": "Attention une nouvelle version de Sites Conformes est disponible",
             "description": "Description courte de la fonctionnalité.",
             "url": "https://github.com/numerique-gouv/sites-faciles/releases",
             "date": "2026-03-28",
