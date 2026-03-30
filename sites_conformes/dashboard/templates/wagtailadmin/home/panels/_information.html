@@ -1,0 +1,42 @@
+{% load i18n wagtailcore_tags wagtailadmin_tags static %}
+{% block extra_css %}
+  <style>
+    /* Reset tout ce que DSFR pourrait écraser hors du panneau */
+    .sf-info-panel-scope * { all: revert; }
+  </style>
+  <link rel="stylesheet" href="{% static 'dsfr/dist/dsfr/dsfr.min.css' %}">
+{% endblock %}
+{% for item in information_items %}
+  <div class="sf-info-panel-scopre fr-notice fr-notice--info"
+       style="margin-bottom: 1rem;
+              border-radius: 4px;
+              overflow: hidden">
+    <div class="fr-container">
+      <div class="fr-notice__body">
+        <div style="display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    width: 100%">
+          <div>
+            <p class="fr-notice__title" style="margin-bottom: 0.25rem;">
+              {{ item.title }}
+              <span style="font-weight: normal; opacity: 0.7; font-size: 0.875rem;">— {{ item.date }}</span>
+            </p>
+            <p style="margin: 0;">
+              {{ item.description }}
+              {% if item.url %}
+                <a href="{{ item.url }}" class="fr-link">{% trans "En savoir plus" %}</a>
+              {% endif %}
+            </p>
+          </div>
+          <button type="button"
+                  title="{% trans 'Fermer' %}"
+                  onclick="this.closest('.fr-notice').style.display='none'"
+                  class="fr-btn--close fr-btn"
+                  style="margin-left: 1rem;
+                         flex-shrink: 0">{% trans "Fermer" %}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
