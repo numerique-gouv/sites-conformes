@@ -1,5 +1,4 @@
 import json
-from datetime import date
 
 import requests
 from django.contrib.admin.utils import quote
@@ -7,6 +6,8 @@ from django.urls import reverse
 from wagtail.admin.admin_url_finder import AdminURLFinder
 from wagtail.admin.ui.components import Component
 from wagtail.models import Site
+
+from .utils import get_all_notifications
 
 finder = AdminURLFinder()
 
@@ -79,6 +80,7 @@ tutorials_panel = TutorialsPanel()
 INFORMATION_URL = "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
 # INFORMATION_CACHE_KEY = "sf_information_panel"
 # INFORMATION_CACHE_TIMEOUT = 60 * 60
+LATEST_RELEASE_URL = "https://api.github.com/repos/numerique-gouv/sites-faciles/releases/latest"
 
 
 class InformationPanel(Component):
@@ -87,24 +89,6 @@ class InformationPanel(Component):
     panel_id = "information"
 
     def get_context_data(self, parent_context=None):
-        # data = cache.get(INFORMATION_CACHE_KEY)
-        # if data is None:
-        try:
-            res = requests.get(INFORMATION_URL, timeout=5)
-            res.raise_for_status()
-            data = res.json()
-            # cache.set(INFORMATION_CACHE_KEY, data, INFORMATION_CACHE_TIMEOUT)
-        except Exception:
-            data = {}
-
-        today = date.today()
-        items = []
-        for item in data.get("items", []):
-            try:
-                end_date = item.get("end_date")
-                if not end_date or date.fromisoformat(end_date) >= today:
-                    items.append(item)
-            except Exception:
-                items.append(item)
+        items = get_all_notifications()
 
         return {"information_items": items}
