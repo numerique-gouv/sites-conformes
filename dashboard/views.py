@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 import requests
 from django.contrib.admin.utils import quote
@@ -74,26 +75,10 @@ class TutorialsPanel(Component):
 
 tutorials_panel = TutorialsPanel()
 
-INFORMATION = {
-    "items": [
-        {
-            "type": "info",
-            "title": "Exemple de nouveauté",
-            "description": "Description courte de la fonctionnalité.",
-            "url": "https://github.com/numerique-gouv/sites-faciles/releases",
-            "date": "2026-03-28",
-            "end_date": "2026-03-30",
-        },
-        {
-            "type": "alert",
-            "title": "Attention une nouvelle version de Sites Conformes est disponible",
-            "description": "Description courte de la fonctionnalité.",
-            "url": "https://github.com/numerique-gouv/sites-faciles/releases",
-            "date": "2026-03-28",
-            "end_date": "2026-03-30",
-        },
-    ]
-}
+
+INFORMATION_URL = "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
+# INFORMATION_CACHE_KEY = "sf_information_panel"
+# INFORMATION_CACHE_TIMEOUT = 60 * 60
 
 
 class InformationPanel(Component):
@@ -102,8 +87,24 @@ class InformationPanel(Component):
     panel_id = "information"
 
     def get_context_data(self, parent_context=None):
-        # Plus tard : res = requests.get(INFORMATION_URL, timeout=10)
-        # data = res.json()
-        data = INFORMATION
-        items = data.get("items", [])
+        # data = cache.get(INFORMATION_CACHE_KEY)
+        # if data is None:
+        try:
+            res = requests.get(INFORMATION_URL, timeout=5)
+            res.raise_for_status()
+            data = res.json()
+            # cache.set(INFORMATION_CACHE_KEY, data, INFORMATION_CACHE_TIMEOUT)
+        except Exception:
+            data = {}
+
+        today = date.today()
+        items = []
+        for item in data.get("items", []):
+            try:
+                end_date = item.get("end_date")
+                if not end_date or date.fromisoformat(end_date) >= today:
+                    items.append(item)
+            except Exception:
+                items.append(item)
+
         return {"information_items": items}

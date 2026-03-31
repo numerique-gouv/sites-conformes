@@ -14,21 +14,17 @@
           <div>
             <p class="fr-notice__title" style="margin-bottom: 0.25rem;">
               {{ item.title }}
-              <span style="font-weight: normal; opacity: 0.7; font-size: 0.875rem;">— {{ item.date }}</span>
+              {% if item.date %}
+                <span style="font-weight: normal; opacity: 0.7; font-size: 0.875rem;">— {{ item.date }}</span>
+              {% endif %}
             </p>
             <p style="margin: 0;">
               {{ item.description }}
               {% if item.url %}
-                <a href="{{ item.url }}" class="fr-link">{% trans "En savoir plus" %}</a>
+                <a href="{{ item.url }}">{% trans "En savoir plus" %}</a>
               {% endif %}
             </p>
           </div>
-          <button type="button"
-                  title="{% trans 'Fermer' %}"
-                  onclick="this.closest('.fr-notice').style.display='none'"
-                  class="fr-btn--close fr-btn"
-                  style="margin-left: 1rem;
-                         flex-shrink: 0">{% trans "Fermer" %}</button>
         </div>
       </div>
     </div>
