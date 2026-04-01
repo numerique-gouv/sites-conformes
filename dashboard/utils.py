@@ -2,7 +2,6 @@ from datetime import date
 
 import requests
 from django.conf import settings
-from django.core.cache import cache
 from packaging.version import Version
 
 from content_manager import __version__ as actual_version
@@ -45,12 +44,12 @@ INFORMATION_CACHE_TIMEOUT = 60 * 60
 def get_all_notifications():
     items = []
     items = push_version_notification(items)
-    data = cache.get(INFORMATION_CACHE_KEY)
+    # data = cache.get(INFORMATION_CACHE_KEY)
     try:
         res = requests.get(settings.INFORMATION_URL, timeout=5)
         res.raise_for_status()
         data = res.json()
-        cache.set(INFORMATION_CACHE_KEY, data, INFORMATION_CACHE_TIMEOUT)
+        # cache.set(INFORMATION_CACHE_KEY, data, INFORMATION_CACHE_TIMEOUT)
     except Exception:
         data = {}
 
