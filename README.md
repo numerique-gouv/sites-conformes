@@ -8,6 +8,8 @@ Branches :
 
 For now, the package name and version in pyproject.toml is the Sites Conformes one, because agreste's modifications are minor. (It will probably change later)
 
+The agreste version is in agreste_version.txt (this is not used anywhere in code, it's just for tracking purposes). Format : the first three numbers are the Sites Conformes version, and the second three are the agreste version (e.g. 2.3.5-0.1.0)
+
 -----
 # Sites Conformes
 
