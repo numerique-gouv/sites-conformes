@@ -37,6 +37,7 @@ def push_version_notification(items):
                     "url": "https://github.com/numerique-gouv/sites-faciles/releases",
                 },
             )
+        return items
     except Exception:
         pass
 
