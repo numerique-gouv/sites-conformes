@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
@@ -38,3 +40,13 @@ class DashboardTestCase(WagtailPageTestCase):
             '<svg class="icon icon-edit w-userbar-icon" aria-hidden="true"><use href="#icon-edit"></use></svg>',
             html=True,
         )
+
+
+@patch("dashboard.utils.requests.get")
+def test_information_panel_not_displayed_if_request_fails(self, mock_get):
+    """Rien ne s'affiche dans le back-office si la requête vers le JSON échoue."""
+    mock_get.side_effect = Exception("Network error")
+
+    self.client.force_login(self.admin)
+    response = self.client.get("/cms-admin/")
+    self.assertNotContains(response, "sc-fr-notice")
