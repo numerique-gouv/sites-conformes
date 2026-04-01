@@ -61,5 +61,5 @@ def get_all_notifications():
             if not end_date or date.fromisoformat(end_date) >= today:
                 items.append(item)
         except Exception:
-            items.append(item)
+            continue
     return items
