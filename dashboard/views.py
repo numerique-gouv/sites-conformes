@@ -77,12 +77,6 @@ class TutorialsPanel(Component):
 tutorials_panel = TutorialsPanel()
 
 
-INFORMATION_URL = "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
-# INFORMATION_CACHE_KEY = "sf_information_panel"
-# INFORMATION_CACHE_TIMEOUT = 60 * 60
-LATEST_RELEASE_URL = "https://api.github.com/repos/numerique-gouv/sites-faciles/releases/latest"
-
-
 class InformationPanel(Component):
     order = 20
     template_name = "wagtailadmin/home/panels/_information.html"
