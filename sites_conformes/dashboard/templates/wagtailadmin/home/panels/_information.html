@@ -1,24 +1,15 @@
 {% load i18n wagtailcore_tags wagtailadmin_tags static %}
-{% block extra_css %}{% endblock %}
 {% for item in information_items %}
-  <div class="fr-notice fr-notice--{{ item.type|default:"info" }}"
-       style="margin-bottom: 1rem;
-              border-radius: 4px;
-              overflow: hidden">
+  <div class="sc-fr-notice sc-fr-notice--{{ item.type|default:"info" }}">
     <div class="fr-container">
-      <div class="fr-notice__body">
-        <div style="display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
-                    width: 100%">
+      <div class="sc-fr-notice__body">
+        <div>
           <div>
-            <p class="fr-notice__title" style="margin-bottom: 0.25rem;">
+            <p class="sc-fr-notice__title">
               {{ item.title }}
-              {% if item.date %}
-                <span style="font-weight: normal; opacity: 0.7; font-size: 0.875rem;">— {{ item.date }}</span>
-              {% endif %}
+              {% if item.date %}<span class="sc-fr-notice__date">— {{ item.date }}</span>{% endif %}
             </p>
-            <p style="margin: 0;">
+            <p>
               {{ item.description }}
               {% if item.url %}
                 <a href="{{ item.url }}">{% trans "En savoir plus" %}</a>
