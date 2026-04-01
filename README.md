@@ -1,3 +1,14 @@
+# Agreste
+
+Forké depuis Sites Conformes (voir ci dessous)
+
+Branches : 
+ - `main-agreste` : branchée depuis la branche `production` de sites conformes
+ - `production-agreste` : pour les déploiements sur agreste-prod
+
+For now, the package name and version in pyproject.toml is the Sites Conformes one, because agreste's modifications are minor. (It will probably change later)
+
+-----
 # Sites Conformes
 
 **Sites Conformes** (anciennement « Sites Faciles ») vise à permettre la création simplifiée de **sites dont le domaine se termine par .gouv.fr**.
