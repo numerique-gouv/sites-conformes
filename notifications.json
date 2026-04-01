@@ -1,0 +1,28 @@
+{
+    "items": [
+        {
+            "type": "info",
+            "title": "Exemple de nouveauté -- Template -- à ne pas supprimer",
+            "description": "Description courte de la fonctionnalité. -- template, date de fin à garder au passé.",
+            "url": "https://sites.beta.gouv.fr/",
+            "date": "2026-03-28",
+            "end_date": "2016-04-1"
+        },
+        {
+            "type": "alert",
+            "title": "test sans date",
+            "description": "",
+            "url": "https://github.com/numerique-gouv/sites-faciles/releases",
+            "date": "",
+            "end_date": "2026-04-30"
+        }, 
+        {
+            "type": "warning",
+            "title": "test sans description sans lien",
+            "description": "",
+            "url": "",
+            "date": "2026-03-28",
+            "end_date": "2026-04-30"
+        }
+    ]
+}
