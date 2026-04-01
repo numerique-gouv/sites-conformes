@@ -1,10 +1,13 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.test import TestCase
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.core.models import ContentPage
+from sites_conformes.dashboard.utils import get_all_notifications
 
 User = get_user_model()
 
@@ -50,3 +53,19 @@ def test_information_panel_not_displayed_if_request_fails(self, mock_get):
     self.client.force_login(self.admin)
     response = self.client.get("/cms-admin/")
     self.assertNotContains(response, "sc-fr-notice")
+
+
+class TestGetAllNotifications(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    @patch("dashboard.utils.requests.get")
+    def test_second_call_uses_cache(self, mock_get):
+        """La deuxième requête utilise le cache et n'appelle pas requests.get."""
+        mock_get.return_value.json.return_value = {"items": []}
+        mock_get.return_value.raise_for_status = MagicMock()
+
+        get_all_notifications()
+        get_all_notifications()
+
+        self.assertEqual(mock_get.call_count, 1)
