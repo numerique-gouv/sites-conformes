@@ -102,10 +102,16 @@ class SitesFacilesBasePage(Page):
         FieldPanel("body", heading=_("Body")),
     ]
 
-    configuration_field_panels = list(Page.promote_panels) + [FieldPanel("preview_image")]
-
     promote_panels = [
-        MultiFieldPanel(configuration_field_panels, _("Common page configuration")),
+        MultiFieldPanel(
+            [
+                "slug",
+                "seo_title",
+                "search_description",
+            ],
+            _("For search engines"),
+        ),
+        FieldPanel("preview_image"),
     ]
 
     search_fields = Page.search_fields + [

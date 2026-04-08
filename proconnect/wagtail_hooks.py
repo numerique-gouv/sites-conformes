@@ -15,6 +15,7 @@ class ProconnectViewSetGroup(SnippetViewSetGroup):
     menu_icon = "group"
     menu_label = "ProConnect"  # type: ignore
     menu_name = "proconnect"
+    menu_order = 8500
 
 
 register_snippet(ProconnectViewSetGroup)

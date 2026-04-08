@@ -1,8 +1,0 @@
-{% for item in menu_items %}
-  <li class="fr-footer__bottom-item">
-    <a href="{{ item.href }}"
-       class="fr-footer__bottom-link"
-       {% if item.active_class %}aria-current="page"{% endif %}
-       target="_self">{{ item.text }}</a>
-  </li>
-{% endfor %}

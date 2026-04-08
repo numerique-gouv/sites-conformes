@@ -1,0 +1,36 @@
+name: 🔮 CI - Quality checks
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings_test
+      PYTHONPATH: .
+    strategy:
+      matrix:
+        python-version: ["3.14"]
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: dju
+          POSTGRES_PASSWORD: djpwd
+          POSTGRES_DB: djdb
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - name: 📔 Install just
+        uses: extractions/setup-just@v2
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 🐍 Set up uv
+        uses: astral-sh/setup-uv@v5
+      - uses: pre-commit/action@v3.0.1
+      - name: ✨ Black & ruff on all files
+        run: |
+          just quality

@@ -15,6 +15,7 @@ from content_manager.constants import (
     LINK_ICON_CHOICES,
     LINK_SIZE_CHOICES,
 )
+from content_manager.validators import validate_query_string
 from content_manager.widgets import DsfrIconPickerWidget
 
 
@@ -63,6 +64,7 @@ class LinkStructValue(blocks.StructValue):
         page = self.get("page")
         document = self.get("document")
         anchor = self.get("anchor")
+        query_string = self.get("query_string")
 
         if page:
             link = page.url
@@ -72,7 +74,24 @@ class LinkStructValue(blocks.StructValue):
         if anchor:
             link += f"#{anchor}"
 
+        if query_string:
+            link += f"{query_string}"
+
         return link
+
+    def label(self):
+        text = self.get("text", "")
+
+        if not text:
+            page = self.get("page")
+            document = self.get("document")
+
+            if page:
+                text = page.title
+            elif document:
+                text = document.title
+
+        return text
 
 
 class LinkWithoutLabelBlock(blocks.StructBlock):
@@ -108,6 +127,13 @@ class LinkWithoutLabelBlock(blocks.StructBlock):
         label=_("Anchor ID"),
         help_text=_("Link to an anchor block on the page. Allowed characters: A-Z, a-z, 0-9, - and _."),
         validators=[validate_slug],
+        default="",
+        required=False,
+    )
+    query_string = blocks.CharBlock(
+        label=_("Extra query parameters"),
+        help_text=_("Extra query parameters at the end of the link, e.g. filtering options."),
+        validators=[validate_query_string],
         default="",
         required=False,
     )
@@ -153,6 +179,9 @@ class LinkWithoutLabelBlock(blocks.StructBlock):
 
         if selected_link_type in ["external_url", "document"]:
             value["anchor"] = ""
+
+        if selected_link_type in ["external_url", "document", "anchor"]:
+            value["query_string"] = ""
 
         return super().clean(value)
 
@@ -253,7 +282,7 @@ class LinkBlockAdapter(StructBlockAdapter):
 
         structblock_media = super().media
         return forms.Media(
-            js=structblock_media._js + ["js/link-block.js"],
+            js=structblock_media._js + ["js/link-block.js"],  # type: ignore
         )
 
 

@@ -1,13 +1,13 @@
 import sys
 
 from django.core.management.color import color_style
+from django.utils.translation import gettext_lazy as _
 from wagtail.models import Collection, Page, PageViewRestriction
-from wagtailmenus.models.menuitems import MainMenuItem
-from wagtailmenus.models.menus import FlatMenu, MainMenu
 
 from content_manager.constants import HEADER_FIELDS
 from content_manager.models import CatalogIndexPage, ContentPage
 from content_manager.utils import get_default_site
+from menus.models import FooterBottomMenu, MainMenu
 
 style = color_style()
 
@@ -139,7 +139,7 @@ def get_or_create_content_page(
     return new_page
 
 
-def get_or_create_footer_menu() -> FlatMenu:
+def get_or_create_footer_bottom_menu() -> FooterBottomMenu:
     """
     Get the footer menu or create it if it doesn't already exist
 
@@ -147,10 +147,10 @@ def get_or_create_footer_menu() -> FlatMenu:
     """
 
     default_site = get_default_site()
-    footer_menu = FlatMenu.objects.filter(handle="footer", site=default_site).first()
+    root_page = default_site.root_page
+    locale = root_page.locale
 
-    if not footer_menu:
-        footer_menu = FlatMenu.objects.create(title="Pied de page", handle="footer", site=default_site)
+    footer_menu, _created = FooterBottomMenu.objects.get_or_create(site=default_site, locale=locale)
 
     return footer_menu
 
@@ -163,20 +163,19 @@ def get_or_create_main_menu() -> MainMenu:
     """
 
     default_site = get_default_site()
-    main_menu = MainMenu.objects.filter(site=default_site).first()
+    root_page = default_site.root_page
+    locale = root_page.locale
 
-    if not main_menu:
-        main_menu = MainMenu.objects.create(site=default_site, max_levels=2)
+    main_menu, created = MainMenu.objects.get_or_create(site=default_site, locale=locale)
 
-        # Init the main menu with the home page
-        home_page = default_site.root_page
-
-        menu_item = {
-            "sort_order": 0,
-            "link_page": home_page,
-            "link_text": "Accueil",
-            "menu": main_menu,
+    if created:
+        # Add a link to the home page by default
+        link_value = {
+            "text": _("Home page"),
+            "page": root_page,
+            "link_type": "page",
         }
-        MainMenuItem.objects.create(**menu_item)
+        main_menu.items.append(("link", link_value))
 
+    main_menu.save()
     return main_menu

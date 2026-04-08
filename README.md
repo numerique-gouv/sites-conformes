@@ -10,6 +10,16 @@ For now, the package name and version in pyproject.toml is the Sites Conformes o
 
 The agreste version is in agreste_version.txt (this is not used anywhere in code, it's just for tracking purposes). Format : the first three numbers are the Sites Conformes version, and the second three are the agreste version (e.g. 2.3.5-0.1.0)
 
+To upgrade of Sites Conformes : 
+ - on https://github.com/betagouv/agreste, run Sync Fork for `production` branch.
+ - `git checkout production; git pull; git fetch --tags`
+ - *Rebase `main-agreste` on top of `production`*. This only works while `main-agreste` has few changes.
+ `git checkout main-agreste; git rebase production`. Solve conflicts, then `git push --force`.
+ - Update the version number in `agreste_version.txt`
+ - Create the release : 
+   - Open a PR to merge `main-agreste` into `production-agreste`. Name it with the new version number. Solve any conflicts and merge (this will trigger the release if autodeploy is configured on `production-agreste` branch)
+   - tag the merge commit with the version number : `git checkout production-agreste; git pull; git tag v3.0.0-0.1.0; git push --tags`
+
 -----
 # Sites Conformes
 

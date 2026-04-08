@@ -1,0 +1,4 @@
+{% load wagtailcore_tags %}
+{% for item in top_menu.items %}
+  <li>{% include_block item %}</li>
+{% endfor %}

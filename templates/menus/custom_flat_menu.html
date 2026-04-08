@@ -1,9 +1,0 @@
-{% load menu_tags %}
-{% for item in menu_items %}
-  <li>
-    <a href="{{ item.href }}"
-       class="fr-btn"
-       {% if item.active_class %}aria-current="page"{% endif %}
-       target="_self">{{ item.text }}</a>
-  </li>
-{% endfor %}

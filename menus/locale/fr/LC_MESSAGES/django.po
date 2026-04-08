@@ -1,0 +1,215 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-05 17:29+0100\n"
+"PO-Revision-Date: 2026-03-05 17:32+0100\n"
+"Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 3.8\n"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "External URL"
+msgstr "URL externe"
+
+msgid "Document"
+msgstr "Document"
+
+msgid "Link type"
+msgstr "Type de lien"
+
+msgid "Select the type of link."
+msgstr "Choisissez le type de lien."
+
+msgid "Link label"
+msgstr "Libellé du lien"
+
+msgid ""
+"If this field is empty, the title of the linked page or document will be "
+"used."
+msgstr ""
+"Si ce champ est vide, le titre de la page ou du document lié sera utilisé."
+
+msgid "Icon"
+msgstr "Icône"
+
+msgid "See the whole section"
+msgstr "Voir tout la rubrique"
+
+msgid "Submenu label"
+msgstr "Libellé du sous-menu"
+
+msgid "Links"
+msgstr "Liens"
+
+msgid "The recommended maximum number of links in a single submenu is 8."
+msgstr "Le nombre de liens maximum recommandé dans un sous-menu est de 8."
+
+msgid "Column label"
+msgstr "Libellé de la colonne"
+
+msgid "Mega menu label"
+msgstr "Libellé du méga menu"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Main link"
+msgstr "Lien principal"
+
+msgid "Column"
+msgstr "Colonne"
+
+msgid "Columns"
+msgstr "Colonnes"
+
+msgid "Link"
+msgstr "Lien"
+
+msgid "Submenu"
+msgstr "Sous-menu"
+
+msgid "Mega menu"
+msgstr "Méga menu"
+
+msgid "Site"
+msgstr "Site"
+
+msgid "Menu items"
+msgstr "Éléments de menu"
+
+msgid "The top menu of the website, displayed in the top right corner."
+msgstr "Le menu du haut du site, situé dans le coin en haut à droite."
+
+msgid "There can only be one top menu per site."
+msgstr "Il ne peut y avoir qu'un menu du haut par site."
+
+msgid "It can contain up to three links."
+msgstr "Il peut contenir jusqu'à trois liens."
+
+msgid "Top menu"
+msgstr "Menu du haut"
+
+msgid "Top menus"
+msgstr "Menus du haut"
+
+#, python-brace-format
+msgid "Top menu for site {hostname}"
+msgstr "Menu du haut pour le site {hostname}"
+
+msgid ""
+"The footer bottom menu of the website, displayed at the bottom of the footer."
+msgstr "Le menu du bas du pied de page du site."
+
+msgid "There can only be one footer bottom menu per site."
+msgstr "Il ne peut y avoir qu'un menu de ce type par site."
+
+msgid ""
+"This menu contains the legal links: Terms of Service, Privacy Policy, etc."
+msgstr ""
+"Ce menu contient les liens vers les pages légales : conditions "
+"d'utilisation, politique de confidentialité, etc."
+
+msgid "Footer bottom menu"
+msgstr "Menu du bas du pied de page"
+
+msgid "Footer bottom menus"
+msgstr "Menus du bas du pied de page"
+
+#, python-brace-format
+msgid "Footer bottom menu for site {hostname}"
+msgstr "Menu du bas du pied de page pour le site {hostname}"
+
+msgid "The recommended maximum number of items in the main menu is 8."
+msgstr "Le nombre de liens maximum recommandé dans le menu principal est de 8."
+
+msgid "The main menu of the website, displayed in the main navigation area."
+msgstr ""
+"Le menu principal du site, situé dans la zone de navigation principale."
+
+msgid "There can only be one main menu per site."
+msgstr "Il ne peut y avoir qu'un menu de ce type par site."
+
+msgid "It can contain links, submenus, and mega menus."
+msgstr "Il peut contenir des liens, des sous-menus et des méga-menus."
+
+msgid "It is recommended to avoid mixing submenus and mega menus."
+msgstr ""
+"Il est recommandé de ne pas utiliser en même temps des sous-menus et des "
+"méga-menus."
+
+msgid "Main menu"
+msgstr "Menu principal"
+
+msgid "Main menus"
+msgstr "Menus principaux"
+
+#, python-brace-format
+msgid "Main menu for site {hostname}"
+msgstr "Menu principal pour le site {hostname}"
+
+msgid "Opens a new window"
+msgstr "Ouvre une nouvelle fenêtre"
+
+msgid "Close"
+msgstr "Fermer"
+
+#~ msgid ""
+#~ "\n"
+#~ "        The top menu of the website, displayed in the top right corner.\n"
+#~ "        There can only be one top menu per site.\n"
+#~ "        It can contain up to three links.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        Le menu en haut à droite du site.\n"
+#~ "        Il ne peut y en avoir qu'un par site.\n"
+#~ "        Il peut contenir jusqu'à trois liens.\n"
+#~ "        "
+
+#~ msgid ""
+#~ "\n"
+#~ "        The footer bottom menu of the website. There can only be one "
+#~ "footer bottom menu per site.\n"
+#~ "        This menu contains the legal links: Terms of Service, Privacy "
+#~ "Policy, etc.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        Le menu situé en bas du pied de page du site. Il ne peut y en "
+#~ "avoir qu'un par site.\n"
+#~ "        Ce menu contient les liens vers les pages légales : conditions "
+#~ "d'utilisation, politique de confidentialité, etc.\n"
+#~ "        "
+
+#~ msgid ""
+#~ "\n"
+#~ "        The main menu of the website. There can only be one main menu per "
+#~ "site.\n"
+#~ "        The main menu can contain links, submenus, and mega menus.\n"
+#~ "        It is recommended to avoid mixing submenus and mega menus.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        Le menu principal du site. Il ne peut y en avoir qu'un par site.\n"
+#~ "        Ce menu peut contenir des liens, des sous-menus et des méga-"
+#~ "menus.\n"
+#~ "        Il est recommandé de ne pas utiliser à la fois des sous-menus et "
+#~ "des méga-menus.\n"
+#~ "        "
+
+#~ msgid "Footer menu"
+#~ msgstr "Menu du pied de page"

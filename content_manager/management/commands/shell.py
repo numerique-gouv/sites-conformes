@@ -30,5 +30,13 @@ class Command(shell.Command):
             "django.db.models.OuterRef",
             "django.db.models.Subquery",
             # Project-related custom imports
+            "content_manager.services.accessors.get_or_create_collection",
+            "content_manager.services.accessors.get_or_create_catalog_index_page",
+            "content_manager.services.accessors.get_or_create_content_page",
+            "content_manager.services.accessors.get_or_create_main_menu",
+            "content_manager.services.accessors.get_or_create_footer_bottom_menu",
             "content_manager.utils.get_default_site",
+            "menus.models.MainMenu",
+            "menus.models.TopMenu",
+            "menus.models.FooterBottomMenu",
         ]

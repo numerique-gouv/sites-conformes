@@ -10,6 +10,7 @@ cd sites-faciles
 ```
 
 ### Effectuer les tests
+
 Les tests unitaires peuvent être lancés avec `just test`.
 
 Cela lance les tests en parallèle pour gagner du temps, mais en cas d’échec, il est possible de les lancer
@@ -34,6 +35,7 @@ just coverage events
 Avant chaque mise en production, les intervenant·es sont prié·es de [passer cette liste en revue](./DOD.md).
 
 ## Commandes
+
 Le projet utilise [just](https://just.systems/) pour gérer le lancement de séries de commandes spéfiques, appelées recettes.
 
 Il est possible d’avoir une liste des recettes implémentées en tapant simplement `just`.
@@ -43,7 +45,6 @@ Pour les commandes Django spécifiquement, il est possible d’en obtenir la lis
 ```sh
 uv run python manage.py
 ```
-
 
 ## Gestion des dépendances avec uv
 
@@ -81,8 +82,8 @@ Le projet utilise [django-dotenv](https://github.com/jpadilla/django-dotenv) pou
 
 Typiquement :
 
- * configuration locale spécifique à chaque intervenant·e sur le projet, e.g paramètres de connexion à la base de données ;
- * configuration de production.
+- configuration locale spécifique à chaque intervenant·e sur le projet, e.g paramètres de connexion à la base de données ;
+- configuration de production.
 
 Pour surcharger la configuration locale de développement, il est nécessaire de créer un fichier `.env` à la racine du projet Django.
 Cf. [le fichier .env.example](./src/.env.example) pour l’exemple.
@@ -102,7 +103,6 @@ Ce project utilise le [système de traduction de Django](https://docs.djangoproj
 
 Le texte dans le code est en anglais et la traduction qui s’affiche sur le site en français, se trouve dans le fichier
 `.po` du dossier `locales`.
-
 
 Pour générer la traduction dans le fichier `.po` :
 

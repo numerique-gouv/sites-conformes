@@ -6,12 +6,14 @@ from faker import Faker
 from taggit.models import slugify
 from wagtail.images import get_image_model
 from wagtail.rich_text import RichText
-from wagtailmenus.models.menuitems import FlatMenuItem, MainMenuItem
-from wagtailmenus.models.menus import FlatMenu, MainMenu
 
 from blog.models import BlogIndexPage
-from content_manager.models import ContentPage, MegaMenu, MegaMenuCategory
-from content_manager.services.accessors import get_or_create_catalog_index_page, get_or_create_content_page
+from content_manager.models import ContentPage
+from content_manager.services.accessors import (
+    get_or_create_catalog_index_page,
+    get_or_create_content_page,
+    get_or_create_main_menu,
+)
 from content_manager.utils import get_default_site, import_image
 from forms.models import FormField, FormPage
 
@@ -41,17 +43,18 @@ class Command(BaseCommand):
         # First, add the home page to the main menu if not already done
         home_page = site.root_page
         locale = home_page.locale
-        main_menu = MainMenu.objects.first()
-        if not main_menu:
-            main_menu = MainMenu.objects.create(site=site)
-        MainMenuItem.objects.update_or_create(
-            link_page=home_page, menu=main_menu, defaults={"link_text": "Accueil", "sort_order": 0}
-        )
+        main_menu = get_or_create_main_menu()
 
         for slug in slugs:
             if slug == "blog_index":
                 blog_index = self.create_blog_index(home_page)
-                MainMenuItem.objects.update_or_create(link_page=blog_index, menu=main_menu, defaults={"sort_order": 1})
+
+                link_value = {
+                    "text": blog_index.title,
+                    "page": blog_index,
+                    "link_type": "page",
+                }
+                main_menu.items.append(("link", link_value))
 
                 # to/do add example blog pages
 
@@ -64,12 +67,13 @@ class Command(BaseCommand):
                 menu_page = get_or_create_content_page(slug, title="Pages d'exemple", body=body, parent_page=home_page)
 
                 # Inserts it right before the last entry
-                contact_menu_entry = MainMenuItem.objects.filter(menu=main_menu).last()
-                MainMenuItem.objects.update_or_create(
-                    link_page=menu_page, menu=main_menu, defaults={"sort_order": contact_menu_entry.sort_order}
-                )
-                contact_menu_entry.sort_order += 1
-                contact_menu_entry.save()
+
+                link_value = {
+                    "text": menu_page.title,
+                    "page": menu_page,
+                    "link_type": "page",
+                }
+                main_menu.items.insert(-1, ("link", link_value))
 
             elif slug == "form":
                 menu_page = ContentPage.objects.get(slug="menu_page", locale=locale)
@@ -85,6 +89,8 @@ class Command(BaseCommand):
 
             else:
                 raise ValueError(f"Valeur inconnue : {slug}")
+
+        main_menu.save()
 
     def get_or_import_image(self, path: str, title: str):
         """Get an existing image by title or import it from the given path."""
@@ -134,29 +140,15 @@ class Command(BaseCommand):
         body.append(("paragraph", RichText(text_raw)))
 
         publications_page = get_or_create_catalog_index_page(slug=slug, title=title, body=body)
-        publications_menu_item, _created = MainMenuItem.objects.update_or_create(
-            link_page=publications_page, menu=main_menu, defaults={"sort_order": 2}
-        )
 
-        # Create the mega menu
-        publications_mega_menu, _created = MegaMenu.objects.get_or_create(
-            name="Méga-menu publications",
-            parent_menu_item_id=publications_menu_item.id,
-            description="Ceci est une description",
-        )
+        menu_columns = []
 
         # Create a set of publications sub-pages
         for i in range(4):
-            menu_category_menu, _created = FlatMenu.objects.get_or_create(
-                site_id=site.id,
-                title=f"Menu publications > Catégorie {i + 1}",
-                handle=f"mega_menu_section_{i + 1}",
-                heading=f"Colonne {i + 1}",
-            )
-
-            menu_category, _created = MegaMenuCategory.objects.get_or_create(
-                mega_menu=publications_mega_menu, sort_order=i, category=menu_category_menu
-            )
+            menu_column_value = {
+                "label": f"Colonne {i + 1}",
+                "links": [],
+            }
 
             for j in range(8):
                 title = f"Page {i + 1} - {j + 1}"
@@ -171,10 +163,20 @@ class Command(BaseCommand):
                     slug=slugify(title), title=title, body=body, parent_page=publications_page
                 )
 
-                FlatMenuItem.objects.get_or_create(link_page=new_page, menu=menu_category_menu, sort_order=j)
+                menu_column_value["links"].append(("link", {"text": title, "page": new_page, "link_type": "page"}))
 
-            publications_mega_menu.categories.add(menu_category)
-            publications_mega_menu.save()
+            menu_column = ("column", menu_column_value)
+
+            menu_columns.append(menu_column)
+
+        mega_menu_values = {
+            "label": "Publications",
+            "columns": menu_columns,
+            "description": "Découvrez nos publications",
+            "main_link": {"text": publications_page.title, "page": publications_page, "link_type": "page"},
+        }
+        main_menu.items.insert(-1, ("megamenu", mega_menu_values))
+        main_menu.save()
 
     def create_form_page(self, slug: str, parent_page: ContentPage) -> None:
         """

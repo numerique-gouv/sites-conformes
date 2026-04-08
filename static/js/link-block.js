@@ -33,11 +33,17 @@ class LinkBlock {
     );
     if (anchorInput) anchorInput.style.display = "none";
 
+    const queryInput = this.container.querySelector(
+      '[data-contentpath="query_string"]'
+    );
+    if (pageChooser) queryInput.style.display = "none";
+
     let fieldsWithAnchors = ["page", "anchor"];
 
     const updateDisplay = (value) => {
       if (pageChooser) {
         pageChooser.style.display = value === "page" ? "block" : "none";
+        queryInput.style.display = value === "page" ? "block" : "none";
       }
       if (urlInput)
         urlInput.style.display = value === "external_url" ? "block" : "none";

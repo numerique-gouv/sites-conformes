@@ -1,5 +1,5 @@
 {% extends "dsfr/header.html" %}
-{% load i18n static wagtailcore_tags wagtailimages_tags menu_tags wagtail_dsfr_tags %}
+{% load i18n static wagtailcore_tags wagtailimages_tags wagtail_dsfr_tags wagtail_dsfr_menus_tags %}
 
 {% block brand %}
   <p class="fr-logo">{{ settings.content_manager.CmsDsfrConfig.header_brand_html|safe }}</p>
@@ -9,7 +9,6 @@
   {% translate "Home page" as home_page %}
   <a href="{% root_url %}"
      title="{{ home_page }} — {{ settings.content_manager.CmsDsfrConfig.site_title }}">
-
     <p class="fr-header__service-title">
       {% if settings.content_manager.CmsDsfrConfig.site_title|slice:"-2:" == "fr" %}
         {{ settings.content_manager.CmsDsfrConfig.site_title|slice:":-2" }}<em>fr</em>
@@ -42,7 +41,7 @@
 
 {% block header_tools %}
   {% if request %}
-    {% flat_menu handle="header_tools" template="menus/custom_flat_menu.html" %}
+    {% top_menu %}
   {% endif %}
   {% if user.is_authenticated %}
     <li>
@@ -119,9 +118,8 @@
                 aria-controls="fr-menu-mobile">{{ close_label }}</button>
         <div class="fr-header__menu-links"></div>
         {% translate "Main menu" as main_menu_label %}
-
         <nav class="fr-nav" id="fr-navigation" aria-label="{{ main_menu_label }}">
-          {% main_menu max_levels=2 template="menus/custom_main_menu.html" sub_menu_template="menus/custom_sub_menu.html" %}
+          {% main_menu %}
         </nav>
       </div>
     </div>

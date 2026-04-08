@@ -1,5 +1,5 @@
 {% extends "dsfr/footer.html" %}
-{% load i18n wagtailcore_tags wagtailimages_tags menu_tags wagtail_dsfr_tags %}
+{% load i18n wagtailcore_tags wagtailimages_tags wagtail_dsfr_menus_tags wagtail_dsfr_tags %}
 
 {% block footer_brand %}
   {% translate "Back to home page" as back_to_home_label %}
@@ -41,7 +41,7 @@
 
 {% block footer_links %}
   {% if request %}
-    {% flat_menu handle="footer" template="menus/custom_flat_menu_footer.html" %}
+    {% footer_bottom_menu %}
   {% endif %}
   <li class="fr-footer__bottom-item">
     <a class="fr-footer__bottom-link" href="{% url 'readable_sitemap' %}">{% translate "Sitemap" %}</a>

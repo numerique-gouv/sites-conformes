@@ -14,11 +14,13 @@ Two test classes:
 
 from django.core.management import call_command
 from django.test import SimpleTestCase
+from wagtail.models import Site
 from wagtail.test.utils import WagtailPageTestCase
 
 from content_manager.blocks.core import HERO_STREAMFIELD_BLOCKS, STREAMFIELD_COMMON_BLOCKS
 from content_manager.blocks.utils import block_to_sample_dict
 from content_manager.models import ContentPage
+from menus.models import MainMenu
 
 
 class BlockValidationTestCase(SimpleTestCase):
@@ -140,3 +142,58 @@ class CreateDemoPagesCommandTestCase(WagtailPageTestCase):
     def test_hero_old_page_is_renderable(self):
         page = ContentPage.objects.get(slug="hero-old")
         self.assertPageIsRenderable(page)
+
+    # ------------------------------------------------------------------
+    # main menu
+    # ------------------------------------------------------------------
+
+    def test_main_menu_is_created(self):
+        site = Site.objects.get(is_default_site=True)
+        self.assertTrue(MainMenu.objects.filter(site=site).exists())
+
+    def test_main_menu_has_four_items(self):
+        site = Site.objects.get(is_default_site=True)
+        menu = MainMenu.objects.get(site=site)
+        self.assertEqual(len(menu.items), 4)
+
+    def test_main_menu_first_item_links_to_home_page(self):
+        site = Site.objects.get(is_default_site=True)
+        menu = MainMenu.objects.get(site=site)
+        first = menu.items[0]
+        self.assertEqual(first.block_type, "link")
+        self.assertEqual(first.value["page"], site.root_page)
+
+    def test_main_menu_second_item_is_publications_megamenu(self):
+        site = Site.objects.get(is_default_site=True)
+        menu = MainMenu.objects.get(site=site)
+        second = menu.items[1]
+        self.assertEqual(second.block_type, "megamenu")
+        self.assertEqual(second.value["label"], "Publications")
+
+    def test_main_menu_publications_megamenu_has_four_columns(self):
+        site = Site.objects.get(is_default_site=True)
+        menu = MainMenu.objects.get(site=site)
+        columns = menu.items[1].value["columns"]
+        self.assertEqual(len(columns), 4)
+
+    def test_main_menu_publications_megamenu_columns_have_eight_links_each(self):
+        site = Site.objects.get(is_default_site=True)
+        menu = MainMenu.objects.get(site=site)
+        columns = menu.items[1].value["columns"]
+        for column in columns:
+            with self.subTest(column=column.value["label"]):
+                self.assertEqual(len(column.value["links"]), 8)
+
+    def test_main_menu_third_item_links_to_menu_page(self):
+        site = Site.objects.get(is_default_site=True)
+        menu = MainMenu.objects.get(site=site)
+        third = menu.items[2]
+        self.assertEqual(third.block_type, "link")
+        self.assertEqual(third.value["page"].slug, "menu_page")
+
+    def test_main_menu_fourth_item_links_to_blog_index(self):
+        site = Site.objects.get(is_default_site=True)
+        menu = MainMenu.objects.get(site=site)
+        fourth = menu.items[3]
+        self.assertEqual(fourth.block_type, "link")
+        self.assertEqual(fourth.value["page"].slug, "actualités")

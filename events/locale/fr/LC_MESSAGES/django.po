@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-06 15:20+0100\n"
+"POT-Creation-Date: 2026-02-26 18:17+0100\n"
 "PO-Revision-Date: 2025-10-28 13:47+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,207 +19,154 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.8\n"
 
-#: events/forms.py:11
 msgid "Start date"
 msgstr "Date de début"
 
-#: events/forms.py:17
 msgid "End date"
 msgstr "Date de fin"
 
-#: events/models.py:31
 msgid "Events per page"
 msgstr "Événements par page"
 
-#: events/models.py:35 events/templates/events/events_index_page.html:99
 msgid "Filter by category"
 msgstr "Filtrer par catégorie"
 
-#: events/models.py:36 events/templates/events/events_index_page.html:117
 msgid "Filter by tag"
 msgstr "Filtrer par étiquette"
 
-#: events/models.py:37 events/templates/events/events_index_page.html:135
 msgid "Filter by author"
 msgstr "Filtrer par auteur"
 
-#: events/models.py:39 events/templates/events/events_index_page.html:151
 msgid "Filter by source"
 msgstr "Filtrer par source"
 
-#: events/models.py:39
 msgid "The source is the organization of the event author"
 msgstr ""
 "La source est l’organisation à laquelle appartient l’auteur de l’événement"
 
-#: events/models.py:51
 msgid "Show filters"
 msgstr "Afficher les filtres"
 
-#: events/models.py:58
 msgid "Event calendar index"
 msgstr "Index de l’agenda"
 
-#: events/models.py:99
 #, python-format
 msgid "Events tagged with %(tag)s"
 msgstr "Événements avec l’étiquette %(tag)s"
 
-#: events/models.py:111
 #, python-format
 msgid "Events in category %(category)s"
 msgstr "Événements dans la catégorie %(category)s"
 
-#: events/models.py:123 events/models.py:134
 msgid "Events created by"
 msgstr "Événements créés par"
 
-#: events/models.py:231
 msgid "Past events"
 msgstr "Événements terminés"
 
-#: events/models.py:238
 #, python-format
 msgid "Events published in %(year)s"
 msgstr "Événements publiés en %(year)s"
 
-#: events/models.py:275
 msgid "Categories"
 msgstr "Catégories"
 
-#: events/models.py:278
 msgid "Post date"
 msgstr "Date de publication"
 
-#: events/models.py:279
 msgid "Event start date"
 msgstr "Date de début de l’événement"
 
-#: events/models.py:280
 msgid "Event end date"
 msgstr "Date de fin de l’événement"
 
-#: events/models.py:282
 msgid "Location"
 msgstr "Lieu"
 
-#: events/models.py:284
 msgid "Registration URL"
 msgstr "Lien d’inscription"
 
-#: events/models.py:285
 msgid "Max length: 2000 characters."
 msgstr "Longueur maximum : 2000 caractères."
 
-#: events/models.py:292
 msgid "Author entries can be created in Snippets > Persons"
 msgstr "Les auteurs peuvent être créés via Fragments > Personnes"
 
-#: events/models.py:321
 msgid "Event date and place"
 msgstr "Date et lieu de l’événement"
 
-#: events/models.py:333
 msgid "Scheduled publishing"
 msgstr "Publication programmée"
 
-#: events/models.py:341
 msgid "Tags and Categories"
 msgstr "Étiquettes et Catégories"
 
-#: events/models.py:409
 msgid "Event page"
 msgstr "Page d’événement"
 
-#: events/models.py:417
 msgid "Category"
 msgstr "Catégorie"
 
-#: events/templates/events/blocks/events_index_posts_list.html:45
 msgid "No event found."
 msgstr "Aucun événement trouvé."
 
-#: events/templates/events/event_entry_page.html:82
 msgid "Posted by:"
 msgstr "Écrit par :"
 
-#: events/templates/events/event_entry_page.html:107
 msgid "Date:"
 msgstr "Date :"
 
-#: events/templates/events/event_entry_page.html:110
 msgid "Location:"
 msgstr "Lieu :"
 
-#: events/templates/events/event_entry_page.html:114
 msgid "Registration link:"
 msgstr "Lien d’inscription :"
 
-#: events/templates/events/event_entry_page.html:133
-#: events/templates/events/events_index_page.html:170
 msgid "Add to your calendar (iCal)"
 msgstr "Ajouter à votre calendrier (iCal)"
 
-#: events/templates/events/events_archive_page.html:9
 msgid "Year:"
 msgstr "Année :"
 
-#: events/templates/events/events_archive_page.html:73
-#: events/templates/events/events_index_page.html:89
 msgid "Filters"
 msgstr "Filtres"
 
-#: events/templates/events/events_archive_page.html:75
-#: events/templates/events/events_index_page.html:91
 msgid "Filters and export"
 msgstr "Filtres et export"
 
-#: events/templates/events/events_archive_page.html:78
 msgid "Filter by year"
 msgstr "Filtrer par année"
 
-#: events/templates/events/events_archive_page.html:97
-#: events/templates/events/events_index_page.html:191
 msgid "Events"
 msgstr "Événements"
 
-#: events/templates/events/events_index_page.html:9
 msgid "Category:"
 msgstr "Catégorie :"
 
-#: events/templates/events/events_index_page.html:12
 msgid "Tag:"
 msgstr "Étiquette :"
 
-#: events/templates/events/events_index_page.html:15
 msgid "Author:"
 msgstr "Auteur :"
 
-#: events/templates/events/events_index_page.html:18
 msgid "Source:"
 msgstr "Source :"
 
-#: events/templates/events/events_index_page.html:21
 msgid "Start date:"
 msgstr "Date de début :"
 
-#: events/templates/events/events_index_page.html:24
 msgid "End date:"
 msgstr "Date de fin :"
 
-#: events/templates/events/events_index_page.html:93
 msgid "Filter by date"
 msgstr "Filtrer par date"
 
-#: events/templates/events/events_index_page.html:165
 msgid "Export"
 msgstr "Export"
 
-#: events/templates/events/events_index_page.html:175
 msgid "Archives"
 msgstr "Archives"
 
-#: events/templates/events/events_index_page.html:180
 msgid "See archives"
 msgstr "Voir les archives"
 

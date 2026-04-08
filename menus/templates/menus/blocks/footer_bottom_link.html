@@ -1,0 +1,16 @@
+{% load i18n dsfr_tags wagtailcore_tags wagtail_dsfr_tags %}
+{% settings_value "WAGTAILADMIN_PATH" as admin_path %}
+<a class="fr-footer__bottom-link"
+   href="{{ value.url }}"
+   {% if value.url.0 != '/' and request.get_host not in value.url %}target="_blank" rel="noopener noreferrer"{% endif %}
+   {% if value.page and value.page.id == current_page.id %}aria-current="page"{% endif %}>
+  {{ value.label }}
+  {% if value.url.0 != '/' and request.get_host not in value.url %}
+    <span class="fr-sr-only">{% translate "Opens a new window" %}</span>
+  {% endif %}
+  {% if value.document %}
+    <span class="fr-link__detail">
+      {% include "content_manager/blocks/download_info.html" with document=value.document %}
+    </span>
+  {% endif %}
+</a>

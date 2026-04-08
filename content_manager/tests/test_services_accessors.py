@@ -1,23 +1,36 @@
 from wagtail.models import Collection, PageViewRestriction
 from wagtail.test.utils import WagtailPageTestCase
-from wagtailmenus.models.menus import FlatMenu
 
 from content_manager.services.accessors import (
     get_or_create_collection,
     get_or_create_content_page,
-    get_or_create_footer_menu,
+    get_or_create_footer_bottom_menu,
+    get_or_create_main_menu,
 )
-from content_manager.utils import import_image
+from content_manager.utils import get_default_site, import_image
+from menus.models import FooterBottomMenu, MainMenu
 
 
-class FooterMenuAccessorTestCase(WagtailPageTestCase):
-    def test_get_or_create_footer_menu(self):
-        assert FlatMenu.objects.count() == 0
+class MainMenuAccessorTestCase(WagtailPageTestCase):
+    def test_get_or_create_main_menu(self):
+        assert MainMenu.objects.count() == 0
 
-        flat_menu = get_or_create_footer_menu()
+        main_menu = get_or_create_main_menu()
 
-        assert FlatMenu.objects.count() == 1
-        assert flat_menu.handle == "footer"
+        default_site = get_default_site()
+
+        assert MainMenu.objects.count() == 1
+
+        assert main_menu.items[0].value["page"] == default_site.root_page
+
+
+class FooterBottomMenuAccessorTestCase(WagtailPageTestCase):
+    def test_get_or_create_footer_bottom_menu(self):
+        assert FooterBottomMenu.objects.count() == 0
+
+        _bottom_menu = get_or_create_footer_bottom_menu()
+
+        assert FooterBottomMenu.objects.count() == 1
 
 
 class CollectionAccessorTestCase(WagtailPageTestCase):

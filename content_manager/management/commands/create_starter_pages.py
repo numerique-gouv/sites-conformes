@@ -4,10 +4,9 @@ from django.urls import reverse
 from wagtail.images.models import Image
 from wagtail.models import Page
 from wagtail.rich_text import RichText
-from wagtailmenus.models.menuitems import FlatMenuItem, MainMenuItem
 
 from content_manager.models import ContentPage
-from content_manager.services.accessors import get_or_create_footer_menu, get_or_create_main_menu
+from content_manager.services.accessors import get_or_create_footer_bottom_menu, get_or_create_main_menu
 from content_manager.utils import get_default_site
 from forms.models import FormField, FormPage
 
@@ -180,16 +179,16 @@ class Command(BaseCommand):
         home_page = get_default_site().root_page
         new_page = home_page.add_child(instance=ContentPage(title=title, body=body, slug=slug, show_in_menus=True))
 
-        footer_menu = get_or_create_footer_menu()
+        footer_menu = get_or_create_footer_bottom_menu()
 
-        footer_item = {
-            "menu": footer_menu,
-            "link_page": new_page,
+        link_label = footer_label if footer_label else title
+
+        link_value = {
+            "text": link_label,
+            "page": new_page,
+            "link_type": "page",
         }
-        if footer_label:
-            footer_item["link_text"] = footer_label
-
-        FlatMenuItem.objects.create(**footer_item)
+        footer_menu.items.append(("link", link_value))
 
         self.stdout.write(self.style.SUCCESS(f"Page {slug} created with id {new_page.id}"))
 
@@ -277,12 +276,12 @@ class Command(BaseCommand):
         # Menu item
         main_menu = get_or_create_main_menu()
 
-        menu_item = {
-            "sort_order": MainMenuItem.objects.filter(menu=main_menu).count(),
-            "link_page": contact_page,
-            "link_text": title,
-            "menu": main_menu,
+        link_value = {
+            "text": title,
+            "page": contact_page,
+            "link_type": "page",
         }
-        MainMenuItem.objects.create(**menu_item)
+        main_menu.items.append(("link", link_value))
+        main_menu.save()
 
         self.stdout.write(self.style.SUCCESS(f"Form page {slug} created with id {contact_page.id}"))

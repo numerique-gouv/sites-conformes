@@ -1,0 +1,55 @@
+name: 🌍 CI - Internationalization Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings_test
+      PYTHONPATH: .
+    strategy:
+      matrix:
+        python-version: ["3.14"]
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: dju
+          POSTGRES_PASSWORD: djpwd
+          POSTGRES_DB: djdb
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - name: 📔 Install just
+        uses: extractions/setup-just@v2
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 📦 Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext
+      - name: 🐍 Set up uv
+        uses: astral-sh/setup-uv@v5
+      - name: 🌍 Install dependencies
+        run: |
+          uv sync --no-group dev
+      - name: 📄 Copy empty .env.test to .env
+        run: |
+          cp .env.test .env
+      - name: 🌍 Check internationalization
+        run: |
+          just makemessages
+          just compilemessages
+          git diff --exit-code locale/
+          git diff --exit-code */locale/

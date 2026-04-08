@@ -8,26 +8,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-05 18:31+0200\n"
-"PO-Revision-Date: 2025-04-24 11:26+0200\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2026-02-05 17:42+0100\n"
+"PO-Revision-Date: 2026-02-05 17:46+0100\n"
+"Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.8\n"
 
-#: templates/404.html:5
 msgid "Error 404 — Page not found"
 msgstr "Erreur 404 — Page non trouvée"
 
-#: templates/404.html:12
 msgid "Page not found"
 msgstr "Page non trouvée"
 
-#: templates/404.html:15
 msgid ""
 "The page you are looking for could not be found. We apologize for any "
 "inconvenience."
@@ -35,7 +32,6 @@ msgstr ""
 "La page que vous cherchez est introuvable. Veuillez nous excuser pour la "
 "gêne occasionnée."
 
-#: templates/404.html:18
 msgid ""
 "If you typed the web address into your browser, check that it is correct. "
 "The page may no longer be available."
@@ -43,33 +39,26 @@ msgstr ""
 "Si vous avez tapé l’adresse web dans le navigateur, vérifiez qu’elle est "
 "correcte. La page n’est peut-être plus disponible."
 
-#: templates/404.html:20
 msgid "In this case, to continue your visit, you can consult our home page."
 msgstr ""
 "Dans ce cas, pour continuer votre visite, vous pouvez consulter notre page "
 "d’accueil."
 
-#: templates/404.html:23 templates/500.html:19 templates/blocks/footer.html:5
 msgid "Back to home page"
 msgstr "Retourner à l’accueil"
 
-#: templates/500.html:5
 msgid "Error 500 — Unexpected error"
 msgstr "Erreur 500 — Erreur inattendue"
 
-#: templates/500.html:12
 msgid "Unexpected error"
 msgstr "Erreur inattendue"
 
-#: templates/500.html:13
 msgid "Error 500"
 msgstr "Erreur 500"
 
-#: templates/500.html:14
 msgid "Please try refreshing the page or try again later."
 msgstr "Essayez de rafraîchir la page ou bien ressayez plus tard."
 
-#: templates/500.html:16
 msgid ""
 "Sorry, there is an issue with the service, we are working to resolve it as "
 "quickly as possible."
@@ -77,112 +66,105 @@ msgstr ""
 "Désolé, le service rencontre un problème, nous travaillons pour le résoudre "
 "le plus rapidement possible."
 
-#: templates/blocks/follow.html:9
 msgctxt "Section title"
 msgid "Subscribe to our newsletter"
 msgstr "Abonnez-vous à notre lettre d’information"
 
-#: templates/blocks/follow.html:13
 msgctxt "Button title"
 msgid "Subscribe to our newsletter"
 msgstr "S'abonner à notre lettre d’information"
 
-#: templates/blocks/follow.html:18
 msgid "Subscribe"
 msgstr "S’abonner"
 
-#: templates/blocks/follow.html:30
 msgid "Follow us <br /> on social media"
 msgstr "Suivez-nous<br />sur les réseaux sociaux"
 
-#: templates/blocks/footer.html:47
 msgid "Sitemap"
 msgstr "Plan du site"
 
-#: templates/blocks/footer.html:55
 msgid "Cookie settings"
 msgstr "Gestion des cookies"
 
-#: templates/blocks/footer.html:64
 msgid "Display settings"
 msgstr "Paramètres d’affichage"
 
-#: templates/blocks/footer.html:70 templates/blocks/notice.html:4
-#: templates/blocks/share.html:2
 msgid "Opens a new window"
 msgstr "Ouvre une nouvelle fenêtre"
 
-#: templates/blocks/footer.html:72
 msgid "This website is made with"
 msgstr "Ce site est fait avec"
 
-#: templates/blocks/header.html:9
 msgid "Home page"
 msgstr "Accueil"
 
-#: templates/blocks/header.html:54
 msgid "Hello"
 msgstr "Bonjour"
 
-#: templates/blocks/header.html:54
 msgid "Log out"
 msgstr "Déconnexion"
 
-#: templates/blocks/header.html:61
 msgid "Log in"
 msgstr "Connexion"
 
-#: templates/blocks/header.html:67 templates/blocks/header.html:92
 msgid "Search"
 msgstr "Rechercher"
 
-#: templates/blocks/header.html:71 templates/blocks/header.html:116
 msgid "Close"
 msgstr "Fermer"
 
-#: templates/blocks/header.html:101
 msgid "Menu"
 msgstr "Menu"
 
-#: templates/blocks/header.html:121
 msgid "Main menu"
 msgstr "Menu principal"
 
-#: templates/blocks/notice.html:2
 msgid "Hide message"
 msgstr "Masquer le message"
 
-#: templates/blocks/notice.html:3
 msgid "Consultation link"
 msgstr "Lien de consultation"
 
-#: templates/blocks/share.html:5
 msgid "Share this page"
 msgstr "Partager cette page"
 
-#: templates/blocks/share.html:9
 msgid "Share on Facebook"
 msgstr "Partager sur Facebook"
 
-#: templates/blocks/share.html:21
 msgid "Share on X (previously Twitter)"
 msgstr "Partager sur X (anciennement Twitter)"
 
-#: templates/blocks/share.html:35
 msgid "Share on LinkedIn"
 msgstr "Partager sur LinkedIn"
 
-#: templates/blocks/share.html:49
 msgid "Share via email"
 msgstr "Partager par email"
 
-#: templates/blocks/share.html:62
 msgid "Page URL copied to clipboard."
 msgstr "Adresse de la page copiée dans le presse-papiers."
 
-#: templates/blocks/share.html:66
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
+
+#, fuzzy
+#~| msgid "Main menu"
+#~ msgid "Main link"
+#~ msgstr "Menu principal"
+
+#, fuzzy
+#~| msgid "Main menu"
+#~ msgid "Mega menu"
+#~ msgstr "Menu principal"
+
+#, fuzzy
+#~| msgid "Sitemap"
+#~ msgid "Site"
+#~ msgstr "Plan du site"
+
+#, fuzzy
+#~| msgid "Main menu"
+#~ msgid "Main menus"
+#~ msgstr "Menu principal"
 
 #~ msgid "Invalid response format or token verification failed"
 #~ msgstr "Format de réponse invalide ou vérification du jeton échouée"

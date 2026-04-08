@@ -19,6 +19,11 @@ default:
 collectstatic:
     {{docker_cmd}} {{uv_run}} python manage.py collectstatic --noinput
 
+# Compile the translation files
+[group('Internationalization')]
+compilemessages:
+    {{docker_cmd}} {{uv_run}} django-admin compilemessages -l fr --ignore=.venv
+
 alias csu := createsuperuser
 createsuperuser:
     {{docker_cmd}} {{uv_run}} python manage.py createsuperuser
@@ -52,9 +57,11 @@ init-dev:
     {{docker_cmd}} {{uv_run}} pre-commit install
 
 alias messages := makemessages
+# Update the translation files
+[group('Internationalization')]
 makemessages:
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles
+    {{docker_cmd}} {{uv_run}} django-admin makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles  --no-location
+    {{docker_cmd}} {{uv_run}} django-admin makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --no-location
 
 alias mm:= makemigrations
 makemigrations app="":
@@ -157,7 +164,7 @@ clear-local-db:
 # Creates a bunch of example pages
 [group('Dev DB and medias management')]
 demo:
-    just init
+    just init-dev
     {{docker_cmd}} {{uv_run}} python manage.py create_demo_pages
 
 # Descend the latest DB backup & media files of the production database

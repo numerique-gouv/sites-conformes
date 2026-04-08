@@ -18,7 +18,7 @@ Récupérer le SHA complet puis l'ajouter au fichier avec un commentaire :
 git rev-parse <short-sha>
 ```
 
-```
+```sh
 # Apply black formatting (2026-02-23)
 abc1234def5678abc1234def5678abc1234def5678
 ```

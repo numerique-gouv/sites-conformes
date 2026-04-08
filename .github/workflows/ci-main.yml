@@ -13,7 +13,7 @@ jobs:
         # the one that is pinned in the .python-version file
         # (which should be the default one on Scalingo, per
         # https://doc.scalingo.com/languages/python/start )
-        python-version: ["3.10", "3.13", "3.14"]
+        python-version: ["3.12", "3.13", "3.14"]
         # Only include the first and last supported pgsql versions to limit
         # the number of jobs
         postgresql-version: [14, 17]
@@ -37,7 +37,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: 🐍 Set up uv
         uses: astral-sh/setup-uv@v5
-      - uses: pre-commit/action@v3.0.1
       - name: 🌍 Install dependencies
         run: |
           uv sync --no-group dev
@@ -47,9 +46,6 @@ jobs:
       - name: 💾 Collect static files
         run: |
           just collectstatic
-      - name: ✨ Black & ruff
-        run: |
-          just quality
       - name: 🤹‍ Run the unit tests
         run: |
           just unittest
