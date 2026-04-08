@@ -17,9 +17,8 @@ To upgrade of Sites Conformes :
  `git checkout main-agreste; git rebase production`. Solve conflicts, then `git push --force`.
  - Update the version number in `agreste_version.txt`
  - Create the release : 
-   - Merge main-agreste into production-agreste : `git checkout production-agreste; git pull; git merge main-agreste`
-   - tag the commit : `git tag v3.0.0-0.1.0`
-   - push to github (this will trigger the release if autodeploy is configured on `production-agreste` branch) : `git pushl; git push --tags`
+   - Open a PR to merge `main-agreste` into `production-agreste`. Name it with the new version number. Solve any conflicts and merge (this will trigger the release if autodeploy is configured on `production-agreste` branch)
+   - tag the merge commit with the version number : `git checkout production-agreste; git pull; git tag v3.0.0-0.1.0; git push --tags`
 
 -----
 # Sites Conformes
