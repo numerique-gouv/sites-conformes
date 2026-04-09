@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 
 import requests
@@ -7,9 +8,43 @@ from packaging.version import Version
 
 from content_manager import __version__ as actual_version
 
+logger = logging.getLogger(__name__)
+
+VALID_TYPES = ["info", "warning", "alert"]
+REQUIRED_FIELDS = ["type", "title", "date"]
+
 
 def is_last_version(installed_version, latest_version):
     return Version(installed_version) >= Version(latest_version)
+
+
+def is_displayable_notification(item):
+    """Vérifie qu'une notification est bien formée ET affichable aujourd'hui."""
+
+    for field in REQUIRED_FIELDS:
+        if not item.get(field):
+            return False
+
+    if item.get("type") not in VALID_TYPES:
+        return False
+
+    today = date.today()
+
+    try:
+        if date.fromisoformat(item["date"]) > today:
+            return False
+    except ValueError:
+        return False
+
+    end_date_str = item.get("end_date")
+    if end_date_str:
+        try:
+            if date.fromisoformat(end_date_str) < today:
+                return False
+        except ValueError:
+            return False
+
+    return True
 
 
 def push_version_notification(items):
@@ -53,16 +88,16 @@ def get_all_notifications():
         res = requests.get(settings.INFORMATION_URL, timeout=5)
         res.raise_for_status()
         data = res.json()
-    except Exception:
+    except Exception as e:
+        logger.error("Impossible de récupérer les notifications (%s)", e)
         data = {}
 
-    today = date.today()
     for item in data.get("items", []):
         try:
-            end_date = item.get("end_date")
-            if not end_date or date.fromisoformat(end_date) >= today:
+            if is_displayable_notification(item):
                 items.append(item)
-        except Exception:
+        except Exception as e:
+            logger.warning("Notification invalide ignorée : %s", e)
             continue
 
     cache.set(INFORMATION_CACHE_KEY, items, INFORMATION_CACHE_TIMEOUT)
