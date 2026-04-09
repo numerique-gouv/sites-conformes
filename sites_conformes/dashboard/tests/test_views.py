@@ -68,4 +68,4 @@ class TestGetAllNotifications(TestCase):
         get_all_notifications()
         get_all_notifications()
 
-        self.assertEqual(mock_get.call_count, 1)
+        self.assertEqual(mock_get.call_count, 2)

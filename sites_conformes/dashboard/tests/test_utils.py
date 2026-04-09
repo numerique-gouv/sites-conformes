@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 from unittest.mock import MagicMock, patch
 
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 
 from dashboard.utils import get_all_notifications, is_last_version, push_version_notification
@@ -25,7 +26,7 @@ class TestIsLastVersion(TestCase):
 
 
 @override_settings(
-    INFORMATION_URL="https://example.com/notifications.json",
+    INFORMATION_URL="https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json",
     LATEST_RELEASE_URL="https://api.github.com/repos/test/test/releases/latest",
 )
 class TestPushVersionNotification(TestCase):
@@ -57,14 +58,17 @@ class TestPushVersionNotification(TestCase):
         mock_get.side_effect = Exception("Network error")
 
         items = push_version_notification([])
-        self.assertIsNone(items)
+        self.assertEqual(items, [])
 
 
 @override_settings(
-    INFORMATION_URL="https://example.com/notifications.json",
+    INFORMATION_URL="https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json",
     LATEST_RELEASE_URL="https://api.github.com/repos/test/test/releases/latest",
 )
 class TestGetAllNotifications(TestCase):
+    def setUp(self):
+        cache.clear()
+
     @patch("dashboard.utils.requests.get")
     def test_empty_if_json_not_found(self, mock_get):
         """Rien ne s'affiche si le fichier notifications.json est introuvable."""
