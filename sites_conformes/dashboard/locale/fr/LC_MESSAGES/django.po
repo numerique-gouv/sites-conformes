@@ -8,8 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD:sites_conformes/dashboard/locale/fr/LC_MESSAGES/django.po
 "POT-Creation-Date: 2026-03-24 09:46+0100\n"
 "PO-Revision-Date: 2026-04-29 16:55+0200\n"
+=======
+"POT-Creation-Date: 2026-04-10 12:01+0200\n"
+"PO-Revision-Date: 2026-04-10 12:02+0200\n"
+>>>>>>> 3af292e (add i18n):dashboard/locale/fr/LC_MESSAGES/django.po
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -72,6 +77,9 @@ msgstr "Mon compte"
 
 msgid "Contact us"
 msgstr "Nous contacter"
+
+msgid "Learn more"
+msgstr "En savoir plus"
 
 msgid "Links"
 msgstr "Liens"
