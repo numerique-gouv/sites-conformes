@@ -1,4 +1,3 @@
-import logging
 from datetime import date
 
 import requests
@@ -7,8 +6,6 @@ from django.core.cache import cache
 from packaging.version import Version
 
 from content_manager import __version__ as actual_version
-
-logger = logging.getLogger(__name__)
 
 VALID_TYPES = ["info", "warning", "alert"]
 REQUIRED_FIELDS = ["type", "title", "date"]
@@ -88,17 +85,12 @@ def get_all_notifications():
         res = requests.get(settings.INFORMATION_URL, timeout=5)
         res.raise_for_status()
         data = res.json()
-    except Exception as e:
-        logger.error("Impossible de récupérer les notifications (%s)", e)
+    except Exception:
         data = {}
 
     for item in data.get("items", []):
-        try:
-            if is_displayable_notification(item):
-                items.append(item)
-        except Exception as e:
-            logger.warning("Notification invalide ignorée : %s", e)
-            continue
+        if is_displayable_notification(item):
+            items.append(item)
 
     cache.set(INFORMATION_CACHE_KEY, items, INFORMATION_CACHE_TIMEOUT)
     return items
