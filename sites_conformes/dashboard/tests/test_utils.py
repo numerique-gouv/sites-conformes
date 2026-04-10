@@ -114,7 +114,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_uses_information_url(self, mock_get):
-        """Vérifie que la bonne URL est utilisée pour les notifications."""
         self._mock_response(mock_get, [])
 
         get_all_notifications()
@@ -126,7 +125,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_empty_if_github_unavailable(self, mock_get):
-        """GitHub indisponible : liste vide, ne plante pas."""
         mock_get.side_effect = Exception("Connection refused")
 
         items = get_all_notifications()
@@ -134,7 +132,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_empty_if_bad_url(self, mock_get):
-        """URL incorrecte : échoue silencieusement, liste vide."""
         mock_response = MagicMock()
         mock_response.raise_for_status.side_effect = Exception("404 Not Found")
         mock_get.return_value = mock_response
@@ -147,19 +144,15 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_second_call_uses_cache(self, mock_get):
-        """La deuxième requête utilise le cache et n'appelle pas requests.get."""
         self._mock_response(mock_get, [])
 
         get_all_notifications()
         get_all_notifications()
 
-        self.assertEqual(mock_get.call_count, 2)  # 1 pour la version + 1 pour les notifications
-
-    # --- Champs obligatoires ---
+        self.assertEqual(mock_get.call_count, 2)
 
     @patch("dashboard.utils.requests.get")
     def test_item_not_displayed_if_no_date(self, mock_get):
-        """Une notification sans date n'est pas affichable."""
         item = self._valid_item()
         del item["date"]
         self._mock_response(mock_get, [item])
@@ -170,7 +163,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_not_displayed_if_only_type(self, mock_get):
-        """Une notification avec seulement un type (champs manquants) n'est pas affichée."""
         self._mock_response(mock_get, [{"type": "info"}])
 
         items = get_all_notifications()
@@ -180,18 +172,14 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_not_displayed_if_bad_type(self, mock_get):
-        """Une notification avec un type invalide n'est pas affichée."""
         self._mock_response(mock_get, [self._valid_item(type="badtype")])
 
         items = get_all_notifications()
         titles = [i["title"] for i in items]
         self.assertNotIn("Notification de test", titles)
 
-    # --- date ---
-
     @patch("dashboard.utils.requests.get")
     def test_item_not_displayed_if_date_in_future(self, mock_get):
-        """Une notification avec date dans le futur n'est pas encore affichable."""
         future_date = (date.today() + timedelta(days=5)).isoformat()
         self._mock_response(mock_get, [self._valid_item(date=future_date)])
 
@@ -201,7 +189,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_displayed_if_date_is_today(self, mock_get):
-        """Une notification avec date aujourd'hui est affichable."""
         self._mock_response(mock_get, [self._valid_item()])
 
         items = get_all_notifications()
@@ -210,18 +197,14 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_not_displayed_if_date_malformed(self, mock_get):
-        """Une notification avec une date malformée n'est pas affichée."""
         self._mock_response(mock_get, [self._valid_item(date="pas-une-date")])
 
         items = get_all_notifications()
         titles = [i["title"] for i in items]
         self.assertNotIn("Notification de test", titles)
 
-    # --- end_date ---
-
     @patch("dashboard.utils.requests.get")
     def test_item_not_displayed_if_end_date_in_past(self, mock_get):
-        """Une notification n'est pas affichée si end_date est dépassée."""
         past_date = (date.today() - timedelta(days=1)).isoformat()
         self._mock_response(mock_get, [self._valid_item(end_date=past_date)])
 
@@ -231,7 +214,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_displayed_if_end_date_in_future(self, mock_get):
-        """Une notification s'affiche si end_date est dans le futur."""
         future_date = (date.today() + timedelta(days=10)).isoformat()
         self._mock_response(mock_get, [self._valid_item(end_date=future_date)])
 
@@ -241,7 +223,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_displayed_if_no_end_date(self, mock_get):
-        """Une notification sans end_date s'affiche toujours."""
         self._mock_response(mock_get, [self._valid_item()])
 
         items = get_all_notifications()
@@ -250,7 +231,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_displayed_if_end_date_empty_string(self, mock_get):
-        """Une notification avec end_date = '' s'affiche toujours."""
         self._mock_response(mock_get, [self._valid_item(end_date="")])
 
         items = get_all_notifications()
@@ -259,7 +239,6 @@ class TestGetAllNotifications(TestCase):
 
     @patch("dashboard.utils.requests.get")
     def test_item_not_displayed_if_end_date_malformed(self, mock_get):
-        """Une notification avec une end_date malformée n'est pas affichée."""
         self._mock_response(mock_get, [self._valid_item(end_date="pas-une-date")])
 
         items = get_all_notifications()
