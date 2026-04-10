@@ -1,0 +1,42 @@
+name: Validate notifications.json
+
+on:
+  push:
+    paths:
+      - "notifications.json"
+  pull_request:
+    paths:
+      - "notifications.json"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install jsonschema
+        run: pip install jsonschema
+
+      - name: Validate notifications.json
+        run: |
+          python -c "
+          import json, jsonschema, sys
+
+          with open('notifications.json') as f:
+              data = json.load(f)
+
+          with open('notifications.schema.json') as f:
+              schema = json.load(f)
+
+          try:
+              jsonschema.validate(data, schema)
+              print('✅ notifications.json est valide !')
+          except jsonschema.ValidationError as e:
+              print(f'❌ Erreur de validation : {e.message}')
+              sys.exit(1)
+          "
