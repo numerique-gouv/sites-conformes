@@ -6,7 +6,7 @@
             "description": "Description courte de la fonctionnalité. -- template, date de fin à garder au passé.",
             "url": "https://sites.beta.gouv.fr/",
             "date": "2026-03-28",
-            "end_date": "2016-04-1"
+            "end_date": "2016-04-01"
         },
         {
             "type": "alert",
