@@ -26,6 +26,21 @@ Il existe 3 types de notifications :
 
 ---
 
+## 📌 Règles importantes
+
+| Champ | Obligatoire | Format | Peut être vide |
+|-------|-------------|--------|----------------|
+| `type` | ✅ | `info`, `alert` ou `warning` | ❌ |
+| `title` | ✅ | Texte libre | ❌ |
+| `description` | ✅ | Texte libre | ✅ |
+| `url` | ✅ | URL complète (`https://...`) | ✅ |
+| `date` | ✅ | `YYYY-MM-DD` (ex: `2026-05-01`) | ✅ |
+| `end_date` | ✅ | `YYYY-MM-DD` (ex: `2026-05-31`) | ✅ |
+
+> 💡 **Les templates en haut du fichier** (ceux avec "à ne pas supprimer") servent d'exemples. Ne pas les supprimer, mais s'en inspirer pour créer de nouvelles notifications.
+
+---
+
 ## ✏️ Modifier le fichier
 
 ### Étape 1 — Ouvrir le fichier
@@ -102,7 +117,7 @@ Copier un bloc existant et le modifier. Ne pas oublier la **virgule** entre chaq
             "title": "Maintenance le 15 mai",
             "description": "Le service sera indisponible de 22h à 23h.",
             "url": "",
-            "date": "",
+            "date": "2026-05-05",
             "end_date": "2026-05-15"
         }
     ]
@@ -116,21 +131,6 @@ Modifier la `end_date` pour une date **dans le passé** :
 ```json
 "end_date": "2020-01-01"
 ```
-
----
-
-## 📌 Règles importantes
-
-| Champ | Obligatoire | Format | Peut être vide |
-|-------|-------------|--------|----------------|
-| `type` | ✅ | `info`, `alert` ou `warning` | ❌ |
-| `title` | ✅ | Texte libre | ❌ |
-| `description` | ✅ | Texte libre | ✅ |
-| `url` | ✅ | URL complète (`https://...`) | ✅ |
-| `date` | ✅ | `YYYY-MM-DD` (ex: `2026-05-01`) | ✅ |
-| `end_date` | ✅ | `YYYY-MM-DD` (ex: `2026-05-31`) | ✅ |
-
-> 💡 **Les templates en haut du fichier** (ceux avec "à ne pas supprimer") servent d'exemples. Ne pas les supprimer, mais s'en inspirer pour créer de nouvelles notifications.
 
 ---
 
