@@ -155,7 +155,7 @@ En cas de doute, contacte l'équipe technique en mentionnant le message d'erreur
 Vérifier que la `date` de début n'est pas dans le futur.
 
 **Comment rendre une notification permanente ?**
-Mettre une `end_date` très lointaine, par exemple `2099-12-31`.
+Ne pas mettre de `end_date` rendra la notification permanente.
 
 **Est-il possible d'ajouter autant de notifications que souhaité ?**
 Oui, mais il est conseillé d'en garder un nombre raisonnable pour ne pas surcharger les utilisateurs.
