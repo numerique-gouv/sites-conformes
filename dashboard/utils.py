@@ -45,6 +45,7 @@ def is_displayable_notification(item):
 
 
 def push_version_notification(items):
+    """Ajoute une notification si une nouvelle version est disponible."""
     try:
         release_res = requests.get(settings.LATEST_RELEASE_URL, timeout=5)
         release_res.raise_for_status()
@@ -74,6 +75,7 @@ INFORMATION_CACHE_TIMEOUT = 60 * 60
 
 
 def get_all_notifications():
+    """Récupère toutes les notifications à afficher."""
     cached = cache.get(INFORMATION_CACHE_KEY)
     if cached is not None:
         return cached
