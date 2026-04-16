@@ -88,11 +88,13 @@
   {% endwith %}
 
   <div class="fr-container fr-my-4w">
-    <ul>
+    <ul class="fr-tags-group">
       {% for tag in page.tags.all|dictsort:"slug" %}
-        <a class="fr-tag"
-           target="_self"
-           href="{% pageurl page.get_parent %}{% toggle_url_filter tag=tag %}">{{ tag }}</a>
+        <li>
+          <a class="fr-tag"
+             target="_self"
+             href="{% pageurl page.get_parent %}{% toggle_url_filter tag=tag %}">{{ tag }}</a>
+        </li>
       {% endfor %}
     </ul>
   </div>
