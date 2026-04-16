@@ -205,22 +205,22 @@ class Command(BaseCommand):
     def _update_revisions(self, s3_base_url, dry_run):
         """Scan and update S3 URLs in Wagtail page revision content."""
         updates = 0
-        revisions = Revision.objects.filter(content_json__contains=s3_base_url)
+        revisions = Revision.objects.filter(content__contains=s3_base_url)
         count = revisions.count()
 
         if count:
             self.stdout.write(f"  Found {count} revision(s) containing S3 URLs.")
 
         for revision in revisions.iterator():
-            old_content = revision.content_json
+            old_content = revision.content
             new_content = old_content.replace(s3_base_url, "/db-storage/serve?name=")
 
             if old_content != new_content:
                 if dry_run:
                     self.stdout.write(f"  [DRY RUN] Would update revision {revision.pk}")
                 else:
-                    revision.content_json = new_content
-                    revision.save(update_fields=["content_json"])
+                    revision.content = new_content
+                    revision.save(update_fields=["content"])
                     self.stdout.write(f"  Updated revision {revision.pk}")
                 updates += 1
 
