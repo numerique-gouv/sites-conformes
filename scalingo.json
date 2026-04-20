@@ -1,0 +1,81 @@
+{
+  "name": "Sites conformes",
+  "description": "Basic installation of the sites-faciles app",
+  "logo": "https://raw.githubusercontent.com/numerique-gouv/sites-faciles/refs/heads/main/static/artwork/logo-white-bg.svg",
+  "repository": "https://github.com/numerique-gouv/sites-faciles",
+  "ref": "production",
+  "website": "https://sites.beta.gouv.fr",
+  "env": {
+    "ALLOWED_HOSTS": {
+      "description": "List of allowed host names, separated by commas (domain names only)",
+      "value": "sc-example.osc-fr1.scalingo.io,example.sites.beta.gouv.fr"
+    },
+    "HOST_URL": {
+      "description": "The main hostname (domain name only)",
+      "value": "example.sites.beta.gouv.fr"
+    },
+    "DEFAULT_FROM_EMAIL": {
+      "description": "The default email address for sending transactional emails. Leave empty to disable emails entirely.",
+      "value": ""
+    },
+    "EMAIL_HOST": {
+      "description": "The email address for sending transactional emails",
+      "value": "smtp-relay.brevo.com"
+    },
+    "EMAIL_HOST_PASSWORD": {
+      "description": "The email password for sending transactional emails",
+      "value": "example-password"
+    },
+    "EMAIL_HOST_USER": {
+      "description": "The email user for sending transactional emails",
+      "value": "example.user@smtp-brevo.com"
+    },
+    "EMAIL_PORT": {
+      "description": "The email port for sending transactional emails",
+      "value": "587"
+    },
+    "EMAIL_TIMEOUT": {
+      "description": "The email timeout for sending transactional emails",
+      "value": "30"
+    },
+    "WAGTAIL_PASSWORD_RESET_ENABLED": {
+      "description": "Allows the 'Reset password' form on the login page. Only set to true if actual email settings have been set",
+      "value": false
+    },
+    "SECRET_KEY": {
+      "description": "Django secret key",
+      "generator": "secret"
+    },
+    "S3_BUCKET_NAME": {
+      "description": "The name of the S3 bucket used to store user-imported medias.",
+      "value": "sc-example"
+    },
+    "S3_BUCKET_REGION": {
+      "description": "The region of the S3 bucket",
+      "value": "eu-west-par"
+    },
+    "S3_HOST": {
+      "description": "The host of the S3 bucket",
+      "value": "s3.eu-west-par.io.cloud.ovh.net"
+    },
+    "S3_KEY_ID": {
+      "description": "The access key of the S3 bucket",
+      "value": "example-access-key"
+    },
+    "S3_KEY_SECRET": {
+      "description": "The secret key of the S3 bucket",
+      "value": "example-secret"
+    },
+    "S3_LOCATION": {
+      "description": "The base path for user imported medias in the S3 bucket",
+      "value": "medias"
+    }
+  },
+  "formation": {
+    "web": {
+      "amount": 1,
+      "size": "M"
+    }
+  },
+  "addons": ["scalingo-postgresql"]
+}

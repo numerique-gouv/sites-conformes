@@ -41,6 +41,10 @@ deploy:
 django +command:
     {{docker_cmd}} {{uv_run}} python manage.py {{command}}
 
+# Generate a secret key
+generate_secret_key:
+    {{docker_cmd}} {{uv_run}} python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+
 import_domain_whitelist:
     {{docker_cmd}} {{uv_run}} python manage.py import_domain_whitelist
 
