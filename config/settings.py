@@ -523,5 +523,7 @@ if sentry_dsn := os.getenv("SENTRY_DSN"):
         send_default_pii=True,
         environment=os.getenv("SENTRY_ENVIRONMENT", "production"),
     )
-INFORMATION_URL = "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
+INFORMATION_URL = os.getenv(
+    "INFORMATION_URL", "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
+)
 LATEST_RELEASE_URL = "https://api.github.com/repos/numerique-gouv/sites-faciles/releases/latest"
