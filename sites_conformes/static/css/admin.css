@@ -103,7 +103,7 @@
 }
 
 /* Reprend le composant Notice du DSFR (https: //www.systeme-de-design.gouv.fr/version-courante/fr/composants/bandeau-d-information-importante) */
-.sc-fr-notice {
+.cmsfr-fr-notice {
     --title-spacing: 0;
     --text-spacing: 0;
     background-color: var(--background-contrast-grey, #eee);
@@ -115,7 +115,7 @@
     overflow: hidden;
 }
 
-.sc-fr-notice__body {
+.cmsfr-fr-notice__body {
     align-items: flex-start;
     display: flex;
     flex-direction: row;
@@ -123,13 +123,13 @@
     position: relative;
 }
 
-.sc-fr-notice__title {
+.cmsfr-fr-notice__title {
     font-weight: 700;
     margin-right: .25rem;
     position: relative;
 }
 
-.sc-fr-notice__title:before {
+.cmsfr-fr-notice__title:before {
     --icon-size: 1.5rem;
     background-color: currentColor;
     content: "";
@@ -143,57 +143,57 @@
     width: var(--icon-size);
 }
 
-.sc-fr-notice__date {
+.cmsfr-fr-notice__date {
     font-weight: normal;
     opacity: 0.7;
     font-size: 0.875rem;
 }
 
-.sc-fr-notice p,
-.sc-fr-notice__title {
+.cmsfr-fr-notice p,
+.cmsfr-fr-notice__title {
     margin: 0;
 }
 
-.sc-fr-notice--no-icon .sc-fr-notice__title:before {
+.cmsfr-fr-notice--no-icon .cmsfr-fr-notice__title:before {
     display: none;
 }
 
 /* Info */
-.sc-fr-notice--info {
+.cmsfr-fr-notice--info {
     background-color: var(--background-contrast-info, #e8edff);
     color: var(--text-default-info, #0063cb);
 }
 
-.sc-fr-notice--info .sc-fr-notice__title:not([class^=sc-fr-icon-]):not([class*=" sc-fr-icon-"]):before {
+.cmsfr-fr-notice--info .cmsfr-fr-notice__title:not([class^=cmsfr-fr-icon-]):not([class*=" cmsfr-fr-icon-"]):before {
     -webkit-mask-image: url("../dsfr/dist/icons/system/fr--info-fill.svg");
     mask-image: url("../dsfr/dist/icons/system/fr--info-fill.svg");
 }
 
 /* Warning */
-.sc-fr-notice--warning {
+.cmsfr-fr-notice--warning {
     background-color: var(--background-contrast-warning, #ffe9e6);
     color: var(--text-default-warning, #b34000);
 }
 
-.sc-fr-notice--warning .sc-fr-notice__title:not([class^=sc-fr-icon-]):not([class*=" sc-fr-icon-"]):before {
+.cmsfr-fr-notice--warning .cmsfr-fr-notice__title:not([class^=cmsfr-fr-icon-]):not([class*=" cmsfr-fr-icon-"]):before {
     -webkit-mask-image: url("../dsfr/dist/icons/system/fr--warning-fill.svg");
     mask-image: url("../dsfr/dist/icons/system/fr--warning-fill.svg");
 }
 
 /* Alert */
-.sc-fr-notice--alert {
+.cmsfr-fr-notice--alert {
     background-color: var(--background-contrast-error, #ffe9e9);
     color: var(--text-default-error, #ce0500);
 }
 
-.sc-fr-notice--alert .sc-fr-notice__title:not([class^=sc-fr-icon-]):not([class*=" sc-fr-icon-"]):before {
+.cmsfr-fr-notice--alert .cmsfr-fr-notice__title:not([class^=cmsfr-fr-icon-]):not([class*=" cmsfr-fr-icon-"]):before {
     -webkit-mask-image: url("../dsfr/dist/icons/system/error-warning-fill.svg");
     mask-image: url("../dsfr/dist/icons/system/error-warning-fill.svg");
 }
 
 @media (min-width: 768px) {
-    .sc-fr-notice__link,
-    .sc-fr-notice__title {
+    .cmsfr-fr-notice__link,
+    .cmsfr-fr-notice__title {
         font-size: 1rem;
         line-height: 1.5rem;
     }

@@ -1,13 +1,13 @@
 {% load i18n wagtailcore_tags wagtailadmin_tags static %}
 {% for item in information_items %}
-  <div class="sc-fr-notice sc-fr-notice--{{ item.type|default:"info" }}">
+  <div class="cmsfr-fr-notice cmsfr-fr-notice--{{ item.type|default:"info" }}">
     <div class="fr-container">
-      <div class="sc-fr-notice__body">
+      <div class="cmsfr-fr-notice__body">
         <div>
           <div>
-            <p class="sc-fr-notice__title">
+            <p class="cmsfr-fr-notice__title">
               {{ item.title }}
-              {% if item.date %}<span class="sc-fr-notice__date">— {{ item.date }}</span>{% endif %}
+              {% if item.date %}<span class="cmsfr-fr-notice__date">— {{ item.date }}</span>{% endif %}
             </p>
             <p>
               {{ item.description }}
