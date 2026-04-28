@@ -23,10 +23,6 @@
     <div class="fr-container fr-mb-4w cmsfr-block-card">{% include_block block %}</div>
   {% elif block.block_type == "tile" %}
     <div class="fr-container fr-mb-4w cmsfr-block-tile">{% include_block block %}</div>
-  {% elif block.block_type == "separator" %}
-    <div class="fr-container cmsfr-block-hr">
-      <hr class="fr-mt-{{ block.value.top_margin }}w fr-mb-{{ block.value.bottom_margin }}w fr-py-1v">
-    </div>
   {% elif block.block_type == "markdown" %}
     <div class="fr-container cmsfr-block-markdown">{{ block.value|markdown }}</div>
   {% elif block.block_type == "html" %}

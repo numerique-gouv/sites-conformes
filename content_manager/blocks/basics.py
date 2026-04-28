@@ -252,6 +252,10 @@ class SeparatorBlock(blocks.StructBlock):
     top_margin = blocks.IntegerBlock(label=_("Top margin"), min_value=0, max_value=15, default=3)
     bottom_margin = blocks.IntegerBlock(label=_("Bottom margin"), min_value=0, max_value=15, default=3)
 
+    class Meta:
+        icon = "minus"
+        template = "content_manager/blocks/separator.html"
+
 
 class StepBlock(blocks.StructBlock):
     title = blocks.CharBlock(label=_("Title"))
