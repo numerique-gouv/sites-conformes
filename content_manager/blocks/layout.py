@@ -125,6 +125,7 @@ class CommonStreamBlock(blocks.StreamBlock):
     )
     anchor = AnchorBlock(label=_("Anchor"), group=_("Page structure"))
     separator = SeparatorBlock(label=_("Separator"), group=_("Page structure"))
+    contact_card = VerticalContactCardBlock(label=_("Contact card"), group=_("Extra components"))
 
     class Meta:
         icon = "dots-horizontal"
@@ -132,7 +133,6 @@ class CommonStreamBlock(blocks.StreamBlock):
 
 class ColumnBlock(CommonStreamBlock):
     card = VerticalCardBlock(label=_("Vertical card"), group=_("DSFR components"))
-    contact_card = VerticalContactCardBlock(label=_("Contact card"), group=_("Extra components"))
 
 
 class GridPositionStructValue(blocks.StructValue):
