@@ -15,7 +15,7 @@
           {% endif %}
         </div>
       </div>
-      {% if value.image % %}
+      {% if value.image %}
         <div class="cmsfr-author_card__header fr-card__header">
           <div class="fr-card__img">
             {% image value.image fill-200x200 as contact_image %}
@@ -26,7 +26,8 @@
                  alt="" />
           </div>
         </div>
-      </div>
-    {% endif %}
+      {% endif %}
+    </div>
+
   </div>
 </div>
