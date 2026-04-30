@@ -44,7 +44,6 @@ services:
       timeout: 2s
       retries: 1
 
-
 volumes:
   postgres_data:
   medias:

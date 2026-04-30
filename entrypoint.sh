@@ -10,6 +10,7 @@ just deploy
 
 #creation conf nginx rproxy 
 ownip=`hostname -i`
+# reinit conf
 echo "" >  /app/nginx/default.conf 
 tee -a /app/nginx/default.conf << EOF
     server { 

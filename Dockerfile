@@ -20,6 +20,7 @@ RUN set -ex \
 WORKDIR $APP_DIR
 
 # prepare nginx creation empty config file 
+
 RUN mkdir /app/nginx && echo 'config not yet written, waiting entrypoint for env vars' > /app/nginx/default.conf
 
 COPY pyproject.toml uv.lock ./
