@@ -11,12 +11,16 @@ ENV APP_DIR="/app"
 # Needed for docker build to succeed
 ENV DATABASE_URL=postgres://user:password@localhost:5432/db
 
+
 # Add new user to run the whole thing as non-root.
 RUN set -ex \
     && addgroup --gid 1000 app \
     && adduser --uid 1000 --gid 1000 --home ${APP_DIR} --disabled-password app;
 
 WORKDIR $APP_DIR
+
+# prepare nginx creation empty config file 
+RUN mkdir /app/nginx && echo 'config not yet written, waiting entrypoint for env vars' > /app/nginx/default.conf
 
 COPY pyproject.toml uv.lock ./
 # Deploy in the global env of the container instead of a uv-specific venv
