@@ -3,7 +3,7 @@ from django.urls import reverse
 from wagtail.test.utils import WagtailPageTestCase
 from wagtail_localize.models import TranslationSource
 
-from forms.models import FormPage
+from forms.models import FormField, FormPage
 
 
 class FormsTestCase(WagtailPageTestCase):
@@ -55,6 +55,57 @@ class FormsTestCase(WagtailPageTestCase):
             r"<li class=\"fr-error-text\">(\\n)?\s*(Ce champ est requis|Ce champ est obligatoire)\.(\\n)?\s*<\/li>",
         )
         # Updates sometimes mess with the order of the translations and so the displayed translation. Both are fine.
+
+    def test_form_field_clean_name_set_on_save(self):
+        """
+        Regression test: FormField.clean_name must never be empty after save.
+
+        Certain code paths (e.g. reconstruction from a page revision via
+        from_serializable_data) can produce FormField instances whose pk is
+        already set before save() is called, causingAbstractFormField.save()
+        to skip the clean_name computation (it only runs when pk is None).
+        This leaves clean_name as "" in the database, making all BO responses
+        appear as None.
+        """
+        form_page = FormPage.objects.first()
+
+        # Simulate the problematic path: a FormField whose pk is pre-assigned
+        # (non-None) but whose clean_name is still empty, as happens when
+        # from_serializable_data reconstructs a child object from a revision.
+        field = FormField.objects.filter(page=form_page).first()
+        original_clean_name = field.clean_name
+
+        field.clean_name = ""
+        field.save()
+
+        field.refresh_from_db()
+        self.assertNotEqual(field.clean_name, "", "clean_name should not be empty after save")
+        self.assertEqual(field.clean_name, original_clean_name)
+
+    def test_get_data_fields_has_no_empty_clean_names(self):
+        """
+        Regression test: every FormField returned by get_data_fields() must
+        have a non-empty clean_name.
+
+        If clean_name is "" in the DB, get_data_fields() returns ("", label)
+        tuples. The BO then calls form_data.get("") which is always None, and
+        the xlsx export collapses all "" keys so every column header becomes
+        the last field's label.
+        """
+        form_page = FormPage.objects.first()
+
+        # Force empty clean_names on all fields to simulate the buggy state.
+        FormField.objects.filter(page=form_page).update(clean_name="")
+
+        # Re-save each field; the overridden save() must restore clean_name.
+        for field in FormField.objects.filter(page=form_page):
+            field.save()
+
+        data_fields = form_page.get_data_fields()
+        for name, label in data_fields:
+            if name == "submit_time":
+                continue
+            self.assertNotEqual(name, "", f"Field '{label}' has an empty clean_name after save()")
 
     def test_form_field_labels_are_translatable(self):
         form_page = FormPage.objects.first()

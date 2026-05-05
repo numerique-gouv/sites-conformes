@@ -9,6 +9,7 @@ from wagtail.api import APIField
 from wagtail.contrib.forms.forms import BaseForm, FormBuilder
 from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
 from wagtail.contrib.forms.panels import FormSubmissionsPanel
+from wagtail.contrib.forms.utils import get_field_clean_name
 from wagtail.fields import RichTextField
 from wagtail.models import TranslatableMixin
 from wagtail_honeypot.models import HoneypotFormMixin, HoneypotFormSubmissionMixin
@@ -42,6 +43,13 @@ class FormField(TranslatableMixin, AbstractFormField):
     override_translatable_fields = [
         SynchronizedField("clean_name", overridable=False),
     ]
+
+    def save(self, *args, **kwargs):
+        # Guarantee clean_name is always set, even if pk is already assigned (e.g. when
+        # reconstructed from a revision via from_serializable_data before the first DB insert).
+        if not self.clean_name:
+            self.clean_name = get_field_clean_name(self.label)
+        super().save(*args, **kwargs)
 
     class Meta(TranslatableMixin.Meta, AbstractFormField.Meta):
         verbose_name = _("Form field")
