@@ -1,7 +1,9 @@
 from unittest.mock import MagicMock, patch
 
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.test import TestCase
+from wagtail.models import Page, Revision
 
 from db_storage.models import StoredFile
 
@@ -119,3 +121,30 @@ class MigrateS3ToDbCommandTestCase(TestCase):
         self.assertEqual(StoredFile.objects.count(), 1)
         stored = StoredFile.objects.first()
         self.assertEqual(bytes(stored.content), b"old-data")
+
+    @patch("db_storage.management.commands.migrate_s3_to_db.boto3")
+    @patch.dict("os.environ", S3_ENV)
+    def test_update_revision_urls(self, mock_boto3):
+        """S3 URLs in Revision.content (JSONField) should be replaced."""
+        mock_client = MagicMock()
+        mock_boto3.client.return_value = mock_client
+        mock_client.get_paginator.return_value.paginate.return_value = []
+
+        # Create a Revision with S3 URL in its content
+        root_page = Page.objects.first()
+        ct = ContentType.objects.get_for_model(Page)
+        revision = Revision.objects.create(
+            content_type=ct,
+            base_content_type=ct,
+            object_id=str(root_page.pk),
+            content={
+                "title": "Test",
+                "image": "https://s3.example.com/bucket/media/images/pic.jpg",
+            },
+        )
+
+        call_command("migrate_s3_to_db", "--skip-files")
+
+        revision.refresh_from_db()
+        self.assertNotIn("s3.example.com", str(revision.content))
+        self.assertIn("/db-storage/serve?name=", revision.content["image"])

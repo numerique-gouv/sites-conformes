@@ -204,25 +204,34 @@ class Command(BaseCommand):
 
     def _update_revisions(self, s3_base_url, dry_run):
         """Scan and update S3 URLs in Wagtail page revision content."""
-        updates = 0
-        revisions = Revision.objects.filter(content__contains=s3_base_url)
-        count = revisions.count()
+        import json
 
-        if count:
-            self.stdout.write(f"  Found {count} revision(s) containing S3 URLs.")
+        updates = 0
+
+        # Wagtail 3+ uses a JSONField named `content` (dict).
+        # We serialize to string to search/replace URLs, then parse back.
+        revisions = Revision.objects.all()
+        count = revisions.count()
+        self.stdout.write(f"  Scanning {count} revision(s) for S3 URLs...")
 
         for revision in revisions.iterator():
-            old_content = revision.content
-            new_content = old_content.replace(s3_base_url, "/db-storage/serve?name=")
+            content = revision.content
+            if not content:
+                continue
 
-            if old_content != new_content:
-                if dry_run:
-                    self.stdout.write(f"  [DRY RUN] Would update revision {revision.pk}")
-                else:
-                    revision.content = new_content
-                    revision.save(update_fields=["content"])
-                    self.stdout.write(f"  Updated revision {revision.pk}")
-                updates += 1
+            content_str = json.dumps(content, ensure_ascii=False)
+            if s3_base_url not in content_str:
+                continue
+
+            new_content_str = content_str.replace(s3_base_url, "/db-storage/serve?name=")
+
+            if dry_run:
+                self.stdout.write(f"  [DRY RUN] Would update revision {revision.pk}")
+            else:
+                revision.content = json.loads(new_content_str)
+                revision.save(update_fields=["content"])
+                self.stdout.write(f"  Updated revision {revision.pk}")
+            updates += 1
 
         return updates
 
