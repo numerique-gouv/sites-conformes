@@ -1,6 +1,6 @@
 [project]
 name = "sites-conformes"
-version = "3.1.0"
+version = "3.1.1"
 description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l’État, accessible et responsive"
 authors = [
     { name = "Sites Conformes dev team", email = "contact@sites.beta.gouv.fr" }
