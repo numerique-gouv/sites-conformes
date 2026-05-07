@@ -88,16 +88,16 @@ pipx install uv
 ### Cloner le dépôt
 
 ```sh
-git clone https://github.com/numerique-gouv/sites-faciles.git
+git clone https://github.com/numerique-gouv/sites-conformes.git
 
 # ou en ssh
-git clone git@github.com:numerique-gouv/sites-faciles.git
+git clone git@github.com:numerique-gouv/sites-conformes.git
 ```
 
 Et rentrer dans le dossier du dépôt
 
 ```sh
-cd sites-faciles
+cd sites-conformes
 ```
 
 ### PostgreSQL (base de données)

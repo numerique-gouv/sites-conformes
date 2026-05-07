@@ -21,7 +21,7 @@ Les tests automatisés couvrent les versions suivantes :
 - Pour installer le projet en local pour le développement, voir la [documentation d'embarquement](./ONBOARDING.md)
 - Avant de soumettre une contribution, consulter la  [documentation de contribution](./CONTRIBUTING.md)
 
-[![Déployer sur Scalingo (en test)](https://raw.githubusercontent.com/numerique-gouv/sites-faciles/refs/heads/main/static/artwork/logo-white-bg.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/numerique-gouv/sites-faciles)
+[![Déployer sur Scalingo (en test)](https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/static/artwork/logo-white-bg.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/numerique-gouv/sites-conformes#production)
 
 ### Git blame
 

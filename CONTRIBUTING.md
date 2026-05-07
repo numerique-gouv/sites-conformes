@@ -5,8 +5,8 @@
 Une documentation détaillée de l’installation en local est disponible sur [ONBOARDING.md](./ONBOARDING.md).
 
 ```sh
-git clone https://github.com/numerique-gouv/sites-faciles
-cd sites-faciles
+git clone https://github.com/numerique-gouv/sites-conformes
+cd sites-conformes
 ```
 
 ### Effectuer les tests
