@@ -17,7 +17,7 @@ Les tests automatisés couvrent les versions suivantes :
 
 ## Installation et contribution
 
-- Pour déployer le projet en production sur un serveur, voir la [documentation d'installation](https://sites.beta.gouv.fr/documentation/installation/)
+- Pour déployer le projet en production sur un serveur, voir la [documentation d'installation](https://sites.beta.gouv.fr/documentation/d%C3%A9ployer-sites-dsfr-sur-un-serveur/)
 - Pour installer le projet en local pour le développement, voir la [documentation d'embarquement](./ONBOARDING.md)
 - Avant de soumettre une contribution, consulter la  [documentation de contribution](./CONTRIBUTING.md)
 
