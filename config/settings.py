@@ -281,22 +281,38 @@ STATICFILES_FINDERS = [
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
 if os.getenv("S3_HOST"):
-    endpoint_url = f"{os.getenv('S3_PROTOCOL', 'https')}://{os.getenv('S3_HOST')}"
+    protocol = os.getenv("S3_PROTOCOL", "https")
+    endpoint_url = f"{protocol}://{os.getenv('S3_HOST')}"
+    bucket_name = os.getenv("S3_BUCKET_NAME", "set-bucket-name")
+    public_host = os.getenv("S3_PUBLIC_HOST", "")
+
+    options = {
+        "bucket_name": bucket_name,
+        "access_key": os.getenv("S3_KEY_ID", "123"),
+        "secret_key": os.getenv("S3_KEY_SECRET", "secret"),
+        "endpoint_url": endpoint_url,
+        "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
+        "file_overwrite": False,
+        "location": os.getenv("S3_LOCATION", ""),
+    }
+
+    if public_host:
+        # Presigned URLs bind the signature to the endpoint hostname, so when the
+        # internal endpoint differs from the public one, signing must be disabled.
+        # The bucket is appended to custom_domain to produce path-style URLs for MinIO.
+        options["custom_domain"] = f"{public_host}/{bucket_name}"
+        options["url_protocol"] = f"{protocol}:"
+        options["querystring_auth"] = False
+        public_endpoint = f"{protocol}://{public_host}"
+    else:
+        public_endpoint = endpoint_url
 
     STORAGES["default"] = {
         "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "bucket_name": os.getenv("S3_BUCKET_NAME", "set-bucket-name"),
-            "access_key": os.getenv("S3_KEY_ID", "123"),
-            "secret_key": os.getenv("S3_KEY_SECRET", "secret"),
-            "endpoint_url": endpoint_url,
-            "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
-            "file_overwrite": False,
-            "location": os.getenv("S3_LOCATION", ""),
-        },
+        "OPTIONS": options,
     }
 
-    MEDIA_URL = f"{endpoint_url}/"
+    MEDIA_URL = f"{public_endpoint}/"
 elif SF_USE_DB_STORAGE:
     STORAGES["default"] = {
         "BACKEND": "db_storage.storage.DatabaseStorage",

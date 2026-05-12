@@ -24,6 +24,8 @@ services:
       - .:/app
       - medias:/app/medias
       - staticfiles:/app/staticfiles
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
 

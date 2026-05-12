@@ -38,7 +38,7 @@ deploy:
     just index
 
 # Pass a django command
-django +command:
+django +command="":
     {{docker_cmd}} {{uv_run}} python manage.py {{command}}
 
 import_domain_whitelist:
