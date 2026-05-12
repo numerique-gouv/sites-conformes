@@ -17,7 +17,10 @@ class DatabaseStorage(Storage):
     def _open(self, name, mode="rb"):
         from db_storage.models import StoredFile
 
-        stored_file = StoredFile.objects.get(name=name)
+        try:
+            stored_file = StoredFile.objects.get(name=name)
+        except StoredFile.DoesNotExist:
+            raise FileNotFoundError(f"No stored file found for: {name}")
         f = ContentFile(bytes(stored_file.content))
         f.name = name
         return f
