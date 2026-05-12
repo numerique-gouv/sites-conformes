@@ -87,9 +87,11 @@ class Command(BaseCommand):
         self.stdout.write("")
 
         for stored_file in StoredFile.objects.all().iterator():
-            s3_key = stored_file.name
+            file_name = stored_file.name.lstrip("/")
             if location:
-                s3_key = f"{location}/{stored_file.name}"
+                s3_key = f"{location.rstrip('/')}/{file_name}"
+            else:
+                s3_key = file_name
 
             # Check if already exists on S3
             if not dry_run:
