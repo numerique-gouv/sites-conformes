@@ -37,7 +37,7 @@ deploy:
     {{docker_cmd}} {{uv_run}} python manage.py import_illustration_images
     just index
 
-# Pass a django command
+# Pass a django command (or list available django commands)
 django +command="":
     {{docker_cmd}} {{uv_run}} python manage.py {{command}}
 
