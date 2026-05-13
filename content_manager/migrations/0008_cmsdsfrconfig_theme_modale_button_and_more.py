@@ -9,7 +9,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0007_cmsdsfrconfig"),
+        ("sites_conformes_content_manager", "0007_cmsdsfrconfig"),
     ]
 
     operations = [

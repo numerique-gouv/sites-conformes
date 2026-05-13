@@ -5,10 +5,10 @@ from wagtail.images.models import Image
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 
-from content_manager.models import ContentPage
-from content_manager.services.accessors import get_or_create_footer_bottom_menu, get_or_create_main_menu
-from content_manager.utils import get_default_site
-from forms.models import FormField, FormPage
+from sites_conformes.content_manager.models import ContentPage
+from sites_conformes.content_manager.services.accessors import get_or_create_footer_bottom_menu, get_or_create_main_menu
+from sites_conformes.content_manager.utils import get_default_site
+from sites_conformes.forms.models import FormField, FormPage
 
 ALL_ALLOWED_SLUGS = ["home", "mentions-legales", "accessibilite", "contact"]
 

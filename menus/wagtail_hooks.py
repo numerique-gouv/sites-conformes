@@ -1,7 +1,7 @@
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 
-from menus.models import FooterBottomMenu, MainMenu, TopMenu
+from sites_conformes.menus.models import FooterBottomMenu, MainMenu, TopMenu
 
 
 class TopMenuViewSet(SnippetViewSet):

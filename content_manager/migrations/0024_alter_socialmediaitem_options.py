@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0023_alter_cmsdsfrconfig_footer_description_and_more"),
+        ("sites_conformes_content_manager", "0023_alter_cmsdsfrconfig_footer_description_and_more"),
     ]
 
     operations = [

@@ -8,7 +8,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0022_alter_cmsdsfrconfig_options_cmsdsfrconfig_beta_tag_and_more"),
+        ("sites_conformes_content_manager", "0022_alter_cmsdsfrconfig_options_cmsdsfrconfig_beta_tag_and_more"),
     ]
 
     operations = [
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                     modelcluster.fields.ParentalKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="social_media_items",
-                        to="content_manager.cmsdsfrconfig",
+                        to="sites_conformes_content_manager.cmsdsfrconfig",
                     ),
                 ),
             ],

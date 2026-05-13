@@ -28,7 +28,7 @@
     "32": {
       "id": 32,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/32/",
         "html_url": "http://sites.beta.gouv.fr/exemples/template-landing-page-dsfr/",
         "slug": "template-landing-page-dsfr",
@@ -765,7 +765,7 @@
     "36": {
       "id": 36,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/36/",
         "html_url": "http://sites.beta.gouv.fr/exemples/exemples-de-tuiles-dsfr/",
         "slug": "exemples-de-tuiles-dsfr",
@@ -1127,7 +1127,7 @@
     "37": {
       "id": 37,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/37/",
         "html_url": "http://sites.beta.gouv.fr/exemples/en-t%C3%AAtes-et-bandeaux-dappel-%C3%A0-action-dsfr/",
         "slug": "en-t\u00eates-et-bandeaux-dappel-\u00e0-action-dsfr",
@@ -1392,7 +1392,7 @@
     "38": {
       "id": 38,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/38/",
         "html_url": "http://sites.beta.gouv.fr/exemples/page-de-contenu-avec-menu-lat%C3%A9ral-dsfr/",
         "slug": "page-de-contenu-avec-menu-lat\u00e9ral-dsfr",
@@ -1507,7 +1507,7 @@
     "39": {
       "id": 39,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/39/",
         "html_url": "http://sites.beta.gouv.fr/exemples/blocs-simples-de-textes-et-dimages-dsfr/",
         "slug": "blocs-simples-de-textes-et-dimages-dsfr",
@@ -1606,7 +1606,7 @@
     "40": {
       "id": 40,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/40/",
         "html_url": "http://sites.beta.gouv.fr/exemples/options-de-mise-en-valeur-de-textes-dsfr/",
         "slug": "options-de-mise-en-valeur-de-textes-dsfr",
@@ -1760,7 +1760,7 @@
     "41": {
       "id": 41,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/41/",
         "html_url": "http://sites.beta.gouv.fr/exemples/grilles-d%C3%A9l%C3%A9ments-dsfr/",
         "slug": "grilles-d\u00e9l\u00e9ments-dsfr",
@@ -2076,7 +2076,7 @@
     "42": {
       "id": 42,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/42/",
         "html_url": "http://sites.beta.gouv.fr/exemples/accord%C3%A9ons-dsfr/",
         "slug": "accord\u00e9ons-dsfr",
@@ -2144,7 +2144,7 @@
     "43": {
       "id": 43,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/43/",
         "html_url": "http://sites.beta.gouv.fr/exemples/exemples-de-cartes-dsfr/",
         "slug": "exemples-de-cartes-dsfr",
@@ -2646,7 +2646,7 @@
     "44": {
       "id": 44,
       "meta": {
-        "type": "content_manager.ContentPage",
+        "type": "sites_conformes_content_manager.ContentPage",
         "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/44/",
         "html_url": "http://sites.beta.gouv.fr/exemples/etapiers-dsfr/",
         "slug": "etapiers-dsfr",

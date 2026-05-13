@@ -7,7 +7,7 @@ from wagtail.blocks import StructValue
 from wagtail.blocks.struct_block import StructBlockAdapter
 from wagtail.images import get_image_model
 
-from content_manager.constants import (
+from sites_conformes.content_manager.constants import (
     ALIGN_HORIZONTAL_CHOICES,
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
     EXTRA_LIMITED_RICHTEXTFIELD_FEATURES,
@@ -73,7 +73,7 @@ class ResizedTextSection(blocks.StructBlock):
     )
 
     class Meta:
-        template = "content_manager/blocks/sections/layout_text_block.html"
+        template = "sites_conformes_content_manager/blocks/sections/layout_text_block.html"
         value_class = ResizedStructValue
         form_classname = "struct-block resized-text-section"
 
@@ -123,7 +123,7 @@ class ImageTextCTASection(blocks.StructBlock):
     layout = LayoutBlock(label=_("Layout"), collapsed=True)
 
     class Meta:
-        template = "content_manager/blocks/sections/image_text_cta.html"
+        template = "sites_conformes_content_manager/blocks/sections/image_text_cta.html"
 
 
 class ImageAndTextItems(blocks.StructBlock):
@@ -205,7 +205,7 @@ class ImageAndTextGridSection(BaseSection):
     )
 
     class Meta:
-        template = "content_manager/blocks/sections/image_text_grid.html"
+        template = "sites_conformes_content_manager/blocks/sections/image_text_grid.html"
         form_classname = "struct-block image-text-grid-block"
 
 
@@ -242,7 +242,7 @@ class CTASection(BaseSection):
     )
 
     class Meta:
-        template = "content_manager/blocks/sections/text-cta.html"
+        template = "sites_conformes_content_manager/blocks/sections/text-cta.html"
         form_classname = "struct-block cta-section"
 
 
@@ -320,7 +320,7 @@ class SpotlightSection(BaseSection):
     items = SpotLightItem(label=_("Items"))
 
     class Meta:
-        template = "content_manager/blocks/sections/spotlight.html"
+        template = "sites_conformes_content_manager/blocks/sections/spotlight.html"
         form_classname = "struct-block spotlight-grid-block"
 
 
@@ -361,4 +361,4 @@ class AccordionSection(blocks.StructBlock):
     )
 
     class Meta:
-        template = "content_manager/blocks/sections/accordion_section.html"
+        template = "sites_conformes_content_manager/blocks/sections/accordion_section.html"

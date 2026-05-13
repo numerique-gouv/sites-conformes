@@ -1,0 +1,23 @@
+{% extends "content_manager/blocks/sections/base_section.html" %}
+{% load static wagtailcore_tags wagtailimages_tags %}
+{% block extra_classes %}
+  fr-py-3w
+{% endblock extra_classes %}
+{% block children %}
+  <div class="fr-grid-row fr-grid-row--middle fr-grid-row--center {{ value.layout.vertical_margin }}">
+    <div class="fr-col-md-6 {% if value.position == 'right' %} cmsfr-order__2 fr-pl-md-8v {% else %} fr-pr-md-8v {% endif %}">
+      {{ value.text }}
+      <ul class="fr-btns-group fr-btns-group--inline-lg{% if icons_side == 'fr-btn--icon-left' %} fr-btns-group--icon-left{% elif icons_side == 'fr-btn--icon-right' %} fr-btns-group--icon-right {% endif %} {{ value.position }}">
+        <li>{% include "sites_conformes_content_manager/blocks/button.html" with button=value.button %}</li>
+      </ul>
+
+    </div>
+    <div class="fr-col-md-6">
+      {% image value.image fill-600x600 as image %}
+      <img class="fr-responsive-img"
+           src="{{ image.full_url }}"
+           alt="{{ image.alt }}" />
+    </div>
+  </div>
+
+{% endblock children %}

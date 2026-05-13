@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("proconnect", "0001_initial"),
+        ("sites_conformes_proconnect", "0001_initial"),
     ]
 
     operations = [

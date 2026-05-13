@@ -4,7 +4,7 @@ from wagtail import blocks
 from wagtail.images import get_image_model
 from wagtail.images.blocks import ImageBlock
 
-from content_manager.constants import (
+from sites_conformes.content_manager.constants import (
     MEDIA_WIDTH_CHOICES,
 )
 
@@ -61,7 +61,7 @@ class IframeBlock(blocks.StructBlock):
 
     class Meta:
         icon = "globe"
-        template = "content_manager/blocks/iframe.html"
+        template = "sites_conformes_content_manager/blocks/iframe.html"
 
 
 class TranscriptionBlock(blocks.StructBlock):
@@ -70,7 +70,7 @@ class TranscriptionBlock(blocks.StructBlock):
 
     class Meta:
         icon = "media"
-        template = "content_manager/blocks/transcription.html"
+        template = "sites_conformes_content_manager/blocks/transcription.html"
 
 
 class VideoBlock(blocks.StructBlock):
@@ -101,4 +101,4 @@ class VideoBlock(blocks.StructBlock):
 
     class Meta:
         icon = "media"
-        template = "content_manager/blocks/video.html"
+        template = "sites_conformes_content_manager/blocks/video.html"

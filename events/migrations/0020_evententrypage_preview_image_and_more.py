@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("events", "0019_remove_evententrypage_header_cta_label_and_more"),
+        ("sites_conformes_events", "0019_remove_evententrypage_header_cta_label_and_more"),
         ("wagtailimages", "0027_image_description"),
     ]
 

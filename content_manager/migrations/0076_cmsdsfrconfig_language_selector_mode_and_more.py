@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("content_manager", "0075_catalogindexpage_exclude_from_sitemap_and_more"),
+        ("sites_conformes_content_manager", "0075_catalogindexpage_exclude_from_sitemap_and_more"),
         ("wagtailcore", "0096_referenceindex_referenceindex_source_object_and_more"),
     ]
 
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
                     modelcluster.fields.ParentalKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="language_selector_items",
-                        to="content_manager.cmsdsfrconfig",
+                        to="sites_conformes_content_manager.cmsdsfrconfig",
                     ),
                 ),
             ],

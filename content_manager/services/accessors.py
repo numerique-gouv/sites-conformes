@@ -4,10 +4,10 @@ from django.core.management.color import color_style
 from django.utils.translation import gettext_lazy as _
 from wagtail.models import Collection, Page, PageViewRestriction
 
-from content_manager.constants import HEADER_FIELDS
-from content_manager.models import CatalogIndexPage, ContentPage
-from content_manager.utils import get_default_site
-from menus.models import FooterBottomMenu, MainMenu
+from sites_conformes.content_manager.constants import HEADER_FIELDS
+from sites_conformes.content_manager.models import CatalogIndexPage, ContentPage
+from sites_conformes.content_manager.utils import get_default_site
+from sites_conformes.menus.models import FooterBottomMenu, MainMenu
 
 style = color_style()
 

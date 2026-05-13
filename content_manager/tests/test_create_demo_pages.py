@@ -17,10 +17,10 @@ from django.test import SimpleTestCase
 from wagtail.models import Site
 from wagtail.test.utils import WagtailPageTestCase
 
-from content_manager.blocks.core import HERO_STREAMFIELD_BLOCKS, STREAMFIELD_COMMON_BLOCKS
-from content_manager.blocks.utils import block_to_sample_dict
-from content_manager.models import ContentPage
-from menus.models import MainMenu
+from sites_conformes.content_manager.blocks.core import HERO_STREAMFIELD_BLOCKS, STREAMFIELD_COMMON_BLOCKS
+from sites_conformes.content_manager.blocks.utils import block_to_sample_dict
+from sites_conformes.content_manager.models import ContentPage
+from sites_conformes.menus.models import MainMenu
 
 
 class BlockValidationTestCase(SimpleTestCase):

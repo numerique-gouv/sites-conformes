@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("content_manager", "0060_auto_20250528_1627"),
+        ("sites_conformes_content_manager", "0060_auto_20250528_1627"),
     ]
 
     operations = [

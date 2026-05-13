@@ -11,7 +11,7 @@ def update_header_fields(apps, schema_editor):
     in the stream
     """
 
-    ContentPage = apps.get_model("content_manager", "ContentPage")
+    ContentPage = apps.get_model("sites_conformes_content_manager", "ContentPage")
     for page in ContentPage.objects.all():
         for block in page.body.raw_data:
             if block["type"] == "hero":
@@ -41,13 +41,13 @@ def update_header_fields(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0015_alter_contentpage_options_and_more"),
+        ("sites_conformes_content_manager", "0015_alter_contentpage_options_and_more"),
     ]
 
     operations = [
         migrations.RunPython(update_header_fields, elidable=True),
         MigrateStreamData(
-            app_name="content_manager",
+            app_name="sites_conformes_content_manager",
             model_name="ContentPage",
             field_name="body",
             operations_and_block_paths=[

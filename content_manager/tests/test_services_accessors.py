@@ -1,14 +1,14 @@
 from wagtail.models import Collection, PageViewRestriction
 from wagtail.test.utils import WagtailPageTestCase
 
-from content_manager.services.accessors import (
+from sites_conformes.content_manager.services.accessors import (
     get_or_create_collection,
     get_or_create_content_page,
     get_or_create_footer_bottom_menu,
     get_or_create_main_menu,
 )
-from content_manager.utils import get_default_site, import_image
-from menus.models import FooterBottomMenu, MainMenu
+from sites_conformes.content_manager.utils import get_default_site, import_image
+from sites_conformes.menus.models import FooterBottomMenu, MainMenu
 
 
 class MainMenuAccessorTestCase(WagtailPageTestCase):

@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
-from proconnect.models import WhitelistedEmailDomain
+from sites_conformes.proconnect.models import WhitelistedEmailDomain
 
 
 class Command(BaseCommand):

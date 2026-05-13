@@ -1,0 +1,28 @@
+{% load static wagtailcore_tags wagtailimages_tags %}
+{% if value.header_image or value.header_color_class %}
+  {% image value.header_image fill-1200x350 as bg_img %}
+  <div class="cmsfr-hero cmsfr-hero-position__center cmsfr-hero-column {% if value.header_large %}cmsfr-hero-large{% endif %}{% if value.header_darken %} cmsfr-background-dark {% endif %}"
+       style="{% if value.header_image %}background-image: {% if value.header_darken %}linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),{% endif %}url({{ bg_img.url }});
+              {% elif value.header_color_class %}background-color: var(--background-alt-{{ value.header_color_class }});
+              {% endif %} min-height: 350px">
+    {% if value.header_with_title or value.header_cta_buttons or value.header_cta_link and value.header_cta_label %}
+      <div class="fr-container fr-py-8w">
+        <div class="fr-grid-row fr-grid-row--gutters">
+          <div class="fr-col  {% if not value.header_large %}fr-col-md-6{% else %} fr-col-12 cmsfr-hero-column {% endif %}">
+            {% if value.header_with_title %}
+              <h1 {% if block.value.large %}class="fr-display--sm"{% endif %}>
+                {{ page.title }}
+                {% if extra_title %}: {{ extra_title }}{% endif %}
+                {% include "sites_conformes_content_manager/blocks/page_visibility.html" %}
+              </h1>
+            {% endif %}
+            {% if value.header_cta_text %}{{ value.header_cta_text|richtext }}{% endif %}
+            {% if value.header_cta_buttons %}
+              {% include "sites_conformes_content_manager/blocks/buttons_horizontal_list.html" with block=value.header_cta_buttons %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}

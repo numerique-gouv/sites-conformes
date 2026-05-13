@@ -18,10 +18,10 @@ from wagtail.contrib.routable_page.models import RoutablePageMixin, path
 from wagtail.models.i18n import Locale
 from wagtail.search import index
 
-from blog.models import Category, CategorySerializer, Organization, Person, PersonSerializer
-from content_manager.abstract import SitesFacilesBasePage
-from content_manager.models import CmsDsfrConfig, Tag
-from events.forms import EventSearchForm
+from sites_conformes.blog.models import Category, CategorySerializer, Organization, Person, PersonSerializer
+from sites_conformes.content_manager.abstract import SitesFacilesBasePage
+from sites_conformes.content_manager.models import CmsDsfrConfig, Tag
+from sites_conformes.events.forms import EventSearchForm
 
 
 class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
@@ -52,7 +52,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = ["events.EventEntryPage"]
+    subpage_types = ["sites_conformes_events.EventEntryPage"]
 
     class Meta:
         verbose_name = _("Event calendar index")
@@ -261,7 +261,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
                 "paginator": paginator,
                 "current_year": year,
             },
-            template="events/events_archive_page.html",
+            template="sites_conformes_events/events_archive_page.html",
         )
 
 
@@ -269,7 +269,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
     tags = ClusterTaggableManager(through="TagEventEntryPage", blank=True)
 
     event_categories = ParentalManyToManyField(
-        "blog.Category",
+        "sites_conformes_blog.Category",
         through="CategoryEventEntryPage",
         blank=True,
         verbose_name=_("Categories"),
@@ -289,10 +289,10 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
     )
 
     authors = ParentalManyToManyField(
-        "blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
+        "sites_conformes_blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
     )
 
-    parent_page_types = ["events.EventsIndexPage"]
+    parent_page_types = ["sites_conformes_events.EventsIndexPage"]
     subpage_types = []
 
     search_fields = SitesFacilesBasePage.search_fields + [

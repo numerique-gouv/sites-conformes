@@ -1,0 +1,112 @@
+{% extends "dsfr/header.html" %}
+{% load i18n static wagtailcore_tags wagtailimages_tags wagtail_dsfr_tags wagtail_dsfr_menus_tags %}
+
+{% block brand %}
+  <p class="fr-logo">{{ settings.sites_conformes_content_manager.CmsDsfrConfig.header_brand_html|safe }}</p>
+{% endblock brand %}
+
+{% block service_title %}
+  {% translate "Home page" as home_page %}
+  <a href="{% root_url %}"
+     title="{{ home_page }} — {{ settings.sites_conformes_content_manager.CmsDsfrConfig.site_title }}">
+    <p class="fr-header__service-title">
+      {% if settings.sites_conformes_content_manager.CmsDsfrConfig.site_title|slice:"-2:" == "fr" %}
+        {{ settings.sites_conformes_content_manager.CmsDsfrConfig.site_title|slice:":-2" }}<em>fr</em>
+      {% else %}
+        {{ settings.sites_conformes_content_manager.CmsDsfrConfig.site_title }}
+      {% endif %}
+      {% if settings.sites_conformes_content_manager.CmsDsfrConfig.beta_tag %}
+        <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">BETA</span>
+      {% endif %}
+    </p>
+  </a>
+{% endblock service_title %}
+
+{% block service_tagline %}
+  {{ settings.sites_conformes_content_manager.CmsDsfrConfig.site_tagline }}
+{% endblock service_tagline %}
+
+{% block operator_logo %}
+  {% if settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_file %}
+    {% image settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_file original as logo_img %}
+
+    <div class="fr-header__operator">
+      <img class="fr-responsive-img"
+           src="{{ logo_img.url }}"
+           alt="{{ settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_alt }}"
+           {% if settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_width >= 1 %}style="max-width:{{ settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_width|floatformat:"1u" }}rem;"{% endif %} />
+    </div>
+  {% endif %}
+{% endblock operator_logo %}
+
+{% block header_tools %}
+  {% if request %}
+    {% top_menu %}
+    {% language_selector %}
+  {% endif %}
+    {% include "sites_conformes_core/blocks/user_menu.html" %}
+{% endblock header_tools %}
+
+{% block header_search %}
+  {% translate "Search" as search_label %}
+  {% if settings.sites_conformes_content_manager.CmsDsfrConfig.search_bar %}
+    <div class="fr-header__search fr-modal" id="modal-search">
+      <div class="fr-container fr-container-lg--fluid">
+        {% translate "Close" as close_label %}
+        <button class="fr-btn--close fr-btn"
+                aria-controls="modal-search"
+                title="{{ close_label }}">{{ close_label }}</button>
+        <form action="{% url 'cms_search' %}" method="get">
+          <div class="fr-search-bar" id="search-bar" role="search">
+            <label class="fr-label" for="query">{{ search_label }}</label>
+            <input class="fr-input"
+                   placeholder="{{ search_label }}"
+                   type="search"
+                   id="query"
+                   name="q">
+            <button class="fr-btn" title="{{ search_label }}">{{ search_label }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+{% endblock header_search %}
+
+{% block burger_menu %}
+  {% translate "Search" as search_label %}
+  <div class="fr-header__navbar">
+    {% if settings.sites_conformes_content_manager.CmsDsfrConfig.search_bar %}
+      <button class="fr-btn--search fr-btn"
+              data-fr-opened="false"
+              aria-controls="modal-search"
+              id="fr-btn-search-mobile"
+              title="{{ search_label }}">{{ search_label }}</button>
+    {% endif %}
+    {% translate "Menu" as menu_label %}
+    <button class="fr-btn--menu fr-btn"
+            data-fr-opened="false"
+            aria-controls="fr-menu-mobile"
+            id="fr-btn-menu-mobile"
+            title="{{ menu_label }}">{{ menu_label }}</button>
+  </div>
+{% endblock burger_menu %}
+
+{% block main_menu %}
+  {% if request %}
+    <div class="fr-header__menu fr-modal"
+         id="fr-menu-mobile"
+         aria-labelledby="fr-btn-menu-mobile">
+      <div class="fr-container">
+        {% translate "Close" as close_label %}
+        <button type="button"
+                class="fr-btn--close fr-btn"
+                aria-controls="fr-menu-mobile">{{ close_label }}</button>
+        <div class="fr-header__menu-links"></div>
+        {% translate "Main menu" as main_menu_label %}
+        <nav class="fr-nav" id="fr-navigation" aria-label="{{ main_menu_label }}">
+          {% main_menu %}
+        </nav>
+      </div>
+    </div>
+  {% endif %}
+{% endblock main_menu %}

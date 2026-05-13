@@ -5,8 +5,8 @@ from itertools import chain
 
 
 def migrate_old_hero_in_new_streamfield_hero(apps, schema_editor):
-    EventEntryPage = apps.get_model("events", "EventEntryPage")
-    EventsIndexPage = apps.get_model("events", "EventsIndexPage")
+    EventEntryPage = apps.get_model("sites_conformes_events", "EventEntryPage")
+    EventsIndexPage = apps.get_model("sites_conformes_events", "EventsIndexPage")
 
     pages = chain(EventEntryPage.objects.all(), EventsIndexPage.objects.all())
 
@@ -46,7 +46,7 @@ def migrate_old_hero_in_new_streamfield_hero(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("events", "0021_evententrypage_hero_eventsindexpage_hero_and_more"),
+        ("sites_conformes_events", "0021_evententrypage_hero_eventsindexpage_hero_and_more"),
     ]
 
     operations = [

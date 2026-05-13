@@ -20,7 +20,7 @@ class BadgeBlock(blocks.StructBlock):
     hide_icon = blocks.BooleanBlock(label=_("Hide badge icon"), required=False)
 
     class Meta:
-        template = "content_manager/blocks/badge.html"
+        template = "sites_conformes_content_manager/blocks/badge.html"
 
 
 class BadgesListBlock(blocks.StreamBlock):
@@ -28,7 +28,7 @@ class BadgesListBlock(blocks.StreamBlock):
 
     class Meta:
         icon = "list-ul"
-        template = "content_manager/blocks/badges_list.html"
+        template = "sites_conformes_content_manager/blocks/badges_list.html"
 
 
 class TagBlock(blocks.StructBlock):
@@ -44,7 +44,7 @@ class TagBlock(blocks.StructBlock):
     link = LinkWithoutLabelBlock(required=False)
 
     class Meta:
-        template = "content_manager/blocks/tag.html"
+        template = "sites_conformes_content_manager/blocks/tag.html"
 
 
 class TagListBlock(blocks.StreamBlock):
@@ -52,4 +52,4 @@ class TagListBlock(blocks.StreamBlock):
 
     class Meta:
         icon = "list-ul"
-        template = "content_manager/blocks/tags_list.html"
+        template = "sites_conformes_content_manager/blocks/tags_list.html"

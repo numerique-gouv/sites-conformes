@@ -87,7 +87,7 @@ STREAMFIELD_COMMON_BLOCKS = [
         blocks.StaticBlock(
             label=_("Subpages list"),
             admin_text=_("A simple, alphabetical list of the subpages of the current page."),
-            template="content_manager/blocks/subpages_list.html",
+            template="sites_conformes_content_manager/blocks/subpages_list.html",
             group=_("4. Website structure"),
         ),
     ),

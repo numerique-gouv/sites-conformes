@@ -5,8 +5,8 @@ from itertools import chain
 
 
 def invert_text_position(apps, schema_editor):
-    ContentPage = apps.get_model("content_manager", "ContentPage")
-    CatalogIndexPage = apps.get_model("content_manager", "CatalogIndexPage")
+    ContentPage = apps.get_model("sites_conformes_content_manager", "ContentPage")
+    CatalogIndexPage = apps.get_model("sites_conformes_content_manager", "CatalogIndexPage")
 
     pages = chain(ContentPage.objects.all(), CatalogIndexPage.objects.all())
 
@@ -39,7 +39,7 @@ def invert_text_position(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("content_manager", "0073_alter_catalogindexpage_body_and_more"),
+        ("sites_conformes_content_manager", "0073_alter_catalogindexpage_body_and_more"),
     ]
 
     operations = [

@@ -13,7 +13,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0016_auto_20240305_1611"),
+        ("sites_conformes_content_manager", "0016_auto_20240305_1611"),
         ("taggit", "0006_rename_taggeditem_content_type_object_id_taggit_tagg_content_8fc721_idx"),
     ]
 
@@ -527,7 +527,7 @@ class Migration(migrations.Migration):
                     modelcluster.fields.ParentalKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="contentpage_tags",
-                        to="content_manager.contentpage",
+                        to="sites_conformes_content_manager.contentpage",
                     ),
                 ),
                 (
@@ -549,7 +549,7 @@ class Migration(migrations.Migration):
             field=modelcluster.contrib.taggit.ClusterTaggableManager(
                 blank=True,
                 help_text="A comma-separated list of tags.",
-                through="content_manager.TagContentPage",
+                through="sites_conformes_content_manager.TagContentPage",
                 to="taggit.Tag",
                 verbose_name="Tags",
             ),

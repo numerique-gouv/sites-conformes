@@ -4,8 +4,8 @@ from wagtail import blocks
 from wagtail.blocks import StructValue
 from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 
-from content_manager.blocks.badges_tags import BadgesListBlock, TagListBlock
-from content_manager.constants import (
+from sites_conformes.content_manager.blocks.badges_tags import BadgesListBlock, TagListBlock
+from sites_conformes.content_manager.constants import (
     HEADING_CHOICES,
     HORIZONTAL_CARD_IMAGE_RATIOS,
     LIMITED_RICHTEXTFIELD_FEATURES,
@@ -132,7 +132,7 @@ class CardBlock(blocks.StructBlock):
 
     class Meta:
         icon = "tablet-alt"
-        template = "content_manager/blocks/card.html"
+        template = "sites_conformes_content_manager/blocks/card.html"
         value_class = CardstructValue
 
 
@@ -154,14 +154,14 @@ class HorizontalCardBlock(CardBlock):
 
     class Meta:
         icon = "tablet-alt"
-        template = "content_manager/blocks/card_horizontal.html"
+        template = "sites_conformes_content_manager/blocks/card_horizontal.html"
         value_class = CardstructValue
 
 
 class VerticalCardBlock(CardBlock):
     class Meta:
         icon = "tablet-alt"
-        template = "content_manager/blocks/card_vertical.html"
+        template = "sites_conformes_content_manager/blocks/card_vertical.html"
         value_class = CardstructValue
 
 
@@ -204,5 +204,5 @@ class TileBlock(blocks.StructBlock):
 
     class Meta:
         icon = "tablet-alt"
-        template = "content_manager/blocks/tile.html"
+        template = "sites_conformes_content_manager/blocks/tile.html"
         value_class = CardstructValue

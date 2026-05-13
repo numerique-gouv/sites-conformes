@@ -5,7 +5,7 @@ from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
-from events.models import EventEntryPage, EventsIndexPage
+from sites_conformes.events.models import EventEntryPage, EventsIndexPage
 
 User = get_user_model()
 

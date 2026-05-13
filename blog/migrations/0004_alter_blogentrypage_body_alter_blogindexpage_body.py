@@ -10,7 +10,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("blog", "0003_blogentrypage_header_color_class_and_more"),
+        ("sites_conformes_blog", "0003_blogentrypage_header_color_class_and_more"),
     ]
 
     operations = [

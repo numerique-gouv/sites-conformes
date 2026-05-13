@@ -35,7 +35,7 @@ class Command(shell.Command):
             "content_manager.services.accessors.get_or_create_content_page",
             "content_manager.services.accessors.get_or_create_main_menu",
             "content_manager.services.accessors.get_or_create_footer_bottom_menu",
-            "content_manager.utils.get_default_site",
+            "sites_conformes.content_manager.utils.get_default_site",
             "menus.models.MainMenu",
             "menus.models.TopMenu",
             "menus.models.FooterBottomMenu",

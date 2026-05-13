@@ -3,8 +3,8 @@ from django.test import TestCase
 from wagtail.models import Site
 from wagtail.test.utils import WagtailPageTestCase
 
-from menus.blocks import MainMenuStructValue, MainMenuSubmenuBlock
-from menus.models import FooterBottomMenu, MainMenu, TopMenu
+from sites_conformes.menus.blocks import MainMenuStructValue, MainMenuSubmenuBlock
+from sites_conformes.menus.models import FooterBottomMenu, MainMenu, TopMenu
 
 
 class TopMenuModelTestCase(WagtailPageTestCase):

@@ -9,7 +9,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("blog", "0053_alter_blogentrypage_body_and_more"),
+        ("sites_conformes_blog", "0053_alter_blogentrypage_body_and_more"),
     ]
 
     operations = [
@@ -146,7 +146,7 @@ class Migration(migrations.Migration):
                         },
                     ),
                     11: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Icon", "required": False},
                     ),
@@ -602,7 +602,7 @@ class Migration(migrations.Migration):
                         },
                     ),
                     11: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Icon", "required": False},
                     ),

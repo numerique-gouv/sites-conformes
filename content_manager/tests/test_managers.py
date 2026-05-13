@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
-from content_manager.models import ContentPage, Tag, TagContentPage
+from sites_conformes.content_manager.models import ContentPage, Tag, TagContentPage
 
 User = get_user_model()
 

@@ -1,0 +1,77 @@
+{% extends "dsfr/footer.html" %}
+{% load i18n wagtailcore_tags wagtailimages_tags wagtail_dsfr_menus_tags wagtail_dsfr_tags %}
+
+{% block footer_brand %}
+  {% translate "Back to home page" as back_to_home_label %}
+  {% if settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_file and settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_display == "header-footer" %}
+    {% image settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_file original as logo_img %}
+    <div class="fr-footer__brand fr-enlarge-link">
+      <p class="fr-logo"
+         title="{{ settings.sites_conformes_content_manager.CmsDsfrConfig.footer_brand|default:'république française' }}">
+        {{ settings.sites_conformes_content_manager.CmsDsfrConfig.footer_brand_html| default_if_none:'république<br />française' | safe }}
+      </p>
+      <a class="fr-footer__brand-link"
+         href="{% root_url %}"
+         title="{{ back_to_home_label }} - {{ settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_alt }} - {{ settings.sites_conformes_content_manager.CmsDsfrConfig.footer_brand|default:'république française' }}">
+        <img class="fr-footer__logo"
+             src="{{ logo_img.url }}"
+             alt="{{ settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_alt }}"
+             {% if settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_width >= 1 %}style="max-width:{{ settings.sites_conformes_content_manager.CmsDsfrConfig.operator_logo_width|floatformat:"1u" }}rem;"{% endif %} />
+        {# L’alternative de l’image (attribut alt) doit impérativement être renseignée et reprendre le texte visible dans l’image #}
+      </a>
+    </div>
+  {% else %}
+    <div class="fr-footer__brand fr-enlarge-link">
+      <a id="footer-operator"
+         href="{% root_url %}"
+         title="{{ back_to_home_label }} - {{ settings.sites_conformes_content_manager.CmsDsfrConfig.site_title }} - {{ settings.sites_conformes_content_manager.CmsDsfrConfig.footer_brand|default:'république française' }}">
+        {% block brand %}
+          <p class="fr-logo">
+            {{ settings.sites_conformes_content_manager.CmsDsfrConfig.footer_brand_html| default_if_none:'république<br />française' | safe }}
+          </p>
+        {% endblock brand %}
+      </a>
+    </div>
+  {% endif %}
+{% endblock footer_brand %}
+
+{% block footer_description %}
+  {{ settings.sites_conformes_content_manager.CmsDsfrConfig.footer_description | richtext | richtext_p_add_class:"fr-footer__content-desc" }}
+{% endblock footer_description %}
+
+{% block footer_links %}
+  {% if request %}
+    {% footer_bottom_menu %}
+  {% endif %}
+  <li class="fr-footer__bottom-item">
+    <a class="fr-footer__bottom-link" href="{% url 'readable_sitemap' %}">{% translate "Sitemap" %}</a>
+  </li>
+  {% if settings.sites_conformes_content_manager.CustomScriptsSettings.use_tarteaucitron %}
+    <li class="fr-footer__bottom-item">
+      <button id="tarteaucitronManager"
+              aria-controls="tarteaucitron"
+              data-fr-opened="false"
+              class="fr-footer__bottom-link"
+              data-fr-js-modal-button="true">{% translate "Cookie settings" %}</button>
+    </li>
+  {% endif %}
+  {% if settings.sites_conformes_content_manager.CmsDsfrConfig.theme_modale_button %}
+    <li class="fr-footer__bottom-item">
+      <button id="footer__bottom-link__parametres-affichage"
+              aria-controls="fr-theme-modal"
+              data-fr-opened="false"
+              class="fr-icon-theme-fill fr-link--icon-left fr-footer__bottom-link"
+              data-fr-js-modal-button="true">{% translate "Display settings" %}</button>
+    </li>
+  {% endif %}
+{% endblock footer_links %}
+
+{% block footer_bottom_extra %}
+  {% translate "Opens a new window" as new_window %}
+  <span class="cmsfr-footer__bottom-extra">
+    {% translate "This website is made with" %} <a href="https://sites.beta.gouv.fr/?mtm_campaign=footer-link"
+    target="_blank"
+    rel="noopener external"
+    title="Sites Conformes - {{ new_window }}">Sites Conformes</a>
+  </span>
+{% endblock footer_bottom_extra %}

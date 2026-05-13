@@ -3,7 +3,7 @@ from wagtail import blocks
 from wagtail.blocks import BooleanBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
-from content_manager.constants import (
+from sites_conformes.content_manager.constants import (
     HEADING_CHOICES_2_5,
 )
 
@@ -90,15 +90,15 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
         default="h2",
         help_text=_("Adapt to the page layout. Defaults to heading 2."),
     )
-    blog = blocks.PageChooserBlock(label=_("Blog"), page_type="blog.BlogIndexPage")
+    blog = blocks.PageChooserBlock(label=_("Blog"), page_type="sites_conformes_blog.BlogIndexPage")
     entries_count = blocks.IntegerBlock(
         label=_("Number of entries"), required=False, min_value=1, max_value=8, default=3
     )
-    category_filter = SnippetChooserBlock("blog.Category", label=_("Filter by category"), required=False)
-    tag_filter = SnippetChooserBlock("content_manager.Tag", label=_("Filter by tag"), required=False)
-    author_filter = SnippetChooserBlock("blog.Person", label=_("Filter by author"), required=False)
+    category_filter = SnippetChooserBlock("sites_conformes_blog.Category", label=_("Filter by category"), required=False)
+    tag_filter = SnippetChooserBlock("sites_conformes_content_manager.Tag", label=_("Filter by tag"), required=False)
+    author_filter = SnippetChooserBlock("sites_conformes_blog.Person", label=_("Filter by author"), required=False)
     source_filter = SnippetChooserBlock(
-        "blog.Organization",
+        "sites_conformes_blog.Organization",
         label=_("Filter by source"),
         help_text=_("The source is the organization of the post author"),
         required=False,
@@ -107,7 +107,7 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
 
     class Meta:
         icon = "placeholder"
-        template = ("content_manager/blocks/blog_recent_entries.html",)
+        template = ("sites_conformes_content_manager/blocks/blog_recent_entries.html",)
         value_class = RecentEntriesStructValue
 
 
@@ -120,15 +120,15 @@ class EventsRecentEntriesBlock(blocks.StructBlock):
         default="h2",
         help_text=_("Adapt to the page layout. Defaults to heading 2."),
     )
-    index_page = blocks.PageChooserBlock(label=_("Event calendar"), page_type="events.EventsIndexPage")
+    index_page = blocks.PageChooserBlock(label=_("Event calendar"), page_type="sites_conformes_events.EventsIndexPage")
     entries_count = blocks.IntegerBlock(
         label=_("Number of entries"), required=False, min_value=1, max_value=8, default=3
     )
-    category_filter = SnippetChooserBlock("blog.Category", label=_("Filter by category"), required=False)
-    tag_filter = SnippetChooserBlock("content_manager.Tag", label=_("Filter by tag"), required=False)
-    author_filter = SnippetChooserBlock("blog.Person", label=_("Filter by author"), required=False)
+    category_filter = SnippetChooserBlock("sites_conformes_blog.Category", label=_("Filter by category"), required=False)
+    tag_filter = SnippetChooserBlock("sites_conformes_content_manager.Tag", label=_("Filter by tag"), required=False)
+    author_filter = SnippetChooserBlock("sites_conformes_blog.Person", label=_("Filter by author"), required=False)
     source_filter = SnippetChooserBlock(
-        "blog.Organization",
+        "sites_conformes_blog.Organization",
         label=_("Filter by source"),
         help_text=_("The source is the organization of the post author"),
         required=False,
@@ -137,5 +137,5 @@ class EventsRecentEntriesBlock(blocks.StructBlock):
 
     class Meta:
         icon = "placeholder"
-        template = ("content_manager/blocks/events_recent_entries.html",)
+        template = ("sites_conformes_content_manager/blocks/events_recent_entries.html",)
         value_class = RecentEntriesStructValue

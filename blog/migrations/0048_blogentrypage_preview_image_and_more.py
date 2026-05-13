@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("blog", "0047_remove_blogentrypage_header_cta_label_and_more"),
+        ("sites_conformes_blog", "0047_remove_blogentrypage_header_cta_label_and_more"),
         ("wagtailimages", "0027_image_description"),
     ]
 

@@ -7,12 +7,12 @@ import wagtail.images.blocks
 import wagtailmarkdown.blocks
 from django.db import migrations
 
-import content_manager.blocks
+import sites_conformes.content_manager.blocks
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0020_alter_contentpage_body_and_more"),
+        ("sites_conformes_content_manager", "0020_alter_contentpage_body_and_more"),
     ]
 
     operations = [
@@ -394,7 +394,7 @@ class Migration(migrations.Migration):
                                             ),
                                             (
                                                 "icon_class",
-                                                content_manager.blocks.IconPickerBlock(label="Icon", required=False),
+                                                sites_conformes.content_manager.blocks.IconPickerBlock(label="Icon", required=False),
                                             ),
                                             (
                                                 "link",

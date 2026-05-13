@@ -6,7 +6,7 @@ from django.utils.html import mark_safe
 from wagtail.models import Site
 from wagtail.rich_text import RichText
 
-from content_manager.models import CmsDsfrConfig
+from sites_conformes.content_manager.models import CmsDsfrConfig
 
 register = template.Library()
 
@@ -49,7 +49,7 @@ def canonical_url(context):
     return f"{scheme}://{hostname}{request.path}"
 
 
-@register.inclusion_tag("content_manager/widgets/language_selector.html", takes_context=True)
+@register.inclusion_tag("sites_conformes_content_manager/widgets/language_selector.html", takes_context=True)
 def language_selector(context: Context) -> dict:
     """
     Returns the language selector item.

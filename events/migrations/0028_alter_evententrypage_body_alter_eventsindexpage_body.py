@@ -9,7 +9,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("events", "0027_alter_evententrypage_body_alter_evententrypage_hero_and_more"),
+        ("sites_conformes_events", "0027_alter_evententrypage_body_alter_evententrypage_hero_and_more"),
     ]
 
     operations = [
@@ -342,7 +342,7 @@ class Migration(migrations.Migration):
                         },
                     ),
                     35: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Icon", "required": False},
                     ),
@@ -747,7 +747,7 @@ class Migration(migrations.Migration):
                     ),
                     88: ("wagtail.blocks.CharBlock", (), {"label": "Top detail: text", "required": False}),
                     89: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Top detail: icon", "required": False},
                     ),
@@ -768,7 +768,7 @@ class Migration(migrations.Migration):
                         },
                     ),
                     94: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Bottom detail: icon", "required": False},
                     ),
@@ -953,7 +953,7 @@ class Migration(migrations.Migration):
                     120: (
                         "wagtail.blocks.PageChooserBlock",
                         (),
-                        {"label": "Blog", "page_type": ["blog.BlogIndexPage"]},
+                        {"label": "Blog", "page_type": ["sites_conformes_blog.BlogIndexPage"]},
                     ),
                     121: (
                         "wagtail.blocks.IntegerBlock",
@@ -968,22 +968,22 @@ class Migration(migrations.Migration):
                     ),
                     122: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Category",),
+                        ("sites_conformes_blog.Category",),
                         {"label": "Filter by category", "required": False},
                     ),
                     123: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("content_manager.Tag",),
+                        ("sites_conformes_content_manager.Tag",),
                         {"label": "Filter by tag", "required": False},
                     ),
                     124: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Person",),
+                        ("sites_conformes_blog.Person",),
                         {"label": "Filter by author", "required": False},
                     ),
                     125: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Organization",),
+                        ("sites_conformes_blog.Organization",),
                         {
                             "help_text": "The source is the organization of the post author",
                             "label": "Filter by source",
@@ -1015,7 +1015,7 @@ class Migration(migrations.Migration):
                     128: (
                         "wagtail.blocks.PageChooserBlock",
                         (),
-                        {"label": "Event calendar", "page_type": ["events.EventsIndexPage"]},
+                        {"label": "Event calendar", "page_type": ["sites_conformes_events.EventsIndexPage"]},
                     ),
                     129: (
                         "wagtail.blocks.StructBlock",
@@ -1151,7 +1151,7 @@ class Migration(migrations.Migration):
                     ),
                     145: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Person",),
+                        ("sites_conformes_blog.Person",),
                         {
                             "help_text": "Optional, all values can be manually specified or overriden below",
                             "label": "Person",
@@ -1661,7 +1661,7 @@ class Migration(migrations.Migration):
                             "admin_text": "A simple, alphabetical list of the subpages of the current page.",
                             "group": "4. Website structure",
                             "label": "Subpages list",
-                            "template": "content_manager/blocks/subpages_list.html",
+                            "template": "sites_conformes_content_manager/blocks/subpages_list.html",
                         },
                     ),
                     188: (
@@ -1805,7 +1805,7 @@ class Migration(migrations.Migration):
                     ),
                     202: ("wagtail.blocks.StructBlock", [[("image", 10), ("title", 200), ("text", 201)]], {}),
                     203: (
-                        "content_manager.blocks.sections.ImageAndTextListBlock",
+                        "sites_conformes.content_manager.blocks.sections.ImageAndTextListBlock",
                         (202,),
                         {"collapsed": True, "label": "Items"},
                     ),
@@ -2331,7 +2331,7 @@ class Migration(migrations.Migration):
                         },
                     ),
                     35: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Icon", "required": False},
                     ),
@@ -2736,7 +2736,7 @@ class Migration(migrations.Migration):
                     ),
                     88: ("wagtail.blocks.CharBlock", (), {"label": "Top detail: text", "required": False}),
                     89: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Top detail: icon", "required": False},
                     ),
@@ -2757,7 +2757,7 @@ class Migration(migrations.Migration):
                         },
                     ),
                     94: (
-                        "content_manager.blocks.buttons_links.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.buttons_links.IconPickerBlock",
                         (),
                         {"label": "Bottom detail: icon", "required": False},
                     ),
@@ -2942,7 +2942,7 @@ class Migration(migrations.Migration):
                     120: (
                         "wagtail.blocks.PageChooserBlock",
                         (),
-                        {"label": "Blog", "page_type": ["blog.BlogIndexPage"]},
+                        {"label": "Blog", "page_type": ["sites_conformes_blog.BlogIndexPage"]},
                     ),
                     121: (
                         "wagtail.blocks.IntegerBlock",
@@ -2957,22 +2957,22 @@ class Migration(migrations.Migration):
                     ),
                     122: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Category",),
+                        ("sites_conformes_blog.Category",),
                         {"label": "Filter by category", "required": False},
                     ),
                     123: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("content_manager.Tag",),
+                        ("sites_conformes_content_manager.Tag",),
                         {"label": "Filter by tag", "required": False},
                     ),
                     124: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Person",),
+                        ("sites_conformes_blog.Person",),
                         {"label": "Filter by author", "required": False},
                     ),
                     125: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Organization",),
+                        ("sites_conformes_blog.Organization",),
                         {
                             "help_text": "The source is the organization of the post author",
                             "label": "Filter by source",
@@ -3004,7 +3004,7 @@ class Migration(migrations.Migration):
                     128: (
                         "wagtail.blocks.PageChooserBlock",
                         (),
-                        {"label": "Event calendar", "page_type": ["events.EventsIndexPage"]},
+                        {"label": "Event calendar", "page_type": ["sites_conformes_events.EventsIndexPage"]},
                     ),
                     129: (
                         "wagtail.blocks.StructBlock",
@@ -3140,7 +3140,7 @@ class Migration(migrations.Migration):
                     ),
                     145: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Person",),
+                        ("sites_conformes_blog.Person",),
                         {
                             "help_text": "Optional, all values can be manually specified or overriden below",
                             "label": "Person",
@@ -3650,7 +3650,7 @@ class Migration(migrations.Migration):
                             "admin_text": "A simple, alphabetical list of the subpages of the current page.",
                             "group": "4. Website structure",
                             "label": "Subpages list",
-                            "template": "content_manager/blocks/subpages_list.html",
+                            "template": "sites_conformes_content_manager/blocks/subpages_list.html",
                         },
                     ),
                     188: (
@@ -3794,7 +3794,7 @@ class Migration(migrations.Migration):
                     ),
                     202: ("wagtail.blocks.StructBlock", [[("image", 10), ("title", 200), ("text", 201)]], {}),
                     203: (
-                        "content_manager.blocks.sections.ImageAndTextListBlock",
+                        "sites_conformes.content_manager.blocks.sections.ImageAndTextListBlock",
                         (202,),
                         {"collapsed": True, "label": "Items"},
                     ),

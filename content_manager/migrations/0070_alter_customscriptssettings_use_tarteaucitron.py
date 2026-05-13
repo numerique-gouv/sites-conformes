@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("content_manager", "0069_alter_catalogindexpage_body_and_more"),
+        ("sites_conformes_content_manager", "0069_alter_catalogindexpage_body_and_more"),
     ]
 
     operations = [

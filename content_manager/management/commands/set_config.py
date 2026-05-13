@@ -5,8 +5,8 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from content_manager.models import CmsDsfrConfig
-from content_manager.utils import get_default_site
+from sites_conformes.content_manager.models import CmsDsfrConfig
+from sites_conformes.content_manager.utils import get_default_site
 
 
 class Command(BaseCommand):

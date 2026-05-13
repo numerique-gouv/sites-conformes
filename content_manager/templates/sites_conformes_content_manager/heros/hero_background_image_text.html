@@ -1,0 +1,14 @@
+{% load static wagtailcore_tags wagtailimages_tags %}
+{% image value.image.image fill-1900x650 as bg_img %}
+
+<div class="cmsfr-hero fr-container-fluid {% if value.image.image_mask == 'darken' %}cmsfr-background-dark{% endif %} {% if value.image.image_positioning == 'top' %} cmsfr-hero-position--top {% elif value.image.image_positioning == 'bottom' %} cmsfr-hero-position--bottom {% else %} cmsfr-hero-position--center {% endif %} "
+     style="{% if value.background_color_or_image == 'image' %} background-image: {% if value.image.image_mask == 'darken' %}linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), {% elif value.image.image_mask == 'lighten' %}linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)),{% endif %}url({{ bg_img.url }}) {% elif value.background_color_or_image == 'color' %}background-color: var(--background-alt-{{ value.background_color }}){% endif %};
+            min-height: 650px">
+  <div class="fr-container fr-grid-row fr-grid-row--middle {% if value.text_content.position == 'left' %} fr-grid-row--left cmsfr-text-content--left {% elif value.text_content.position == 'right' %} fr-grid-row--right cmsfr-text-content--right {% else %} fr-grid-row--center cmsfr-text-content--center {% endif %}"
+       style="min-height:650px">
+    <div class="fr-col-10 fr-col-md-6">
+      {% include "sites_conformes_content_manager/heros/_hero_text_content.html" %}
+      {% include "sites_conformes_content_manager/heros/_hero_buttons.html" %}
+    </div>
+  </div>
+</div>

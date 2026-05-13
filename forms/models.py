@@ -15,7 +15,7 @@ from wagtail.models import TranslatableMixin
 from wagtail_honeypot.models import HoneypotFormMixin, HoneypotFormSubmissionMixin
 from wagtail_localize.fields import SynchronizedField
 
-from forms.widgets import CustomEmailInputWidget
+from sites_conformes.forms.widgets import CustomEmailInputWidget
 
 
 class FormField(TranslatableMixin, AbstractFormField):

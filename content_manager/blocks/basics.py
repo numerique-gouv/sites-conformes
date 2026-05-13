@@ -6,8 +6,8 @@ from wagtail.images import get_image_model
 from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
-from content_manager.blocks.badges_tags import TagListBlock
-from content_manager.constants import (
+from sites_conformes.content_manager.blocks.badges_tags import TagListBlock
+from sites_conformes.content_manager.constants import (
     ALIGN_HORIZONTAL_CHOICES,
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
     ALIGN_VERTICAL_CHOICES,
@@ -90,7 +90,7 @@ class AccordionsBlock(blocks.StreamBlock):
     accordion = AccordionBlock(label=_("Accordion"), min_num=1, max_num=15)
 
     class Meta:
-        template = "content_manager/blocks/accordions.html"
+        template = "sites_conformes_content_manager/blocks/accordions.html"
 
 
 class AlertBlock(blocks.StructBlock):
@@ -106,7 +106,7 @@ class AlertBlock(blocks.StructBlock):
 
     class Meta:
         icon = "info-circle"
-        template = "content_manager/blocks/alert.html"
+        template = "sites_conformes_content_manager/blocks/alert.html"
 
 
 class CalloutBlock(blocks.StructBlock):
@@ -129,7 +129,7 @@ class CalloutBlock(blocks.StructBlock):
 
     class Meta:
         icon = "info-circle"
-        template = "content_manager/blocks/callout.html"
+        template = "sites_conformes_content_manager/blocks/callout.html"
 
 
 class HighlightBlock(blocks.StructBlock):
@@ -147,7 +147,7 @@ class HighlightBlock(blocks.StructBlock):
 
     class Meta:
         icon = "info-circle"
-        template = "content_manager/blocks/highlight.html"
+        template = "sites_conformes_content_manager/blocks/highlight.html"
 
 
 class ImageAndTextBlock(blocks.StructBlock):
@@ -181,7 +181,7 @@ class ImageAndTextBlock(blocks.StructBlock):
 
     class Meta:
         icon = "image"
-        template = "content_manager/blocks/image_and_text.html"
+        template = "sites_conformes_content_manager/blocks/image_and_text.html"
 
 
 class CenteredImageStructValue(StructValue):
@@ -228,7 +228,7 @@ class CenteredImageBlock(blocks.StructBlock):
 
     class Meta:
         icon = "image"
-        template = "content_manager/blocks/image.html"
+        template = "sites_conformes_content_manager/blocks/image.html"
         value_class = CenteredImageStructValue
 
 
@@ -245,7 +245,7 @@ class QuoteBlock(blocks.StructBlock):
 
     class Meta:
         icon = "openquote"
-        template = "content_manager/blocks/quote.html"
+        template = "sites_conformes_content_manager/blocks/quote.html"
 
 
 class SeparatorBlock(blocks.StructBlock):
@@ -269,7 +269,7 @@ class StepperBlock(blocks.StructBlock):
     steps = StepsListBlock(label=_("Steps"))
 
     class Meta:
-        template = "content_manager/blocks/stepper.html"
+        template = "sites_conformes_content_manager/blocks/stepper.html"
 
 
 class TextAndCTA(blocks.StructBlock):
@@ -292,7 +292,7 @@ class TextAndCTA(blocks.StructBlock):
 
     class Meta:
         icon = "link"
-        template = "content_manager/blocks/text_and_cta.html"
+        template = "sites_conformes_content_manager/blocks/text_and_cta.html"
 
 
 class VerticalContactCardStructValue(blocks.StructValue):
@@ -349,7 +349,7 @@ class VerticalContactCardStructValue(blocks.StructValue):
 
 class VerticalContactCardBlock(blocks.StructBlock):
     contact = SnippetChooserBlock(
-        "blog.Person",
+        "sites_conformes_blog.Person",
         label=_("Person"),
         help_text=_("Optional, all values can be manually specified or overriden below"),
         required=False,
@@ -375,4 +375,4 @@ class VerticalContactCardBlock(blocks.StructBlock):
     class Meta:
         icon = "user"
         value_class = VerticalContactCardStructValue
-        template = ("content_manager/blocks/contact_card_vertical.html",)
+        template = ("sites_conformes_content_manager/blocks/contact_card_vertical.html",)

@@ -2,7 +2,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from content_manager.services.import_export import TEMPLATES_DATA_FILE, ExportPage, ImportExportImages
+from sites_conformes.content_manager.services.import_export import TEMPLATES_DATA_FILE, ExportPage, ImportExportImages
 
 SOURCE_URL = "https://sites.beta.gouv.fr/"
 

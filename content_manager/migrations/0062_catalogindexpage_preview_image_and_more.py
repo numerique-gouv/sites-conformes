@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("content_manager", "0061_remove_catalogindexpage_header_cta_label_and_more"),
+        ("sites_conformes_content_manager", "0061_remove_catalogindexpage_header_cta_label_and_more"),
         ("wagtailimages", "0027_image_description"),
     ]
 

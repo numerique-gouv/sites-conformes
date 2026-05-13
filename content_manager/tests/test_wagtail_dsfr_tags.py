@@ -4,7 +4,7 @@ from django.utils.translation import override
 from wagtail.models import Locale, Page, Site
 from wagtail.test.utils import WagtailPageTestCase
 
-from content_manager.models import CmsDsfrConfig, ContentPage, LanguageSelectorItem
+from sites_conformes.content_manager.models import CmsDsfrConfig, ContentPage, LanguageSelectorItem
 
 
 class LanguageSelectorTagBaseTestCase(WagtailPageTestCase):
@@ -28,13 +28,13 @@ class LanguageSelectorTagDisabledTestCase(LanguageSelectorTagBaseTestCase):
         self.config.save()
 
     def test_is_not_active(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         self.assertFalse(result["language_selector"]["is_active"])
 
     def test_items_are_empty(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         self.assertEqual(result["language_selector"]["items"], [])
@@ -58,27 +58,27 @@ class LanguageSelectorTagSimpleTestCase(LanguageSelectorTagBaseTestCase):
             self.home_en.save_revision().publish()
 
     def test_is_active(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         self.assertTrue(result["language_selector"]["is_active"])
 
     def test_items_include_default_locale(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         codes = [item["language_code"] for item in result["language_selector"]["items"]]
         self.assertIn("fr", codes)
 
     def test_items_include_translated_locale(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         codes = [item["language_code"] for item in result["language_selector"]["items"]]
         self.assertIn("en", codes)
 
     def test_items_include_homepage_url(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         urls = [item["url"] for item in result["language_selector"]["items"]]
@@ -112,27 +112,27 @@ class LanguageSelectorTagManualTestCase(LanguageSelectorTagBaseTestCase):
         )
 
     def test_is_active(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         self.assertTrue(result["language_selector"]["is_active"])
 
     def test_page_item_uses_page_full_url(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         fr_item = next(i for i in result["language_selector"]["items"] if i["language_code"] == "fr")
         self.assertEqual(fr_item["url"], self.fr_page.full_url)
 
     def test_external_url_item(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         en_item = next(i for i in result["language_selector"]["items"] if i["language_code"] == "en")
         self.assertEqual(en_item["url"], "https://en.example.com")
 
     def test_item_language_name(self):
-        from content_manager.templatetags.wagtail_dsfr_tags import language_selector
+        from sites_conformes.content_manager.templatetags.wagtail_dsfr_tags import language_selector
 
         result = language_selector(self._make_context())
         en_item = next(i for i in result["language_selector"]["items"] if i["language_code"] == "en")

@@ -2,7 +2,7 @@ from django.forms import Media, widgets
 
 
 class DsfrIconPickerWidget(widgets.TextInput):
-    template_name = "content_manager/widgets/dsfr-icon-picker-widget.html"
+    template_name = "sites_conformes_content_manager/widgets/dsfr-icon-picker-widget.html"
 
     def __init__(self, attrs=None):
         default_attrs = {}

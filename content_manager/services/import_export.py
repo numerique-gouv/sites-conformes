@@ -15,9 +15,9 @@ from wagtail.images.models import Image
 from wagtail.models import Page
 from wagtail.utils.file import hash_filelike
 
-from content_manager.constants import HEADER_FIELDS
-from content_manager.models import ContentPage
-from content_manager.services.accessors import get_or_create_collection, get_or_create_content_page
+from sites_conformes.content_manager.constants import HEADER_FIELDS
+from sites_conformes.content_manager.models import ContentPage
+from sites_conformes.content_manager.services.accessors import get_or_create_collection, get_or_create_content_page
 
 PAGE_TEMPLATES_ROOT = settings.BASE_DIR / "content_manager/page_templates"
 TEMPLATES_DATA_FILE = PAGE_TEMPLATES_ROOT / "pages_data.json"

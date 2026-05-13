@@ -1,0 +1,17 @@
+{% load static wagtailcore_tags wagtailimages_tags %}
+<div style="{% if value.layout.background_color %}background-color: var(--background-alt-{{ value.layout.background_color }});
+            {% endif %} min-height: 350px">
+  <div class="cmsfr-hero-column">
+    <div class="{{ value.layout.vertical_margin }} cmsfr-hero-column {% if value.text_content.position == 'bottom' %}cmsfr-order__2{% endif %}">
+      <div class="fr-col-10 fr-col-md-9 cmsfr-text-content--center">
+        {% include "sites_conformes_content_manager/heros/_hero_text_content.html" %}
+        {% include "sites_conformes_content_manager/heros/_hero_buttons.html" %}
+      </div>
+    </div>
+    <div class="fr-grid-row fr-grid-row--gutters">
+      <figure class="fr-content-media {{ value.image.image_width }} {% if value.text_content.position == 'bottom' %}cmsfr-without-margin{% endif %}">
+        <div class="fr-content-media__img">{% image value.image.image original class=value.image.extra_classes %}</div>
+      </figure>
+    </div>
+  </div>
+</div>

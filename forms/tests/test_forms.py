@@ -3,7 +3,7 @@ from django.urls import reverse
 from wagtail.test.utils import WagtailPageTestCase
 from wagtail_localize.models import TranslationSource
 
-from forms.models import FormField, FormPage
+from sites_conformes.forms.models import FormField, FormPage
 
 
 class FormsTestCase(WagtailPageTestCase):

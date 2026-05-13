@@ -9,7 +9,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0008_cmsdsfrconfig_theme_modale_button_and_more"),
+        ("sites_conformes_content_manager", "0008_cmsdsfrconfig_theme_modale_button_and_more"),
     ]
 
     operations = [

@@ -6,8 +6,8 @@ from wagtail.models import Locale, Page, Site
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
-from content_manager.models import ContentPage
-from content_manager.services.accessors import get_or_create_content_page
+from sites_conformes.content_manager.models import ContentPage
+from sites_conformes.content_manager.services.accessors import get_or_create_content_page
 
 User = get_user_model()
 

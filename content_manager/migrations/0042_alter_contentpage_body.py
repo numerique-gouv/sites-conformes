@@ -6,7 +6,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("content_manager", "0041_alter_contentpage_body"),
+        ("sites_conformes_content_manager", "0041_alter_contentpage_body"),
     ]
 
     operations = [
@@ -282,7 +282,7 @@ class Migration(migrations.Migration):
                         [[("title", 23), ("description", 24), ("level", 25), ("heading_tag", 26)]],
                         {"label": "Alert message"},
                     ),
-                    28: ("content_manager.blocks.IconPickerBlock", (), {"label": "Icon", "required": False}),
+                    28: ("sites_conformes.content_manager.blocks.IconPickerBlock", (), {"label": "Icon", "required": False}),
                     29: (
                         "wagtail.blocks.RichTextBlock",
                         (),
@@ -613,7 +613,7 @@ class Migration(migrations.Migration):
                     ),
                     68: ("wagtail.blocks.CharBlock", (), {"label": "Top detail: text", "required": False}),
                     69: (
-                        "content_manager.blocks.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.IconPickerBlock",
                         (),
                         {"label": "Top detail: icon", "required": False},
                     ),
@@ -634,7 +634,7 @@ class Migration(migrations.Migration):
                         },
                     ),
                     74: (
-                        "content_manager.blocks.IconPickerBlock",
+                        "sites_conformes.content_manager.blocks.IconPickerBlock",
                         (),
                         {"label": "Bottom detail: icon", "required": False},
                     ),
@@ -961,7 +961,7 @@ class Migration(migrations.Migration):
                     125: (
                         "wagtail.blocks.PageChooserBlock",
                         (),
-                        {"label": "Blog", "page_type": ["blog.BlogIndexPage"]},
+                        {"label": "Blog", "page_type": ["sites_conformes_blog.BlogIndexPage"]},
                     ),
                     126: (
                         "wagtail.blocks.IntegerBlock",
@@ -976,22 +976,22 @@ class Migration(migrations.Migration):
                     ),
                     127: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Category",),
+                        ("sites_conformes_blog.Category",),
                         {"label": "Filter by category", "required": False},
                     ),
                     128: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("content_manager.Tag",),
+                        ("sites_conformes_content_manager.Tag",),
                         {"label": "Filter by tag", "required": False},
                     ),
                     129: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Person",),
+                        ("sites_conformes_blog.Person",),
                         {"label": "Filter by author", "required": False},
                     ),
                     130: (
                         "wagtail.snippets.blocks.SnippetChooserBlock",
-                        ("blog.Organization",),
+                        ("sites_conformes_blog.Organization",),
                         {
                             "help_text": "The source is the organization of the post author",
                             "label": "Filter by source",
@@ -1023,7 +1023,7 @@ class Migration(migrations.Migration):
                     133: (
                         "wagtail.blocks.PageChooserBlock",
                         (),
-                        {"label": "Event calendar", "page_type": ["events.EventsIndexPage"]},
+                        {"label": "Event calendar", "page_type": ["sites_conformes_events.EventsIndexPage"]},
                     ),
                     134: (
                         "wagtail.blocks.StructBlock",
@@ -1281,7 +1281,7 @@ class Migration(migrations.Migration):
                             "admin_text": "A simple, alphabetical list of the subpages of the current page.",
                             "group": "Website structure",
                             "label": "Subpages list",
-                            "template": "content_manager/blocks/subpages_list.html",
+                            "template": "sites_conformes_content_manager/blocks/subpages_list.html",
                         },
                     ),
                     155: (

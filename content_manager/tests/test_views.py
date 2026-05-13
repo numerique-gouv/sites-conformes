@@ -4,13 +4,13 @@ from django.urls import reverse
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
-from content_manager.models import (
+from sites_conformes.content_manager.models import (
     CatalogIndexPage,
     CmsDsfrConfig,
     ContentPage,
     Tag,
 )
-from content_manager.services.accessors import get_or_create_content_page
+from sites_conformes.content_manager.services.accessors import get_or_create_content_page
 
 User = get_user_model()
 

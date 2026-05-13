@@ -6,7 +6,7 @@ from wagtail.admin.panels import FieldPanel, HelpPanel
 from wagtail.fields import StreamField
 from wagtail.models import Site, TranslatableMixin
 
-from menus.blocks import FOOTER_BOTTOM_MENU_BLOCKS, MAIN_MENU_BLOCKS, TOP_MENU_BLOCKS
+from sites_conformes.menus.blocks import FOOTER_BOTTOM_MENU_BLOCKS, MAIN_MENU_BLOCKS, TOP_MENU_BLOCKS
 
 
 class TopMenu(TranslatableMixin, models.Model):
