@@ -318,6 +318,7 @@ elif SF_USE_DB_STORAGE:
         "BACKEND": "db_storage.storage.DatabaseStorage",
     }
     MEDIA_URL = os.getenv("MEDIA_URL", "db-storage/")
+    MEDIA_ROOT = os.path.join(BASE_DIR, os.getenv("MEDIA_ROOT", ""))
 
     if FORCE_SCRIPT_NAME and not MEDIA_URL.startswith(FORCE_SCRIPT_NAME):
         MEDIA_URL = f"{FORCE_SCRIPT_NAME}/{MEDIA_URL}"
