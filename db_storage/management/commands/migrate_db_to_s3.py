@@ -68,7 +68,7 @@ class Command(BaseCommand):
     # ─────────────────────────────────────
 
     def _transfer_files(self, s3_config, dry_run):
-        self.stdout.write(self.style.MIGRATE_HEADING("Transferring files from database to S3..."))
+        self.stdout.write(self.style.MIGRATE_HEADING("Transferring files from database to S3…"))
 
         client = self._get_s3_client(s3_config)
         bucket = s3_config["bucket_name"]

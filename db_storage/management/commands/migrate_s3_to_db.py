@@ -107,7 +107,7 @@ class Command(BaseCommand):
     # ─────────────────────────────────────
 
     def _transfer_files(self, s3_config, dry_run):
-        self.stdout.write(self.style.MIGRATE_HEADING("Step 1: Transferring files from S3 to database..."))
+        self.stdout.write(self.style.MIGRATE_HEADING("Step 1: Transferring files from S3 to database…"))
 
         client = self._get_s3_client(s3_config)
         bucket = s3_config["bucket_name"]
@@ -185,7 +185,7 @@ class Command(BaseCommand):
     # ─────────────────────────────────────
 
     def _update_urls(self, s3_base_url, dry_run):
-        self.stdout.write(self.style.MIGRATE_HEADING("Step 2: Updating hardcoded S3 URLs in content..."))
+        self.stdout.write(self.style.MIGRATE_HEADING("Step 2: Updating hardcoded S3 URLs in content…"))
 
         total_updates = 0
 
@@ -212,7 +212,7 @@ class Command(BaseCommand):
         # We serialize to string to search/replace URLs, then parse back.
         revisions = Revision.objects.all()
         count = revisions.count()
-        self.stdout.write(f"  Scanning {count} revision(s) for S3 URLs...")
+        self.stdout.write(f"  Scanning {count} revision(s) for S3 URLs…")
 
         for revision in revisions.iterator():
             content = revision.content
