@@ -2,7 +2,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from wagtail.blocks import CharBlock, ChoiceBlock, StreamBlock, StructBlock, StructValue
 
-from content_manager.blocks import IconPickerBlock, LinkStructValue, LinkWithoutLabelBlock
+from sites_conformes.core.blocks import IconPickerBlock, LinkStructValue, LinkWithoutLabelBlock
 
 
 class BaseMenuLinkBlock(LinkWithoutLabelBlock):
@@ -28,7 +28,7 @@ class BaseMenuLinkBlock(LinkWithoutLabelBlock):
     class Meta:
         value_class = LinkStructValue
         icon = "link"
-        template = "menus/blocks/link.html"
+        template = "sites_conformes_menus/blocks/link.html"
 
 
 class MenuLinkWithIconBlock(BaseMenuLinkBlock):
@@ -37,17 +37,17 @@ class MenuLinkWithIconBlock(BaseMenuLinkBlock):
 
 class FooterBottomLinkBlock(BaseMenuLinkBlock):
     class Meta:
-        template = "menus/blocks/footer_bottom_link.html"
+        template = "sites_conformes_menus/blocks/footer_bottom_link.html"
 
 
 class MainMenuLinkBlock(BaseMenuLinkBlock):
     class Meta:
-        template = "menus/blocks/main_menu_link.html"
+        template = "sites_conformes_menus/blocks/main_menu_link.html"
 
 
 class MainMenuSubmenuLinkBlock(BaseMenuLinkBlock):
     class Meta:
-        template = "menus/blocks/main_menu_link.html"
+        template = "sites_conformes_menus/blocks/main_menu_link.html"
 
 
 class MainMenuMegamenuMainLinkBlock(BaseMenuLinkBlock):
@@ -57,7 +57,7 @@ class MainMenuMegamenuMainLinkBlock(BaseMenuLinkBlock):
     )
 
     class Meta:
-        template = "menus/blocks/main_menu_link.html"
+        template = "sites_conformes_menus/blocks/main_menu_link.html"
 
 
 class MainMenuStructValue(StructValue):
@@ -101,7 +101,7 @@ class MainMenuSubmenuBlock(StructBlock):
     )
 
     class Meta:
-        template = "menus/blocks/main_menu_submenu.html"
+        template = "sites_conformes_menus/blocks/main_menu_submenu.html"
         value_class = MainMenuStructValue
 
 
@@ -112,7 +112,7 @@ class MainMenuMegamenuColumnBlock(MainMenuSubmenuBlock):
     )
 
     class Meta:
-        template = "menus/blocks/main_menu_megamenu_column.html"
+        template = "sites_conformes_menus/blocks/main_menu_megamenu_column.html"
         value_class = MainMenuStructValue
 
 
@@ -143,7 +143,7 @@ class MainMenuMegamenuBlock(StructBlock):
     )
 
     class Meta:
-        template = "menus/blocks/main_menu_megamenu.html"
+        template = "sites_conformes_menus/blocks/main_menu_megamenu.html"
         value_class = MainMenuStructValue
 
 

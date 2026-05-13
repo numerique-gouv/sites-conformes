@@ -5,14 +5,14 @@ from django.db import migrations, models
 
 
 def set_unique_translation_keys(apps, _schema_editor):
-    FormField = apps.get_model("forms", "FormField")
+    FormField = apps.get_model("sites_conformes_forms", "FormField")
     for ff in FormField.objects.all():
         ff.translation_key = uuid.uuid4()
         ff.save(update_fields=["translation_key"])
 
 
 def set_default_locale(apps, _schema_editor):
-    FormField = apps.get_model("forms", "FormField")
+    FormField = apps.get_model("sites_conformes_forms", "FormField")
     Locale = apps.get_model("wagtailcore", "Locale")
     default_locale = Locale.objects.filter(language_code="fr").first() or Locale.objects.first()
     if default_locale:
@@ -22,7 +22,7 @@ def set_default_locale(apps, _schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("forms", "0003_formpage_honeypot"),
+        ("sites_conformes_forms", "0003_formpage_honeypot"),
         ("wagtailcore", "0096_referenceindex_referenceindex_source_object_and_more"),
     ]
 
@@ -57,9 +57,9 @@ class Migration(migrations.Migration):
         # Set locale for existing rows from their parent FormPage's locale
         migrations.RunSQL(
             sql="""
-                UPDATE forms_formfield ff
+                UPDATE sites_conformes_forms_formfield ff
                 SET locale_id = wp.locale_id
-                FROM forms_formpage fp
+                FROM sites_conformes_forms_formpage fp
                 JOIN wagtailcore_page wp ON wp.id = fp.page_ptr_id
                 WHERE fp.page_ptr_id = ff.page_id
             """,

@@ -1,31 +1,34 @@
 [project]
 name = "sites-conformes"
-version = "3.1.1"
-description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l’État, accessible et responsive"
+version = "3.2.0rc1"
+description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l'État, accessible et responsive"
+readme = "README.md"
+requires-python = "<4.0,>=3.11"
 authors = [
-    { name = "Sites Conformes dev team", email = "contact@sites.beta.gouv.fr" }
+    { name = "Sébastien Reuiller", email = "sebastien.reuiller@beta.gouv.fr" },
+    { name = "Sylvain Boissel", email = "sylvain.boissel@beta.gouv.fr" },
+    { name = "Lucien Mollard", email = "lucien.mollard@beta.gouv.fr" },
+    { name = "Lucie Laporte", email = "lucie.laporte@beta.gouv.fr" },
 ]
 maintainers = [
-    { name = "Sites Conformes dev team", email = "contact@sites.beta.gouv.fr" }
+    { name = "Sylvain Boissel", email = "sylvain.boissel@beta.gouv.fr" },
+    { name = "Lucien Mollard", email = "lucien.mollard@beta.gouv.fr" },
+    { name = "Lucie Laporte", email = "lucie.laporte@beta.gouv.fr" },
 ]
-readme = "README.md"
-requires-python = "<4.0,>=3.12"
+
 dependencies = [
     "django-dsfr>=2.4.0",
-    "django>=6.0",
-    "wagtail>=7.2.0",
+    "django>=5.2.3",
+    "wagtail>=7.0.1",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.1.0",
     "dj-database-url>=3.0.0",
     "gunicorn>=23.0.0",
     "dj-static>=0.0.6",
-    "whitenoise<7.0,>=6.6",
     "wagtailmenus>=4.0.3",
     "wagtail-modeladmin>=2.2.0",
     "wagtail-markdown>=0.12.1",
     "unidecode>=1.4.0",
-    "django-storages[s3]>=1.14.6",
-    "boto3==1.35.99",
     "beautifulsoup4>=4.13.4",
     "django-taggit>=6.1.0",
     "wagtail-localize>=1.12.1",
@@ -33,8 +36,7 @@ dependencies = [
     "faker>=37.4.0",
     "rust-just>=1.40.0",
     "mozilla-django-oidc>=4.0.1",
-    "wand>=0.6.13",
-    "wagtail-honeypot>=1.2.1",
+    "pyyaml>=6.0.2",
 ]
 
 [dependency-groups]
@@ -50,9 +52,27 @@ dev = [
     "tblib>=3.1.0",
 ]
 
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sites_conformes*"]
+
+[tool.setuptools.package-data]
+sites_conformes = [
+    "templates/**/*",
+    "static/**/*",
+    "*/templates/**/*",
+    "*/static/**/*",
+    "*/page_templates/**/*",
+    "*/locale/*/LC_MESSAGES/*.po",
+    "*/locale/*/LC_MESSAGES/*.mo",
+]
+
 [tool.black]
 line-length = 119
-
 extend-exclude = '''
 /(
   | migrations
@@ -63,7 +83,6 @@ extend-exclude = '''
 omit = [
     "manage.py",
     "config/settings_test.py",
-    "config/asgi.py",
     "config/wsgi.py",
     "*/__init__.py",
     "*/migrations/*.py",
@@ -75,55 +94,22 @@ max_blank_lines = 1
 ignore = "H030,H031,H006,D018,T003"
 indent = 2
 
-[tool.pyright]
-reportAttributeAccessIssue = false
-reportArgumentType = false
-reportFunctionMemberAccess = false
-reportGeneralTypeIssues = false
-reportIncompatibleMethodOverride = false
-reportIncompatibleVariableOverride = false
-reportOptionalCall = false
-reportOptionalMemberAccess = false
-reportUnboundVariable = false
-
 [tool.ruff]
 exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".ipynb_checkpoints",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pyenv",
-    ".pytest_cache",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    ".vscode",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "site-packages",
-    "venv",
-    "migrations",
+    ".bzr", ".direnv", ".eggs", ".git", ".git-rewrite", ".hg",
+    ".ipynb_checkpoints", ".mypy_cache", ".nox", ".pants.d", ".pyenv",
+    ".pytest_cache", ".pytype", ".ruff_cache", ".svn", ".tox", ".venv",
+    ".vscode", "__pypackages__", "_build", "buck-out", "build", "dist",
+    "node_modules", "site-packages", "venv", "migrations",
 ]
-
 line-length = 119
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
 ignore = ["E203", "E266"]
-# E203: Whitespace before ':', used to please Black in `yield items[i : i + n]`
-# E266: Too many leading '#' for block comment
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
+
+
+

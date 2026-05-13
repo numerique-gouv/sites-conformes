@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("forms", "0002_alter_formfield_options"),
+        ("sites_conformes_forms", "0002_alter_formfield_options"),
     ]
 
     operations = [

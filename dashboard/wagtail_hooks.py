@@ -8,7 +8,7 @@ from wagtail.admin.menu import MenuItem
 from wagtail.admin.ui.components import Component
 from wagtail.rich_text import LinkHandler
 
-from dashboard.views import ShortcutsPanel, TutorialsPanel
+from sites_conformes.dashboard.views import ShortcutsPanel, TutorialsPanel
 
 
 @hooks.register("insert_global_admin_css")

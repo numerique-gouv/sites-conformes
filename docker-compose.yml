@@ -13,6 +13,7 @@ services:
 
   web:
     build: .
+    user: "1000:1000"
     env_file:
       - .env
     environment:
@@ -23,6 +24,8 @@ services:
       - .:/app
       - medias:/app/medias
       - staticfiles:/app/staticfiles
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
 

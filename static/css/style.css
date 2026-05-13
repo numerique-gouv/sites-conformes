@@ -304,6 +304,10 @@ label.fr-tag[aria-pressed="false"] {
   padding-right: .5rem
 }
 
+.fr-header__menu #fr-navigation .fr-link__detail {
+  padding-left: .5rem;
+}
+
 @media (min-width:62em) {
  /*! media lg */
   .fr-usermenu .fr-usermenu__btn {

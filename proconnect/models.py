@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel
 from wagtail.search import index
 
-from proconnect.validators import sub_validator
+from sites_conformes.proconnect.validators import sub_validator
 
 User = get_user_model()
 

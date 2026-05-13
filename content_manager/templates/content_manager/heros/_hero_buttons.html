@@ -1,7 +1,0 @@
-{% with value.buttons.0.icon_side as icons_side %}
-  <ul class="cmsfr-hero-btns {% if value.text_content.position == 'left' %} cmsfr-hero-btns--left {% elif value.text_content.position == 'right' %} cmsfr-hero-btns--right {% else %} cmsfr-hero-btns--center {% endif %} fr-btns-group fr-btns-group--inline-lg {% if icons_side == 'fr-btn--icon-left' %} fr-btns-group--icon-left {% elif icons_side == 'fr-btn--icon-right' %} fr-btns-group--icon-right {% endif %}">
-    {% for button in value.buttons %}
-      <li>{% include "content_manager/blocks/button.html" with button=button %}</li>
-    {% endfor %}
-  </ul>
-{% endwith %}

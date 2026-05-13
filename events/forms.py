@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from config.forms.baseform import SitesFacilesBaseForm
+from sites_conformes.config.forms.baseform import SitesFacilesBaseForm
 
 
 class EventSearchForm(SitesFacilesBaseForm):

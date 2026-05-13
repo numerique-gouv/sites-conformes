@@ -1,7 +1,0 @@
-{% load static wagtailcore_tags %}
-
-<ul class="fr-btns-group">
-  {% for button in block.value %}
-    <li>{% include "content_manager/blocks/button.html" with button=button.value %}</li>
-  {% endfor %}
-</ul>

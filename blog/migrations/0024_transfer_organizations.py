@@ -5,8 +5,8 @@ from django.utils.text import slugify
 
 
 def link_organizations(apps, schema_editor):
-    Person = apps.get_model("blog", "Person")
-    Organization = apps.get_model("blog", "Organization")
+    Person = apps.get_model("sites_conformes_blog", "Person")
+    Organization = apps.get_model("sites_conformes_blog", "Organization")
     for person in Person.objects.all():
         if person.organization:
             organization, _created = Organization.objects.get_or_create(
@@ -18,7 +18,7 @@ def link_organizations(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("blog", "0023_organization_person_organization_item"),
+        ("sites_conformes_blog", "0023_organization_person_organization_item"),
     ]
 
     operations = [

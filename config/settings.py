@@ -58,6 +58,12 @@ FORCE_SCRIPT_NAME = os.getenv("FORCE_SCRIPT_NAME", "").rstrip("/")
 # Allow enabling WhiteNoise via an environment variable (disabled by default)
 SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 
+# Allow storing media files in PostgreSQL instead of the filesystem (disabled by default)
+# Useful for PaaS deployments with ephemeral filesystems (Scalingo, Heroku, etc.)
+# /!\ Not recommended beyond 1 GB of media — prefer S3 for larger volumes.
+# Selection order: S3_HOST wins if set, then SF_USE_DB_STORAGE, then filesystem (default)
+SF_USE_DB_STORAGE = getenv_bool("SF_USE_DB_STORAGE", False)
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
@@ -106,6 +112,9 @@ INSTALLED_APPS = [
     "dashboard",
     "wagtail.admin",
 ]
+
+if SF_USE_DB_STORAGE:
+    INSTALLED_APPS.insert(-1, "db_storage")
 
 if SF_USE_WHITENOISE:
     INSTALLED_APPS.insert(0, "whitenoise.runserver_nostatic")
@@ -272,22 +281,47 @@ STATICFILES_FINDERS = [
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
 if os.getenv("S3_HOST"):
-    endpoint_url = f"{os.getenv('S3_PROTOCOL', 'https')}://{os.getenv('S3_HOST')}"
+    protocol = os.getenv("S3_PROTOCOL", "https")
+    endpoint_url = f"{protocol}://{os.getenv('S3_HOST')}"
+    bucket_name = os.getenv("S3_BUCKET_NAME", "set-bucket-name")
+    public_host = os.getenv("S3_PUBLIC_HOST", "")
+
+    options = {
+        "bucket_name": bucket_name,
+        "access_key": os.getenv("S3_KEY_ID", "123"),
+        "secret_key": os.getenv("S3_KEY_SECRET", "secret"),
+        "endpoint_url": endpoint_url,
+        "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
+        "file_overwrite": False,
+        "location": os.getenv("S3_LOCATION", ""),
+    }
+
+    if public_host:
+        # Presigned URLs bind the signature to the endpoint hostname, so when the
+        # internal endpoint differs from the public one, signing must be disabled.
+        # The bucket is appended to custom_domain to produce path-style URLs for MinIO.
+        options["custom_domain"] = f"{public_host}/{bucket_name}"
+        options["url_protocol"] = f"{protocol}:"
+        options["querystring_auth"] = False
+        public_endpoint = f"{protocol}://{public_host}"
+    else:
+        public_endpoint = endpoint_url
 
     STORAGES["default"] = {
         "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "bucket_name": os.getenv("S3_BUCKET_NAME", "set-bucket-name"),
-            "access_key": os.getenv("S3_KEY_ID", "123"),
-            "secret_key": os.getenv("S3_KEY_SECRET", "secret"),
-            "endpoint_url": endpoint_url,
-            "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
-            "file_overwrite": False,
-            "location": os.getenv("S3_LOCATION", ""),
-        },
+        "OPTIONS": options,
     }
 
-    MEDIA_URL = f"{endpoint_url}/"
+    MEDIA_URL = f"{public_endpoint}/"
+elif SF_USE_DB_STORAGE:
+    STORAGES["default"] = {
+        "BACKEND": "db_storage.storage.DatabaseStorage",
+    }
+    MEDIA_URL = os.getenv("MEDIA_URL", "db-storage/")
+    MEDIA_ROOT = os.path.join(BASE_DIR, os.getenv("MEDIA_ROOT", ""))
+
+    if FORCE_SCRIPT_NAME and not MEDIA_URL.startswith(FORCE_SCRIPT_NAME):
+        MEDIA_URL = f"{FORCE_SCRIPT_NAME}/{MEDIA_URL}"
 else:
     STORAGES["default"] = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -395,6 +429,7 @@ WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
 WAGTAILMENUS_FLAT_MENUS_EDITABLE_IN_WAGTAILADMIN = False
 WAGTAILMENUS_MAIN_MENUS_EDITABLE_IN_WAGTAILADMIN = False
 
+WAGTAILDOCS_MAX_UPLOAD_SIZE = int(os.getenv("WAGTAILDOCS_MAX_UPLOAD_SIZE", 10 * 1024 * 1024))  # 10MB
 
 WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
 SF_SCHEME_DEPENDENT_SVGS = True if os.getenv("SF_SCHEME_DEPENDENT_SVGS", False) in ["1", "True"] else False
