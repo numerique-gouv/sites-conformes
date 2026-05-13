@@ -1,8 +1,8 @@
 from django.core.files.base import ContentFile
 from django.test import TestCase
 
-from db_storage.models import StoredFile
-from db_storage.storage import DatabaseStorage
+from sites_conformes.db_storage.models import StoredFile
+from sites_conformes.db_storage.storage import DatabaseStorage
 
 
 class DatabaseStorageTestCase(TestCase):

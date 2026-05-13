@@ -6,7 +6,7 @@ from django.db import models
 from wagtail.fields import RichTextField
 from wagtail.models import Revision
 
-from db_storage.models import StoredFile
+from sites_conformes.db_storage.models import StoredFile
 
 
 class Command(BaseCommand):

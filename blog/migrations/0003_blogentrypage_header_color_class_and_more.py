@@ -10,7 +10,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("blog", "0002_alter_blogentrypage_body_alter_blogindexpage_body"),
+        ("sites_conformes_blog", "0002_alter_blogentrypage_body_alter_blogindexpage_body"),
     ]
 
     operations = [

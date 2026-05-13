@@ -7,7 +7,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from wagtail.models import Page, Revision
 
-from db_storage.models import StoredFile
+from sites_conformes.db_storage.models import StoredFile
 
 
 class MigrateDbToFilesCommandTestCase(TestCase):

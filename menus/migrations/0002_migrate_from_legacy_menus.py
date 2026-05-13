@@ -70,7 +70,7 @@ def forwards_move_top_menu(apps, schema_editor):
     `TopMenu` blocks.
     """
 
-    TopMenu = apps.get_model("menus", "TopMenu")
+    TopMenu = apps.get_model("sites_conformes_menus", "TopMenu")
     Page = apps.get_model("wagtailcore", "Page")
 
     FlatMenu = _get_model(apps, "wagtailmenus", "FlatMenu")
@@ -100,7 +100,7 @@ def forwards_move_top_menu(apps, schema_editor):
 def backwards_clear_top_menu(apps, schema_editor):
     """Best-effort reverse: clear `TopMenu` items that may have been set."""
 
-    TopMenu = apps.get_model("menus", "TopMenu")
+    TopMenu = apps.get_model("sites_conformes_menus", "TopMenu")
     if not TopMenu:
         return
 
@@ -119,7 +119,7 @@ def forwards_move_footer_bottom_menu(apps, schema_editor):
     `FooterBottomMenu` blocks.
     """
 
-    FooterBottomMenu = apps.get_model("menus", "FooterBottomMenu")
+    FooterBottomMenu = apps.get_model("sites_conformes_menus", "FooterBottomMenu")
     Page = apps.get_model("wagtailcore", "Page")
 
     FlatMenu = _get_model(apps, "wagtailmenus", "FlatMenu")
@@ -149,7 +149,7 @@ def forwards_move_footer_bottom_menu(apps, schema_editor):
 def backwards_clear_footer_bottom_menu(apps, schema_editor):
     """Best-effort reverse: clear `FooterBottomMenu` items that may have been set."""
 
-    FooterBottomMenu = apps.get_model("menus", "FooterBottomMenu")
+    FooterBottomMenu = apps.get_model("sites_conformes_menus", "FooterBottomMenu")
     if not FooterBottomMenu:
         return
 
@@ -236,7 +236,7 @@ def forwards_move_main_menu(apps, schema_editor):
     MegaMenus.
     """
 
-    NewMainMenu = apps.get_model("menus", "MainMenu")
+    NewMainMenu = apps.get_model("sites_conformes_menus", "MainMenu")
     Page = apps.get_model("wagtailcore", "Page")
     LegacyMainMenu = _get_model(apps, "wagtailmenus", "MainMenu")
     LegacyMainMenuItem = _get_model(apps, "wagtailmenus", "MainMenuItem")
@@ -321,7 +321,7 @@ def forwards_move_main_menu(apps, schema_editor):
 def backwards_clear_main_menu(apps, schema_editor):
     """Best-effort reverse: clear `MainMenu` items that may have been set."""
 
-    MainMenu = apps.get_model("menus", "MainMenu")
+    MainMenu = apps.get_model("sites_conformes_menus", "MainMenu")
     if not MainMenu:
         return
 
@@ -334,7 +334,7 @@ class Migration(migrations.Migration):
     # Manual migration to move the menus from the wagtailmenus app to the new menus app
 
     dependencies = [
-        ("menus", "0001_initial"),
+        ("sites_conformes_menus", "0001_initial"),
     ]
 
     operations = [

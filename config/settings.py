@@ -87,7 +87,7 @@ INSTALLED_APPS = [
     "wagtail.snippets",
     "wagtail",
     "wagtailmarkdown",
-    "wagtailmenus",  # Obsolete, to be removed in a future version (replaced by "menus")
+    "wagtailmenus",  # Obsolete, to be removed in a future version (replaced by "sites_conformes.menus")
     "wagtail_localize",
     "wagtail_localize.locales",
     "taggit",
@@ -103,18 +103,18 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "dsfr",
-    "content_manager",
-    "blog",
-    "events",
-    "forms",
-    "menus",
+    "sites_conformes.core",
+    "sites_conformes.blog",
+    "sites_conformes.events",
+    "sites_conformes.forms",
+    "sites_conformes.menus",
     "wagtail_honeypot",
-    "dashboard",
+    "sites_conformes.dashboard",
     "wagtail.admin",
 ]
 
 if SF_USE_DB_STORAGE:
-    INSTALLED_APPS.insert(-1, "db_storage")
+    INSTALLED_APPS.insert(-1, "sites_conformes.db_storage")
 
 if SF_USE_WHITENOISE:
     INSTALLED_APPS.insert(0, "whitenoise.runserver_nostatic")
@@ -185,8 +185,8 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "wagtail.contrib.settings.context_processors.settings",
                 "wagtailmenus.context_processors.wagtailmenus",
-                "content_manager.context_processors.skiplinks",
-                "content_manager.context_processors.mega_menus",
+                "sites_conformes.core.context_processors.skiplinks",
+                "sites_conformes.core.context_processors.mega_menus",
             ],
         },
     },
@@ -315,7 +315,7 @@ if os.getenv("S3_HOST"):
     MEDIA_URL = f"{public_endpoint}/"
 elif SF_USE_DB_STORAGE:
     STORAGES["default"] = {
-        "BACKEND": "db_storage.storage.DatabaseStorage",
+        "BACKEND": "sites_conformes.db_storage.storage.DatabaseStorage",
     }
     MEDIA_URL = os.getenv("MEDIA_URL", "db-storage/")
     MEDIA_ROOT = os.path.join(BASE_DIR, os.getenv("MEDIA_ROOT", ""))
@@ -382,7 +382,7 @@ LOGOUT_URL = f"{FORCE_SCRIPT_NAME}/{WAGTAILADMIN_PATH}logout/"
 
 WAGTAIL_FRONTEND_LOGIN_URL = LOGIN_URL
 
-WAGTAIL_PASSWORD_REQUIRED_TEMPLATE = "content_manager/password_required.html"
+WAGTAIL_PASSWORD_REQUIRED_TEMPLATE = "sites_conformes_core/password_required.html"
 
 # Disable Gravatar service
 WAGTAIL_GRAVATAR_PROVIDER_URL = None
@@ -405,7 +405,7 @@ WAGTAIL_RICHTEXT_FIELD_FEATURES = [
 WAGTAILEMBEDS_RESPONSIVE_HTML = True
 WAGTAIL_MODERATION_ENABLED = False
 
-# Wagtailmenus: Obsolete, to be removed in a future version (replaced by "menus")
+# Wagtailmenus: Obsolete, to be removed in a future version (replaced by "sites_conformes.menus")
 WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
     ("header_tools", "Menu en haut à droite"),
     ("footer", "Menu en pied de page"),
@@ -482,12 +482,12 @@ LOGOUT_REDIRECT_URL = f"{FORCE_SCRIPT_NAME}/"
 if PROCONNECT_ACTIVATED:
     INSTALLED_APPS += [
         "mozilla_django_oidc",
-        "proconnect",
+        "sites_conformes.proconnect",
     ]
 
     AUTHENTICATION_BACKENDS = [
         "django.contrib.auth.backends.ModelBackend",
-        "proconnect.backends.OIDCAuthenticationBackend",
+        "sites_conformes.proconnect.backends.OIDCAuthenticationBackend",
     ]
 
     LOGOUT_URL = f"{FORCE_SCRIPT_NAME}/oidc/logout/"

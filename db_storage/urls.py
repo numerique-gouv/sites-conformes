@@ -1,6 +1,6 @@
 from django.urls import path
 
-from db_storage.views import ServeFileView
+from sites_conformes.db_storage.views import ServeFileView
 
 app_name = "db_storage"
 

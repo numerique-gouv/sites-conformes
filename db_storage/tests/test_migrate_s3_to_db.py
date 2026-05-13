@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from wagtail.models import Page, Revision
 
-from db_storage.models import StoredFile
+from sites_conformes.db_storage.models import StoredFile
 
 S3_ENV = {
     "S3_HOST": "s3.example.com",

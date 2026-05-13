@@ -1,7 +1,7 @@
 import boto3
 from django.core.management.base import BaseCommand, CommandError
 
-from db_storage.models import StoredFile
+from sites_conformes.db_storage.models import StoredFile
 
 
 class Command(BaseCommand):

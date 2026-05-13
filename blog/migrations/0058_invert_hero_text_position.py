@@ -5,8 +5,8 @@ from itertools import chain
 
 
 def invert_text_position(apps, schema_editor):
-    BlogEntryPage = apps.get_model("blog", "BlogEntryPage")
-    BlogIndexPage = apps.get_model("blog", "BlogIndexPage")
+    BlogEntryPage = apps.get_model("sites_conformes_blog", "BlogEntryPage")
+    BlogIndexPage = apps.get_model("sites_conformes_blog", "BlogIndexPage")
 
     pages = chain(BlogEntryPage.objects.all(), BlogIndexPage.objects.all())
 
@@ -39,7 +39,7 @@ def invert_text_position(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("blog", "0057_alter_blogentrypage_body_and_more"),
+        ("sites_conformes_blog", "0057_alter_blogentrypage_body_and_more"),
     ]
 
     operations = [

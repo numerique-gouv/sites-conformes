@@ -1,0 +1,2716 @@
+{
+  "image_ids": [
+    74,
+    77,
+    112,
+    81,
+    84,
+    116,
+    117,
+    82,
+    77,
+    66,
+    78,
+    96,
+    163,
+    6,
+    81,
+    6,
+    28,
+    81,
+    84,
+    77,
+    1,
+    81,
+    84
+  ],
+  "pages": {
+    "32": {
+      "id": 32,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/32/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/template-landing-page-dsfr/",
+        "slug": "template-landing-page-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:38:17.932779+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Landing page d'un service num\u00e9rique",
+      "hero": [
+        {
+          "type": "old_hero",
+          "value": {
+            "header_with_title": true,
+            "header_image": {
+              "image": 112,
+              "alt_text": "",
+              "decorative": true
+            },
+            "header_color_class": null,
+            "header_large": null,
+            "header_darken": null,
+            "header_cta_text": "<p data-block-key=\"4k2ok\"><b>Voici un exemple de page que vous pouvez utiliser pour promouvoir un service num\u00e9rique.</b></p><p data-block-key=\"4i4tf\">Utilisez cette <a linktype=\"page\" id=\"37\">en-t\u00eate</a> pour ins\u00e9rer une phrase d'accroche. </p><p data-block-key=\"f07co\">Vous pouvez la configurer dans l'onglet \"Promotion\" de l'\u00e9dition de votre page.<br/>Vous pouvez \u00e9galement ajouter un court paragraphe d'explication, et un appel \u00e0 action.</p>",
+            "header_cta_buttons": [
+              {
+                "type": "button",
+                "value": {
+                  "link_type": null,
+                  "page": 34,
+                  "document": null,
+                  "external_url": "",
+                  "text": "Appel \u00e0 action",
+                  "button_type": "fr-btn",
+                  "icon_class": "",
+                  "icon_side": ""
+                },
+                "id": "e3bb30c0-d0bb-433a-b688-2a2200978885"
+              }
+            ]
+          },
+          "id": "9ddaa6db-0640-477a-a328-d57d10fa2a5a"
+        }
+      ],
+      "body": [
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "grey",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"d8v03\"><b>Pourquoi utiliser ce service ?</b></h2>"
+              },
+              {
+                "type": "tile",
+                "value": {
+                  "title": "Argument #1",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"lwlg0\">D\u00e9veloppez une des raisons pour lesquelles votre service simplifie la vie de ses utilisateurs.</p>",
+                  "image": 77,
+                  "link": {
+                    "link_type": null,
+                    "page": null,
+                    "document": null,
+                    "external_url": ""
+                  },
+                  "top_detail_badges_tags": [],
+                  "detail_text": "",
+                  "is_small": false,
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false,
+                  "is_horizontal": true
+                }
+              },
+              {
+                "type": "tile",
+                "value": {
+                  "title": "Argument #2",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"lwlg0\">D\u00e9veloppez une des raisons pour lesquelles votre service simplifie la vie de ses utilisateurs.</p>",
+                  "image": 77,
+                  "link": {
+                    "link_type": null,
+                    "page": null,
+                    "document": null,
+                    "external_url": ""
+                  },
+                  "top_detail_badges_tags": [],
+                  "detail_text": "",
+                  "is_small": false,
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false,
+                  "is_horizontal": true
+                }
+              },
+              {
+                "type": "tile",
+                "value": {
+                  "title": "Argument #3",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"lwlg0\">D\u00e9veloppez une des raisons pour lesquelles votre service simplifie la vie de ses utilisateurs.</p>",
+                  "image": 77,
+                  "link": {
+                    "link_type": null,
+                    "page": null,
+                    "document": null,
+                    "external_url": ""
+                  },
+                  "top_detail_badges_tags": [],
+                  "detail_text": "",
+                  "is_small": false,
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false,
+                  "is_horizontal": true
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "blue-france",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"5y1zw\"><b>Quelles sont les fonctionnalit\u00e9s principales de votre service ?</b></h2>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "3",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Fonctionnalit\u00e9 #1",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"pkphn\">Vous pouvez expliquer ici l'une des fonctionnalit\u00e9s phares de votre service.</p>",
+                        "image": 74,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Fonctionnalit\u00e9 #2",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"pkphn\">Vous pouvez expliquer ici l'une des fonctionnalit\u00e9s phares de votre service.</p>",
+                        "image": 74,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Fonctionnalit\u00e9 #3",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"pkphn\">Vous pouvez expliquer ici l'une des fonctionnalit\u00e9s phares de votre service.</p>",
+                        "image": 74,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Fonctionnalit\u00e9 #4",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"pkphn\">Vous pouvez expliquer ici l'une des fonctionnalit\u00e9s phares de votre service.</p>",
+                        "image": 74,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "imageandtext",
+          "value": {
+            "image": {
+              "image": 84,
+              "alt_text": "",
+              "decorative": true
+            },
+            "image_side": "right",
+            "image_ratio": "5",
+            "text": "<h2 data-block-key=\"8jec0\"><b>\u00c0 qui s'adresse votre service ?</b></h2><h3 data-block-key=\"4jjcu\"><b>Vous pouvez expliquer ici le p\u00e9rim\u00e8tre d'usage du service :</b></h3><ul><li data-block-key=\"aap7e\">Exemple type d'utilisateur avec son cas d'usage</li><li data-block-key=\"19n35\">Exemple type d'utilisateur avec son cas d'usage</li><li data-block-key=\"eoo5q\">Exemple type d'utilisateur avec son cas d'usage</li></ul>",
+            "link": {
+              "link_type": null,
+              "page": null,
+              "document": null,
+              "external_url": "",
+              "text": "",
+              "icon": "",
+              "size": ""
+            },
+            "link_label": "",
+            "page": null,
+            "link_url": ""
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "blue-france",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"8fa3l\">Quelques exemples de cas d'usage</h2>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "6",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Exemple #1",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"vgd43\">Expliquez ici le cas d'usage que vous voulez mettre en valeur pour que vos utilisateurs puissent se projeter dans l'usage de votre service.</p>",
+                        "image": 81,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [
+                          {
+                            "type": "tags",
+                            "value": [
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Exemple de tag 1",
+                                  "is_small": true,
+                                  "color": "green-tilleul-verveine",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": null,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Exemple #2",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"vgd43\">Expliquez ici le cas d'usage que vous voulez mettre en valeur pour que vos utilisateurs puissent se projeter dans l'usage de votre service.</p>",
+                        "image": 81,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [
+                          {
+                            "type": "tags",
+                            "value": [
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Exemple de tag 1",
+                                  "is_small": true,
+                                  "color": "green-tilleul-verveine",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": null,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              },
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Exemple de tag 2",
+                                  "is_small": true,
+                                  "color": "green-bourgeon",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": 29,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Exemple #3",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"vgd43\">Expliquez ici le cas d'usage que vous voulez mettre en valeur pour que vos utilisateurs puissent se projeter dans l'usage de votre service.</p>",
+                        "image": 81,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [
+                          {
+                            "type": "tags",
+                            "value": [
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Exemple de tag 2",
+                                  "is_small": true,
+                                  "color": "green-bourgeon",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": 29,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              },
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Exemple de tag 3",
+                                  "is_small": true,
+                                  "color": "orange-terre-battue",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": 18,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Exemple #4",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"vgd43\">Expliquez ici le cas d'usage que vous voulez mettre en valeur pour que vos utilisateurs puissent se projeter dans l'usage de votre service.</p>",
+                        "image": 81,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [
+                          {
+                            "type": "tags",
+                            "value": [
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Exemple de tag 3",
+                                  "is_small": true,
+                                  "color": "orange-terre-battue",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": 18,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "grey",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text_cta",
+                "value": {
+                  "text": "<h2 data-block-key=\"qc55l\">Ce qu'en pensent vos utilisateurs</h2>",
+                  "cta_buttons": [],
+                  "cta_label": "",
+                  "cta_url": ""
+                }
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "6",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "quote",
+                      "value": {
+                        "image": 116,
+                        "quote": "T\u00e9moignage d'une usag\u00e8re de votre service sous forme de citation.",
+                        "author_name": "Nom de l'usag\u00e8re",
+                        "author_title": "Titre de l'usag\u00e8re",
+                        "color": ""
+                      }
+                    },
+                    {
+                      "type": "quote",
+                      "value": {
+                        "image": 117,
+                        "quote": "T\u00e9moignage d'un usager de votre service sous forme de citation.",
+                        "author_name": "Nom de l'usager",
+                        "author_title": "Titre de l'usager",
+                        "color": ""
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "accordions",
+          "value": [
+            {
+              "type": "title",
+              "value": "Questions fr\u00e9quentes de vos utilisateurs"
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Question fr\u00e9quente #1 ?",
+                "content": "<p data-block-key=\"psp9j\">Saisissez la r\u00e9ponse dans ce champ.</p>"
+              }
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Question fr\u00e9quente #2 ?",
+                "content": "<p data-block-key=\"psp9j\">Saisissez la r\u00e9ponse dans ce champ.</p>"
+              }
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Question fr\u00e9quente #3 ?",
+                "content": "<p data-block-key=\"psp9j\">Saisissez la r\u00e9ponse dans ce champ.</p>"
+              }
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Question fr\u00e9quente #4 ?",
+                "content": "<p data-block-key=\"psp9j\">Saisissez la r\u00e9ponse dans ce champ.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "grey",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "stepper",
+                "value": {
+                  "title": "Votre feuille de route",
+                  "total": 3,
+                  "current": 2,
+                  "steps": [
+                    {
+                      "type": "step",
+                      "value": {
+                        "title": "Date",
+                        "detail": "Premi\u00e8re \u00e9tape \r\nCourte description des enjeux"
+                      }
+                    },
+                    {
+                      "type": "step",
+                      "value": {
+                        "title": "Date",
+                        "detail": "Etape actuelle\r\nCourte description des enjeux"
+                      }
+                    },
+                    {
+                      "type": "step",
+                      "value": {
+                        "title": "Date",
+                        "detail": "Prochaine \u00e9tape\r\nCourte description des enjeux"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text_cta",
+                "value": {
+                  "text": "<h3 data-block-key=\"ourr0\">Utilisez ce dernier bloc pour inciter \u00e0 une action</h3>",
+                  "cta_buttons": [
+                    {
+                      "type": "buttons",
+                      "value": [
+                        {
+                          "type": "button",
+                          "value": {
+                            "link_type": null,
+                            "page": 29,
+                            "document": null,
+                            "external_url": "",
+                            "text": "Appel \u00e0 action",
+                            "button_type": "fr-btn fr-btn--secondary",
+                            "icon_class": "fr-icon-send-plane-fill",
+                            "icon_side": "fr-btn--icon-left"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "cta_label": "",
+                  "cta_url": ""
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": {
+        "id": 112,
+        "meta": {
+          "type": "wagtailimages.Image",
+          "detail_url": "https://sites.beta.gouv.fr/api/v2/images/112/"
+        },
+        "title": "Design sans titre (3)"
+      },
+      "header_with_title": true,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "<p data-block-key=\"4k2ok\"><b>Voici un exemple de page que vous pouvez utiliser pour promouvoir un service num\u00e9rique.</b></p><p data-block-key=\"4i4tf\">Utilisez cette <a linktype=\"page\" id=\"37\">en-t\u00eate</a> pour ins\u00e9rer une phrase d'accroche. </p><p data-block-key=\"f07co\">Vous pouvez la configurer dans l'onglet \"Promotion\" de l'\u00e9dition de votre page.<br/>Vous pouvez \u00e9galement ajouter un court paragraphe d'explication, et un appel \u00e0 action.</p>",
+      "header_cta_buttons": [
+        {
+          "type": "buttons",
+          "value": [
+            {
+              "type": "button",
+              "value": {
+                "link_type": null,
+                "page": 34,
+                "document": null,
+                "external_url": "",
+                "text": "Appel \u00e0 action",
+                "button_type": "fr-btn",
+                "icon_class": "",
+                "icon_side": ""
+              },
+              "id": "e3bb30c0-d0bb-433a-b688-2a2200978885"
+            }
+          ],
+          "id": "639058db-5850-43cc-a67a-c26818cd39d6"
+        }
+      ],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "36": {
+      "id": 36,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/36/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/exemples-de-tuiles-dsfr/",
+        "slug": "exemples-de-tuiles-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:26:02.224329+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Tuiles",
+      "hero": [],
+      "body": [
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"e7w6x\">Tuiles simples ins\u00e9r\u00e9es dans une grille d'\u00e9l\u00e9ments</h2>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "4",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile simple",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"2ucus\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": null,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile simple",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"2ucus\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": null,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile simple",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"2ucus\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": null,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"e7w6x\">Tuiles \u00e9labor\u00e9es ins\u00e9r\u00e9es dans une grille d'\u00e9l\u00e9ments</h2>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "6",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile avec un lien et un badge",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"2ucus\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 82,
+                        "link": {
+                          "link_type": null,
+                          "page": 42,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [
+                          {
+                            "type": "badges",
+                            "value": [
+                              {
+                                "type": "badge",
+                                "value": {
+                                  "text": "Badge \"nouveau\"",
+                                  "color": "new",
+                                  "hide_icon": false
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile avec un texte de d\u00e9tail et un tag",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"2ucus\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 78,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [
+                          {
+                            "type": "tags",
+                            "value": [
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Tag avec ic\u00f4ne",
+                                  "is_small": false,
+                                  "color": "green-tilleul-verveine",
+                                  "icon_class": "fr-icon-chat-check-line",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": null,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "detail_text": "Texte de d\u00e9tail : Lorem ipsum dolor sit amet",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile avec un document \u00e0 t\u00e9l\u00e9charger",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"2ucus\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "image": 66,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": 1,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "blue-france",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"r6nbg\">Tuiles horizontales, sur fond pleine largeur</h2>"
+              },
+              {
+                "type": "tile",
+                "value": {
+                  "title": "Tuile horizontale sans image avec des tags",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"9rgqk\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                  "image": null,
+                  "link": {
+                    "link_type": null,
+                    "page": null,
+                    "document": null,
+                    "external_url": ""
+                  },
+                  "top_detail_badges_tags": [
+                    {
+                      "type": "tags",
+                      "value": [
+                        {
+                          "type": "tag",
+                          "value": {
+                            "label": "Tag 1",
+                            "is_small": false,
+                            "color": "green-tilleul-verveine",
+                            "icon_class": "",
+                            "link": {
+                              "link_type": null,
+                              "page": null,
+                              "document": null,
+                              "external_url": ""
+                            }
+                          }
+                        },
+                        {
+                          "type": "tag",
+                          "value": {
+                            "label": "Tag 2",
+                            "is_small": false,
+                            "color": "green-bourgeon",
+                            "icon_class": "",
+                            "link": {
+                              "link_type": null,
+                              "page": 42,
+                              "document": null,
+                              "external_url": ""
+                            }
+                          }
+                        },
+                        {
+                          "type": "tag",
+                          "value": {
+                            "label": "Tag 3",
+                            "is_small": false,
+                            "color": "green-emeraude",
+                            "icon_class": "",
+                            "link": {
+                              "link_type": null,
+                              "page": 42,
+                              "document": null,
+                              "external_url": ""
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "detail_text": "",
+                  "is_small": false,
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false,
+                  "is_horizontal": true
+                }
+              },
+              {
+                "type": "tile",
+                "value": {
+                  "title": "Tuile horizontale avec une image et un lien",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"9rgqk\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                  "image": 77,
+                  "link": {
+                    "link_type": null,
+                    "page": 42,
+                    "document": null,
+                    "external_url": ""
+                  },
+                  "top_detail_badges_tags": [],
+                  "detail_text": "",
+                  "is_small": false,
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false,
+                  "is_horizontal": true
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "37": {
+      "id": 37,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/37/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/en-t%C3%AAtes-et-bandeaux-dappel-%C3%A0-action-dsfr/",
+        "slug": "en-t\u00eates-et-bandeaux-dappel-\u00e0-action-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:34:36.937313+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "En-t\u00eates et bandeaux d'appel \u00e0 action",
+      "hero": [
+        {
+          "type": "old_hero",
+          "value": {
+            "header_with_title": true,
+            "header_image": {
+              "image": 96,
+              "alt_text": "",
+              "decorative": true
+            },
+            "header_color_class": null,
+            "header_large": null,
+            "header_darken": true,
+            "header_cta_text": "<p data-block-key=\"irw4q\">Vous pouvez cr\u00e9er un en-t\u00eate comme celle-ci, en vous rendant dans l'onglet \"Promotion\" de votre page, puis en choisissant les \"Options d'en-t\u00eate\".</p><p data-block-key=\"9u080\"></p><p data-block-key=\"eujil\">Vous pourrez y ins\u00e9rer une image ou une couleur de fond, ainsi que du texte format\u00e9 et des boutons d'appel \u00e0 action.</p><p data-block-key=\"cpkig\"></p><p data-block-key=\"172l8\">Cet en-t\u00eate appara\u00eetra lorsque des aper\u00e7us de votre page seront g\u00e9n\u00e9r\u00e9s.</p>",
+            "header_cta_buttons": [
+              {
+                "type": "button",
+                "value": {
+                  "link_type": null,
+                  "page": 37,
+                  "document": null,
+                  "external_url": "",
+                  "text": "Bouton d'appel \u00e0 action",
+                  "button_type": "fr-btn",
+                  "icon_class": "",
+                  "icon_side": ""
+                },
+                "id": "0ee1a462-98a6-4261-a117-e56c331fcbb3"
+              }
+            ]
+          },
+          "id": "90401278-53e1-4bfb-a94c-89e9560c0f76"
+        }
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "value": "<h2 data-block-key=\"kpxyk\">Autres exemples</h2><p data-block-key=\"6f2pa\">Il est \u00e9galement possible de cr\u00e9er des bandeaux d'appel \u00e0 action avec d'autres types de blocs. Voici quelques exemples.</p>"
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": 6,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text_cta",
+                "value": {
+                  "text": "<h3 data-block-key=\"xmc3p\">Texte avec appel \u00e0 action, sur fond pleine largeur</h3><p data-block-key=\"51v2r\">Le \"fond pleine largeur\" peut \u00eatre une image de votre choix, ou l'une des couleurs du Syst\u00e8me de Design de l'Etat (DSFR).</p><p data-block-key=\"433ba\">Pour cet exemple, nous avons opt\u00e9 pour une image en fond.</p>",
+                  "cta_buttons": [
+                    {
+                      "type": "buttons",
+                      "value": [
+                        {
+                          "type": "button",
+                          "value": {
+                            "link_type": null,
+                            "page": null,
+                            "document": null,
+                            "external_url": "",
+                            "text": "Bouton primaire avec ic\u00f4ne",
+                            "button_type": "fr-btn",
+                            "icon_class": "fr-icon-award-line",
+                            "icon_side": "fr-btn--icon-left"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "cta_label": "",
+                  "cta_url": ""
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "grey",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text_cta",
+                "value": {
+                  "text": "<h3 data-block-key=\"beife\">Texte avec appel \u00e0 action, sur fond pleine largeur</h3><p data-block-key=\"9imau\">Pour cet exemple, nous avons opt\u00e9 pour un \"fond pleine largeur\" de couleur grise, et nous y avons ins\u00e9r\u00e9 un \"texte avec appel action\".</p><p data-block-key=\"b573u\"></p><p data-block-key=\"9jepn\">Voici les diff\u00e9rents types de bouton (\"appel \u00e0 action\") disponibles :</p>",
+                  "cta_buttons": [
+                    {
+                      "type": "buttons",
+                      "value": [
+                        {
+                          "type": "button",
+                          "value": {
+                            "link_type": null,
+                            "page": null,
+                            "document": null,
+                            "external_url": "",
+                            "text": "Un bouton primaire",
+                            "button_type": "fr-btn",
+                            "icon_class": "",
+                            "icon_side": ""
+                          }
+                        },
+                        {
+                          "type": "button",
+                          "value": {
+                            "link_type": null,
+                            "page": null,
+                            "document": null,
+                            "external_url": "",
+                            "text": "Un bouton secondaire",
+                            "button_type": "fr-btn fr-btn--secondary",
+                            "icon_class": "",
+                            "icon_side": ""
+                          }
+                        },
+                        {
+                          "type": "button",
+                          "value": {
+                            "link_type": null,
+                            "page": null,
+                            "document": null,
+                            "external_url": "",
+                            "text": "Un bouton tertiaire",
+                            "button_type": "fr-btn fr-btn--tertiary",
+                            "icon_class": "",
+                            "icon_side": ""
+                          }
+                        },
+                        {
+                          "type": "button",
+                          "value": {
+                            "link_type": null,
+                            "page": null,
+                            "document": null,
+                            "external_url": "",
+                            "text": "Un bouton tertiaire sans bordure",
+                            "button_type": "fr-btn fr-btn--tertiary-no-outline",
+                            "icon_class": "",
+                            "icon_side": ""
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "cta_label": "",
+                  "cta_url": ""
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "multicolumns",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "beige-gris-galet",
+            "bg_color": "",
+            "title": "Multi-colonnes",
+            "heading_tag": "h3",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "vertical_align": "",
+            "columns": [
+              {
+                "type": "text_cta",
+                "value": {
+                  "text": "<p data-block-key=\"alpf0\">Pour cet exemple, nous avons opt\u00e9 pour un bloc \"multi-colonne\", en ins\u00e9rant :</p><ul><li data-block-key=\"bv8ev\">un \"texte et appel \u00e0 action\" dans la colonne 1</li><li data-block-key=\"7p7kg\">une image dans la colonne 2</li></ul><p data-block-key=\"9hhgu\">Il est possible de choisir une couleur de fond pour votre bloc \"multi-colonne\". Nous avons s\u00e9lectionn\u00e9 ici \"gris galet\".</p><p data-block-key=\"9maco\"></p>",
+                  "cta_buttons": [
+                    {
+                      "type": "buttons",
+                      "value": [
+                        {
+                          "type": "button",
+                          "value": {
+                            "link_type": null,
+                            "page": 34,
+                            "document": null,
+                            "external_url": "",
+                            "text": "Bouton primaire",
+                            "button_type": "fr-btn",
+                            "icon_class": "",
+                            "icon_side": ""
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "cta_label": "",
+                  "cta_url": ""
+                }
+              },
+              {
+                "type": "image",
+                "value": {
+                  "title": "",
+                  "heading_tag": "",
+                  "image": 163,
+                  "alt": "",
+                  "width": "fr-content-media--sm",
+                  "image_ratio": "fr-ratio-3x2",
+                  "caption": "",
+                  "url": ""
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": {
+        "id": 96,
+        "meta": {
+          "type": "wagtailimages.Image",
+          "detail_url": "https://sites.beta.gouv.fr/api/v2/images/96/"
+        },
+        "title": "Header"
+      },
+      "header_with_title": true,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": true,
+      "header_cta_text": "<p data-block-key=\"irw4q\">Vous pouvez cr\u00e9er un en-t\u00eate comme celle-ci, en vous rendant dans l'onglet \"Promotion\" de votre page, puis en choisissant les \"Options d'en-t\u00eate\".</p><p data-block-key=\"9u080\"></p><p data-block-key=\"eujil\">Vous pourrez y ins\u00e9rer une image ou une couleur de fond, ainsi que du texte format\u00e9 et des boutons d'appel \u00e0 action.</p><p data-block-key=\"cpkig\"></p><p data-block-key=\"172l8\">Cet en-t\u00eate appara\u00eetra lorsque des aper\u00e7us de votre page seront g\u00e9n\u00e9r\u00e9s.</p>",
+      "header_cta_buttons": [
+        {
+          "type": "buttons",
+          "value": [
+            {
+              "type": "button",
+              "value": {
+                "link_type": null,
+                "page": 37,
+                "document": null,
+                "external_url": "",
+                "text": "Bouton d'appel \u00e0 action",
+                "button_type": "fr-btn",
+                "icon_class": "",
+                "icon_side": ""
+              },
+              "id": "0ee1a462-98a6-4261-a117-e56c331fcbb3"
+            }
+          ],
+          "id": "7a709cda-d544-492b-812b-26e7f5b41fe4"
+        }
+      ],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "38": {
+      "id": 38,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/38/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/page-de-contenu-avec-menu-lat%C3%A9ral-dsfr/",
+        "slug": "page-de-contenu-avec-menu-lat\u00e9ral-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:32:49.092767+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Page de contenu avec menu lat\u00e9ral",
+      "hero": [],
+      "body": [
+        {
+          "type": "fullwidthbackgroundwithsidemenu",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "blue-france",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "main_content": [
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "6",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Comment cr\u00e9er un menu lat\u00e9ral ?",
+                        "heading_tag": "h2",
+                        "description": "<p data-block-key=\"r9e8q\">Choisissez le bloc \"Fond pleine largeur avec menu lat\u00e9ral\". Le menu appara\u00eetra \u00e0 gauche de la page. Vous pourrez ensuite choisir une page \"racine\", et l'ensemble de ses sous-pages appara\u00eetront automatiquement dans le menu, refl\u00e9tant l'arborescence de votre site.</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Et pour la partie de droite de la page ?",
+                        "heading_tag": "h2",
+                        "description": "<p data-block-key=\"r9e8q\">Vous pouvez ins\u00e9rer le contenu de votre choix dans cette partie. Pour cet exemple, nous avons opt\u00e9 pour une \"grille d'\u00e9l\u00e9ments\", dans laquelle nous avons ins\u00e9r\u00e9 des \"cartes verticales\".</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "sidemenu_title": "Titre de votre menu lat\u00e9ral",
+            "sidemenu_content": [
+              {
+                "type": "pagetree",
+                "value": {
+                  "page": 34
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "39": {
+      "id": 39,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/39/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/blocs-simples-de-textes-et-dimages-dsfr/",
+        "slug": "blocs-simples-de-textes-et-dimages-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:31:35.383776+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Blocs simples de textes et d'images",
+      "hero": [],
+      "body": [
+        {
+          "type": "imageandtext",
+          "value": {
+            "image": {
+              "image": 81,
+              "alt_text": "Illustration CMS",
+              "decorative": false
+            },
+            "image_side": "right",
+            "image_ratio": "5",
+            "text": "<h2 data-block-key=\"0ruyo\">Bloc \"Image et texte\"</h2><p data-block-key=\"etjrq\"><i>Vous pouvez choisir la disposition de l'image (gauche ou droite) et ses dimensions. Vous pouvez \u00e9galement mettre ce texte en forme (</i><b><i>gras</i></b><i>, italique, listes \u00e0 puce, listes num\u00e9rot\u00e9es, liens hypertexte...).</i></p><hr/><p data-block-key=\"9op7q\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+            "link": {
+              "link_type": null,
+              "page": null,
+              "document": null,
+              "external_url": "",
+              "text": "",
+              "icon": "",
+              "size": ""
+            },
+            "link_label": "",
+            "page": null,
+            "link_url": ""
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "blue-france",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"r6nbg\">Texte avec mise en forme</h2><p data-block-key=\"4k2di\"><i>Vous pouvez mettre le texte en forme (</i><b><i>gras</i></b><i>, italique, listes \u00e0 puce, listes num\u00e9rot\u00e9es, liens hypertexte...).<br/><br/>Pour cet exemple, nous avons ins\u00e9r\u00e9 le bloc de texte dans un \"fond pleine largeur\", qui peut \u00eatre une couleur ou l'image de votre choix. Ici, nous avons choisi la couleur \"Bleu France\".</i></p><hr/><p data-block-key=\"fu722\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>"
+              }
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "value": "<h2 data-block-key=\"b1v1c\">Image seule</h2><p data-block-key=\"cnkho\">Utilisez un bloc 'image\" pour cela. Vous pourrez choisir les dimensions de l'image, et l'agr\u00e9menter si vous le souhaitez d'un titre, d'une l\u00e9gende et d'un lien.</p><p data-block-key=\"1umk9\">Pour garantir l'accessibilit\u00e9 de votre site, n'oubliez pas de renseigner une alternative textuelle pour chaque image.</p>"
+        },
+        {
+          "type": "image",
+          "value": {
+            "title": "",
+            "heading_tag": "h3",
+            "image": 6,
+            "alt": "Une image d'illustration.",
+            "width": "",
+            "image_ratio": "fr-ratio-32x9",
+            "caption": "Vous pouvez ajouter une l\u00e9gende ici.",
+            "url": ""
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"ji7v2\">Options de mise en forme des textes</h2><p data-block-key=\"drlgg\">De nombreuses options existent pour mettre vos textes en forme. N'h\u00e9sitez pas \u00e0 les utiliser pour am\u00e9liorer la lisibilit\u00e9 de vos contenus.</p><h2 data-block-key=\"6seko\">En-t\u00eate 2</h2><h3 data-block-key=\"5nnh1\">En-t\u00eate 3</h3><h4 data-block-key=\"9gsch\">En-t\u00eate 4</h4><ol><li data-block-key=\"6qec5\">liste 1</li><li data-block-key=\"coi4m\">liste 2</li><li data-block-key=\"cu26k\">liste 3</li></ol><ul><li data-block-key=\"an85p\">liste \u00e0 puce</li><li data-block-key=\"fpcep\">liste \u00e0 puce</li><li data-block-key=\"bfi1p\">liste \u00e0 puce</li></ul><p data-block-key=\"1u1re\"></p><p data-block-key=\"hq3l\"><a linktype=\"page\" id=\"3\">Lien interne</a></p><p data-block-key=\"2ri44\"><a href=\"https://beta.gouv.fr\">Lien externe</a></p><p data-block-key=\"4b95q\"><a href=\"mailto:contact@sites.beta.gouv.fr?subject=Sujet%20de%20mon%20email%20param%C3%A9trable&amp;body=Corps%20de%20mon%20message\">Lien email</a></p><p data-block-key=\"4nd7k\"><a linktype=\"document\" id=\"1\">Un document \u00e0 t\u00e9l\u00e9charger</a></p><p data-block-key=\"df36n\"></p><p data-block-key=\"durv0\">Un texte simple</p><p data-block-key=\"7jcm0\"></p><p data-block-key=\"dpocg\"><b>Un texte en gras</b></p><p data-block-key=\"dlbm2\"></p><p data-block-key=\"3ugrc\"><i>Un texte en italique</i></p><p data-block-key=\"p0ah\"></p><p data-block-key=\"3dehe\">Une ligne horizontale :</p><hr/><p data-block-key=\"be5b9\"></p>"
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "40": {
+      "id": 40,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/40/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/options-de-mise-en-valeur-de-textes-dsfr/",
+        "slug": "options-de-mise-en-valeur-de-textes-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:29:51.465461+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Options de mise en valeur de textes",
+      "hero": [],
+      "body": [
+        {
+          "type": "paragraph",
+          "value": "<p data-block-key=\"dx3xp\">Utilisez ces blocs particuliers pour mettre des textes en valeur, et attirer l'attention de vos lecteurs. Vous pouvez personnaliser ces blocs avec des ic\u00f4nes, des boutons, des couleurs et des images.</p>"
+        },
+        {
+          "type": "paragraph",
+          "value": "<h2 data-block-key=\"dx3xp\">Messages d'alerte</h2>"
+        },
+        {
+          "type": "alert",
+          "value": {
+            "title": "Message d'alerte - succ\u00e8s",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "level": "success",
+            "heading_tag": "h3"
+          }
+        },
+        {
+          "type": "alert",
+          "value": {
+            "title": "Message d'alerte - information",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "level": "info",
+            "heading_tag": "h3"
+          }
+        },
+        {
+          "type": "alert",
+          "value": {
+            "title": "Message d'alerte - erreur",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "level": "error",
+            "heading_tag": "h3"
+          }
+        },
+        {
+          "type": "alert",
+          "value": {
+            "title": "Message d'alerte - avertissement",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "level": "warning",
+            "heading_tag": "h3"
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h3 data-block-key=\"7a2xt\">Mise en avant</h3>"
+              },
+              {
+                "type": "callout",
+                "value": {
+                  "title": "Titre",
+                  "heading_tag": "h4",
+                  "icon_class": "fr-icon-flag-line",
+                  "text": "<p data-block-key=\"0u10c\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                  "button": {
+                    "link_type": null,
+                    "page": 39,
+                    "document": null,
+                    "external_url": "",
+                    "text": "Bouton secondaire",
+                    "button_type": "fr-btn fr-btn--secondary",
+                    "icon_class": "",
+                    "icon_side": ""
+                  },
+                  "color": ""
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h3 data-block-key=\"7a2xt\">Mise en exergue</h3>"
+              },
+              {
+                "type": "highlight",
+                "value": {
+                  "text": "<p data-block-key=\"m9sac\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                  "color": "",
+                  "size": ""
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h3 data-block-key=\"7a2xt\">Citation</h3>"
+              },
+              {
+                "type": "quote",
+                "value": {
+                  "image": 28,
+                  "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                  "author_name": "Nom de l'auteur",
+                  "author_title": "Titre de l'auteur",
+                  "color": ""
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "41": {
+      "id": 41,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/41/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/grilles-d%C3%A9l%C3%A9ments-dsfr/",
+        "slug": "grilles-d\u00e9l\u00e9ments-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:27:10.483371+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Grilles d'\u00e9l\u00e9ments",
+      "hero": [],
+      "body": [
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<p data-block-key=\"e8ihh\"><b>Utilisez ce type de bloc pour structurer des \u00e9l\u00e9ments en rang\u00e9es et en colonnes. Vous pouvez y ins\u00e9rer les \u00e9l\u00e9ments de votre choix.</b><br/><br/> Pour cela, il suffit de choisir le bloc \"grille d'\u00e9l\u00e9ment\", puis de choisir la largeur des colonnes :</p><ul><li data-block-key=\"baoq1\">3/12 pour une grille \u00e0 4 colonnes</li><li data-block-key=\"d4t1q\">4/12 pour une grille \u00e0 3 colonnes</li><li data-block-key=\"bn2vj\">6/12 pour une grille \u00e0 2 colonnes</li></ul><p data-block-key=\"dvhat\">Le nombre de rang\u00e9es augmentera en fonction du nombre d'\u00e9l\u00e9ments que vous ajoutez dans la grille.</p>"
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "blue-france",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"e8ihh\">Exemple de grille avec des cartes verticales</h2><p data-block-key=\"avlse\"></p><p data-block-key=\"f3dgi\">Pour cette grille, nous avons r\u00e9gl\u00e9 la largeur de colonnes sur 6/12.</p>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "6",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte verticale",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"u0jo5\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "image": null,
+                        "image_ratio": "fr-ratio-1x1",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": 41,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte verticale",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"u0jo5\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": 41,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte verticale",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"u0jo5\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": 41,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte verticale",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"u0jo5\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": 41,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"e8ihh\">Exemple de grille avec des tuiles et des images</h2><p data-block-key=\"f3dgi\">Pour cette grille, nous avons r\u00e9gl\u00e9 la largeur de colonnes sur 4/12.</p>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "4",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"8giub\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 77,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "image",
+                      "value": {
+                        "title": "",
+                        "heading_tag": "h3",
+                        "image": 84,
+                        "alt": "",
+                        "width": "fr-content-media--sm",
+                        "image_ratio": "fr-ratio-4x3",
+                        "caption": "",
+                        "url": ""
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"8giub\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 77,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "image",
+                      "value": {
+                        "title": "",
+                        "heading_tag": "h3",
+                        "image": 81,
+                        "alt": "",
+                        "width": "fr-content-media--sm",
+                        "image_ratio": "fr-ratio-4x3",
+                        "caption": "",
+                        "url": ""
+                      }
+                    },
+                    {
+                      "type": "tile",
+                      "value": {
+                        "title": "Tuile",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"8giub\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 77,
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "top_detail_badges_tags": [],
+                        "detail_text": "",
+                        "is_small": false,
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false,
+                        "is_horizontal": false
+                      }
+                    },
+                    {
+                      "type": "image",
+                      "value": {
+                        "title": "",
+                        "heading_tag": "h3",
+                        "image": 1,
+                        "alt": "",
+                        "width": "fr-content-media--sm",
+                        "image_ratio": "fr-ratio-4x3",
+                        "caption": "",
+                        "url": ""
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "42": {
+      "id": 42,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/42/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/accord%C3%A9ons-dsfr/",
+        "slug": "accord\u00e9ons-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:23:07.932797+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Accord\u00e9ons",
+      "hero": [],
+      "body": [
+        {
+          "type": "paragraph",
+          "value": "<p data-block-key=\"ek4a8\">Les accord\u00e9ons sont id\u00e9aux pour cr\u00e9er des sections \"questions fr\u00e9quentes\". Vous pouvez appliquer la mise en forme de votre choix sur les textes (gras, italique, listes, liens...).</p>"
+        },
+        {
+          "type": "accordions",
+          "value": [
+            {
+              "type": "title",
+              "value": "Titre de l'accord\u00e9on"
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Titre de la section ou question",
+                "content": "<p data-block-key=\"bm5qs\">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>"
+              }
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Titre de la section ou question",
+                "content": "<p data-block-key=\"bm5qs\">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>"
+              }
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Titre de la section ou question",
+                "content": "<p data-block-key=\"bm5qs\">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>"
+              }
+            },
+            {
+              "type": "accordion",
+              "value": {
+                "title": "Titre de la section ou question",
+                "content": "<p data-block-key=\"bm5qs\">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>"
+              }
+            }
+          ]
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "43": {
+      "id": 43,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/43/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/exemples-de-cartes-dsfr/",
+        "slug": "exemples-de-cartes-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:25:06.220370+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "Cartes",
+      "hero": [],
+      "body": [
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"e7w6x\">Cartes simples ins\u00e9r\u00e9es dans une grille d'\u00e9l\u00e9ments</h2>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "4",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte verticale simple",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"9vifq\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte verticale simple",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"9vifq\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte verticale simple",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"9vifq\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": null,
+                        "image_ratio": "",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "grey",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"e7w6x\">Cartes verticales \u00e9labor\u00e9es ins\u00e9r\u00e9es dans une grille d'\u00e9l\u00e9ments</h2>"
+              },
+              {
+                "type": "item_grid",
+                "value": {
+                  "column_width": "6",
+                  "horizontal_align": "left",
+                  "vertical_align": "",
+                  "items": [
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte avec d\u00e9tail du haut et lien",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"9vifq\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 84,
+                        "image_ratio": "fr-ratio-4x3",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": 43,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "D\u00e9tail du haut avec ic\u00f4ne",
+                        "top_detail_icon": "fr-icon-quote-line",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte avec d\u00e9tail du bas et document \u00e0 t\u00e9l\u00e9charger",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"9vifq\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 84,
+                        "image_ratio": "fr-ratio-4x3",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": 1,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "fr-icon-quote-line",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "D\u00e9tail du bas avec ic\u00f4ne",
+                        "bottom_detail_icon": "fr-icon-attachment-line",
+                        "call_to_action": [],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte avec badge et bouton",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"9vifq\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 84,
+                        "image_ratio": "fr-ratio-4x3",
+                        "image_badge": [
+                          {
+                            "type": "badge",
+                            "value": {
+                              "text": "Badge info",
+                              "color": "info",
+                              "hide_icon": false
+                            }
+                          }
+                        ],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "fr-icon-quote-line",
+                        "top_detail_badges_tags": [],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "fr-icon-attachment-line",
+                        "call_to_action": [
+                          {
+                            "type": "buttons",
+                            "value": [
+                              {
+                                "type": "button",
+                                "value": {
+                                  "link_type": null,
+                                  "page": 43,
+                                  "document": null,
+                                  "external_url": "",
+                                  "text": "Bouton d'appel \u00e0 action",
+                                  "button_type": "fr-btn fr-btn--secondary",
+                                  "icon_class": "",
+                                  "icon_side": ""
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    },
+                    {
+                      "type": "card",
+                      "value": {
+                        "title": "Carte avec des tags et des liens",
+                        "heading_tag": "h3",
+                        "description": "<p data-block-key=\"9vifq\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "image": 84,
+                        "image_ratio": "fr-ratio-4x3",
+                        "image_badge": [],
+                        "link": {
+                          "link_type": null,
+                          "page": null,
+                          "document": null,
+                          "external_url": ""
+                        },
+                        "url": "",
+                        "document": null,
+                        "top_detail_text": "",
+                        "top_detail_icon": "fr-icon-quote-line",
+                        "top_detail_badges_tags": [
+                          {
+                            "type": "tags",
+                            "value": [
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Tag 1",
+                                  "is_small": false,
+                                  "color": "green-tilleul-verveine",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": 43,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              },
+                              {
+                                "type": "tag",
+                                "value": {
+                                  "label": "Tag 2",
+                                  "is_small": false,
+                                  "color": "green-bourgeon",
+                                  "icon_class": "",
+                                  "link": {
+                                    "link_type": null,
+                                    "page": 43,
+                                    "document": null,
+                                    "external_url": ""
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "bottom_detail_text": "",
+                        "bottom_detail_icon": "fr-icon-attachment-line",
+                        "call_to_action": [
+                          {
+                            "type": "links",
+                            "value": [
+                              {
+                                "type": "link",
+                                "value": {
+                                  "link_type": null,
+                                  "page": 43,
+                                  "document": null,
+                                  "external_url": "",
+                                  "text": "Lien 1"
+                                }
+                              },
+                              {
+                                "type": "link",
+                                "value": {
+                                  "link_type": null,
+                                  "page": 43,
+                                  "document": null,
+                                  "external_url": "",
+                                  "text": "Lien 2"
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "grey_background": false,
+                        "no_background": false,
+                        "no_border": false,
+                        "shadow": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "fullwidthbackground",
+          "value": {
+            "bg_image": null,
+            "bg_color_class": "blue-france",
+            "top_margin": 5,
+            "bottom_margin": 5,
+            "content": [
+              {
+                "type": "text",
+                "value": "<h2 data-block-key=\"r6nbg\">Cartes horizontales, sur fond pleine largeur</h2>"
+              },
+              {
+                "type": "card",
+                "value": {
+                  "title": "Carte horizontale simple",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"ye5df\">Version des mod\u00e8les de page : 1.10.0RC</p>",
+                  "image": null,
+                  "image_ratio": "",
+                  "image_badge": [],
+                  "link": {
+                    "link_type": null,
+                    "page": null,
+                    "document": null,
+                    "external_url": ""
+                  },
+                  "url": "",
+                  "document": null,
+                  "top_detail_text": "",
+                  "top_detail_icon": "",
+                  "top_detail_badges_tags": [],
+                  "bottom_detail_text": "",
+                  "bottom_detail_icon": "",
+                  "call_to_action": [],
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false
+                }
+              },
+              {
+                "type": "card",
+                "value": {
+                  "title": "Carte horizontale sans image avec un document \u00e0 t\u00e9l\u00e9charger et un tag",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"ye5df\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                  "image": null,
+                  "image_ratio": "",
+                  "image_badge": [],
+                  "link": {
+                    "link_type": null,
+                    "page": null,
+                    "document": 1,
+                    "external_url": ""
+                  },
+                  "url": "",
+                  "document": null,
+                  "top_detail_text": "",
+                  "top_detail_icon": "",
+                  "top_detail_badges_tags": [
+                    {
+                      "type": "tags",
+                      "value": [
+                        {
+                          "type": "tag",
+                          "value": {
+                            "label": "Tag 1",
+                            "is_small": false,
+                            "color": "green-tilleul-verveine",
+                            "icon_class": "",
+                            "link": {
+                              "link_type": null,
+                              "page": null,
+                              "document": null,
+                              "external_url": ""
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "bottom_detail_text": "",
+                  "bottom_detail_icon": "",
+                  "call_to_action": [],
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false
+                }
+              },
+              {
+                "type": "card",
+                "value": {
+                  "title": "Carte horizontale avec image, un lien de t\u00e9l\u00e9chargement et un badge",
+                  "heading_tag": "h3",
+                  "description": "<p data-block-key=\"ye5df\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                  "image": 81,
+                  "image_ratio": "fr-card--horizontal-tier",
+                  "image_badge": [
+                    {
+                      "type": "badge",
+                      "value": {
+                        "text": "Badge \"Succ\u00e8s\"",
+                        "color": "success",
+                        "hide_icon": false
+                      }
+                    }
+                  ],
+                  "link": {
+                    "link_type": null,
+                    "page": null,
+                    "document": 1,
+                    "external_url": ""
+                  },
+                  "url": "",
+                  "document": null,
+                  "top_detail_text": "",
+                  "top_detail_icon": "",
+                  "top_detail_badges_tags": [],
+                  "bottom_detail_text": "",
+                  "bottom_detail_icon": "",
+                  "call_to_action": [],
+                  "grey_background": false,
+                  "no_background": false,
+                  "no_border": false,
+                  "shadow": false
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    },
+    "44": {
+      "id": 44,
+      "meta": {
+        "type": "sites_conformes_core.ContentPage",
+        "detail_url": "https://sites.beta.gouv.fr/api/v2/pages/44/",
+        "html_url": "http://sites.beta.gouv.fr/exemples/etapiers-dsfr/",
+        "slug": "etapiers-dsfr",
+        "show_in_menus": true,
+        "first_published_at": "2024-09-16T17:20:49.058230+02:00",
+        "alias_of": null,
+        "locale": "fr"
+      },
+      "title": "\u00c9tapiers",
+      "hero": [],
+      "body": [
+        {
+          "type": "paragraph",
+          "value": "<p data-block-key=\"qkj8d\">Les \u00e9tapiers servent \u00e0 illustrer des processus. Vous pouvez choisir le nombre d'\u00e9tapes, et indiquer l'\u00e9tape actuelle.</p>"
+        },
+        {
+          "type": "stepper",
+          "value": {
+            "title": "Titre",
+            "total": 4,
+            "current": 3,
+            "steps": [
+              {
+                "type": "step",
+                "value": {
+                  "title": "Etape 1",
+                  "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                }
+              },
+              {
+                "type": "step",
+                "value": {
+                  "title": "Etape 2",
+                  "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                }
+              },
+              {
+                "type": "step",
+                "value": {
+                  "title": "Etape 3",
+                  "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                }
+              },
+              {
+                "type": "step",
+                "value": {
+                  "title": "Etape 4",
+                  "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "header_image": null,
+      "header_with_title": false,
+      "header_color_class": null,
+      "header_large": false,
+      "header_darken": false,
+      "header_cta_text": "",
+      "header_cta_buttons": [],
+      "public_child_pages": [],
+      "preview_image": null,
+      "preview_image_render": null
+    }
+  }
+}

@@ -4,8 +4,8 @@ from django.utils.translation import override
 from wagtail.models import Locale, Site
 from wagtail.test.utils import WagtailPageTestCase
 
-from menus.models import FooterBottomMenu, MainMenu, TopMenu
-from menus.templatetags.wagtail_dsfr_menus_tags import footer_bottom_menu, main_menu, top_menu
+from sites_conformes.menus.models import FooterBottomMenu, MainMenu, TopMenu
+from sites_conformes.menus.templatetags.wagtail_dsfr_menus_tags import footer_bottom_menu, main_menu, top_menu
 
 
 class BaseMenuLocaleTestCase(WagtailPageTestCase):

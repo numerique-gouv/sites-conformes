@@ -110,7 +110,7 @@ class Migration(migrations.Migration):
                 (
                     "page",
                     modelcluster.fields.ParentalKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="form_fields", to="forms.formpage"
+                        on_delete=django.db.models.deletion.CASCADE, related_name="form_fields", to="sites_conformes_forms.formpage"
                     ),
                 ),
             ],
