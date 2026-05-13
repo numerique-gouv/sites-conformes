@@ -1652,8 +1652,8 @@ wheels = [
 
 [[package]]
 name = "sites-conformes"
-version = "3.2.0"
-source = { virtual = "." }
+version = "3.2.0rc1"
+source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "boto3" },
