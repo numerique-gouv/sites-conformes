@@ -1058,7 +1058,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="children",
-                        to="blog.category",
+                        to="sites_conformes_blog.category",
                         verbose_name="Parent category",
                     ),
                 ),
@@ -1080,7 +1080,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="+",
-                        to="blog.category",
+                        to="sites_conformes_blog.category",
                         verbose_name="Category",
                     ),
                 ),
@@ -1089,7 +1089,7 @@ class Migration(migrations.Migration):
                     modelcluster.fields.ParentalKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="entry_categories",
-                        to="blog.blogentrypage",
+                        to="sites_conformes_blog.blogentrypage",
                     ),
                 ),
             ],
@@ -1098,7 +1098,7 @@ class Migration(migrations.Migration):
             model_name="blogentrypage",
             name="blog_categories",
             field=modelcluster.fields.ParentalManyToManyField(
-                blank=True, null=True, through="blog.CategoryEntryPage", to="blog.category", verbose_name="Categories"
+                blank=True, null=True, through="sites_conformes_blog.CategoryEntryPage", to="sites_conformes_blog.category", verbose_name="Categories"
             ),
         ),
         migrations.CreateModel(
@@ -1108,7 +1108,7 @@ class Migration(migrations.Migration):
                 (
                     "content_object",
                     modelcluster.fields.ParentalKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="entry_tags", to="blog.blogentrypage"
+                        on_delete=django.db.models.deletion.CASCADE, related_name="entry_tags", to="sites_conformes_blog.blogentrypage"
                     ),
                 ),
                 (
@@ -1130,7 +1130,7 @@ class Migration(migrations.Migration):
             field=modelcluster.contrib.taggit.ClusterTaggableManager(
                 blank=True,
                 help_text="A comma-separated list of tags.",
-                through="blog.TagEntryPage",
+                through="sites_conformes_blog.TagEntryPage",
                 to="taggit.Tag",
                 verbose_name="Tags",
             ),

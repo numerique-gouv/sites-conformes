@@ -4,7 +4,7 @@ import tempfile
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 
-from db_storage.models import StoredFile
+from sites_conformes.db_storage.models import StoredFile
 
 
 class MigrateFilesToDbCommandTestCase(TestCase):

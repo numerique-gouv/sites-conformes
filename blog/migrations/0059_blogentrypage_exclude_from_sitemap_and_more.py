@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("blog", "0058_invert_hero_text_position"),
+        ("sites_conformes_blog", "0058_invert_hero_text_position"),
     ]
 
     operations = [

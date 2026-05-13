@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("menus", "0002_migrate_from_legacy_menus"),
+        ("sites_conformes_menus", "0002_migrate_from_legacy_menus"),
         ("wagtailcore", "0096_referenceindex_referenceindex_source_object_and_more"),
     ]
 

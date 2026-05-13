@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("blog", "0022_blogindexpage_filter_by_author_and_more"),
+        ("sites_conformes_blog", "0022_blogindexpage_filter_by_author_and_more"),
     ]
 
     operations = [
@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="person",
             name="organization_item",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to="blog.organization"),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to="sites_conformes_blog.organization"),
         ),
     ]

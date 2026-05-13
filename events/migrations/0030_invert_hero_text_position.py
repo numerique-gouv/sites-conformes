@@ -5,8 +5,8 @@ from itertools import chain
 
 
 def invert_text_position(apps, schema_editor):
-    EventEntryPage = apps.get_model("events", "EventEntryPage")
-    EventsIndexPage = apps.get_model("events", "EventsIndexPage")
+    EventEntryPage = apps.get_model("sites_conformes_events", "EventEntryPage")
+    EventsIndexPage = apps.get_model("sites_conformes_events", "EventsIndexPage")
 
     pages = chain(EventEntryPage.objects.all(), EventsIndexPage.objects.all())
 
@@ -39,7 +39,7 @@ def invert_text_position(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("events", "0029_alter_evententrypage_body_and_more"),
+        ("sites_conformes_events", "0029_alter_evententrypage_body_and_more"),
     ]
 
     operations = [migrations.RunPython(invert_text_position, reverse_code=migrations.RunPython.noop)]

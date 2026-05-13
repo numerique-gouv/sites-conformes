@@ -15,7 +15,7 @@ class DatabaseStorage(Storage):
     """
 
     def _open(self, name, mode="rb"):
-        from db_storage.models import StoredFile
+        from sites_conformes.db_storage.models import StoredFile
 
         try:
             stored_file = StoredFile.objects.get(name=name)
@@ -26,7 +26,7 @@ class DatabaseStorage(Storage):
         return f
 
     def _save(self, name, content):
-        from db_storage.models import StoredFile
+        from sites_conformes.db_storage.models import StoredFile
 
         if hasattr(content, "read"):
             data = content.read()
@@ -50,17 +50,17 @@ class DatabaseStorage(Storage):
         return name
 
     def delete(self, name):
-        from db_storage.models import StoredFile
+        from sites_conformes.db_storage.models import StoredFile
 
         StoredFile.objects.filter(name=name).delete()
 
     def exists(self, name):
-        from db_storage.models import StoredFile
+        from sites_conformes.db_storage.models import StoredFile
 
         return StoredFile.objects.filter(name=name).exists()
 
     def listdir(self, path):
-        from db_storage.models import StoredFile
+        from sites_conformes.db_storage.models import StoredFile
 
         path = path.rstrip("/")
         if path:
@@ -80,7 +80,7 @@ class DatabaseStorage(Storage):
         return sorted(dirs), sorted(files)
 
     def size(self, name):
-        from db_storage.models import StoredFile
+        from sites_conformes.db_storage.models import StoredFile
 
         return StoredFile.objects.get(name=name).size
 

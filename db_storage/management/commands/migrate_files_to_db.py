@@ -4,7 +4,7 @@ import os
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from db_storage.models import StoredFile
+from sites_conformes.db_storage.models import StoredFile
 
 
 class Command(BaseCommand):

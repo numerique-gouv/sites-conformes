@@ -2,12 +2,12 @@ from django import template
 from django.template.context import Context
 from wagtail.models import Locale, Site
 
-from menus.models import FooterBottomMenu, MainMenu, TopMenu
+from sites_conformes.menus.models import FooterBottomMenu, MainMenu, TopMenu
 
 register = template.Library()
 
 
-@register.inclusion_tag("menus/header_top_menu.html", takes_context=True)
+@register.inclusion_tag("sites_conformes_menus/header_top_menu.html", takes_context=True)
 def top_menu(context: Context) -> dict:
     """
     Returns the top_menu item for the site
@@ -23,7 +23,7 @@ def top_menu(context: Context) -> dict:
     return {"request": request, "top_menu": top_menu, "current_page": current_page}
 
 
-@register.inclusion_tag("menus/footer_bottom_menu.html", takes_context=True)
+@register.inclusion_tag("sites_conformes_menus/footer_bottom_menu.html", takes_context=True)
 def footer_bottom_menu(context: Context) -> dict:
     """
     Returns the footer_bottom_menu item for the site
@@ -42,7 +42,7 @@ def footer_bottom_menu(context: Context) -> dict:
     return {"request": request, "footer_bottom_menu": footer_bottom_menu, "current_page": current_page}
 
 
-@register.inclusion_tag("menus/header_main_menu.html", takes_context=True)
+@register.inclusion_tag("sites_conformes_menus/header_main_menu.html", takes_context=True)
 def main_menu(context: Context) -> dict:
     """
     Returns the main_menu item for the site

@@ -1,0 +1,30 @@
+{% load i18n wagtailcore_tags wagtail_dsfr_tags %}
+{% translate "Hide message" as hide_message %}
+{% translate "Consultation link" as consultation_link %}
+{% translate "Opens a new window" as new_window_label %}
+<div class="fr-notice fr-notice--{{ settings.sites_conformes_core.CmsDsfrConfig.notice_type|default:'info' }}">
+  <div class="fr-container">
+    <div class="fr-notice__body">
+      {{ settings.sites_conformes_core.CmsDsfrConfig.notice_title | richtext | richtext_p_add_class:"fr-notice__title" | richtext_p_add_class:settings.sites_conformes_core.CmsDsfrConfig.notice_icon_class }}
+      {% if settings.sites_conformes_core.CmsDsfrConfig.notice_description %}
+        {{ settings.sites_conformes_core.CmsDsfrConfig.notice_description | richtext | richtext_p_add_class:"fr-notice__desc" }}
+      {% endif %}
+      {% if settings.sites_conformes_core.CmsDsfrConfig.notice_link %}
+        <p class="cmsfr-display__inline">
+          <a target="_blank"
+             rel="noopener external"
+             title="{{ consultation_link }} - {{ new_window_label }}"
+             href="{{ settings.sites_conformes_core.CmsDsfrConfig.notice_link }}"
+             class="fr-notice__link">{{ consultation_link }}</a>
+        </p>
+      {% endif %}
+      {% if settings.sites_conformes_core.CmsDsfrConfig.notice_is_collapsible %}
+        <button class="fr-btn--close fr-btn"
+                title="{{ hide_message }}"
+                onclick="const notice = this.parentNode.parentNode.parentNode; notice.parentNode.removeChild(notice)">
+          {{ hide_message }}
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div>

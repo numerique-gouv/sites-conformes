@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from db_storage.models import StoredFile
+from sites_conformes.db_storage.models import StoredFile
 
 
 class ServeFileViewTestCase(TestCase):

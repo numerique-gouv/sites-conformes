@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("blog", "0029_alter_blogentrypage_body_alter_blogindexpage_body_and_more"),
+        ("sites_conformes_blog", "0029_alter_blogentrypage_body_alter_blogindexpage_body_and_more"),
         ("wagtailcore", "0094_alter_page_locale"),
     ]
 

@@ -14,9 +14,9 @@ from mozilla_django_oidc.auth import (
     OIDCAuthenticationBackend as MozillaOIDCAuthenticationBackend,
 )
 
-from proconnect.exceptions import DuplicateEmailError
-from proconnect.models import UserOIDC
-from proconnect.utils import get_user_by_sub_or_email
+from sites_conformes.proconnect.exceptions import DuplicateEmailError
+from sites_conformes.proconnect.models import UserOIDC
+from sites_conformes.proconnect.utils import get_user_by_sub_or_email
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
