@@ -88,15 +88,13 @@ class Command(BaseCommand):
 
     def _plan_table_renames(self, cursor) -> list[tuple[str, str]]:
         like_clauses = " OR ".join([f"table_name LIKE '{app}_%'" for app in self.APPS_TO_MIGRATE])
-        cursor.execute(
-            f"""
+        cursor.execute(f"""
             SELECT table_name
             FROM information_schema.tables
             WHERE table_schema = 'public'
               AND ({like_clauses})
             ORDER BY table_name;
-            """
-        )
+            """)
 
         renames = []
         for (table_name,) in cursor.fetchall():
@@ -105,7 +103,7 @@ class Command(BaseCommand):
                 None,
             )
             if owning_app:
-                suffix = table_name[len(owning_app):]
+                suffix = table_name[len(owning_app) :]
                 new_name = self._new_app_label(owning_app) + suffix
             else:
                 new_name = "sites_conformes_" + table_name
@@ -114,28 +112,24 @@ class Command(BaseCommand):
 
     def _plan_migration_updates(self, cursor) -> list[tuple[str, str, int]]:
         apps_in_clause = ", ".join([f"'{app}'" for app in self.APPS_TO_MIGRATE])
-        cursor.execute(
-            f"""
+        cursor.execute(f"""
             SELECT app, COUNT(*) AS migration_count
             FROM django_migrations
             WHERE app IN ({apps_in_clause})
             GROUP BY app
             ORDER BY app;
-            """
-        )
+            """)
         return [(app, self._new_app_label(app), count) for app, count in cursor.fetchall()]
 
     def _plan_content_type_updates(self, cursor) -> list[tuple[str, str, int]]:
         apps_in_clause = ", ".join([f"'{app}'" for app in self.APPS_TO_MIGRATE])
-        cursor.execute(
-            f"""
+        cursor.execute(f"""
             SELECT app_label, COUNT(*) AS ct_count
             FROM django_content_type
             WHERE app_label IN ({apps_in_clause})
             GROUP BY app_label
             ORDER BY app_label;
-            """
-        )
+            """)
         return [(app, self._new_app_label(app), count) for app, count in cursor.fetchall()]
 
     # --- Reporting ----------------------------------------------------------
@@ -203,30 +197,26 @@ class Command(BaseCommand):
     def _verify(self, cursor):
         self.stdout.write("\nVerifying changes...")
 
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT app, COUNT(*) AS count
             FROM django_migrations
             WHERE app LIKE 'sites_conformes_%'
             GROUP BY app
             ORDER BY app;
-            """
-        )
+            """)
         results = cursor.fetchall()
         if results:
             self.stdout.write("Migration records after update:")
             for app, count in results:
                 self.stdout.write(f"  - {app}: {count} migration(s)")
 
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT app_label, COUNT(*) AS count
             FROM django_content_type
             WHERE app_label LIKE 'sites_conformes_%'
             GROUP BY app_label
             ORDER BY app_label;
-            """
-        )
+            """)
         ct_results = cursor.fetchall()
         if ct_results:
             self.stdout.write("\nContent type records after update:")

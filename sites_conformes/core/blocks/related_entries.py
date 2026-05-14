@@ -94,7 +94,9 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
     entries_count = blocks.IntegerBlock(
         label=_("Number of entries"), required=False, min_value=1, max_value=8, default=3
     )
-    category_filter = SnippetChooserBlock("sites_conformes_blog.Category", label=_("Filter by category"), required=False)
+    category_filter = SnippetChooserBlock(
+        "sites_conformes_blog.Category", label=_("Filter by category"), required=False
+    )
     tag_filter = SnippetChooserBlock("sites_conformes_core.Tag", label=_("Filter by tag"), required=False)
     author_filter = SnippetChooserBlock("sites_conformes_blog.Person", label=_("Filter by author"), required=False)
     source_filter = SnippetChooserBlock(
@@ -124,7 +126,9 @@ class EventsRecentEntriesBlock(blocks.StructBlock):
     entries_count = blocks.IntegerBlock(
         label=_("Number of entries"), required=False, min_value=1, max_value=8, default=3
     )
-    category_filter = SnippetChooserBlock("sites_conformes_blog.Category", label=_("Filter by category"), required=False)
+    category_filter = SnippetChooserBlock(
+        "sites_conformes_blog.Category", label=_("Filter by category"), required=False
+    )
     tag_filter = SnippetChooserBlock("sites_conformes_core.Tag", label=_("Filter by tag"), required=False)
     author_filter = SnippetChooserBlock("sites_conformes_blog.Person", label=_("Filter by author"), required=False)
     source_filter = SnippetChooserBlock(

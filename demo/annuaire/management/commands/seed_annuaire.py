@@ -61,9 +61,7 @@ class Command(BaseCommand):
         # `manage.py migrate` + wagtail's initial data fixture).
         root = Page.objects.filter(depth=2).first()
         if root is None:
-            return (
-                "ignorée — aucune page racine. Lancez `migrate` avant `seed_annuaire`."
-            )
+            return "ignorée — aucune page racine. Lancez `migrate` avant `seed_annuaire`."
 
         page = AnnuairePage(
             title=PAGE_TITLE,

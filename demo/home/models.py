@@ -1,4 +1,3 @@
-
 from wagtail.models import Page
 
 
