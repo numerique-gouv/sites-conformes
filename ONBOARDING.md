@@ -188,21 +188,25 @@ CSRF_TRUSTED_ORIGINS="http://127.0.0.1:18000,http://localhost:18000,http://*.loc
 
 - On peut alors accéder au site via http:/sites-conformes.localhost:18000/pages/
 
-## Gestion de la base de données et des médias
+## Comment récupérer les données de prod en local
 
-Un ensemble de scripts pour gérer la base de données et les fichiers médias, que ce soit ceux de la base locale de dev ou ceux de la production.
+Afin de debugger un problème, on peut avoir besoin de récupérer la base de données et les médias du site de prod en local. Puis quand on a fini, "remettre" la base de données et les médias initiaux du site local.
 
-Ils sont regroupés dans la catégorie « [Dev DB and medias management] » de la commande `just`.
+Il y a un ensemble de scripts pour gérer la base de données et les fichiers médias, que ce soit ceux de la base locale de dev ou ceux de la production, dans la catégorie « [Dev DB and medias management] » de la commande `just`.
 
-La gestion des sauvegardes locales nécessite de définir la variable `BACKUP_DIR` dans le fichier `.env`, en spécifiant un répertoire situé hors du projet Django pour ne pas risquer de commiter une sauvegarde par erreur.
+### Installation
 
-La gestion des sauvegardes de production nécessite de définir les variables supplémentaires dans le fichier `.env`.
+Installer la CLI de Scalingo, en suivant [la documentation d’installation](https://doc.scalingo.com/tools/cli/start).
 
-Il faut aussi installer deux dépendances : d’une part, la CLI de Scalingo, en suivant [la documentation d’installation](https://doc.scalingo.com/tools/cli/start) et [celle de connexion](https://doc.scalingo.com/tools/cli/introduction), pour pouvoir récupérer la dernière sauvegarde de la base de données.
+Faire [scalingo login](https://doc.scalingo.com/tools/cli/introduction), pour pouvoir récupérer la dernière sauvegarde de la base de données.
 
-D’autre part, le paquet [rclone](https://rclone.org/) (via `apt install rclone`) pour gérer la récupération des fichiers média depuis un S3.
+Installer le paquet [rclone](https://rclone.org/) (via `apt install rclone` sur linux ou `brew install rclone` sur macos) pour gérer la récupération des fichiers média depuis un S3.
 
+Sur macos, installer les GNU coreutils : `brew install coreutils`. Et les faire remplacer les commandes natives de macos en les ajoutant dans le PATH: `PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"`
+
+Ajouter ces variables dans le fichier .env :
 ```sh
+BACKUP_DIR= (un répertoire situé hors du projet Django pour ne pas risquer de commiter une sauvegarde par erreur)
 PROD_APP= (le nom de l’app Scalingo, par ex sites-conformes)
 PROD_DB_NAME= (le nom de la base de données dans Scalingo, par ex sites_facil_123)
 PROD_S3_BUCKET_NAME=
@@ -214,8 +218,7 @@ RCLONE_CONFIG_MYS3_SECRET_ACCESS_KEY=
 RCLONE_CONFIG_MYS3_PROVIDER=Other
 RCLONE_CONFIG_MYS3_TYPE="s3"
 ```
-
-- Le préfixe `RCLONE_CONFIG_MYS3_*` permet à `rclone` de récupérer automatiquement ces paramètres depuis les variables d’environnement.
+Note : Le préfixe `RCLONE_CONFIG_MYS3_*` permet à `rclone` de récupérer automatiquement ces paramètres depuis les variables d’environnement.
 
 ### Données locales
 
