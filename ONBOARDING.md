@@ -88,16 +88,16 @@ pipx install uv
 ### Cloner le dépôt
 
 ```sh
-git clone https://github.com/numerique-gouv/sites-faciles.git
+git clone https://github.com/numerique-gouv/sites-conformes.git
 
 # ou en ssh
-git clone git@github.com:numerique-gouv/sites-faciles.git
+git clone git@github.com:numerique-gouv/sites-conformes.git
 ```
 
 Et rentrer dans le dossier du dépôt
 
 ```sh
-cd sites-faciles
+cd sites-conformes
 ```
 
 ### PostgreSQL (base de données)
@@ -112,6 +112,48 @@ psql -c "CREATE USER sitesconformes WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_p
 # créer la base de données (vide pour l’instant)
 psql -c "CREATE DATABASE sitesconformes OWNER sitesconformes;" -U postgres
 ```
+
+### Utilisation de MinIO
+
+[MinIO](https://min.io/) permet de simuler un stockage objet compatible S3 en local, utile pour tester la configuration de production sans avoir besoin d'un vrai bucket S3.
+
+#### Lancer MinIO
+
+```sh
+docker run -d \
+  --name minio \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v ~/minio-data:/data \
+  -e MINIO_ROOT_USER=admin \
+  -e MINIO_ROOT_PASSWORD=password123 \
+  quay.io/minio/minio server /data --console-address ":9001"
+```
+
+#### Créer le bucket
+
+Accéder à la console MinIO sur <http://localhost:9001> (identifiants : `admin` / `password123`), puis créer un bucket (par exemple `sc-local`).
+
+Pour éviter l'utilisation d'URLs signées (plus simple en local), rendre le bucket public : _Buckets → sc-local → Anonymous → Add Access Rule → Prefix `/`, Access `readonly`_.
+
+#### Variables d'environnement
+
+Ajouter les variables suivantes dans le fichier `.env` :
+
+```sh
+S3_HOST=host.docker.internal:9000
+S3_PUBLIC_HOST=localhost:9000
+S3_PROTOCOL=http
+S3_KEY_ID=admin
+S3_KEY_SECRET=password123
+S3_BUCKET_NAME=sc-local
+S3_BUCKET_REGION=
+S3_LOCATION=medias/
+```
+
+> **Note :** C'est la variable `S3_HOST` qui active le stockage S3 dans l'application. Sans elle, les médias seront stockés sur le système de fichiers local, quelle que soit la configuration MinIO.
+
+Alternativement, il est également possible de passer par un stockage des fichiers directement dans la base PostgreSQL, cf. [documentation](./docs/db-storage.md)
 
 ## Fonctionnement depuis un sous-répertoire
 

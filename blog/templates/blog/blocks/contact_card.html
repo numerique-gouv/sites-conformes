@@ -15,16 +15,19 @@
           {% endif %}
         </div>
       </div>
-      <div class="cmsfr-author_card__header fr-card__header">
-        <div class="fr-card__img">
-          {% image value.image fill-200x200 as contact_image %}
-          <img class="fr-responsive-img cmsfr-author-img"
-               src="{{ contact_image.url }}"
-               width="4.5em"
-               height="4.5em"
-               alt="" />
+      {% if value.image %}
+        <div class="cmsfr-author_card__header fr-card__header">
+          <div class="fr-card__img">
+            {% image value.image fill-200x200 as contact_image %}
+            <img class="fr-responsive-img cmsfr-author-img"
+                 src="{{ contact_image.url }}"
+                 width="4.5em"
+                 height="4.5em"
+                 alt="" />
+          </div>
         </div>
-      </div>
+      {% endif %}
     </div>
+
   </div>
 </div>

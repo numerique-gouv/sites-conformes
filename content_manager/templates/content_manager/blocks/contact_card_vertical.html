@@ -40,16 +40,18 @@
       {% endif %}
     </div>
   </div>
-  <div class="fr-card__header">
-    <div class="fr-card__img">
-      <div class="cmsfr-vertical_contact_card__header fr-py-2w">
-        {% image value.display.image fill-200x200 as contact_image %}
-        <img class="cmsfr-vertical_contact_card-img fr-py-2w"
-             src="{{ contact_image.url }}"
-             width="4.5em"
-             height="4.5em"
-             alt="" />
+  {% if value.display.image %}
+    <div class="fr-card__header">
+      <div class="fr-card__img">
+        <div class="cmsfr-vertical_contact_card__header fr-py-2w">
+          {% image value.display.image fill-200x200 as contact_image %}
+          <img class="cmsfr-vertical_contact_card-img fr-py-2w"
+               src="{{ contact_image.url }}"
+               width="4.5em"
+               height="4.5em"
+               alt="" />
+        </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 </div>

@@ -43,7 +43,7 @@ Les tests automatisés couvrent les versions suivantes :
 * Pour installer le projet en local pour le développement, voir la [documentation d'embarquement](./ONBOARDING.md)
 * Avant de soumettre une contribution, consulter la  [documentation de contribution](./CONTRIBUTING.md)
 
-[![Déployer sur Scalingo (en test)](https://raw.githubusercontent.com/numerique-gouv/sites-faciles/refs/heads/main/static/artwork/logo-white-bg.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/numerique-gouv/sites-faciles)
+[![Déployer sur Scalingo (en test)](https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/static/artwork/logo-white-bg.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/numerique-gouv/sites-conformes#production)
 
 ### Git blame
 
@@ -68,6 +68,7 @@ Sites Conformes est développé en utilisant le framework [Django](https://www.d
 - **[django-dsfr](https://github.com/numerique-gouv/django-dsfr)** : Permet d’utiliser facilement le [système de design de l’État](https://www.systeme-de-design.gouv.fr/) dans des templates Django.
 - **events** : Similaire à `blog`, mais permet de gérer des événements et des pages de calendrier, ainsi que les exports iCal correspondants.
 - **forms** : implémentation du [module de création de formulaire](https://docs.wagtail.org/en/stable/reference/contrib/forms/index.html) de Wagtail, par exemple pour les pages de contact. Volontairement assez limité (suffisant pour un formulaire de contact mais pas beaucoup plus), pour les cas complexes il vaut mieux privilégier l’intégration de [Démarches simplifiées](https://www.demarches-simplifiees.fr) ou de [Grist](https://grist.numerique.gouv.fr/).
+- **db_storage** : stockage des médias en base de données PostgreSQL, alternative au S3 pour les PaaS avec filesystem éphémère (cf. [documentation](./docs/db-storage.md))
 - **proconnect** : permet la connexion via [ProConnect](https://www.proconnect.gouv.fr/)
 
 

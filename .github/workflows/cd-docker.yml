@@ -9,7 +9,7 @@ on:
 
 jobs:
   docker:
-    if: github.repository == 'numerique-gouv/sites-faciles'
+    if: github.repository == 'numerique-gouv/sites-conformes'
     runs-on: ubuntu-latest
     name: Build and push Docker image
     steps:
@@ -31,8 +31,8 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/sites-faciles:${{ env.GITHUB_REF_SLUG }}
-            ${{ env.TAG_NO_V && format('ghcr.io/{0}/sites-faciles:latest', env.GITHUB_REPOSITORY_OWNER_PART_SLUG) || '' }}
-            ${{ env.TAG_NO_V && format('ghcr.io/{0}/sites-faciles:{1}', env.GITHUB_REPOSITORY_OWNER_PART_SLUG, env.TAG_NO_V) || '' }}
-          cache-from: type=registry,ref=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/sites-faciles:${{ env.GITHUB_REF_SLUG }}
+            ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/sites-conformes:${{ env.GITHUB_REF_SLUG }}
+            ${{ env.TAG_NO_V && format('ghcr.io/{0}/sites-conformes:latest', env.GITHUB_REPOSITORY_OWNER_PART_SLUG) || '' }}
+            ${{ env.TAG_NO_V && format('ghcr.io/{0}/sites-conformes:{1}', env.GITHUB_REPOSITORY_OWNER_PART_SLUG, env.TAG_NO_V) || '' }}
+          cache-from: type=registry,ref=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/sites-conformes:${{ env.GITHUB_REF_SLUG }}
           cache-to: type=inline

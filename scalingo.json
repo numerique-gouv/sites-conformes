@@ -1,8 +1,8 @@
 {
   "name": "Sites conformes",
-  "description": "Basic installation of the sites-faciles app",
-  "logo": "https://raw.githubusercontent.com/numerique-gouv/sites-faciles/refs/heads/main/static/artwork/logo-white-bg.svg",
-  "repository": "https://github.com/numerique-gouv/sites-faciles",
+  "description": "Basic installation of the sites-conformes app",
+  "logo": "https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/static/artwork/logo-white-bg.svg",
+  "repository": "https://github.com/numerique-gouv/sites-conformes",
   "ref": "production",
   "website": "https://sites.beta.gouv.fr",
   "env": {
@@ -46,29 +46,33 @@
       "description": "Django secret key",
       "generator": "secret"
     },
-    "S3_BUCKET_NAME": {
-      "description": "The name of the S3 bucket used to store user-imported medias.",
-      "value": "sc-example"
-    },
-    "S3_BUCKET_REGION": {
-      "description": "The region of the S3 bucket",
-      "value": "eu-west-par"
-    },
     "S3_HOST": {
-      "description": "The host of the S3 bucket",
-      "value": "s3.eu-west-par.io.cloud.ovh.net"
+      "description": "The host of the S3 bucket (ex: s3.eu-west-par.io.cloud.ovh.net)",
+      "value": ""
     },
     "S3_KEY_ID": {
       "description": "The access key of the S3 bucket",
-      "value": "example-access-key"
+      "value": ""
     },
     "S3_KEY_SECRET": {
       "description": "The secret key of the S3 bucket",
-      "value": "example-secret"
+      "value": ""
+    },
+    "S3_BUCKET_NAME": {
+      "description": "The name of the S3 bucket used to store user-imported medias.",
+      "value": ""
+    },
+    "S3_BUCKET_REGION": {
+      "description": "The region of the S3 bucket (ex: eu-west-par)",
+      "value": ""
     },
     "S3_LOCATION": {
       "description": "The base path for user imported medias in the S3 bucket",
       "value": "medias"
+    },
+    "SF_USE_DB_STORAGE": {
+      "description": "Store the files in database instead of S3. Not recommanded for high trafic sites",
+      "value": false
     }
   },
   "formation": {
