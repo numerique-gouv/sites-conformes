@@ -1,3 +1,5 @@
+import copy
+
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import VIDEO_RATIOS
 from wagtail import blocks
@@ -31,15 +33,20 @@ class ImageBlockWithDefault(ImageBlock):
                 "Describe the content or purpose of the image in a short, clear sentence."
             )
 
-    def get_default(self):
+    def get_default(self) -> "Image | None":
         if self._default_image_title:
             image = Image.objects.filter(title=self._default_image_title).first()
             if image:
-                return {
-                    "image": image,
-                    "alt_text": self._default_image_alt_text,
-                    "decorative": self._default_image_decorative,
-                }
+                # ImageBlock represents its value as an Image instance with
+                # contextual_alt_text and decorative attached, not as a dict.
+                # Returning a raw dict bypasses ImageBlock.normalize and crashes
+                # downstream consumers such as get_form_state -> image chooser.
+                # copy.copy keeps the per-block context attributes from leaking
+                # across callers that share the same underlying row.
+                image = copy.copy(image)
+                image.contextual_alt_text = "" if self._default_image_decorative else self._default_image_alt_text
+                image.decorative = self._default_image_decorative
+                return image
         return super().get_default()
 
 

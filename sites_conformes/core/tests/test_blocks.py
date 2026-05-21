@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import override_settings
+from django.urls import reverse
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
@@ -554,3 +555,124 @@ class EventsRecentEntriesBlockTestCase(WagtailPageTestCase):
 
     def test_events_recent_entries_is_renderable(self):
         self.assertPageIsRenderable(self.content_page)
+
+
+class HeroBackgroundImageBlockTestCase(WagtailPageTestCase):
+    """
+    Reproduces the bug:
+      1. Create a "page de contenu" with an "En-tête avec arrière-plan" (hero with background).
+      2. Publish with an image background.
+      3. Edit the page and switch "Image ou couleur en arrière-plan" to a color.
+      4. Re-save / publish.
+      5. The published page renders a 500.
+    """
+
+    def setUp(self):
+        home = Page.objects.get(slug="home")
+        self.admin = User.objects.create_superuser("hero-bg-test", "test@test.test", "pass")
+
+        image_file = "static/artwork/technical-error.svg"
+        self.image = import_image(image_file, "Hero background image")
+        # The hero block's inner image uses ImageBlockWithDefault with this title;
+        # its presence is what triggers the bug when an empty image dict is loaded
+        # back from the StreamField JSON.
+        self.default_image = import_image(image_file, "Banner Sites Faciles Dimitri Iakymuk Unsplash")
+
+        hero_with_image = [
+            (
+                "hero_text_background_image",
+                {
+                    "text_content": {
+                        "hero_title": "Sample hero",
+                        "hero_subtitle": RichText("<p>Sample subtitle</p>"),
+                        "position": "",
+                    },
+                    "buttons": [],
+                    "background_color_or_image": "image",
+                    "image": {
+                        "image": {"image": self.image, "alt_text": "Image de fond", "decorative": False},
+                        "image_positioning": "",
+                        "image_mask": "",
+                    },
+                    "background_color": None,
+                },
+            )
+        ]
+
+        self.content_page = home.add_child(
+            instance=ContentPage(
+                title="Hero background bug page",
+                slug="hero-background-bug",
+                owner=self.admin,
+                hero=hero_with_image,
+                body=[],
+            )
+        )
+        self.content_page.save()
+
+    def test_hero_with_image_background_is_renderable(self):
+        """Baseline: the page renders correctly with an image background."""
+        self.assertPageIsRenderable(self.content_page)
+
+    def test_hero_switched_from_image_to_color_is_renderable(self):
+        """
+        Bug reproduction: switching the background from image to color after
+        an initial publish must not break rendering.
+        """
+        hero_with_color = [
+            (
+                "hero_text_background_image",
+                {
+                    "text_content": {
+                        "hero_title": "Sample hero",
+                        "hero_subtitle": RichText("<p>Sample subtitle</p>"),
+                        "position": "",
+                    },
+                    "buttons": [],
+                    "background_color_or_image": "color",
+                    "image": {},
+                    "background_color": "blue-france",
+                },
+            )
+        ]
+        self.content_page.hero = hero_with_color
+        self.content_page.save()
+
+        self.assertPageIsRenderable(self.content_page)
+
+        response = self.client.get(self.content_page.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "background-color: var(--background-alt-blue-france)")
+
+    def test_hero_switched_to_color_admin_edit_does_not_500(self):
+        """
+        After switching the background to a color, re-opening the admin edit page
+        must not crash. Regression test for:
+          TypeError: Field 'id' expected a number but got
+          {'image': <Image: …>, 'alt_text': '', 'decorative': True}.
+        The crash happens inside ImageBlock.get_form_state because
+        ImageBlockWithDefault.get_default() returns a raw dict that is then
+        forwarded to the image chooser widget as if it were an Image instance.
+        """
+        self.content_page.hero = [
+            (
+                "hero_text_background_image",
+                {
+                    "text_content": {
+                        "hero_title": "Sample hero",
+                        "hero_subtitle": RichText("<p>Sample subtitle</p>"),
+                        "position": "",
+                    },
+                    "buttons": [],
+                    "background_color_or_image": "color",
+                    "image": {},
+                    "background_color": "blue-france",
+                },
+            )
+        ]
+        self.content_page.save()
+
+        self.client.force_login(self.admin)
+        edit_url = reverse("wagtailadmin_pages:edit", args=[self.content_page.id])
+        response = self.client.get(edit_url)
+        self.assertEqual(response.status_code, 200)
