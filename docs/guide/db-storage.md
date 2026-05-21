@@ -25,9 +25,16 @@ Les commandes de migration disponibles couvrent tous les trajets possibles entre
 > Pour les sites avec beaucoup d'images ou de documents, préférez un stockage S3 compatible.
 > Au-delà de cette limite, les performances se dégradent (temps de réponse, sauvegardes, consommation mémoire).
 
+## Fonctionnement
+
+- Les fichiers sont stockés dans la table `db_storage_storedfile` sous forme binaire (`BinaryField`).
+- Les images et documents uploadés via l'admin Wagtail sont automatiquement sauvegardés en base.
+- Les fichiers sont servis via l'URL `/db-storage/serve/?name=<chemin>`.
+- Un header `Cache-Control: public, max-age=3600` est appliqué pour le cache navigateur.
+
 ## Activation
 
-Ajoutez dans votre fichier `.env` :
+Ajoutez dans vos variables d'environnement (Dans Scalingo : onglet Environnement > Nouvelle variable ) :
 
 ```env
 SF_USE_DB_STORAGE=1
@@ -36,13 +43,7 @@ SF_USE_DB_STORAGE=1
 Puis relancez l'application. Les médias seront stockés directement dans la base de données PostgreSQL.
 
 > **Note** : Si `S3_HOST` est configuré, le S3 est prioritaire et `SF_USE_DB_STORAGE` est ignoré.
-
-## Fonctionnement
-
-- Les fichiers sont stockés dans la table `db_storage_storedfile` sous forme binaire (`BinaryField`).
-- Les images et documents uploadés via l'admin Wagtail sont automatiquement sauvegardés en base.
-- Les fichiers sont servis via l'URL `/db-storage/serve/?name=<chemin>`.
-- Un header `Cache-Control: public, max-age=3600` est appliqué pour le cache navigateur.
+> Si vous utilisiez déjà un S3, il faudra d'abord suivre la procédure "Migration depuis un S3 ci-dessous avant de retirer la variable `S3_HOST`.
 
 ## Migration depuis S3
 
@@ -50,7 +51,7 @@ Si vous utilisez actuellement S3 et souhaitez passer au stockage en base de donn
 
 ### 1. Transférer les fichiers
 
-Avec S3 encore configuré dans votre `.env`, lancez :
+Après l'activation de `SF_USE_DB_STORAGE` (cf. ci-dessus), et avec les variables `S3_xxx` encore configurées, se connecter à l'app en ligne de commande (cf [Documentation de Scalingo](https://doc.scalingo.com/tools/cli/start))
 
 ```bash
 python manage.py migrate_s3_to_db
@@ -58,9 +59,9 @@ python manage.py migrate_s3_to_db
 
 Cette commande :
 
-- Se connecte au bucket S3 avec les credentials de votre `.env`
+- Se connecte au bucket S3 avec les credentials définis dans les variables d'environnement
 - Télécharge tous les fichiers et les stocke dans la table `StoredFile`
-- Met à jour les URLs S3 codées en dur dans les révisions Wagtail et les champs texte
+- Met à jour les éventuelles URLs S3 codées en dur dans les révisions Wagtail et les champs texte
 
 ### 2. Options disponibles
 
@@ -77,15 +78,9 @@ python manage.py migrate_s3_to_db --skip-files
 
 ### 3. Basculer le backend
 
-Une fois les fichiers transférés, modifiez votre `.env` :
+Une fois les fichiers transférés, modifiez vos variables d'environnement (Dans Scalingo : onglet Environnement > Modifier en masse ) :
 
-```env
-# Supprimer ou vider S3_HOST
-S3_HOST=
-
-# Activer le stockage en base
-SF_USE_DB_STORAGE=1
-```
+- Supprimer ou vider `S3_HOST` et les autres variables dont le nom commencent par `S3_`.
 
 Redémarrez l'application. Les images et documents s'afficheront depuis la base de données.
 
