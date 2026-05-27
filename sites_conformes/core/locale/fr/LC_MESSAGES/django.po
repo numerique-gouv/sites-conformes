@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-29 16:53+0200\n"
-"PO-Revision-Date: 2026-04-29 16:56+0200\n"
+"POT-Creation-Date: 2026-05-27 11:55+0200\n"
+"PO-Revision-Date: 2026-05-27 12:04+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -533,6 +533,27 @@ msgstr "Liste de boutons"
 msgid "Single link"
 msgstr "Lien isolé"
 
+msgid "Rich text with layout"
+msgstr "Texte avec mise en page"
+
+msgid "1. Section templates to be adapted"
+msgstr "1. Modèles de sections à adapter"
+
+msgid "Items grid (image and text)"
+msgstr "Grille d’items (image et texte)"
+
+msgid "Image, text and cta"
+msgstr "Image, texte et bouton"
+
+msgid "Text and button"
+msgstr "Texte et bouton"
+
+msgid "In the spotlight"
+msgstr "A la une"
+
+msgid "Accordions with layout"
+msgstr "Accordéons avec mise en page"
+
 msgid "Accordions"
 msgstr "Accordéons"
 
@@ -556,22 +577,6 @@ msgstr "Tuile"
 
 msgid "Tabs"
 msgstr "Onglets"
-
-msgid "Markdown"
-msgstr "Markdown"
-
-msgid "5. Expert syntax"
-msgstr "5. Syntaxe experte"
-
-msgid "Iframe"
-msgstr "Iframe"
-
-msgid ""
-"Warning: Use HTML block with caution. Malicious code can compromise the "
-"security of the site."
-msgstr ""
-"Avertissement : Utilisez le bloc HTML avec précaution. Un code malveillant "
-"peut compromettre la sécurité du site."
 
 msgid "Anchor"
 msgstr "Ancre"
@@ -610,26 +615,21 @@ msgstr "Articles récents du blog"
 msgid "Event calendar recent entries"
 msgstr "Articles récents de l’agenda"
 
-msgid "Rich text with layout"
-msgstr "Texte avec mise en page"
+msgid "Markdown"
+msgstr "Markdown"
 
-msgid "1. Section templates to be adapted"
-msgstr "1. Modèles de sections à adapter"
+msgid "5. Expert syntax"
+msgstr "5. Syntaxe experte"
 
-msgid "Items grid (image and text)"
-msgstr "Grille d’items (image et texte)"
+msgid "Iframe"
+msgstr "Iframe"
 
-msgid "Image, text and cta"
-msgstr "Image, texte et bouton"
-
-msgid "Text and button"
-msgstr "Texte et bouton"
-
-msgid "In the spotlight"
-msgstr "A la une"
-
-msgid "Accordions with layout"
-msgstr "Accordéons avec mise en page"
+msgid ""
+"Warning: Use HTML block with caution. Malicious code can compromise the "
+"security of the site."
+msgstr ""
+"Avertissement : Utilisez le bloc HTML avec précaution. Un code malveillant "
+"peut compromettre la sécurité du site."
 
 msgid "Header with an image and text"
 msgstr "En-tête avec image et texte"
