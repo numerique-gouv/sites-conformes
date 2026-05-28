@@ -1,0 +1,31 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+
+{% block titletag %}{% trans "Delete 2FA device" %}{% endblock %}
+
+{% block content %}
+  {% trans "Two Factor Settings" as prefs_str %}
+  {% include "wagtailadmin/shared/header.html" with title=prefs_str %}
+
+  <div class="nice-padding">
+    <div class="help-block help-warning">
+      <p>
+        {% blocktrans with name=object.name|default:"Default token" %}
+          You are about to delete the device <strong>{{ name }}</strong>.
+        {% endblocktrans %}
+      </p>
+      <p>{% trans "After deletion, you will no longer be able to sign in with this device. This action cannot be undone." %}</p>
+    </div>
+
+    <form method="post" action="{% url 'wagtail_2fa_device_remove' pk=object.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="user_id" value="{{ object.user.id }}" />
+      <div class="submit">
+        <a href="{% url 'wagtail_2fa_device_list' user_id=object.user.id %}" class="button button-secondary">
+          {% trans "Cancel" %}
+        </a>
+        <input type="submit" class="button serious" value="{% trans "Delete device" %}" />
+      </div>
+    </form>
+  </div>
+{% endblock %}
