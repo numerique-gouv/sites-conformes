@@ -37,19 +37,19 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        working_directory: sites_conformes/docs
-        run: pip install -r requirements.txt
-
+        run: |
+          cd docs
+          pip install -r requirements.txt
       - name: Build documentation
-        working_directory: sites_conformes/docs
-        run: python -m sphinx -M html . _build
+        run: |
+          cd docs
+          python -m sphinx -M html . _build
           touch _build/html/.nojekyll
           ls -la _build/html/
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: sites_conformes/docs/_build/html
+          path: docs/_build/html
 
   deploy:
     environment:
