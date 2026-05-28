@@ -11,6 +11,7 @@ Cette documentation concerne les fonctionnalités spécifiques à sites-conforme
 sites-conformes est un package Python qui étend Wagtail pour créer des sites conformes au [Système de Design de l'État français (DSFR)](https://www.systeme-de-design.gouv.fr/).
 
 **Fonctionnalités principales :**
+
 - 📝 Modèles de pages pour blog, événements et contenu
 - 🧭 Gabarits et menus adaptés au DSFR
 - ♿ Accessibilité RGAA intégrée
@@ -35,6 +36,7 @@ changelog
 maxdepth: 2
 caption: Guides
 ---
+guide/2fa
 guide/db-storage
 guide/cas-pratique-annuaire
 ```
