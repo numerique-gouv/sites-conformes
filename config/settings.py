@@ -140,7 +140,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "dashboard.middleware.VerifyUserStaticFilesMiddleware",
+    "sites_conformes.dashboard.middleware.VerifyUserStaticFilesMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
