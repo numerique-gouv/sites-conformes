@@ -111,7 +111,11 @@ INSTALLED_APPS = [
     "wagtail_honeypot",
     "sites_conformes.dashboard",
     "wagtail.admin",
+    "wagtail_2fa",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
 ]
+
 
 if SF_USE_DB_STORAGE:
     INSTALLED_APPS.insert(-1, "sites_conformes.db_storage")
@@ -136,6 +140,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "dashboard.middleware.VerifyUserStaticFilesMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "sites_conformes.core.middleware.IframeMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -475,6 +480,10 @@ if DEFAULT_FROM_EMAIL:
 WAGTAIL_PASSWORD_RESET_ENABLED = getenv_bool("WAGTAIL_PASSWORD_RESET_ENABLED", False)
 WAGTAILADMIN_USER_PASSWORD_RESET_FORM = "sites_conformes.dashboard.forms.DsfrPasswordResetForm"
 DSFR_MARK_OPTIONAL_FIELDS = getenv_bool("DSFR_MARK_OPTIONAL_FIELDS", True)
+
+# (Optional) 2FA settings
+WAGTAIL_2FA_REQUIRED = getenv_bool("WAGTAIL_2FA_REQUIRED", False)
+WAGTAIL_2FA_OTP_TOTP_NAME = os.getenv("WAGTAIL_2FA_OTP_TOTP_NAME", WAGTAIL_SITE_NAME)
 
 # (Optional) ProConnect settings
 PROCONNECT_ACTIVATED = getenv_bool("PROCONNECT_ACTIVATED", False)
