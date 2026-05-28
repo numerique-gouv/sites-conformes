@@ -40,6 +40,7 @@ dependencies = [
     "wand>=0.6.13",
     "wagtail-honeypot>=1.2.1",
     "sentry-sdk[django]>=2.61.0",
+    "wagtail-2fa>=1.8.0",
 ]
 
 [dependency-groups]
