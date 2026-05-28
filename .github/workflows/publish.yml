@@ -1,8 +1,9 @@
 # See https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
 # for a detailed guide.
 #
-# Triggers only on GitHub Release publish. The release branch (e.g. v3.1.1-namespaced-folder)
-# is the working branch — actual PyPI uploads happen when a release is cut.
+# Triggers only on GitHub Release publish. The release tag IS the package
+# version: cutting a release named e.g. v4.0.0 publishes sites-conformes==4.0.0
+# to PyPI. There is no manual version bump in pyproject.toml.
 name: Publish to PyPI
 
 on:
@@ -25,15 +26,22 @@ jobs:
       - name: Install build dependencies
         run: python -m pip install --upgrade build
 
+      - name: Resolve version from release tag
+        # Strip a leading "v" so v4.0.0 becomes a PEP 440 version 4.0.0.
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          echo "Publishing version: ${VERSION}"
+          printf '__version__ = "%s"\n' "${VERSION}" > sites_conformes/_version.py
+
       - name: Build package
-        working-directory: ./sites_conformes
         run: python -m build
 
       - name: Upload dist
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: ./sites_conformes/dist
+          path: dist
 
   publish:
     needs: build
