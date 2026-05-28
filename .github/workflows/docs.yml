@@ -7,9 +7,6 @@ on:
     paths:
       - "docs/**"
       - ".github/workflows/docs.yml"
-  pull_request:
-    paths:
-      - "docs/**"
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
