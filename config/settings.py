@@ -405,6 +405,15 @@ WAGTAIL_RICHTEXT_FIELD_FEATURES = [
 WAGTAILEMBEDS_RESPONSIVE_HTML = True
 WAGTAIL_MODERATION_ENABLED = False
 
+# Settings for the dashboard admin panel
+INFORMATION_URL = os.getenv(
+    "INFORMATION_URL", "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
+)
+LATEST_RELEASE_URL = "https://api.github.com/repos/numerique-gouv/sites-faciles/releases/latest"
+INFORMATION_CACHE_KEY = "sf_information_panel"
+INFORMATION_CACHE_TIMEOUT = 60 * 60
+
+
 # Wagtailmenus: Obsolete, to be removed in a future version (replaced by "sites_conformes.menus")
 WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
     ("header_tools", "Menu en haut à droite"),
@@ -523,7 +532,3 @@ if sentry_dsn := os.getenv("SENTRY_DSN"):
         send_default_pii=True,
         environment=os.getenv("SENTRY_ENVIRONMENT", "production"),
     )
-INFORMATION_URL = os.getenv(
-    "INFORMATION_URL", "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
-)
-LATEST_RELEASE_URL = "https://api.github.com/repos/numerique-gouv/sites-faciles/releases/latest"

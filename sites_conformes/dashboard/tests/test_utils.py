@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 
-from dashboard.utils import get_all_notifications, is_last_version, push_version_notification
+from sites_conformes.dashboard import get_all_notifications, is_last_version, push_version_notification
 
 INFORMATION_URL = settings.INFORMATION_URL
 LATEST_RELEASE_URL = settings.LATEST_RELEASE_URL
