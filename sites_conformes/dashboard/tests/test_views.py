@@ -45,7 +45,7 @@ class DashboardTestCase(WagtailPageTestCase):
         )
 
 
-@patch("dashboard.utils.requests.get")
+@patch("sites_conformes.dashboard.utils.requests.get")
 def test_information_panel_not_displayed_if_request_fails(self, mock_get):
     """Rien ne s'affiche dans le back-office si la requête vers le JSON échoue."""
     mock_get.side_effect = Exception("Network error")
@@ -59,7 +59,7 @@ class TestGetAllNotifications(TestCase):
     def setUp(self):
         cache.clear()
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_second_call_uses_cache(self, mock_get):
         """La deuxième requête utilise le cache et n'appelle pas requests.get."""
         mock_get.return_value.json.return_value = {"items": []}
