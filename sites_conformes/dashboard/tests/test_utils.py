@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 
-from sites_conformes.dashboard import get_all_notifications, is_last_version, push_version_notification
+from sites_conformes.dashboard.utils import get_all_notifications, is_last_version, push_version_notification
 
 INFORMATION_URL = settings.INFORMATION_URL
 LATEST_RELEASE_URL = settings.LATEST_RELEASE_URL
@@ -34,8 +34,8 @@ class TestIsLastVersion(TestCase):
     LATEST_RELEASE_URL=LATEST_RELEASE_URL,
 )
 class TestPushVersionNotification(TestCase):
-    @patch("dashboard.utils.requests.get")
-    @patch("dashboard.utils.actual_version", "3.0.0")
+    @patch("sites_conformes.dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.actual_version", "3.0.0")
     def test_uses_latest_release_url(self, mock_get):
         """Vérifie que la bonne URL est appelée."""
         mock_get.return_value.json.return_value = {"tag_name": "v3.0.0"}
@@ -45,8 +45,8 @@ class TestPushVersionNotification(TestCase):
 
         mock_get.assert_called_once_with(settings.LATEST_RELEASE_URL, timeout=5)
 
-    @patch("dashboard.utils.requests.get")
-    @patch("dashboard.utils.actual_version", "3.0.0")
+    @patch("sites_conformes.dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.actual_version", "3.0.0")
     def test_no_notification_if_up_to_date(self, mock_get):
         """Aucune notification si la version est à jour."""
         mock_get.return_value.json.return_value = {"tag_name": "v3.0.0"}
@@ -55,8 +55,8 @@ class TestPushVersionNotification(TestCase):
         items = push_version_notification([])
         self.assertEqual(items, [])
 
-    @patch("dashboard.utils.requests.get")
-    @patch("dashboard.utils.actual_version", "2.9.0")
+    @patch("sites_conformes.dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.actual_version", "2.9.0")
     def test_notification_if_outdated(self, mock_get):
         """Une notification s'affiche si la version est obsolète."""
         mock_get.return_value.json.return_value = {"tag_name": "v3.0.0"}
@@ -67,7 +67,7 @@ class TestPushVersionNotification(TestCase):
         self.assertEqual(items[0]["type"], "info")
         self.assertIn("3.0.0", items[0]["title"])
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_no_crash_if_github_unavailable(self, mock_get):
         """GitHub indisponible : retourne la liste inchangée, ne plante pas."""
         mock_get.side_effect = Exception("Connection refused")
@@ -75,8 +75,8 @@ class TestPushVersionNotification(TestCase):
         items = push_version_notification([])
         self.assertEqual(items, [])
 
-    @patch("dashboard.utils.requests.get")
-    @patch("dashboard.utils.actual_version", "")
+    @patch("sites_conformes.dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.actual_version", "")
     def test_no_crash_if_no_version_number(self, mock_get):
         """Pas de numéro de version installée : ne plante pas."""
         mock_get.return_value.json.return_value = {"tag_name": "v3.0.0"}
@@ -112,7 +112,7 @@ class TestGetAllNotifications(TestCase):
 
     # --- URL ---
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_uses_information_url(self, mock_get):
         self._mock_response(mock_get, [])
 
@@ -123,14 +123,14 @@ class TestGetAllNotifications(TestCase):
 
     # --- Erreurs réseau ---
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_empty_if_github_unavailable(self, mock_get):
         mock_get.side_effect = Exception("Connection refused")
 
         items = get_all_notifications()
         self.assertEqual(items, [])
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_empty_if_bad_url(self, mock_get):
         mock_response = MagicMock()
         mock_response.raise_for_status.side_effect = Exception("404 Not Found")
@@ -142,7 +142,7 @@ class TestGetAllNotifications(TestCase):
 
     # --- Cache ---
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_second_call_uses_cache(self, mock_get):
         self._mock_response(mock_get, [])
 
@@ -151,7 +151,7 @@ class TestGetAllNotifications(TestCase):
 
         self.assertEqual(mock_get.call_count, 2)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_no_date(self, mock_get):
         item = self._valid_item()
         del item["date"]
@@ -161,7 +161,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertNotIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_only_type(self, mock_get):
         self._mock_response(mock_get, [{"type": "info"}])
 
@@ -170,7 +170,7 @@ class TestGetAllNotifications(TestCase):
 
     # --- Type ---
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_bad_type(self, mock_get):
         self._mock_response(mock_get, [self._valid_item(type="badtype")])
 
@@ -178,7 +178,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertNotIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_date_in_future(self, mock_get):
         future_date = (date.today() + timedelta(days=5)).isoformat()
         self._mock_response(mock_get, [self._valid_item(date=future_date)])
@@ -187,7 +187,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertNotIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_displayed_if_date_is_today(self, mock_get):
         self._mock_response(mock_get, [self._valid_item()])
 
@@ -195,7 +195,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_date_malformed(self, mock_get):
         self._mock_response(mock_get, [self._valid_item(date="pas-une-date")])
 
@@ -203,7 +203,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertNotIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_end_date_in_past(self, mock_get):
         past_date = (date.today() - timedelta(days=1)).isoformat()
         self._mock_response(mock_get, [self._valid_item(end_date=past_date)])
@@ -212,7 +212,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertNotIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_displayed_if_end_date_in_future(self, mock_get):
         future_date = (date.today() + timedelta(days=10)).isoformat()
         self._mock_response(mock_get, [self._valid_item(end_date=future_date)])
@@ -221,7 +221,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_displayed_if_no_end_date(self, mock_get):
         self._mock_response(mock_get, [self._valid_item()])
 
@@ -229,7 +229,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_displayed_if_end_date_empty_string(self, mock_get):
         self._mock_response(mock_get, [self._valid_item(end_date="")])
 
@@ -237,7 +237,7 @@ class TestGetAllNotifications(TestCase):
         titles = [i["title"] for i in items]
         self.assertIn("Notification de test", titles)
 
-    @patch("dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_end_date_malformed(self, mock_get):
         self._mock_response(mock_get, [self._valid_item(end_date="pas-une-date")])
 
