@@ -222,11 +222,7 @@ class Migration(migrations.Migration):
                             "help_text": "Extra query parameters at the end of the link, e.g. filtering options.",
                             "label": "Extra query parameters",
                             "required": False,
-<<<<<<< HEAD:sites_conformes/blog/migrations/0060_alter_blogentrypage_body_alter_blogindexpage_body_and_more.py
                             "validators": [sites_conformes.core.validators.validate_query_string],
-=======
-                            "validators": [content_manager.validators.validate_query_string],
->>>>>>> 0fdfdfd (add migrations):blog/migrations/0060_alter_blogentrypage_body_alter_blogindexpage_body_and_more.py
                         },
                     ),
                     19: ("wagtail.blocks.CharBlock", (), {"label": "Link label", "required": False}),
@@ -1211,11 +1207,7 @@ class Migration(migrations.Migration):
                             "required": False,
                         },
                     ),
-<<<<<<< HEAD:sites_conformes/blog/migrations/0060_alter_blogentrypage_body_alter_blogindexpage_body_and_more.py
-                    152: (
-=======
-                    146: (
->>>>>>> 0fdfdfd (add migrations):blog/migrations/0060_alter_blogentrypage_body_alter_blogindexpage_body_and_more.py
+                   152: (
                         "wagtail.blocks.StructBlock",
                         [
                             [
