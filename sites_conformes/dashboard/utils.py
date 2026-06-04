@@ -50,7 +50,8 @@ def push_version_notification(items):
         release_res.raise_for_status()
         tag = release_res.json().get("tag_name", "").lstrip("v")
         print(f"Latest release version: {tag}, installed version: {actual_version}")
-        if not is_last_version(actual_version, tag):
+
+        if settings.ADVERTISE_LATEST_VERSION and not is_last_version(actual_version, tag):
             items.insert(
                 0,
                 {
