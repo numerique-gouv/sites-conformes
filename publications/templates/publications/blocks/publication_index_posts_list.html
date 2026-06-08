@@ -1,0 +1,42 @@
+{% load i18n %}
+{% for post in posts %}
+  <div class="fr-col fr-col-md-6">
+    <div class="fr-card fr-enlarge-link">
+      <div class="fr-card__body">
+        <div class="fr-card__content">
+          <h3 class="fr-card__title">
+            <a href="{{ post.url }}">{{ post.title }}</a>
+          </h3>
+          <p class="fr-card__desc">Publié le {{ post.date |date:'l j F Y' }}</p>
+          {% if post.collections.all or post.themes.all %}
+            <div class="fr-card__start">
+              <ul class="fr-tags-group">
+                {% for collection in post.collections.all %}
+                  <li>
+                    <p class="fr-tag">{{ collection.name }}</p>
+                  </li>
+                {% endfor %}
+                {% for theme in post.themes.all %}
+                  <li>
+                    <p class="fr-tag">{{ theme.name }}</p>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {% if post.cover %}
+        <div class="fr-card__header">
+          <div class="fr-card__img">
+            <img class="fr-responsive-img" src="{{ post.cover.file.url }}" alt="">
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <div class="fr-col">
+    <p>{% translate "No article found." %}</p>
+  </div>
+{% endfor %}

@@ -110,6 +110,7 @@ INSTALLED_APPS = [
     "sites_conformes.menus",
     "wagtail_honeypot",
     "sites_conformes.dashboard",
+    "publications",
     "wagtail.admin",
 ]
 
