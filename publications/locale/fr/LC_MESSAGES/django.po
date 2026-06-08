@@ -15,23 +15,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "Collection name"
-msgstr "Nom de la collection"
+msgid "Name"
+msgstr "Nom"
 
-msgid "Parent collection"
-msgstr "Collection parente"
+msgid "Parent"
+msgstr "Parent"
 
 msgid "Description"
 msgstr "Description"
 
-msgid "Displayed on the top of the collection page"
-msgstr "Affiché en haut de la page de la collection"
+msgid "Displayed at the top of the taxonomy listing page"
+msgstr "Affiché en haut de la page de liste de la taxonomie"
 
-msgid "Text displayed at the end of every page in the collection"
-msgstr "Texte affiché à la fin de chaque page de la collection"
+msgid "Text displayed at the end of every page in the taxonomy"
+msgstr "Texte affiché à la fin de chaque page de la taxonomie"
 
-msgid "Parent collection cannot be self."
-msgstr "La collection ne peut être sa propre parente."
+#, python-format
+msgid "Parent %(type)s cannot be self."
+msgstr "Le/La %(type)s ne peut être sa propre catégorie parente."
 
 msgid "Cannot have circular Parents."
 msgstr "Il est impossible d'avoir des parents circulaires."
@@ -41,21 +42,6 @@ msgstr "Collection"
 
 msgid "Collections"
 msgstr "Collections"
-
-msgid "Theme name"
-msgstr "Nom du thème"
-
-msgid "Parent theme"
-msgstr "Thème parent"
-
-msgid "Displayed on the top of the theme page"
-msgstr "Affiché en haut de la page du thème"
-
-msgid "Text displayed at the end of every page in the theme"
-msgstr "Texte affiché à la fin de chaque page du thème"
-
-msgid "Parent theme cannot be self."
-msgstr "Le thème ne peut être sa propre parent."
 
 msgid "Theme"
 msgstr "Thème"

@@ -1,164 +1,34 @@
-from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import models
-from django.db.models import BooleanField, Count, QuerySet
-from django.db.models.expressions import F
+from django.db.models import BooleanField, QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
-from wagtail.admin.panels import FieldPanel, FieldRowPanel, MultiFieldPanel, TitleFieldPanel
-from wagtail.admin.widgets.slug import SlugInput
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import path
-from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Orderable
-from wagtail.models.i18n import TranslatableMixin
-from wagtail.search import index
 
-from sites_conformes.blog.blocks import COLOPHON_BLOCKS
 from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Person
-from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.models import Tag
+from publications.taxonomy import (
+    AbstractTaxonomy,
+    get_taxonomies_for_index,
+    list_taxonomies_for_index,
+)
 
 
-class Collection(TranslatableMixin, index.Indexed, Orderable):
-    name = models.CharField(max_length=80, unique=True, verbose_name=_("Collection name"))
-    slug = models.SlugField(unique=True, max_length=80)
-    parent = models.ForeignKey(
-        "self",
-        blank=True,
-        null=True,
-        related_name="children",
-        verbose_name=_("Parent collection"),
-        on_delete=models.SET_NULL,
-    )
-    description = RichTextField(
-        max_length=500,
-        features=LIMITED_RICHTEXTFIELD_FEATURES,
-        blank=True,
-        verbose_name=_("Description"),
-        help_text=_("Displayed on the top of the collection page"),
-    )  # type: ignore
-    colophon = StreamField(
-        COLOPHON_BLOCKS,
-        blank=True,
-        use_json_field=True,
-        help_text=_("Text displayed at the end of every page in the collection"),
-    )
-    panels = [
-        TitleFieldPanel("name"),
-        FieldPanel("slug", widget=SlugInput),
-        FieldPanel("description"),
-        FieldPanel("colophon"),
-        FieldPanel("parent"),
-    ]
-
-    api_fields = [
-        APIField("name"),
-        APIField("slug"),
-        APIField("description"),
-        APIField("colophon"),
-        APIField("parent"),
-    ]
-
-    def __str__(self):
-        return self.name
-
-    def clean(self):
-        if self.parent:
-            parent = self.parent
-            if self.parent == self:
-                raise ValidationError(_("Parent collection cannot be self."))
-            if parent.parent and parent.parent == self:
-                raise ValidationError(_("Cannot have circular Parents."))
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ["name"]
+class Collection(AbstractTaxonomy):
+    class Meta(AbstractTaxonomy.Meta):
         verbose_name = _("Collection")
         verbose_name_plural = _("Collections")
-        unique_together = [
-            ("translation_key", "locale"),
-            ("name", "locale"),
-            ("slug", "locale"),
-        ]
-
-    search_fields = [index.SearchField("name")]
 
 
-class Theme(TranslatableMixin, index.Indexed, Orderable):
-    name = models.CharField(max_length=80, unique=True, verbose_name=_("Theme name"))
-    slug = models.SlugField(unique=True, max_length=80)
-    parent = models.ForeignKey(
-        "self",
-        blank=True,
-        null=True,
-        related_name="children",
-        verbose_name=_("Parent theme"),
-        on_delete=models.SET_NULL,
-    )
-    description = RichTextField(
-        max_length=500,
-        features=LIMITED_RICHTEXTFIELD_FEATURES,
-        blank=True,
-        verbose_name=_("Description"),
-        help_text=_("Displayed on the top of the theme page"),
-    )  # type: ignore
-    colophon = StreamField(
-        COLOPHON_BLOCKS,
-        blank=True,
-        use_json_field=True,
-        help_text=_("Text displayed at the end of every page in the theme"),
-    )
-    panels = [
-        TitleFieldPanel("name"),
-        FieldPanel("slug", widget=SlugInput),
-        FieldPanel("description"),
-        FieldPanel("colophon"),
-        FieldPanel("parent"),
-    ]
-
-    api_fields = [
-        APIField("name"),
-        APIField("slug"),
-        APIField("description"),
-        APIField("colophon"),
-        APIField("parent"),
-    ]
-
-    def __str__(self):
-        return self.name
-
-    def clean(self):
-        if self.parent:
-            parent = self.parent
-            if self.parent == self:
-                raise ValidationError(_("Parent theme cannot be self."))
-            if parent.parent and parent.parent == self:
-                raise ValidationError(_("Cannot have circular Parents."))
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ["name"]
+class Theme(AbstractTaxonomy):
+    class Meta(AbstractTaxonomy.Meta):
         verbose_name = _("Theme")
         verbose_name_plural = _("Themes")
-        unique_together = [
-            ("translation_key", "locale"),
-            ("name", "locale"),
-            ("slug", "locale"),
-        ]
-
-    search_fields = [index.SearchField("name")]
 
 
 class CollectionPublication(Orderable):
@@ -387,35 +257,19 @@ class PublicationIndexPage(BlogIndexPage):
         return context
 
     def get_collections(self) -> QuerySet:
-        ids = self.posts.specific().values_list("collections", flat=True)
-        return Collection.objects.filter(id__in=ids).order_by("name")
+        return get_taxonomies_for_index(self, Collection, "collections")
 
     def get_themes(self) -> QuerySet:
-        ids = self.posts.specific().values_list("themes", flat=True)
-        return Theme.objects.filter(id__in=ids).order_by("name")
+        return get_taxonomies_for_index(self, Theme, "themes")
 
     def list_collections(self) -> list:
-        posts = self.posts.specific()
-        return (
-            posts.values(
-                coll_slug=F("collections__slug"),
-                coll_name=F("collections__name"),
-            )
-            .annotate(coll_count=Count("coll_slug"))
-            .filter(coll_count__gte=1)
-            .order_by("-coll_count")
+        return list_taxonomies_for_index(
+            self, prefix="coll", slug_path="collections__slug", name_path="collections__name"
         )
 
     def list_themes(self) -> list:
-        posts = self.posts.specific()
-        return (
-            posts.values(
-                theme_slug=F("themes__slug"),
-                theme_name=F("themes__name"),
-            )
-            .annotate(theme_count=Count("theme_slug"))
-            .filter(theme_count__gte=1)
-            .order_by("-theme_count")
+        return list_taxonomies_for_index(
+            self, prefix="theme", slug_path="themes__slug", name_path="themes__name"
         )
 
     @property
