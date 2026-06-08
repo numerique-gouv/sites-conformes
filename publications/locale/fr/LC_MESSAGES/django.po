@@ -1,0 +1,143 @@
+# Publications app translations (French).
+# Copyright (C) 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-08 15:16+0200\n"
+"PO-Revision-Date: 2026-06-08 15:16+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Collection name"
+msgstr "Nom de la collection"
+
+msgid "Parent collection"
+msgstr "Collection parente"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Displayed on the top of the collection page"
+msgstr "Affiché en haut de la page de la collection"
+
+msgid "Text displayed at the end of every page in the collection"
+msgstr "Texte affiché à la fin de chaque page de la collection"
+
+msgid "Parent collection cannot be self."
+msgstr "La collection ne peut être sa propre parente."
+
+msgid "Cannot have circular Parents."
+msgstr "Il est impossible d'avoir des parents circulaires."
+
+msgid "Collection"
+msgstr "Collection"
+
+msgid "Collections"
+msgstr "Collections"
+
+msgid "Theme name"
+msgstr "Nom du thème"
+
+msgid "Parent theme"
+msgstr "Thème parent"
+
+msgid "Displayed on the top of the theme page"
+msgstr "Affiché en haut de la page du thème"
+
+msgid "Text displayed at the end of every page in the theme"
+msgstr "Texte affiché à la fin de chaque page du thème"
+
+msgid "Parent theme cannot be self."
+msgstr "Le thème ne peut être sa propre parent."
+
+msgid "Theme"
+msgstr "Thème"
+
+msgid "Themes"
+msgstr "Thèmes"
+
+msgid "Tags and Categories"
+msgstr "Étiquettes et Catégories"
+
+msgid "Tags, collections and themes"
+msgstr "Étiquettes, collections et thèmes"
+
+msgid "Publication page"
+msgstr "Page de publication"
+
+msgid "Filter by collection"
+msgstr "Filtrer par collection"
+
+msgid "Filter by theme"
+msgstr "Filtrer par thème"
+
+msgid "Show filters"
+msgstr "Afficher les filtres"
+
+msgid "Publication index"
+msgstr "Index des publications"
+
+msgid "Tags"
+msgstr "Étiquettes"
+
+#, python-format
+msgid "Posts tagged with %(tag)s"
+msgstr "Publications avec l'étiquette %(tag)s"
+
+#, python-format
+msgid "Posts in collection %(collection)s"
+msgstr "Publications dans la collection %(collection)s"
+
+#, python-format
+msgid "Posts in theme %(theme)s"
+msgstr "Publications dans le thème %(theme)s"
+
+msgid "Posts written by"
+msgstr "Publications écrites par"
+
+#, python-format
+msgid "Posts published in %(year)s"
+msgstr "Publications publiées en %(year)s"
+
+msgid "No article found."
+msgstr "Aucune publication trouvée."
+
+msgid "Collection:"
+msgstr "Collection :"
+
+msgid "Theme:"
+msgstr "Thème :"
+
+msgid "Tag:"
+msgstr "Étiquette :"
+
+msgid "Author:"
+msgstr "Auteur :"
+
+msgid "Source:"
+msgstr "Source :"
+
+msgid "Filters"
+msgstr "Filtres"
+
+msgid "Filter by tag"
+msgstr "Filtrer par étiquette"
+
+msgid "Filter by author"
+msgstr "Filtrer par auteur"
+
+msgid "Filter by source"
+msgstr "Filtrer par source"
+
+msgid "Posts"
+msgstr "Publications"
+
+msgid "Posted by:"
+msgstr "Écrit par :"
