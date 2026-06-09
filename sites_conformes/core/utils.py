@@ -26,8 +26,7 @@ def _build_image_name(full_file_path: str, content: bytes) -> str:
     ext = guess_extension(full_file_path, content)
     if not ext:
         logger.warning(
-            "Could not determine an extension for image %r; storing it without "
-            "one may break rendition generation.",
+            "Could not determine an extension for image %r; storing it without " "one may break rendition generation.",
             full_file_path,
         )
     return f"{path.stem}{ext}"
