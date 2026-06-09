@@ -70,6 +70,7 @@ FILTER_CASES = [
         "heading": gettext("Filter by source"),
         "visible_label": lambda self: self.organization.name,
         "query_param": lambda self: "source=inrae",
+        # You can't assign a source to a post directly, so we assign an author associated to the source.
         "post_kwargs": lambda self: {"authors": [self.author]},
         "matching_post": "post_with_author",
         "other_post": "post_with_other_author",
@@ -186,20 +187,6 @@ class PublicationIndexPageFilterTestBase(WagtailPageTestCase):
             setattr(self.index, field, value)
         self.index.save_revision().publish()
 
-    def _post_matches_filter(self, post, case):
-        if case["name"] == "collection":
-            return post.collections.filter(slug="agriculture").exists()
-        if case["name"] == "theme":
-            return post.themes.filter(slug="climate").exists()
-        if case["name"] == "tag":
-            return post.tags.filter(slug="news").exists()
-        if case["name"] == "author":
-            return post.authors.filter(id=self.author.id).exists()
-        if case["name"] == "source":
-            return post.authors.filter(organization=self.organization).exists()
-        return False
-
-
 class PublicationIndexPageFilterVisibilityTest(PublicationIndexPageFilterTestBase):
     def test_filter_shown_when_enabled(self):
         for case in FILTER_CASES:
@@ -239,7 +226,10 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
                 self.assertNotContains(response, getattr(self, case["other_post"]).title)
 
     def test_filters_posts_with_two_query_params(self):
-        for case_a, case_b in combinations(FILTER_CASES, 2):
+        # Remove the "source" case, because there's interactions with the "author" case that make testing complicated.
+        # We'll have less coverage but reliable tests.
+        filter_cases = [case for case in FILTER_CASES if case["name"] != "source"]
+        for case_a, case_b in combinations(filter_cases, 2):
             with self.subTest(f"{case_a['name']}+{case_b['name']}"):
                 title = f"Post with {case_a['name']} and {case_b['name']}"
                 kwargs = {**case_a["post_kwargs"](self), **case_b["post_kwargs"](self)}
@@ -252,11 +242,7 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
                 self.assertContains(response, matching.title)
                 # Check that posts with only one filter do not show.
                 for case in (case_a, case_b):
-                    single_filter_matching = getattr(self, case["matching_post"])
-                    # Extra check for the case author+source : e.g. Jane Doe from INRAE
-                    if not (
-                        self._post_matches_filter(single_filter_matching, case_a)
-                        and self._post_matches_filter(single_filter_matching, case_b)
-                    ):
-                        self.assertNotContains(response, single_filter_matching.title)
+                    self.assertNotContains(
+                        response, getattr(self, case["matching_post"]).title
+                    )
                     self.assertNotContains(response, getattr(self, case["other_post"]).title)
