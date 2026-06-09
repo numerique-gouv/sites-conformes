@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django import template
 
 register = template.Library()
@@ -39,7 +41,7 @@ def build_toggle_url_query_string(context, filters: list[FilterSpec], **kwargs) 
         elif val and val == current_val:
             base_params.pop(param, None)
 
-    url_string = "&".join(f"{key}={value}" for key, value in base_params.items())
+    url_string = urlencode(base_params, doseq=True)
     if url_string:
         return f"?{url_string}"
     return ""
