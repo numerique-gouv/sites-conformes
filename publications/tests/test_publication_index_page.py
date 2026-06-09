@@ -71,40 +71,23 @@ FILTER_CASES = [
 ]
 
 
-def settings_panel_field_names(panels):
-    """
-    List model field names from a Wagtail panel tree (including nested panels).
-
-    Wagtail page settings are grouped in panels (FieldPanel, MultiFieldPanel, …).
-    A MultiFieldPanel like "Show filters" wraps several FieldPanels; this helper
-    walks the tree and collects every ``field_name``.
-
-    Example::
-
-        names = settings_panel_field_names(PublicationIndexPage.settings_panels)
-        # ["filter_by_collection", "filter_by_theme", "filter_by_tag", ...]
-        assert "filter_by_collection" in names
-    """
+def list_settings_in_panel(panels):
     names = []
     for panel in panels:
         if hasattr(panel, "field_name"):
             names.append(panel.field_name)
         if hasattr(panel, "children"):
-            names.extend(settings_panel_field_names(panel.children))
+            names.extend(list_settings_in_panel(panel.children))
     return names
 
 
 class PublicationIndexPageSettingsTest(SimpleTestCase):
     def test_settings_show_filters_panel_includes_all_fields(self):
-        field_names = settings_panel_field_names(PublicationIndexPage.settings_panels)
+        field_names = list_settings_in_panel(PublicationIndexPage.settings_panels)
         for field_name in FILTER_SETTINGS_DEFAULTS:
             self.assertIn(field_name, field_names)
 
     def test_filter_settings_default_values(self):
-        for field_name, expected_default in FILTER_SETTINGS_DEFAULTS.items():
-            field = PublicationIndexPage._meta.get_field(field_name)
-            self.assertEqual(field.default, expected_default, field_name)
-
         page = PublicationIndexPage(title="Defaults", slug="defaults")
         for field_name, expected_default in FILTER_SETTINGS_DEFAULTS.items():
             self.assertEqual(getattr(page, field_name), expected_default, field_name)
@@ -215,5 +198,18 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
         for case in FILTER_CASES:
             with self.subTest(case["name"]):
                 response = self.client.get(case["filter_url"](self))
+                self.assertContains(response, getattr(self, case["matching_post"]).title)
+                self.assertNotContains(response, getattr(self, case["other_post"]).title)
+
+    def test_url_filter_applies_even_when_filter_disabled_in_settings(self):
+        """
+        Disabling a filter hides its sidemenu block, but get_context still
+        filters posts from the query param.
+        """
+        for case in FILTER_CASES:
+            with self.subTest(case["name"]):
+                self._set_filter_settings(**{case["setting"]: False})
+                response = self.client.get(case["filter_url"](self))
+                self.assertNotContains(response, case["heading"])
                 self.assertContains(response, getattr(self, case["matching_post"]).title)
                 self.assertNotContains(response, getattr(self, case["other_post"]).title)
