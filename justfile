@@ -56,6 +56,7 @@ init-dev:
     just deploy
     {{docker_cmd}} {{uv_run}} pre-commit install
 
+alias messages := makemessages
 # Update the translation files
 [group('Internationalization')]
 makemessages:
