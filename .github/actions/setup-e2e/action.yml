@@ -13,6 +13,11 @@ runs:
       shell: bash
       run: npm ci
 
+    # NOTE: do not pass --with-deps. GitHub-hosted ubuntu-latest runners already
+    # ship Chromium's system libraries, and --with-deps shells out to apt-get,
+    # which hangs indefinitely on an interactive dpkg prompt while upgrading
+    # xvfb/xserver-common/libcups2 (no TTY in CI). Installing just the browser
+    # binary avoids that hang.
     - name: Install Playwright browsers
       shell: bash
-      run: npx playwright install chromium --with-deps
+      run: npx playwright install chromium
