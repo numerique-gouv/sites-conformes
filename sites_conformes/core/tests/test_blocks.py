@@ -571,7 +571,7 @@ class HeroBackgroundImageBlockTestCase(WagtailPageTestCase):
         home = Page.objects.get(slug="home")
         self.admin = User.objects.create_superuser("hero-bg-test", "test@test.test", "pass")
 
-        image_file = "static/artwork/technical-error.svg"
+        image_file = "sites_conformes/static/artwork/technical-error.svg"
         self.image = import_image(image_file, "Hero background image")
         # The hero block's inner image uses ImageBlockWithDefault with this title;
         # its presence is what triggers the bug when an empty image dict is loaded
