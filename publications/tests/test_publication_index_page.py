@@ -31,8 +31,8 @@ FILTER_CASES = [
         "visible_label": lambda self: self.collection.name,
         "query_param": lambda self: "collection=agriculture",
         "post_kwargs": lambda self: {"collections": [self.collection]},
-        "matching_post": "post_with_collection",
-        "other_post": "post_with_other_collection",
+        "matching_title": lambda self: self.post_with_collection.title,
+        "other_title": lambda self: self.post_with_other_collection.title,
     },
     {
         "name": "theme",
@@ -41,8 +41,8 @@ FILTER_CASES = [
         "visible_label": lambda self: self.theme.name,
         "query_param": lambda self: "theme=climate",
         "post_kwargs": lambda self: {"themes": [self.theme]},
-        "matching_post": "post_with_theme",
-        "other_post": "post_with_other_theme",
+        "matching_title": lambda self: self.post_with_theme.title,
+        "other_title": lambda self: self.post_with_other_theme.title,
     },
     {
         "name": "tag",
@@ -51,8 +51,8 @@ FILTER_CASES = [
         "visible_label": lambda self: self.tag.name,
         "query_param": lambda self: "tag=news",
         "post_kwargs": lambda self: {"tags": [self.tag]},
-        "matching_post": "post_with_tag",
-        "other_post": "post_with_other_tag",
+        "matching_title": lambda self: self.post_with_tag.title,
+        "other_title": lambda self: self.post_with_other_tag.title,
     },
     {
         "name": "author",
@@ -61,8 +61,8 @@ FILTER_CASES = [
         "visible_label": lambda self: self.author.name,
         "query_param": lambda self: f"author={self.author.id}",
         "post_kwargs": lambda self: {"authors": [self.author]},
-        "matching_post": "post_with_author",
-        "other_post": "post_with_other_author",
+        "matching_title": lambda self: self.post_with_author.title,
+        "other_title": lambda self: self.post_with_other_author.title,
     },
     {
         "name": "source",
@@ -72,8 +72,8 @@ FILTER_CASES = [
         "query_param": lambda self: "source=inrae",
         # You can't assign a source to a post directly, so we assign an author associated to the source.
         "post_kwargs": lambda self: {"authors": [self.author]},
-        "matching_post": "post_with_author",
-        "other_post": "post_with_other_author",
+        "matching_title": lambda self: self.post_with_author.title,
+        "other_title": lambda self: self.post_with_other_author.title,
     },
 ]
 
@@ -209,8 +209,8 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
         for case in FILTER_CASES:
             with self.subTest(case["name"]):
                 response = self.client.get(case["filter_url"](self))
-                self.assertContains(response, getattr(self, case["matching_post"]).title)
-                self.assertNotContains(response, getattr(self, case["other_post"]).title)
+                self.assertContains(response, case["matching_title"](self))
+                self.assertNotContains(response, case["other_title"](self))
 
     def test_url_filter_applies_even_when_filter_disabled_in_settings(self):
         """
@@ -222,8 +222,8 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
                 self._set_filter_settings(**{case["setting"]: False})
                 response = self.client.get(case["filter_url"](self))
                 self.assertNotContains(response, case["heading"])
-                self.assertContains(response, getattr(self, case["matching_post"]).title)
-                self.assertNotContains(response, getattr(self, case["other_post"]).title)
+                self.assertContains(response, case["matching_title"](self))
+                self.assertNotContains(response, case["other_title"](self))
 
     def test_filters_posts_with_two_query_params(self):
         # Remove the "source" case, because there's interactions with the "author" case that make testing complicated.
@@ -242,7 +242,5 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
                 self.assertContains(response, matching.title)
                 # Check that posts with only one filter do not show.
                 for case in (case_a, case_b):
-                    self.assertNotContains(
-                        response, getattr(self, case["matching_post"]).title
-                    )
-                    self.assertNotContains(response, getattr(self, case["other_post"]).title)
+                    self.assertNotContains(response, case["matching_title"](self))
+                    self.assertNotContains(response, case["other_title"](self))
