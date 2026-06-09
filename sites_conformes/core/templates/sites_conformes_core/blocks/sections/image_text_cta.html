@@ -13,7 +13,7 @@
 
     </div>
     <div class="fr-col-md-6">
-      {% picture value.image fill-600x600 format-{avif,webp,jpeg} preserve-svg class="fr-responsive-img" alt="{{ image.alt }}" %}
+      {% picture value.image fill-600x600 format-{avif,webp,jpeg} preserve-svg class="fr-responsive-img" alt="{{ value.image.contextual_alt_text }}" %}
     </div>
   </div>
 
