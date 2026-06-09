@@ -2,6 +2,48 @@ from django import template
 
 register = template.Library()
 
+FilterSpec = tuple[str, str]
+
+PUBLICATION_INDEX_FILTERS: list[FilterSpec] = [
+    ("author", "id"),
+    ("collection", "slug"),
+    ("theme", "slug"),
+    ("source", "slug"),
+    ("tag", "slug"),
+    ("year", ""),
+]
+
+
+def build_toggle_url_query_string(context, filters: list[FilterSpec], **kwargs) -> str:
+    """
+    Set or remove a filter query param (toggle off when already active).
+
+    ``kwargs`` are filter values from the template (e.g. collection=collection).
+    Optional ``filters_dict`` overrides ``request.GET`` as the starting query params.
+    """
+    filters_dict = kwargs.pop("filters_dict", None)
+    if filters_dict:
+        base_params = filters_dict.copy()
+    else:
+        base_params = context["request"].GET.copy()
+
+    for param, attr in filters:
+        val = kwargs.get(param, "")
+        current_val = context.get(f"current_{param}", "")
+
+        if val and val != current_val:
+            if attr:
+                base_params[param] = getattr(val, attr)
+            else:
+                base_params[param] = val
+        elif val and val == current_val:
+            base_params.pop(param, None)
+
+    url_string = "&".join(f"{key}={value}" for key, value in base_params.items())
+    if url_string:
+        return f"?{url_string}"
+    return ""
+
 
 @register.simple_tag(takes_context=True)
 def toggle_url_filter(context, *_, **kwargs):
@@ -11,36 +53,4 @@ def toggle_url_filter(context, *_, **kwargs):
     Same behaviour as sites_conformes.core.templatetags.wagtail_dsfr_tags.toggle_url_filter,
     with collection and theme query parameters.
     """
-
-    filters_dict = kwargs.get("filters_dict", {})
-    if filters_dict:
-        url_params = filters_dict.copy()
-    else:
-        url_params = context["request"].GET.copy()
-
-    filters = [
-        ("author", "id"),
-        ("collection", "slug"),
-        ("theme", "slug"),
-        ("source", "slug"),
-        ("tag", "slug"),
-        ("year", ""),
-    ]
-
-    for param, attr in filters:
-        val = kwargs.get(param, "")
-        current_val = context.get(f"current_{param}", "")
-
-        if val and val != current_val:
-            if attr:
-                url_params[param] = getattr(val, attr)
-            else:
-                url_params[param] = val
-        elif val and val == current_val:
-            url_params.pop(param, None)
-
-    url_string = "&".join(["{}={}".format(key, value) for key, value in url_params.items()])
-
-    if url_string:
-        return f"?{url_string}"
-    return ""
+    return build_toggle_url_query_string(context, PUBLICATION_INDEX_FILTERS, **kwargs)
