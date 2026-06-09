@@ -19,6 +19,8 @@ runs:
       # Debug is required to get media working
       run: DEBUG=True uv run python manage.py runserver 127.0.0.1:8000 &
 
+    # `wait-on` is not a project dependency, so `npx` would normally prompt to
+    # install it and block forever on stdin in CI. `-y` auto-confirms the fetch.
     - name: Wait for server to be ready
       shell: bash
-      run: npx wait-on ${{ inputs.base-url }} --timeout ${{ inputs.timeout }}
+      run: npx -y wait-on ${{ inputs.base-url }} --timeout ${{ inputs.timeout }}
