@@ -116,7 +116,6 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
 ]
 
-
 if SF_USE_DB_STORAGE:
     INSTALLED_APPS.insert(-1, "sites_conformes.db_storage")
 
@@ -482,6 +481,7 @@ WAGTAILADMIN_USER_PASSWORD_RESET_FORM = "sites_conformes.dashboard.forms.DsfrPas
 DSFR_MARK_OPTIONAL_FIELDS = getenv_bool("DSFR_MARK_OPTIONAL_FIELDS", True)
 
 # (Optional) 2FA settings
+# See https://wagtail-2fa.readthedocs.io/en/stable/
 WAGTAIL_2FA_REQUIRED = getenv_bool("WAGTAIL_2FA_REQUIRED", False)
 WAGTAIL_2FA_OTP_TOTP_NAME = os.getenv("WAGTAIL_2FA_OTP_TOTP_NAME", WAGTAIL_SITE_NAME)
 
