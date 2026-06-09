@@ -13,9 +13,9 @@ runs:
       shell: bash
       run: npm ci
 
-    # Cache the browser binary keyed on the exact Playwright version, so we only
-    # hit cdn.playwright.dev once per version instead of on every run. The cold
-    # download is the part that hangs in CI, so caching is the primary fix.
+    # Cache the browser binary keyed on the exact Playwright version so warm runs
+    # skip the download entirely. (The download itself is fast — ~30s for 167MB —
+    # but caching it is still a free win and insulates us from CDN flakiness.)
     - name: Get Playwright version
       id: playwright-version
       shell: bash
@@ -30,26 +30,22 @@ runs:
         restore-keys: |
           playwright-${{ runner.os }}-
 
-    # On a cache miss we must download the browser. Wrap it in `timeout` plus a
-    # retry: a stalled CDN download otherwise blocks the job until the 30-minute
-    # job timeout (observed hanging right after "Downloading Chrome for Testing").
-    - name: Install Playwright browser + system deps (cache miss)
+    # Install ONLY the browser binary — never `--with-deps`. The browser download
+    # completes in seconds; the hang we chased was the apt/dpkg step that
+    # `--with-deps` runs afterward, which stalls silently at dpkg-configure
+    # (no TTY for an interactive prompt) until the job timeout. GitHub-hosted
+    # ubuntu-latest already ships every Chromium system library, so the apt step
+    # is unnecessary here. `timeout` stays as a cheap guard against a stalled CDN.
+    - name: Install Playwright browser (cache miss)
       if: steps.cache-playwright.outputs.cache-hit != 'true'
       shell: bash
       run: |
         for attempt in 1 2; do
-          if timeout 600 npx playwright install chromium --with-deps; then
+          if timeout 300 npx playwright install chromium; then
             exit 0
           fi
-          echo "::warning::Playwright install attempt ${attempt} failed or timed out; retrying..."
+          echo "::warning::Playwright browser download attempt ${attempt} failed or timed out; retrying..."
           sleep 10
         done
-        echo "::error::Playwright browser install failed after 2 attempts"
+        echo "::error::Playwright browser download failed after 2 attempts"
         exit 1
-
-    # On a cache hit the browser is already present; only the apt system
-    # libraries need (re)installing on the fresh runner.
-    - name: Install Playwright system deps (cache hit)
-      if: steps.cache-playwright.outputs.cache-hit == 'true'
-      shell: bash
-      run: npx playwright install-deps chromium
