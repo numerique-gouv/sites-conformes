@@ -213,3 +213,15 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
                 self.assertNotContains(response, case["heading"])
                 self.assertContains(response, getattr(self, case["matching_post"]).title)
                 self.assertNotContains(response, getattr(self, case["other_post"]).title)
+
+    def test_filters_posts_with_two_query_params(self):
+        matching = self._create_post(
+            "Post with multiple taxonomies",
+            collections=[self.collection],
+            tags=[self.tag],
+        )
+        response = self.client.get(f"{self.index.url}?collection=agriculture&tag=news")
+        self.assertContains(response, matching.title)
+        self.assertNotContains(response, self.post_with_collection.title)
+        self.assertNotContains(response, self.post_with_tag.title)
+        self.assertNotContains(response, self.post_with_other_collection.title)
