@@ -25,6 +25,13 @@ Avec cette option, tout utilisateur authentifié sans appareil 2FA configuré es
 3. Il saisit un code de vérification pour confirmer la configuration.
 4. Lors des connexions suivantes, un écran intermédiaire lui demande son code à 6 chiffres.
 
+## Accéder à la gestion des appareils 2FA
+
+Le lien vers la page de gestion des appareils 2FA est accessible depuis :
+
+- **Liste des utilisateurs** : `/cms-admin/users/` → bouton **"Gérer 2FA"** sur chaque ligne (réservé aux administrateurs)
+- **Page de compte** : cliquer sur son avatar/nom en bas à gauche → "Paramètres du compte" → onglet **"Plus d'actions"** (onglet visible uniquement si des actions sont disponibles) → "Manage your 2FA devices"
+
 ## Middleware et fichiers statiques
 
 Lorsque `WAGTAIL_2FA_REQUIRED=True`, le middleware `VerifyUserMiddleware` intercepte toutes les requêtes entrantes pour les utilisateurs non vérifiés. Cela inclut les requêtes vers les fichiers statiques (CSS, JS), ce qui empêche le navigateur de les charger.
