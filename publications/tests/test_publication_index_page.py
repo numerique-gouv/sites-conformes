@@ -1,5 +1,6 @@
 import zoneinfo
 from datetime import datetime
+from itertools import combinations
 
 from django.contrib.auth import get_user_model
 from django.test import SimpleTestCase
@@ -28,7 +29,8 @@ FILTER_CASES = [
         "setting": "filter_by_collection",
         "heading": gettext("Filter by collection"),
         "visible_label": lambda self: self.collection.name,
-        "filter_url": lambda self: f"{self.index.url}?collection=agriculture",
+        "query_param": lambda self: "collection=agriculture",
+        "post_kwargs": lambda self: {"collections": [self.collection]},
         "matching_post": "post_with_collection",
         "other_post": "post_with_other_collection",
     },
@@ -37,7 +39,8 @@ FILTER_CASES = [
         "setting": "filter_by_theme",
         "heading": gettext("Filter by theme"),
         "visible_label": lambda self: self.theme.name,
-        "filter_url": lambda self: f"{self.index.url}?theme=climate",
+        "query_param": lambda self: "theme=climate",
+        "post_kwargs": lambda self: {"themes": [self.theme]},
         "matching_post": "post_with_theme",
         "other_post": "post_with_other_theme",
     },
@@ -46,7 +49,8 @@ FILTER_CASES = [
         "setting": "filter_by_tag",
         "heading": gettext("Filter by tag"),
         "visible_label": lambda self: self.tag.name,
-        "filter_url": lambda self: f"{self.index.url}?tag=news",
+        "query_param": lambda self: "tag=news",
+        "post_kwargs": lambda self: {"tags": [self.tag]},
         "matching_post": "post_with_tag",
         "other_post": "post_with_other_tag",
     },
@@ -55,7 +59,8 @@ FILTER_CASES = [
         "setting": "filter_by_author",
         "heading": gettext("Filter by author"),
         "visible_label": lambda self: self.author.name,
-        "filter_url": lambda self: f"{self.index.url}?author={self.author.id}",
+        "query_param": lambda self: f"author={self.author.id}",
+        "post_kwargs": lambda self: {"authors": [self.author]},
         "matching_post": "post_with_author",
         "other_post": "post_with_other_author",
     },
@@ -64,11 +69,17 @@ FILTER_CASES = [
         "setting": "filter_by_source",
         "heading": gettext("Filter by source"),
         "visible_label": lambda self: self.organization.name,
-        "filter_url": lambda self: f"{self.index.url}?source=inrae",
+        "query_param": lambda self: "source=inrae",
+        "post_kwargs": lambda self: {"authors": [self.author]},
         "matching_post": "post_with_author",
         "other_post": "post_with_other_author",
     },
 ]
+
+for case in FILTER_CASES:
+    case["filter_url"] = lambda self, case=case: (
+        f"{self.index.url}?{case['query_param'](self)}"
+    )
 
 
 def list_settings_in_panel(panels):
@@ -175,6 +186,19 @@ class PublicationIndexPageFilterTestBase(WagtailPageTestCase):
             setattr(self.index, field, value)
         self.index.save_revision().publish()
 
+    def _post_matches_filter(self, post, case):
+        if case["name"] == "collection":
+            return post.collections.filter(slug="agriculture").exists()
+        if case["name"] == "theme":
+            return post.themes.filter(slug="climate").exists()
+        if case["name"] == "tag":
+            return post.tags.filter(slug="news").exists()
+        if case["name"] == "author":
+            return post.authors.filter(id=self.author.id).exists()
+        if case["name"] == "source":
+            return post.authors.filter(organization=self.organization).exists()
+        return False
+
 
 class PublicationIndexPageFilterVisibilityTest(PublicationIndexPageFilterTestBase):
     def test_filter_shown_when_enabled(self):
@@ -215,13 +239,24 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
                 self.assertNotContains(response, getattr(self, case["other_post"]).title)
 
     def test_filters_posts_with_two_query_params(self):
-        matching = self._create_post(
-            "Post with multiple taxonomies",
-            collections=[self.collection],
-            tags=[self.tag],
-        )
-        response = self.client.get(f"{self.index.url}?collection=agriculture&tag=news")
-        self.assertContains(response, matching.title)
-        self.assertNotContains(response, self.post_with_collection.title)
-        self.assertNotContains(response, self.post_with_tag.title)
-        self.assertNotContains(response, self.post_with_other_collection.title)
+        for case_a, case_b in combinations(FILTER_CASES, 2):
+            with self.subTest(f"{case_a['name']}+{case_b['name']}"):
+                title = f"Post with {case_a['name']} and {case_b['name']}"
+                kwargs = {**case_a["post_kwargs"](self), **case_b["post_kwargs"](self)}
+                matching = self._create_post(title, **kwargs)
+                query = (
+                    f"{self.index.url}?"
+                    f"{case_a['query_param'](self)}&{case_b['query_param'](self)}"
+                )
+                response = self.client.get(query)
+                self.assertContains(response, matching.title)
+                # Check that posts with only one filter do not show.
+                for case in (case_a, case_b):
+                    single_filter_matching = getattr(self, case["matching_post"])
+                    # Extra check for the case author+source : e.g. Jane Doe from INRAE
+                    if not (
+                        self._post_matches_filter(single_filter_matching, case_a)
+                        and self._post_matches_filter(single_filter_matching, case_b)
+                    ):
+                        self.assertNotContains(response, single_filter_matching.title)
+                    self.assertNotContains(response, getattr(self, case["other_post"]).title)
