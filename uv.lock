@@ -1652,7 +1652,6 @@ wheels = [
 
 [[package]]
 name = "sites-conformes"
-version = "4.0.0rc1"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
