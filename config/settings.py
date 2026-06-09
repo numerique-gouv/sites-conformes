@@ -116,7 +116,6 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
 ]
 
-
 if SF_USE_DB_STORAGE:
     INSTALLED_APPS.insert(-1, "sites_conformes.db_storage")
 
@@ -460,6 +459,7 @@ if DEFAULT_FROM_EMAIL:
 WAGTAIL_PASSWORD_RESET_ENABLED = os.getenv("WAGTAIL_PASSWORD_RESET_ENABLED", False)
 
 # (Optional) 2FA settings
+# See https://wagtail-2fa.readthedocs.io/en/stable/
 WAGTAIL_2FA_REQUIRED = getenv_bool("WAGTAIL_2FA_REQUIRED", False)
 WAGTAIL_2FA_OTP_TOTP_NAME = os.getenv("WAGTAIL_2FA_OTP_TOTP_NAME", WAGTAIL_SITE_NAME)
 
