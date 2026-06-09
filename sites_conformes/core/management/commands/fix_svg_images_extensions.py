@@ -8,12 +8,22 @@ from willow.image import (
 
 def rename_wagtail_image(image, new_filename):
     old_file = image.file
-    old_file.open()
+    # Capture the original name and storage as plain values before saving:
+    # image.file.save() mutates image.file (and therefore old_file, which is
+    # the same FieldFile object) to point at the new name, so reading
+    # old_file.name afterwards would yield the new name and delete the file we
+    # just created.
+    old_name = old_file.name
+    old_storage = old_file.storage
 
-    content = old_file.read()
+    old_file.open()
+    try:
+        content = old_file.read()
+    finally:
+        old_file.close()
 
     image.file.save(new_filename, ContentFile(content), save=False)
-    old_file.storage.delete(old_file.name)
+    old_storage.delete(old_name)
 
     # Update only file field prevents erroring on width / height
     # fields that needs to be calculated for non-svg files

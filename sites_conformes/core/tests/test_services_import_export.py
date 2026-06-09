@@ -56,6 +56,13 @@ class GuessExtensionTestCase(SimpleTestCase):
     def test_sniff_webp(self):
         self.assertEqual(self._call("image", b"RIFF\x00\x00\x00\x00WEBP rest"), ".webp")
 
+    def test_sniff_avif(self):
+        # ISOBMFF: 4-byte box size, "ftyp" box type, then the "avif" brand.
+        self.assertEqual(self._call("image", b"\x00\x00\x00\x20ftypavif rest"), ".avif")
+
+    def test_sniff_avif_sequence_brand(self):
+        self.assertEqual(self._call("image", b"\x00\x00\x00\x20ftypavis rest"), ".avif")
+
     def test_sniff_svg(self):
         svg = b'<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"></svg>'
         self.assertEqual(self._call("image", svg), ".svg")
