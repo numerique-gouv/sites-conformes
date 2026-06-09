@@ -4,48 +4,20 @@ description: Install Node.js, npm dependencies, and Playwright Chromium
 runs:
   using: composite
   steps:
+    # Match the official Playwright CI guide:
+    # https://playwright.dev/docs/ci-intro#setting-up-github-actions
+    # Use the Node LTS (not 24) — the post-download install hang we observed
+    # only appeared on the pinned Node 24, never in the documented LTS setup.
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: "24"
+        node-version: lts/*
 
     - name: Install Node dependencies
       shell: bash
       run: npm ci
 
-    # Cache the browser binary keyed on the exact Playwright version so warm runs
-    # skip the download entirely. (The download itself is fast — ~30s for 167MB —
-    # but caching it is still a free win and insulates us from CDN flakiness.)
-    - name: Get Playwright version
-      id: playwright-version
+    # Install browsers + system deps exactly as the official guide prescribes.
+    - name: Install Playwright Browsers
       shell: bash
-      run: echo "version=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> "$GITHUB_OUTPUT"
-
-    - name: Cache Playwright browsers
-      id: cache-playwright
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/ms-playwright
-        key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-        restore-keys: |
-          playwright-${{ runner.os }}-
-
-    # Install ONLY the browser binary — never `--with-deps`. The browser download
-    # completes in seconds; the hang we chased was the apt/dpkg step that
-    # `--with-deps` runs afterward, which stalls silently at dpkg-configure
-    # (no TTY for an interactive prompt) until the job timeout. GitHub-hosted
-    # ubuntu-latest already ships every Chromium system library, so the apt step
-    # is unnecessary here. `timeout` stays as a cheap guard against a stalled CDN.
-    - name: Install Playwright browser (cache miss)
-      if: steps.cache-playwright.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        for attempt in 1 2; do
-          if timeout 300 npx playwright install chromium; then
-            exit 0
-          fi
-          echo "::warning::Playwright browser download attempt ${attempt} failed or timed out; retrying..."
-          sleep 10
-        done
-        echo "::error::Playwright browser download failed after 2 attempts"
-        exit 1
+      run: npx playwright install --with-deps
