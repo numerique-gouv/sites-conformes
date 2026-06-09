@@ -13,11 +13,43 @@ runs:
       shell: bash
       run: npm ci
 
-    # NOTE: do not pass --with-deps. GitHub-hosted ubuntu-latest runners already
-    # ship Chromium's system libraries, and --with-deps shells out to apt-get,
-    # which hangs indefinitely on an interactive dpkg prompt while upgrading
-    # xvfb/xserver-common/libcups2 (no TTY in CI). Installing just the browser
-    # binary avoids that hang.
-    - name: Install Playwright browsers
+    # Cache the browser binary keyed on the exact Playwright version, so we only
+    # hit cdn.playwright.dev once per version instead of on every run. The cold
+    # download is the part that hangs in CI, so caching is the primary fix.
+    - name: Get Playwright version
+      id: playwright-version
       shell: bash
-      run: npx playwright install chromium
+      run: echo "version=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Playwright browsers
+      id: cache-playwright
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+        restore-keys: |
+          playwright-${{ runner.os }}-
+
+    # On a cache miss we must download the browser. Wrap it in `timeout` plus a
+    # retry: a stalled CDN download otherwise blocks the job until the 30-minute
+    # job timeout (observed hanging right after "Downloading Chrome for Testing").
+    - name: Install Playwright browser + system deps (cache miss)
+      if: steps.cache-playwright.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        for attempt in 1 2; do
+          if timeout 600 npx playwright install chromium --with-deps; then
+            exit 0
+          fi
+          echo "::warning::Playwright install attempt ${attempt} failed or timed out; retrying..."
+          sleep 10
+        done
+        echo "::error::Playwright browser install failed after 2 attempts"
+        exit 1
+
+    # On a cache hit the browser is already present; only the apt system
+    # libraries need (re)installing on the fresh runner.
+    - name: Install Playwright system deps (cache hit)
+      if: steps.cache-playwright.outputs.cache-hit == 'true'
+      shell: bash
+      run: npx playwright install-deps chromium
