@@ -8,7 +8,6 @@ class PublicationsConfig(AppConfig):
 
     def ready(self):
         from config.api import api_router
-
         from publications.api import CollectionsAPIViewSet, ThemesAPIViewSet
 
         api_router.register_endpoint("collections", CollectionsAPIViewSet)

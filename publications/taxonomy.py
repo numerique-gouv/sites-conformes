@@ -81,10 +81,7 @@ class AbstractTaxonomy(TranslatableMixin, index.Indexed, Orderable):
         if self.parent:
             parent = self.parent
             if self.parent == self:
-                raise ValidationError(
-                    _("Parent %(type)s cannot be self.")
-                    % {"type": self._meta.verbose_name.lower()}
-                )
+                raise ValidationError(_("Parent %(type)s cannot be self.") % {"type": self._meta.verbose_name.lower()})
             if parent.parent and parent.parent == self:
                 raise ValidationError(_("Cannot have circular Parents."))
 

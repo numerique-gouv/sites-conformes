@@ -13,8 +13,9 @@ User = get_user_model()
 
 
 class PublicationTestCase(BlogTestCase):
-    """ Reuses BlogTestCase tests through inheritance. Also copies what can't
-    be inherited : setUp and test_deep_blog_works """
+    """Reuses BlogTestCase tests through inheritance. Also copies what can't
+    be inherited : setUp and test_deep_blog_works"""
+
     def setUp(self):
         self.home = Page.objects.get(slug="home")
         self.admin = User.objects.create_superuser("test", "test@test.test", "pass")

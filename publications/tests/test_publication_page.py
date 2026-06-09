@@ -49,9 +49,7 @@ class PublicationPageDisplayTest(WagtailPageTestCase):
         response = self.client.get(self.post.url)
         meta_paragraph = next(
             paragraph
-            for paragraph in BeautifulSoup(response.content, "html.parser").select(
-                "div.fr-container p"
-            )
+            for paragraph in BeautifulSoup(response.content, "html.parser").select("div.fr-container p")
             if "Publié le" in paragraph.get_text()
         )
         collection_link = meta_paragraph.find("a", string=self.collection.name)

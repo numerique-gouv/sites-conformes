@@ -10,13 +10,13 @@ from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import path
 from wagtail.models import Orderable
 
-from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Person
-from sites_conformes.core.models import Tag
 from publications.taxonomy import (
     AbstractTaxonomy,
     get_taxonomies_for_index,
     list_taxonomies_for_index,
 )
+from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Person
+from sites_conformes.core.models import Tag
 
 
 class Collection(AbstractTaxonomy):
@@ -75,9 +75,7 @@ class PublicationPage(BlogEntryPage):
 
     settings_panels = BlogEntryPage.settings_panels[:]
     _tags_panel_index = next(
-        i
-        for i, panel in enumerate(settings_panels)
-        if getattr(panel, "heading", None) == _("Tags and Categories")
+        i for i, panel in enumerate(settings_panels) if getattr(panel, "heading", None) == _("Tags and Categories")
     )
     settings_panels[_tags_panel_index] = MultiFieldPanel(
         [
@@ -108,9 +106,7 @@ class PublicationIndexPage(BlogIndexPage):
 
     settings_panels = BlogIndexPage.settings_panels[:]
     _filters_panel_index = next(
-        i
-        for i, panel in enumerate(settings_panels)
-        if getattr(panel, "heading", None) == _("Show filters")
+        i for i, panel in enumerate(settings_panels) if getattr(panel, "heading", None) == _("Show filters")
     )
     settings_panels[_filters_panel_index] = MultiFieldPanel(
         [
@@ -268,9 +264,7 @@ class PublicationIndexPage(BlogIndexPage):
         )
 
     def list_themes(self) -> list:
-        return list_taxonomies_for_index(
-            self, prefix="theme", slug_path="themes__slug", name_path="themes__name"
-        )
+        return list_taxonomies_for_index(self, prefix="theme", slug_path="themes__slug", name_path="themes__name")
 
     @property
     def show_filters(self) -> bool | BooleanField:

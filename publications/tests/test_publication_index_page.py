@@ -79,9 +79,7 @@ FILTER_CASES = [
 ]
 
 for case in FILTER_CASES:
-    case["filter_url"] = lambda self, case=case: (
-        f"{self.index.url}?{case['query_param'](self)}"
-    )
+    case["filter_url"] = lambda self, case=case: (f"{self.index.url}?{case['query_param'](self)}")
 
 
 def list_settings_in_panel(panels):
@@ -188,6 +186,7 @@ class PublicationIndexPageFilterTestBase(WagtailPageTestCase):
             setattr(self.index, field, value)
         self.index.save_revision().publish()
 
+
 class PublicationIndexPageFilterVisibilityTest(PublicationIndexPageFilterTestBase):
     def test_filter_shown_when_enabled(self):
         for case in FILTER_CASES:
@@ -235,10 +234,7 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
                 title = f"Post with {case_a['name']} and {case_b['name']}"
                 kwargs = {**case_a["post_kwargs"](self), **case_b["post_kwargs"](self)}
                 matching = self._create_post(title, **kwargs)
-                query = (
-                    f"{self.index.url}?"
-                    f"{case_a['query_param'](self)}&{case_b['query_param'](self)}"
-                )
+                query = f"{self.index.url}?" f"{case_a['query_param'](self)}&{case_b['query_param'](self)}"
                 response = self.client.get(query)
                 self.assertContains(response, matching.title)
                 # Check that posts with only one filter do not show.
@@ -262,11 +258,7 @@ class PublicationIndexPagePostsDisplayTest(PublicationIndexPageFilterTestBase):
         matching_card = None
         for card in soup.select("div.fr-card"):
             tag_html = "".join(str(tag) for tag in card.select("p.fr-tag"))
-            if (
-                post.title in card.get_text()
-                and collection_tag in tag_html
-                and theme_tag in tag_html
-            ):
+            if post.title in card.get_text() and collection_tag in tag_html and theme_tag in tag_html:
                 matching_card = card
                 break
         self.assertIsNotNone(
