@@ -9,6 +9,9 @@ class PublicationsConfig(AppConfig):
     def ready(self):
         from config.api import api_router
         from publications.api import CollectionsAPIViewSet, ThemesAPIViewSet
+        from publications.blocks.register_sites_conformes_blocks import register_sites_conformes_blocks
+
+        register_sites_conformes_blocks()
 
         api_router.register_endpoint("collections", CollectionsAPIViewSet)
         api_router.register_endpoint("themes", ThemesAPIViewSet)

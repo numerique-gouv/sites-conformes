@@ -1,0 +1,136 @@
+{# Forked from sites_conformes_core/blocks/blog_recent_entries.html: collections/themes and publication_tags. #}
+{% load i18n wagtailcore_tags publication_tags %}
+
+<div class="fr-container fr-py-4w cmsfr-block-publication-recent-entries">
+  {% if value.title %}
+    <{{ value.heading_tag|default:"h2" }}>{{ value.title }}</{{ value.heading_tag|default:"h2" }}>
+  {% endif %}
+
+  {% if value.show_filters %}
+    {% if value.collection_filter and value.index_page.get_collections.count %}
+      <div class="fr-my-3w">
+        <{{ value.sub_heading_tag }} class="fr-h6">{% translate "Filter by collection" %}</{{ value.sub_heading_tag }}>
+        <ul class="fr-tags-group">
+          {% for collection in value.index_page.get_collections %}
+            <li>
+              <a class="fr-tag"
+                 href="{% pageurl value.index_page %}{% toggle_url_filter collection=collection filters_dict=value.current_filters %}"
+                 {% if collection == value.collection_filter %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                {{ collection.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if value.theme_filter and value.index_page.get_themes.count %}
+      <div class="fr-my-3w">
+        <{{ value.sub_heading_tag }} class="fr-h6">{% translate "Filter by theme" %}</{{ value.sub_heading_tag }}>
+        <ul class="fr-tags-group">
+          {% for theme in value.index_page.get_themes %}
+            <li>
+              <a class="fr-tag"
+                 href="{% pageurl value.index_page %}{% toggle_url_filter theme=theme filters_dict=value.current_filters %}"
+                 {% if theme == value.theme_filter %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                {{ theme.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if value.tag_filter and value.index_page.get_tags.count %}
+      <div class="fr-my-3w">
+        <{{ value.sub_heading_tag }} class="fr-h6">{% translate "Filter by tag" %}</{{ value.sub_heading_tag }}>
+        <ul class="fr-tags-group">
+          {% for tag in value.index_page.get_tags %}
+            <li>
+              <a class="fr-tag"
+                 href="{% pageurl value.index_page %}{% toggle_url_filter tag=tag filters_dict=value.current_filters %}"
+                 {% if tag == value.tag_filter %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                {{ tag }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if value.author_filter and value.index_page.get_authors.count %}
+      <div class="fr-my-3w">
+        <{{ value.sub_heading_tag }} class="fr-h6">{% translate "Filter by author" %}</{{ value.sub_heading_tag }}>
+        <ul class="fr-tags-group">
+          {% for author in value.index_page.get_authors %}
+            <li>
+              <a class="fr-tag"
+                 href="{% pageurl value.index_page %}{% toggle_url_filter author=author filters_dict=value.current_filters %}"
+                 {% if author == value.author_filter %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if value.source_filter and value.index_page.get_sources.count %}
+      <div class="fr-my-3w">
+        <{{ value.sub_heading_tag }} class="fr-h6">{% translate "Filter by source" %}</{{ value.sub_heading_tag }}>
+        <ul class="fr-tags-group">
+          {% for source in value.index_page.get_sources %}
+            <li>
+              <a class="fr-tag"
+                 href="{% pageurl value.index_page %}{% toggle_url_filter source=source filters_dict=value.current_filters %}"
+                 {% if source == value.source_filter %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endif %}
+
+  <div class="fr-grid-row fr-grid-row--gutters fr-mb-3w">
+    {% for post in value.posts %}
+      <div class="fr-col fr-col-md-3">
+        <div class="fr-card fr-enlarge-link">
+          <div class="fr-card__body">
+            <div class="fr-card__content">
+              <h2 class="fr-card__title">
+                <a href="{{ post.url }}">{{ post.title|truncatewords:8 }}</a>
+              </h2>
+              <p class="fr-card__desc">{% translate "Published on" %} {{ post.date|date:'l j F Y' }}</p>
+              {% if post.collections.all or post.themes.all %}
+                <div class="fr-card__start">
+                  <ul class="fr-tags-group">
+                    {% for collection in post.collections.all %}
+                      <li>
+                        <p class="fr-tag">{{ collection.name }}</p>
+                      </li>
+                    {% endfor %}
+                    {% for theme in post.themes.all %}
+                      <li>
+                        <p class="fr-tag">{{ theme.name }}</p>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          {% if post.cover %}
+            <div class="fr-card__header">
+              <div class="fr-card__img">
+                <img class="fr-responsive-img" src="{{ post.cover.file.url }}" alt="">
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p>{% translate "No article found." %}</p>
+    {% endfor %}
+  </div>
+  <div class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--center">
+    <a class="fr-btn" href="{% pageurl value.index_page %}">{% translate "See all posts" %}</a>
+  </div>
+</div>
