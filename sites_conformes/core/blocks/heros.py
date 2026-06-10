@@ -207,7 +207,7 @@ class HeroBackgroundImageBlock(blocks.StructBlock):
             raise StructBlockValidationError(block_errors=errors)
 
         if selected_background_type == "color":
-            value["image"] = {}
+            value["image"] = None
         elif selected_background_type == "image":
             value["background_color"] = None
 

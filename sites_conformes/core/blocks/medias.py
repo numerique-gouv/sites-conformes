@@ -35,11 +35,13 @@ class ImageBlockWithDefault(ImageBlock):
         if self._default_image_title:
             image = Image.objects.filter(title=self._default_image_title).first()
             if image:
-                return {
-                    "image": image,
-                    "alt_text": self._default_image_alt_text,
-                    "decorative": self._default_image_decorative,
-                }
+                # ImageBlock represents its value as an Image instance with
+                # contextual_alt_text and decorative attached, not as a dict.
+                # Returning a raw dict bypasses ImageBlock.normalize and crashes
+                # downstream consumers such as get_form_state -> image chooser.
+                image.contextual_alt_text = "" if self._default_image_decorative else self._default_image_alt_text
+                image.decorative = self._default_image_decorative
+                return image
         return super().get_default()
 
 
