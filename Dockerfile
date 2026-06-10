@@ -21,9 +21,13 @@ WORKDIR $APP_DIR
 COPY pyproject.toml uv.lock ./
 # Deploy in the global env of the container instead of a uv-specific venv
 ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
-RUN uv sync --locked
+# The project itself can't be built at this point (its source isn't copied
+# yet), so only install dependencies to keep this layer cacheable.
+RUN uv sync --locked --no-install-project
 
 COPY --chown=app:app . .
+
+RUN uv sync --locked
 
 RUN uv run python manage.py collectstatic --no-input
 
