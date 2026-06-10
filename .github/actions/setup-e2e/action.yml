@@ -4,20 +4,27 @@ description: Install Node.js, npm dependencies, and Playwright Chromium
 runs:
   using: composite
   steps:
-    # Match the official Playwright CI guide:
-    # https://playwright.dev/docs/ci-intro#setting-up-github-actions
-    # Use the Node LTS (not 24) — the post-download install hang we observed
-    # only appeared on the pinned Node 24, never in the documented LTS setup.
+    # Pin Node to 24.15.0. `playwright install` hangs forever after the browser
+    # download hits 100%, deadlocking in the zip-extraction step (extract-zip /
+    # yauzl). Root cause is a Node 24.16.0 regression — nodejs/node#63487,
+    # tracked for Playwright in microsoft/playwright#41000. It is fixed in
+    # Playwright >= 1.60.0; until we bump the dep, 24.15.0 is the last Node that
+    # extracts cleanly. `lts/*` does NOT avoid this — the LTS line resolves to
+    # the broken 24.16.x, which is why earlier "use LTS" / "drop --with-deps"
+    # attempts kept timing out (apt and the download both finish in seconds; the
+    # 28-minute stall was always the post-download extract).
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: lts/*
+        node-version: 24.15.0
 
     - name: Install Node dependencies
       shell: bash
       run: npm ci
 
-    # Install browsers + system deps exactly as the official guide prescribes.
+    # Install browsers + system deps as the official CI guide prescribes. The
+    # timeout turns any future extraction stall into a fast failure instead of
+    # eating the full job timeout.
     - name: Install Playwright Browsers
       shell: bash
-      run: npx playwright install --with-deps
+      run: timeout 300 npx playwright install --with-deps chromium
