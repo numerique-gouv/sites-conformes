@@ -4,8 +4,7 @@ import { test } from "./fixtures"
 test.describe("Menus", () => {
   test("Les sous-menus fonctionnent", async ({ page }) => {
     const response = await page.goto("/")
-    // TODO: réparer
-    expect(response?.status()).not.toBe(200)
+    expect(response?.status()).toBe(200)
 
     await page.goto("/menu_page/form_with_all_fields/")
     const menuPrincipal = page.locator("[aria-label='Menu principal']")
