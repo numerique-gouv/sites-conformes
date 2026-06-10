@@ -19,9 +19,7 @@ Les tests automatisés couvrent les versions suivantes :
 
 - Pour déployer le projet en production sur un serveur, voir la [documentation d'installation](https://sites.beta.gouv.fr/documentation/installation/)
 - Pour installer le projet en local pour le développement, voir la [documentation d'embarquement](./ONBOARDING.md)
-- Avant de soumettre une contribution, consulter la  [documentation de contribution](./CONTRIBUTING.md)
-
-[![Déployer sur Scalingo (en test)](https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/static/artwork/logo-white-bg.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/numerique-gouv/sites-conformes#production)
+- Avant de soumettre une contribution, consulter la [documentation de contribution](./CONTRIBUTING.md)
 
 ### Git blame
 
@@ -61,11 +59,11 @@ En plus des applications déjà citées, le dépôt contient les répertoires su
 - **static** : des fichiers statiques communs à l’ensemble du site (CSS global, JS global, quelques images intégrées par défaut) ainsi que la librairie tierce TarteaucitronJS (utilisée pour la gestion des cookies tiers)
 - **templates** : les templates de base du site.
 
-## Schéma
+### Schéma
 
-![Schéma montrant les apps listées ci-dessus ainsi que l’interconnection avec la BDD, le S3 et les services tiers (dont ProConnect)](static/doc/sites-conformes-schema.svg)
+![Schéma montrant les apps listées ci-dessus ainsi que l’interconnection avec la BDD, le S3 et les services tiers (dont ProConnect)](sites_conformes/static/doc/sites-conformes-schema.svg)
 
-Schéma de l’application dans le cas d’un hébergement sur Scalingo
+Schéma de l’application dans le cas d’un hébergement sur Scalingo.
 
 ## Indexation des contenus
 
