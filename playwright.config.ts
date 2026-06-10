@@ -27,7 +27,10 @@ export const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   retries: 1,
   workers: 1,
-  reporter: process.env.CI ? "blob" : "html",
+  // HTML report in both environments so a failed run is inspectable. `open:
+  // "never"` stops it from trying to launch a browser/server in CI; the report
+  // dir is uploaded as an artifact by the workflow (see ci-intro#html-report).
+  reporter: [["html", { open: "never" }]],
   // Start the Django dev server for the test run, or reuse one already running
   // on PORT. Locally (reuseExistingServer) it picks up a server you started by
   // hand; in CI it launches its own with the env injected below.
