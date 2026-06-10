@@ -104,6 +104,7 @@ upgrade:
     {{docker_cmd}} uv lock --upgrade
     {{docker_cmd}} {{uv_run}} pre-commit autoupdate
     {{docker_cmd}} npm update
+    {{docker_cmd}} uv lock --upgrade --project ./demo
 
 web-prompt:
     {{docker_cmd}} bash
