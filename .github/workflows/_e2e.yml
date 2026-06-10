@@ -99,10 +99,16 @@ jobs:
           name: regression-screenshots
           path: ${{ env.SCREENSHOTS_BASE_PATH }}
 
+      # Baseline mode: run the full suite and (re)generate every snapshot, then
+      # upload them as the trusted baseline. This step never fails on a visual
+      # diff — that is the point of a baseline.
       - name: Run Playwright tests (full suite + generate snapshots)
         if: ${{ !inputs.compare }}
         run: npx playwright test --update-snapshots
 
+      # Compare mode: render only the @regression tests and assert each one
+      # matches the baseline downloaded above. NO --update-snapshots here, so a
+      # visual diff makes this step (and the job) fail.
       - name: Run Playwright tests (regression comparison only)
         if: inputs.compare
         run: npx playwright test --grep=@regression
@@ -115,22 +121,24 @@ jobs:
           path: ${{ env.SCREENSHOTS_BASE_PATH }}
 
       - name: Upload Playwright report
-        if: ${{ !cancelled() && !inputs.compare }}
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ inputs.compare && 'compare' || 'baseline' }}
           path: playwright-report/
           retention-days: 7
 
-      - name: Upload diff images on failure
+      # On a comparison failure Playwright writes the expected/actual/diff PNGs
+      # plus the error context under test-results/. Upload that whole tree so a
+      # visual regression is reviewable from the run page.
+      - name: Upload diff artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-diffs
-          path: |
-            **/*-expected.png
-            **/*-actual.png
-            **/*-diff.png
+          name: playwright-diffs-${{ inputs.compare && 'compare' || 'baseline' }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
 
 permissions:
   contents: read
