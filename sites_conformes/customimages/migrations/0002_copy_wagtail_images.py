@@ -2,24 +2,37 @@
 
 from django.db import migrations
 
+
 def copy_images(apps, schema_editor):
     OldImage = apps.get_model("wagtailimages", "Image")
     NewImage = apps.get_model("sites_conformes_customimages", "CustomImage")
     for image in OldImage.objects.all():
-        NewImage.objects.create(
+        NewImage.objects.update_or_create(
             id=image.id,
-            title=image.title,
-            file=image.file,
-            width=image.width,
-            height=image.height,
-            created_at=image.created_at,
-            uploaded_by_user=image.uploaded_by_user,
+            defaults={
+                "title": image.title,
+                "file": image.file,
+                "width": image.width,
+                "height": image.height,
+                "created_at": image.created_at,
+                "uploaded_by_user": image.uploaded_by_user,
+            },
         )
+    # Réaligne la séquence d'auto-incrément sur le max(id) copié
+    from django.db import connection
+    table = NewImage._meta.db_table
+    with connection.cursor() as cursor:
+        cursor.execute(
+            f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), "
+            f"COALESCE((SELECT MAX(id) FROM {table}), 1))"
+        )
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
         ('sites_conformes_customimages', '0001_initial'),
+        ('wagtailimages', '__latest__'),
     ]
 
     operations = [

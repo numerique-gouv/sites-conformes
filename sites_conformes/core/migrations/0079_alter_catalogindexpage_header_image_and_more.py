@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('sites_conformes_core', '0078_alter_catalogindexpage_body'),
-        ('sites_conformes_customimages', '0001_initial'),
+        ('sites_conformes_customimages', '0002_copy_wagtail_images'),
     ]
 
     operations = [

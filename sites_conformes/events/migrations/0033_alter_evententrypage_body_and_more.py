@@ -11,7 +11,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sites_conformes_customimages', '0001_initial'),
+        ('sites_conformes_customimages', '0002_copy_wagtail_images'),
         ('sites_conformes_events', '0032_alter_evententrypage_body_alter_eventsindexpage_body'),
     ]
 

@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('sites_conformes_blog', '0061_alter_blogentrypage_body'),
-        ('sites_conformes_customimages', '0001_initial'),
+        ('sites_conformes_customimages', '0002_copy_wagtail_images')
     ]
 
     operations = [
