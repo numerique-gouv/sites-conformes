@@ -13,3 +13,5 @@ class ContentManagerConfig(AppConfig):
         from .monkey_patches import patch_wagtail_localize_handle_image_block
 
         patch_wagtail_localize_handle_image_block()
+
+        from sites_conformes.core import checks  # noqa: F401

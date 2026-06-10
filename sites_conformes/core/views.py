@@ -6,7 +6,8 @@ from django.views.generic import ListView, TemplateView
 from unidecode import unidecode
 from wagtail.models import Page, Site
 
-from sites_conformes.core.models import ContentPage, Tag
+from sites_conformes.core.model_utils import get_contentpage_model
+from sites_conformes.core.models import Tag
 
 
 class SearchResultsView(ListView):
@@ -82,12 +83,11 @@ class TagsListView(TemplateView):
 
 class TagView(ListView):
     template_name = "sites_conformes_core/tag_page.html"
-    model = ContentPage
     paginate_by = 10
 
     def get_queryset(self, **kwargs):
         tag_slug = self.kwargs.get("tag")
-        return ContentPage.objects.filter(tags__slug=tag_slug, live=True)
+        return get_contentpage_model().objects.filter(tags__slug=tag_slug, live=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
