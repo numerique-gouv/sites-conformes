@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-26 18:17+0100\n"
-"PO-Revision-Date: 2025-10-28 13:46+0100\n"
+"POT-Creation-Date: 2026-03-23 16:30+0100\n"
+"PO-Revision-Date: 2026-03-23 16:34+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -85,8 +85,7 @@ msgid "Filter by source"
 msgstr "Filtrer par source"
 
 msgid "The source is the organization of the post author"
-msgstr ""
-"La source est l’organisation à laquelle appartient l’auteur de l’article"
+msgstr "La source est l’organisation à laquelle appartient l’auteur de l’article"
 
 msgid "Show filters"
 msgstr "Afficher les filtres"
@@ -159,6 +158,12 @@ msgstr "Source :"
 
 msgid "Filters"
 msgstr "Filtres"
+
+msgid "selected"
+msgstr "étiquette sélectionnée"
+
+msgid "unselected"
+msgstr "étiquette non-sélectionnée"
 
 msgid "Posts"
 msgstr "Articles"
