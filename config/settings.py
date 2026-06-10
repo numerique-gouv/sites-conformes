@@ -111,6 +111,9 @@ INSTALLED_APPS = [
     "wagtail_honeypot",
     "sites_conformes.dashboard",
     "wagtail.admin",
+    "wagtail_2fa",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
 ]
 
 if SF_USE_DB_STORAGE:
@@ -136,6 +139,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "sites_conformes.dashboard.middleware.VerifyUserStaticFilesMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
@@ -453,6 +457,11 @@ if DEFAULT_FROM_EMAIL:
     EMAIL_SSL_CERTFILE = os.getenv("EMAIL_SSL_CERTFILE", None)
 
 WAGTAIL_PASSWORD_RESET_ENABLED = os.getenv("WAGTAIL_PASSWORD_RESET_ENABLED", False)
+
+# (Optional) 2FA settings
+# See https://wagtail-2fa.readthedocs.io/en/stable/
+WAGTAIL_2FA_REQUIRED = getenv_bool("WAGTAIL_2FA_REQUIRED", False)
+WAGTAIL_2FA_OTP_TOTP_NAME = os.getenv("WAGTAIL_2FA_OTP_TOTP_NAME", WAGTAIL_SITE_NAME)
 
 # (Optional) ProConnect settings
 PROCONNECT_ACTIVATED = True if os.getenv("PROCONNECT_ACTIVATED", False) in ["1", "True"] else False
