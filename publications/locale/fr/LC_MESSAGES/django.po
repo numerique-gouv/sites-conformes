@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 17:46+0200\n"
+"POT-Creation-Date: 2026-06-10 17:26+0200\n"
 "PO-Revision-Date: 2026-06-08 15:16+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -15,6 +15,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Publications"
+msgstr "Publications"
+
+msgid "Filter by collection"
+msgstr "Filtrer par collection"
+
+msgid "Filter by theme"
+msgstr "Filtrer par thématique"
+
+msgid "Publication recent entries"
+msgstr "Publications récentes"
 
 msgid "Collection"
 msgstr "Collection"
@@ -33,12 +45,6 @@ msgstr "Étiquettes, collections et thématiques"
 
 msgid "Publication page"
 msgstr "Page de publication"
-
-msgid "Filter by collection"
-msgstr "Filtrer par collection"
-
-msgid "Filter by theme"
-msgstr "Filtrer par thématique"
 
 msgid "Publication index"
 msgstr "Index de publications"
@@ -68,4 +74,4 @@ msgid "Collection:"
 msgstr "Collection :"
 
 msgid "Theme:"
-msgstr "Thématique:"
+msgstr "Thématique :"
