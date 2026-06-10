@@ -23,13 +23,13 @@ msgid "Collections"
 msgstr "Collections"
 
 msgid "Theme"
-msgstr "Thème"
+msgstr "Thématique"
 
 msgid "Themes"
-msgstr "Thèmes"
+msgstr "Thématiques"
 
 msgid "Tags, collections and themes"
-msgstr "Étiquettes, collections et thèmes"
+msgstr "Étiquettes, collections et thématiques"
 
 msgid "Publication page"
 msgstr "Page de publication"
@@ -38,10 +38,10 @@ msgid "Filter by collection"
 msgstr "Filtrer par collection"
 
 msgid "Filter by theme"
-msgstr "Filtrer par thème"
+msgstr "Filtrer par thématique"
 
 msgid "Publication index"
-msgstr "Index des publications"
+msgstr "Index de publications"
 
 #, python-format
 msgid "Posts in collection %(collection)s"
@@ -49,7 +49,7 @@ msgstr "Articles dans la collection %(collection)s"
 
 #, python-format
 msgid "Posts in theme %(theme)s"
-msgstr "Articles dans le thème %(theme)s"
+msgstr "Articles dans la thématique %(theme)s"
 
 msgid "Parent"
 msgstr "Parent"
@@ -68,4 +68,4 @@ msgid "Collection:"
 msgstr "Collection :"
 
 msgid "Theme:"
-msgstr "Thème :"
+msgstr "Thématique:"
