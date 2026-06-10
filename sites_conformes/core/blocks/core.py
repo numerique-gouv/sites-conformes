@@ -39,7 +39,7 @@ from .tables import AdvancedTypedTableBlock
 
 ## Streamblocks definitions
 STREAMFIELD_COMMON_BLOCKS = [
-    ("paragraph", blocks.RichTextBlock(label=_("Rich text"))),
+    ("paragraph", blocks.CharBlock(label=_("Rich text"))),
     ("image", CenteredImageBlock(label=_("Centered image"))),
     ("imageandtext", ImageAndTextBlock(label=_("Image and text"))),
     ("table", AdvancedTypedTableBlock(label=_("Table"))),
