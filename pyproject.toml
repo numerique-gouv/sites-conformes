@@ -1,9 +1,10 @@
 [project]
 name = "sites-conformes"
-# This is the packagified-release version, decoupled from upstream's tag.
-# Upstream `v3.2.0` is the source we fork from; we publish as `4.0.0` because
-# the packaging changes are large enough to warrant a major bump for consumers.
-version = "4.0.0rc1"
+# Version is driven by the GitHub Release tag at publish time. See
+# .github/workflows/publish.yml, which writes sites_conformes/_version.py
+# from github.event.release.tag_name (stripped of a leading "v").
+# The committed _version.py value is the local/dev fallback.
+dynamic = ["version"]
 description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l’État, accessible et responsive"
 authors = [
     { name = "Sites Conformes dev team", email = "contact@sites.beta.gouv.fr" }
@@ -59,6 +60,9 @@ dev = [
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = { attr = "sites_conformes._version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]
