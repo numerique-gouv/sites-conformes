@@ -514,6 +514,11 @@ DSFR_USE_INTEGRITY_CHECKSUMS = True if os.getenv("DSFR_USE_INTEGRITY_CHECKSUMS")
 SF_DISABLE_TUTORIALS = True if os.getenv("SF_DISABLE_TUTORIALS") in ["1", "True"] else False
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
+# Swappable content page model, in the manner of WAGTAILIMAGES_IMAGE_MODEL.
+# Point this to a concrete subclass of sites_conformes.core.abstract.AbstractContentPage.
+# Must be set before any page is created; see docs for converting an existing site.
+SF_CONTENTPAGE_MODEL = "sites_conformes_core.ContentPage"
+
 
 if sentry_dsn := os.getenv("SENTRY_DSN"):
     import sentry_sdk  # noqa: E402

@@ -16,7 +16,7 @@ from wagtail.models import Page
 from wagtail.utils.file import hash_filelike
 
 from sites_conformes.core.constants import HEADER_FIELDS
-from sites_conformes.core.models import ContentPage
+from sites_conformes.core.model_utils import get_contentpage_model
 from sites_conformes.core.services.accessors import get_or_create_collection, get_or_create_content_page
 
 PAGE_TEMPLATES_ROOT = settings.BASE_DIR / "sites_conformes/core/page_templates"
@@ -122,12 +122,12 @@ class ImportPages:
         self.image_importer = ImportExportImages(self.image_ids, image_folder=image_folder)
 
         if parent_page_slug:
-            self.parent_page = ContentPage.objects.get(slug=parent_page_slug)
+            self.parent_page = get_contentpage_model().objects.get(slug=parent_page_slug)
         else:
             # Do not create the parent page at this step if it doesn't exit
             self.parent_page = None
 
-    def get_or_create_page_templates_index(self) -> ContentPage:
+    def get_or_create_page_templates_index(self) -> Page:
         # The templates index is created right under the Root page, like a site
         parent_page = Page.objects.first()
         body = [("subpageslist", None)]
@@ -147,13 +147,15 @@ class ImportPages:
             raw_page = self.pages[page_id]
             source_url = raw_page["meta"]["html_url"]
 
-            page_exists = ContentPage.objects.child_of(self.parent_page).filter(source_url=source_url).first()
+            page_exists = (
+                get_contentpage_model().objects.child_of(self.parent_page).filter(source_url=source_url).first()
+            )
             if page_exists:
                 self.update_page(page_id, page_exists)
             else:
                 self.import_page(page_id)
 
-    def import_page(self, page_id: str) -> ContentPage:
+    def import_page(self, page_id: str) -> Page:
         raw_page = self.pages[page_id]
         source_url = raw_page["meta"]["html_url"]
 

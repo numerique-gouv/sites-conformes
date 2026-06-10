@@ -24,23 +24,24 @@ from wagtail.images import get_image_model_string
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import AbstractContentPage, SitesFacilesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
+from sites_conformes.core.model_utils import get_contentpage_model, get_contentpage_model_string
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-class ContentPage(SitesFacilesBasePage):
+class ContentPage(AbstractContentPage):
     tags = ClusterTaggableManager(through="TagContentPage", blank=True)
 
     class Meta:
         verbose_name = _("Content page")
 
-    content_panels = SitesFacilesBasePage.content_panels + [
+    content_panels = AbstractContentPage.content_panels + [
         FieldPanel("tags"),
     ]
 
-    api_fields = SitesFacilesBasePage.api_fields + [
+    api_fields = AbstractContentPage.api_fields + [
         APIField("tags"),
     ]
 
@@ -97,7 +98,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = ["sites_conformes_core.ContentPage"]
+    subpage_types = [get_contentpage_model_string()]
 
     class Meta:
         verbose_name = _("Catalog index page")
@@ -105,7 +106,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     @property
     def entries(self):
         # Get a list of live content pages that are children of this page
-        return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
+        return get_contentpage_model().objects.child_of(self).live().specific().prefetch_related("tags")
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)

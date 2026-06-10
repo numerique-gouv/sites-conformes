@@ -37,6 +37,7 @@ caption: Guides
 ---
 guide/db-storage
 guide/cas-pratique-annuaire
+guide/modele-de-page-personnalise
 ```
 
 ```{toctree}
