@@ -1,5 +1,6 @@
 import { defineConfig, PlaywrightTestConfig } from "@playwright/test"
 import dotenv from "dotenv"
+import { expand } from "dotenv-expand"
 import path from "path"
 import { fileURLToPath } from "url"
 
@@ -12,7 +13,9 @@ import { fileURLToPath } from "url"
  */
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-dotenv.config({ path: path.resolve(__dirname, ".env") })
+// `expand` resolves ${VAR} references — .env.test builds DATABASE_URL from
+// ${DATABASE_USER} etc., which plain dotenv would leave as literal text.
+expand(dotenv.config({ path: path.resolve(__dirname, ".env") }))
 
 const PORT = 8000
 const BASE_URL = `http://127.0.0.1:${PORT}`
