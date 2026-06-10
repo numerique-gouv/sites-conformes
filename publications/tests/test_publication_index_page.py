@@ -4,7 +4,6 @@ from itertools import combinations
 
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
-from django.test import SimpleTestCase
 from django.utils.translation import gettext
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
@@ -92,14 +91,17 @@ def list_settings_in_panel(panels):
     return names
 
 
-class PublicationIndexPageSettingsTest(SimpleTestCase):
+class PublicationIndexPageSettingsTest(WagtailPageTestCase):
     def test_settings_show_filters_panel_includes_all_fields(self):
         field_names = list_settings_in_panel(PublicationIndexPage.settings_panels)
         for field_name in FILTER_SETTINGS_DEFAULTS:
             self.assertIn(field_name, field_names)
 
     def test_filter_settings_default_values(self):
-        page = PublicationIndexPage(title="Defaults", slug="defaults")
+        home = Page.objects.get(slug="home")
+        page = home.add_child(
+            instance=PublicationIndexPage(title="Defaults", slug="defaults"),
+        )
         for field_name, expected_default in FILTER_SETTINGS_DEFAULTS.items():
             self.assertEqual(getattr(page, field_name), expected_default, field_name)
 
