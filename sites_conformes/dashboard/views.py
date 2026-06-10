@@ -6,6 +6,8 @@ from wagtail.admin.admin_url_finder import AdminURLFinder
 from wagtail.admin.ui.components import Component
 from wagtail.models import Site
 
+from sites_conformes.dashboard.utils import get_all_notifications
+
 finder = AdminURLFinder()
 
 
@@ -80,3 +82,13 @@ class TutorialsPanel(Component):
 
 
 tutorials_panel = TutorialsPanel()
+
+
+class InformationPanel(Component):
+    order = 20
+    template_name = "wagtailadmin/home/panels/_information.html"
+    panel_id = "information"
+
+    def get_context_data(self, parent_context=None):
+        items = get_all_notifications()
+        return {"information_items": items}
