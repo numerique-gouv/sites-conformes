@@ -4,7 +4,13 @@ Register publications StreamField blocks on Sites Conformes page types.
 Sites Conformes copies ``STREAMFIELD_COMMON_BLOCKS`` into each page model at class
 definition time. Host projects add blocks by rebuilding each model's ``body``
 ``StreamBlock`` at startup (see ``register_sites_conformes_blocks``).
+
+HACK to avoid migrations : register the block only if not in a migration
+authoring command. Otherwise it would create migrations in sites_conformes,
+which we can't maintain.
 """
+
+import sys
 
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
@@ -22,9 +28,18 @@ _publication_recent_entries_block = PublicationRecentEntriesBlock(
     group=_("4. Website structure"),
 )
 
+_MIGRATION_AUTHORING_COMMANDS = frozenset({"makemigrations", "squashmigrations"})
+
+
+def _is_migration_authoring_command() -> bool:
+    return len(sys.argv) > 1 and sys.argv[1] in _MIGRATION_AUTHORING_COMMANDS
+
 
 def register_sites_conformes_blocks():
     """Add publications blocks to every page model that has a ``body`` StreamField."""
+    if _is_migration_authoring_command():
+        return
+
     for model in apps.get_models():
         if not issubclass(model, Page):
             continue
