@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/bash
 set -ex
 
 export USE_UV=0

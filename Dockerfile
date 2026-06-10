@@ -7,6 +7,7 @@ EXPOSE ${CONTAINER_PORT}
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV APP_DIR="/app"
+ENV PATH="/tmp/local/bin:${PATH}"
 
 # Needed for docker build to succeed
 ENV DATABASE_URL=postgres://user:password@localhost:5432/db
@@ -18,17 +19,18 @@ RUN set -ex \
 
 WORKDIR $APP_DIR
 
+RUN chown 1000:1000 -R /app
+USER app
+
 COPY pyproject.toml uv.lock ./
 # Deploy in the global env of the container instead of a uv-specific venv
-ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
+ENV UV_PROJECT_ENVIRONMENT="/tmp/local/"
 RUN uv sync --locked
 
 COPY --chown=app:app . .
 
 RUN uv run python manage.py collectstatic --no-input
 
-RUN chown 1000:1000 -R /app
-USER app
 VOLUME [ "/app/medias" ]
 
 ENTRYPOINT ["./entrypoint.sh"]
