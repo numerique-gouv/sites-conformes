@@ -10,7 +10,7 @@
     </div>
     <div class="fr-grid-row fr-grid-row--gutters">
       <figure class="fr-content-media {{ value.image.image_width }} {% if value.text_content.position == 'bottom' %}cmsfr-without-margin{% endif %}">
-        <div class="fr-content-media__img">{% image value.image.image original class=value.image.extra_classes %}</div>
+        <div class="fr-content-media__img">{% picture value.image.image original format-{avif,webp,jpeg} preserve-svg class=value.image.extra_classes %}</div>
       </figure>
     </div>
   </div>

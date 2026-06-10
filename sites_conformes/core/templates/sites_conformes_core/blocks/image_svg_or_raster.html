@@ -13,8 +13,8 @@
   </div>
 {% else %}
   {% if alt %}
-    {% image value.image original class=extra_classes alt=alt %}
+    {% picture value.image original format-{avif,webp,jpeg} preserve-svg class=extra_classes alt=alt %}
   {% else %}
-    {% image value.image original class=extra_classes %}
+    {% picture value.image original format-{avif,webp,jpeg} preserve-svg class=extra_classes %}
   {% endif %}
 {% endif %}
