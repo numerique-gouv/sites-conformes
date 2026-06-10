@@ -89,8 +89,9 @@ jobs:
       - name: Setup E2E tools
         uses: ./.github/actions/setup-e2e
 
-      - name: Start Django server
-        uses: ./.github/actions/start-django-server
+      # The Django server is started by Playwright's `webServer` config (see
+      # playwright.config.ts), which boots `runserver` with the env it needs and
+      # waits for readiness — so there is no separate server step here.
 
       - name: Download baseline screenshots
         if: inputs.compare
