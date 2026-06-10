@@ -156,3 +156,4 @@ temp.json
 # Playwright artifacts
 test-results
 __screenshots__
+playwright-report
