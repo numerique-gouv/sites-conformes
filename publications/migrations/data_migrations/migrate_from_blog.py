@@ -747,7 +747,8 @@ def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: Migrati
 
         if in_collections:
             collection = Collection.objects.get(slug=category.slug, locale=category.locale)
-            if post.collections.filter(pk=collection.pk).exists():
+            # Use `id`, not `pk`: modelcluster's in-memory queryset after .add() has no `pk` field.
+            if post.collections.filter(id=collection.pk).exists():
                 report.log(
                     f"  Post pk={post.pk}: collection '{category.name}' (slug={category.slug}) "
                     "already assigned.",
@@ -762,7 +763,7 @@ def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: Migrati
             continue
 
         theme = Theme.objects.get(slug=category.slug, locale=category.locale)
-        if post.themes.filter(pk=theme.pk).exists():
+        if post.themes.filter(id=theme.pk).exists():
             report.log(
                 f"  Post pk={post.pk}: theme '{category.name}' (slug={category.slug}) already assigned.",
             )
