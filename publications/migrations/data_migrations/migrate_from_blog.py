@@ -217,6 +217,16 @@ class AssignTaxonomiesSummary:
     theme_count: int
 
 
+@dataclass
+class AssignTaxonomyIndexScope:
+    slug: str
+    found: bool
+    title: str | None = None
+    pk: int | None = None
+    locale_language_code: str | None = None
+    post_count: int = 0
+
+
 def get_blog_index_summaries(config: MigrationConfig) -> list[BlogIndexSummary]:
     """Indexes selected by ``config`` and how many blog entries each contains."""
     from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
@@ -346,6 +356,63 @@ def format_assign_taxonomies_summary(summary: AssignTaxonomiesSummary) -> list[s
         f"  - {summary.collection_count} {collection_label}",
         f"  - {summary.theme_count} {theme_label}",
     ]
+
+
+def get_assign_taxonomies_scope(config: MigrationConfig) -> list[AssignTaxonomyIndexScope]:
+    """Publication indexes and posts phase 3 would assign collections/themes on."""
+    from publications.models import PublicationPage
+    from sites_conformes.blog.models import BlogIndexPage
+
+    def scope_for_index(index) -> AssignTaxonomyIndexScope:
+        return AssignTaxonomyIndexScope(
+            slug=index.slug,
+            found=True,
+            title=index.title,
+            pk=index.pk,
+            locale_language_code=index.locale.language_code,
+            post_count=PublicationPage.objects.child_of(index).count(),
+        )
+
+    if config.blog_index_slugs:
+        locale = resolve_migration_locale(config)
+        scopes = []
+        for slug in config.blog_index_slugs:
+            try:
+                index = _get_blog_index_by_slug(slug, locale)
+            except BlogIndexPage.DoesNotExist:
+                scopes.append(
+                    AssignTaxonomyIndexScope(
+                        slug=slug,
+                        found=False,
+                        locale_language_code=locale.language_code,
+                    ),
+                )
+                continue
+            scopes.append(scope_for_index(index))
+        return scopes
+
+    return [scope_for_index(index) for index in BlogIndexPage.objects.all().order_by("slug")]
+
+
+def format_assign_taxonomies_scope(scopes: list[AssignTaxonomyIndexScope]) -> list[str]:
+    lines = ["Publication indexes and posts in scope:"]
+    if not scopes:
+        lines.append("  (none)")
+        return lines
+
+    for scope in scopes:
+        if not scope.found:
+            locale_label = f", locale={scope.locale_language_code}" if scope.locale_language_code else ""
+            lines.append(f"  - slug '{scope.slug}' NOT FOUND{locale_label}")
+            continue
+
+        post_label = "post" if scope.post_count == 1 else "posts"
+        lines.append(
+            f'  - "{scope.title}" (slug={scope.slug}, pk={scope.pk}): '
+            f"{scope.post_count} {post_label}",
+        )
+
+    return lines
 
 
 def _promote_page_to_child_model(page, child_model, *, content_type) -> None:
@@ -583,8 +650,9 @@ def assign_taxonomies(
     Phase 3 — Assign collections/themes to publications.
 
     For each ``PublicationPage`` under the selected indexes (all by default), each
-    ``blog_categories`` entry is matched by slug to a ``Collection`` or ``Theme``
-    created in phase 2.
+    ``blog_categories`` entry is matched by slug to exactly one ``Collection`` or
+    ``Theme`` from phase 2. Ambiguous or missing matches raise ``ValueError``;
+    existing assignments are logged and left unchanged.
     """
     from publications.models import PublicationPage
 
@@ -663,25 +731,46 @@ def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: Migrati
 
     changed = False
     for category in post.blog_categories.all():
-        if category.slug in collection_slugs:
+        in_collections = category.slug in collection_slugs
+        in_themes = category.slug in theme_slugs
+
+        if in_collections and in_themes:
+            raise ValueError(
+                f"Post pk={post.pk}: category '{category.name}' (slug={category.slug}) "
+                "matches both a Collection and a Theme.",
+            )
+        if not in_collections and not in_themes:
+            raise ValueError(
+                f"Post pk={post.pk}: category '{category.name}' (slug={category.slug}) "
+                "matches neither a Collection nor a Theme.",
+            )
+
+        if in_collections:
+            collection = Collection.objects.get(slug=category.slug, locale=category.locale)
+            if post.collections.filter(pk=collection.pk).exists():
+                report.log(
+                    f"  Post pk={post.pk}: collection '{category.name}' (slug={category.slug}) "
+                    "already assigned.",
+                )
+                continue
             report.log(
                 f"  Post pk={post.pk}: add collection '{category.name}' (slug={category.slug}).",
             )
             if not dry_run:
-                post.collections.add(
-                    Collection.objects.get(slug=category.slug, locale=category.locale),
-                )
+                post.collections.add(collection)
                 changed = True
-        elif category.slug in theme_slugs:
-            report.log(f"  Post pk={post.pk}: add theme '{category.name}' (slug={category.slug}).")
-            if not dry_run:
-                post.themes.add(Theme.objects.get(slug=category.slug, locale=category.locale))
-                changed = True
-        else:
+            continue
+
+        theme = Theme.objects.get(slug=category.slug, locale=category.locale)
+        if post.themes.filter(pk=theme.pk).exists():
             report.log(
-                f"  Post pk={post.pk}: category '{category.name}' (slug={category.slug}) "
-                "has no matching collection or theme — skipped.",
+                f"  Post pk={post.pk}: theme '{category.name}' (slug={category.slug}) already assigned.",
             )
+            continue
+        report.log(f"  Post pk={post.pk}: add theme '{category.name}' (slug={category.slug}).")
+        if not dry_run:
+            post.themes.add(theme)
+            changed = True
 
     # ParentalManyToManyField only persists through tables when the page is saved.
     if changed:

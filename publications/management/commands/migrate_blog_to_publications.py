@@ -31,9 +31,11 @@ from wagtail.models import Locale
 from publications.migrations.data_migrations.migrate_from_blog import (
     MigrationConfig,
     blog_index_scope_label,
+    format_assign_taxonomies_scope,
     format_assign_taxonomies_summary,
     format_blog_index_summaries,
     format_taxonomy_migration_summary,
+    get_assign_taxonomies_scope,
     get_assign_taxonomies_summary,
     get_blog_index_summaries,
     get_taxonomy_migration_summary,
@@ -188,8 +190,11 @@ class Command(BaseCommand):
             )
             prompt = f"Proceed with phase 2 ({run_kind}: create collections and themes)? [y/N] "
         elif phase == 3:
-            lines = [mode_label, ""] + format_assign_taxonomies_summary(
-                get_assign_taxonomies_summary(config),
+            lines = (
+                [mode_label, ""]
+                + format_assign_taxonomies_summary(get_assign_taxonomies_summary(config))
+                + [""]
+                + format_assign_taxonomies_scope(get_assign_taxonomies_scope(config))
             )
             prompt = f"Proceed with phase 3 ({run_kind}: assign collections and themes to publications)? [y/N] "
         elif phase == 4:
