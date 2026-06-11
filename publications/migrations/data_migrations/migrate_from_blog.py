@@ -661,6 +661,7 @@ def fix_embedded_links(
 def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: MigrationReport, *, dry_run: bool):
     from publications.models import Collection, Theme
 
+    changed = False
     for category in post.blog_categories.all():
         if category.slug in collection_slugs:
             report.log(
@@ -670,15 +671,21 @@ def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: Migrati
                 post.collections.add(
                     Collection.objects.get(slug=category.slug, locale=category.locale),
                 )
+                changed = True
         elif category.slug in theme_slugs:
             report.log(f"  Post pk={post.pk}: add theme '{category.name}' (slug={category.slug}).")
             if not dry_run:
                 post.themes.add(Theme.objects.get(slug=category.slug, locale=category.locale))
+                changed = True
         else:
             report.log(
                 f"  Post pk={post.pk}: category '{category.name}' (slug={category.slug}) "
                 "has no matching collection or theme — skipped.",
             )
+
+    # ParentalManyToManyField only persists through tables when the page is saved.
+    if changed:
+        post.save()
 
 
 def _build_category_slug_rewrites(migrated_slugs: set[str], locale) -> dict[str, tuple[str, str]]:
