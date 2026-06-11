@@ -55,16 +55,36 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Callable
+from typing import Protocol
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import TextIO
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from django.utils import timezone
 
 # Query param in internal links: ?category=slug or &category=slug
 CATEGORY_QUERY_RE = re.compile(r"([?&])category=([^&#\"']+)")
 
 # Stream block types that reference a blog index and optional category filter.
 BLOG_RECENT_ENTRIES_BLOCK = "blog_recent_entries"
+
+MIGRATION_LOG_OUTPUT_DIR = Path(__file__).resolve().parent / "output"
+
+
+def migration_log_path(
+    *,
+    override: Path | str | None = None,
+    started_at=None,
+) -> Path:
+    """Return a log file path for one command run (new file per invocation)."""
+    if override is not None:
+        return Path(override)
+    started_at = started_at or timezone.now()
+    stamp = started_at.strftime("%Y-%m-%dT%H-%M-%S")
+    MIGRATION_LOG_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    return MIGRATION_LOG_OUTPUT_DIR / f"migrate_blog_to_publications_{stamp}.log"
 
 
 @dataclass
@@ -81,17 +101,44 @@ class MigrationConfig:
     themes_root_slugs: tuple[str, ...] = ("thematiques",)
 
 
+class LogWriter(Protocol):
+    def __call__(self, line: str) -> None: ...
+
+
 @dataclass
 class MigrationReport:
     phase: str
     dry_run: bool
     messages: list[str] = field(default_factory=list)
+    log_file: TextIO | None = None
+    log_stdout: LogWriter | None = None
 
     def log(self, message: str) -> None:
         prefix = "[dry-run] " if self.dry_run else ""
         line = f"{prefix}{message}"
         self.messages.append(line)
-        print(line)
+        if self.log_stdout is not None:
+            self.log_stdout(line)
+        else:
+            print(line, flush=True)
+        if self.log_file is not None:
+            self.log_file.write(line + "\n")
+            self.log_file.flush()
+
+
+def _migration_report(
+    phase: str,
+    *,
+    dry_run: bool,
+    log_file: TextIO | None,
+    log_stdout: LogWriter | None,
+) -> MigrationReport:
+    return MigrationReport(
+        phase=phase,
+        dry_run=dry_run,
+        log_file=log_file,
+        log_stdout=log_stdout,
+    )
 
 
 def _get_blog_indexes(config: MigrationConfig, report: MigrationReport):
@@ -114,7 +161,156 @@ def blog_index_scope_label(config: MigrationConfig) -> str:
     return "all BlogIndexPage(s)"
 
 
-def migrate_pages(config: MigrationConfig, *, dry_run: bool = False) -> MigrationReport:
+@dataclass
+class BlogIndexSummary:
+    slug: str
+    found: bool
+    title: str | None = None
+    pk: int | None = None
+    entry_count: int | None = None
+
+
+@dataclass
+class TaxonomyMigrationSummary:
+    collections_root_name: str | None
+    collections_root_pk: int | None
+    collections_category_count: int
+    themes_root_name: str | None
+    themes_root_pk: int | None
+    themes_category_count: int
+
+
+@dataclass
+class AssignTaxonomiesSummary:
+    collection_count: int
+    theme_count: int
+
+
+def get_blog_index_summaries(config: MigrationConfig) -> list[BlogIndexSummary]:
+    """Indexes selected by ``config`` and how many blog entries each contains."""
+    from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
+
+    if config.blog_index_slugs:
+        summaries = []
+        for slug in config.blog_index_slugs:
+            try:
+                index = BlogIndexPage.objects.get(slug=slug)
+            except BlogIndexPage.DoesNotExist:
+                summaries.append(BlogIndexSummary(slug=slug, found=False))
+                continue
+            summaries.append(
+                BlogIndexSummary(
+                    slug=slug,
+                    found=True,
+                    title=index.title,
+                    pk=index.pk,
+                    entry_count=BlogEntryPage.objects.child_of(index).count(),
+                ),
+            )
+        return summaries
+
+    return [
+        BlogIndexSummary(
+            slug=index.slug,
+            found=True,
+            title=index.title,
+            pk=index.pk,
+            entry_count=BlogEntryPage.objects.child_of(index).count(),
+        )
+        for index in BlogIndexPage.objects.all().order_by("slug")
+    ]
+
+
+def format_blog_index_summaries(summaries: list[BlogIndexSummary]) -> list[str]:
+    lines = ["Blog indexes in scope:"]
+    if not summaries:
+        lines.append("  (none)")
+        return lines
+    for summary in summaries:
+        if not summary.found:
+            lines.append(f"  - slug '{summary.slug}' NOT FOUND")
+            continue
+        entry_label = "entry" if summary.entry_count == 1 else "entries"
+        lines.append(
+            f'  - "{summary.title}" (slug={summary.slug}, pk={summary.pk}): '
+            f"{summary.entry_count} {entry_label}",
+        )
+    return lines
+
+
+def get_taxonomy_migration_summary(config: MigrationConfig) -> TaxonomyMigrationSummary:
+    """Category roots and how many blog categories phase 2 would migrate."""
+    collections_root = _find_root_category(
+        config.collections_root_names,
+        config.collections_root_slugs,
+    )
+    themes_root = _find_root_category(
+        config.themes_root_names,
+        config.themes_root_slugs,
+    )
+    return TaxonomyMigrationSummary(
+        collections_root_name=collections_root.name if collections_root else None,
+        collections_root_pk=collections_root.pk if collections_root else None,
+        collections_category_count=(
+            len(_descendants_two_levels(collections_root)) if collections_root else 0
+        ),
+        themes_root_name=themes_root.name if themes_root else None,
+        themes_root_pk=themes_root.pk if themes_root else None,
+        themes_category_count=len(_descendants_two_levels(themes_root)) if themes_root else 0,
+    )
+
+
+def format_taxonomy_migration_summary(summary: TaxonomyMigrationSummary) -> list[str]:
+    lines = ["Taxonomy migration (phase 2):"]
+    if summary.collections_root_name:
+        lines.append(
+            f"  - Collections root: '{summary.collections_root_name}' "
+            f"(pk={summary.collections_root_pk}): "
+            f"{summary.collections_category_count} categor"
+            f"{'y' if summary.collections_category_count == 1 else 'ies'} to migrate",
+        )
+    else:
+        lines.append("  - Collections root: NOT FOUND")
+
+    if summary.themes_root_name:
+        lines.append(
+            f"  - Themes root: '{summary.themes_root_name}' "
+            f"(pk={summary.themes_root_pk}): "
+            f"{summary.themes_category_count} categor"
+            f"{'y' if summary.themes_category_count == 1 else 'ies'} to migrate",
+        )
+    else:
+        lines.append("  - Themes root: NOT FOUND")
+    return lines
+
+
+def get_assign_taxonomies_summary(_config: MigrationConfig) -> AssignTaxonomiesSummary:
+    """Collection and theme snippet counts available for phase 3 assignment."""
+    from publications.models import Collection, Theme
+
+    return AssignTaxonomiesSummary(
+        collection_count=Collection.objects.count(),
+        theme_count=Theme.objects.count(),
+    )
+
+
+def format_assign_taxonomies_summary(summary: AssignTaxonomiesSummary) -> list[str]:
+    collection_label = "Collection" if summary.collection_count == 1 else "Collections"
+    theme_label = "Theme" if summary.theme_count == 1 else "Themes"
+    return [
+        "Taxonomy assignment (phase 3):",
+        f"  - {summary.collection_count} {collection_label}",
+        f"  - {summary.theme_count} {theme_label}",
+    ]
+
+
+def migrate_pages(
+    config: MigrationConfig,
+    *,
+    dry_run: bool = False,
+    log_file: TextIO | None = None,
+    log_stdout: LogWriter | None = None,
+) -> MigrationReport:
     """
     Phase 1 — Promote blog index and entry pages to publication types.
 
@@ -125,7 +321,12 @@ def migrate_pages(config: MigrationConfig, *, dry_run: bool = False) -> Migratio
     from publications.models import PublicationIndexPage, PublicationPage
     from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
 
-    report = MigrationReport(phase="1-migrate_pages", dry_run=dry_run)
+    report = _migration_report(
+        "1-migrate_pages",
+        dry_run=dry_run,
+        log_file=log_file,
+        log_stdout=log_stdout,
+    )
     index_ct = ContentType.objects.get_for_model(PublicationIndexPage)
     entry_ct = ContentType.objects.get_for_model(PublicationPage)
 
@@ -177,7 +378,13 @@ def _descendants_two_levels(root):
     return children + grandchildren
 
 
-def create_taxonomies(config: MigrationConfig, *, dry_run: bool = False) -> MigrationReport:
+def create_taxonomies(
+    config: MigrationConfig,
+    *,
+    dry_run: bool = False,
+    log_file: TextIO | None = None,
+    log_stdout: LogWriter | None = None,
+) -> MigrationReport:
     """
     Phase 2 — Create ``Collection`` / ``Theme`` snippets from blog categories.
 
@@ -187,7 +394,12 @@ def create_taxonomies(config: MigrationConfig, *, dry_run: bool = False) -> Migr
     """
     from publications.models import Collection, Theme
 
-    report = MigrationReport(phase="2-create_taxonomies", dry_run=dry_run)
+    report = _migration_report(
+        "2-create_taxonomies",
+        dry_run=dry_run,
+        log_file=log_file,
+        log_stdout=log_stdout,
+    )
 
     collections_root = _find_root_category(
         config.collections_root_names,
@@ -278,7 +490,13 @@ def _migrated_category_slugs():
     return collection_slugs, theme_slugs, collection_slugs | theme_slugs
 
 
-def assign_taxonomies(config: MigrationConfig, *, dry_run: bool = False) -> MigrationReport:
+def assign_taxonomies(
+    config: MigrationConfig,
+    *,
+    dry_run: bool = False,
+    log_file: TextIO | None = None,
+    log_stdout: LogWriter | None = None,
+) -> MigrationReport:
     """
     Phase 3 — Assign collections/themes to publications.
 
@@ -288,7 +506,12 @@ def assign_taxonomies(config: MigrationConfig, *, dry_run: bool = False) -> Migr
     """
     from publications.models import PublicationPage
 
-    report = MigrationReport(phase="3-assign_taxonomies", dry_run=dry_run)
+    report = _migration_report(
+        "3-assign_taxonomies",
+        dry_run=dry_run,
+        log_file=log_file,
+        log_stdout=log_stdout,
+    )
 
     collection_slugs, theme_slugs, migrated_category_slugs = _migrated_category_slugs()
 
@@ -302,7 +525,13 @@ def assign_taxonomies(config: MigrationConfig, *, dry_run: bool = False) -> Migr
     return report
 
 
-def fix_embedded_links(config: MigrationConfig, *, dry_run: bool = False) -> MigrationReport:
+def fix_embedded_links(
+    config: MigrationConfig,
+    *,
+    dry_run: bool = False,
+    log_file: TextIO | None = None,
+    log_stdout: LogWriter | None = None,
+) -> MigrationReport:
     """
     Phase 4 — Rewrite embedded links and fix blog_recent_entries blocks.
 
@@ -314,7 +543,12 @@ def fix_embedded_links(config: MigrationConfig, *, dry_run: bool = False) -> Mig
     """
     from wagtail.models import Page
 
-    report = MigrationReport(phase="4-fix_embedded_links", dry_run=dry_run)
+    report = _migration_report(
+        "4-fix_embedded_links",
+        dry_run=dry_run,
+        log_file=log_file,
+        log_stdout=log_stdout,
+    )
     _collection_slugs, _theme_slugs, migrated_category_slugs = _migrated_category_slugs()
 
     if not migrated_category_slugs:
@@ -539,6 +773,8 @@ def run_phase(
     config: MigrationConfig | None = None,
     *,
     dry_run: bool = False,
+    log_file: TextIO | None = None,
+    log_stdout: LogWriter | None = None,
 ) -> MigrationReport:
     """Run one migration phase; non-dry-run work is wrapped in ``transaction.atomic()``."""
     config = config or MigrationConfig()
@@ -550,6 +786,6 @@ def run_phase(
     }
     runner = runners[phase]
     if dry_run:
-        return runner(config, dry_run=True)
+        return runner(config, dry_run=True, log_file=log_file, log_stdout=log_stdout)
     with transaction.atomic():
-        return runner(config, dry_run=False)
+        return runner(config, dry_run=False, log_file=log_file, log_stdout=log_stdout)
