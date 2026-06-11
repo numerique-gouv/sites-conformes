@@ -7,22 +7,21 @@ Run each phase separately after verifying the previous one on staging::
     python manage.py migrate_blog_to_publications --phase=1
     python manage.py migrate_blog_to_publications --phase=2
     python manage.py migrate_blog_to_publications --phase=3
-    python manage.py migrate_blog_to_publications --phase=4
     python manage.py migrate_blog_to_publications --phases 1 2 3 --no-input
 
 See ``publications/migrations/data_migrations/migrate_from_blog.py`` for design
-notes (ContentType, PKs, blog blocks, link rewriting).
+notes (ContentType, PKs, blog blocks).
 
 Each phase is atomic: a failure rolls back that phase only, not earlier phases.
 
 By default, output is written to stdout and to a timestamped log file under
 ``publications/migrations/data_migrations/output/``. Use ``--no-log-file`` for stdout only.
 
-Phases 1–4 prompt for confirmation (scope summary for 1–3). Pass ``--no-input`` to skip
-prompts (e.g. postdeploy).
+Phases 1–3 prompt for confirmation (scope summary for each). Pass ``--no-input`` to skip
+prompts.
 
 On production, consider disabling or hiding the Wagtail admin during the run so
-no one edits pages while types and stream fields are being rewritten.
+no one edits pages while types are being promoted.
 """
 
 from django.core.management.base import BaseCommand, CommandError
@@ -45,30 +44,32 @@ from publications.migrations.data_migrations.migrate_from_blog import (
     run_phase,
 )
 
+PHASE_CHOICES = [1, 2, 3]
+
 
 class Command(BaseCommand):
-    help = "Migrate BlogIndexPage/BlogEntryPage to publications (four phases)."
+    help = "Migrate BlogIndexPage/BlogEntryPage to publications (three phases)."
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--phase",
             type=int,
-            choices=[1, 2, 3, 4],
+            choices=PHASE_CHOICES,
             default=None,
-            help="1=pages, 2=taxonomies, 3=assign taxonomies, 4=fix embedded links",
+            help="1=pages, 2=taxonomies, 3=assign taxonomies",
         )
         parser.add_argument(
             "--phases",
             type=int,
             nargs="+",
             metavar="N",
-            choices=[1, 2, 3, 4],
+            choices=PHASE_CHOICES,
             help="Run these phases in order (e.g. --phases 1 2 3).",
         )
         parser.add_argument(
             "--all-phases",
             action="store_true",
-            help="Run phases 1–4 in order (idempotent; safe on every deploy).",
+            help="Run phases 1–3 in order (idempotent; safe on every deploy).",
         )
         parser.add_argument(
             "--dry-run",
@@ -103,7 +104,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--no-input",
             action="store_true",
-            help="Do not prompt for confirmation before phases 1–4.",
+            help="Do not prompt for confirmation before phases 1–3.",
         )
 
     def handle(self, *args, **options):
@@ -173,7 +174,7 @@ class Command(BaseCommand):
         if phases is not None:
             return phases
         if all_phases:
-            return [1, 2, 3, 4]
+            return [1, 2, 3]
         return [phase]
 
     def _log_stdout_writer(self):
@@ -218,11 +219,8 @@ class Command(BaseCommand):
                 + format_assign_taxonomies_scope(get_assign_taxonomies_scope(config))
             )
             prompt = f"Proceed with phase 3 ({run_kind}: assign collections and themes to publications)? [y/N] "
-        elif phase == 4:
-            lines = [mode_label]
-            prompt = f"Proceed with phase 4 ({run_kind}: fix embedded links and " "blog_recent_entries blocks)? [y/N] "
         else:
-            return
+            raise CommandError(f"Unknown phase {phase!r}; expected 1, 2, or 3.")
 
         self.stdout.write("")
         for line in lines:

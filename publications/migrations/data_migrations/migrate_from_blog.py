@@ -26,34 +26,15 @@ Phases (run separately, in order)
        descendants of the blog categories “Collections” and “Thématiques”.
     3. ``assign_taxonomies`` — link publications to new taxonomies from their
        former ``blog_categories``.
-    4. ``fix_embedded_links`` — rewrite ``?category=`` filter URLs in stream
-       fields and clear obsolete ``category_filter`` on ``blog_recent_entries``
-       blocks (see below).
-
-Blog recent entries blocks
-    ``BlogRecentEntriesBlock`` (in Sites Conformes) still targets
-    ``BlogIndexPage``, filters on ``blog_categories``, and renders category tags.
-    After phase 1 the chosen index *page id* still works if it now resolves to
-    ``PublicationIndexPage``, and posts still appear because ``PublicationPage``
-    inherits ``blog_categories``. Category filters in the block keep working until
-    you remove those M2M links. The block does **not** know about collections or
-    themes; filtering by collection/theme requires a publications-specific block
-    or a Sites Conformes change (out of scope for this script).
-
-    Phase 4 clears ``category_filter`` on ``blog_recent_entries`` blocks when that
-    category was migrated to a collection/theme, so editors are not left with a
-    silently wrong filter. Reconfigure those blocks after migration.
 
 Operations
     Consider disabling or hiding the Wagtail admin (maintenance mode, IP allowlist,
     Scalingo maintenance page, etc.) while the data migration runs, so editors do
-    not create or edit pages concurrently with type promotion and stream rewrites.
+    not create or edit pages concurrently with type promotion.
 """
 
 from __future__ import annotations
 
-import json
-import re
 from collections.abc import Callable
 from typing import Protocol
 from dataclasses import dataclass, field
@@ -63,12 +44,6 @@ from typing import TextIO
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.utils import timezone
-
-# Query param in internal links: ?category=slug or &category=slug
-CATEGORY_QUERY_RE = re.compile(r"([?&])category=([^&#\"']+)")
-
-# Stream block types that reference a blog index and optional category filter.
-BLOG_RECENT_ENTRIES_BLOCK = "blog_recent_entries"
 
 MIGRATION_LOG_OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 
@@ -675,57 +650,6 @@ def assign_taxonomies(
     return report
 
 
-def fix_embedded_links(
-    config: MigrationConfig,
-    *,
-    dry_run: bool = False,
-    log_file: TextIO | None = None,
-    log_stdout: LogWriter | None = None,
-) -> MigrationReport:
-    """
-    Phase 4 — Rewrite embedded links and fix blog_recent_entries blocks.
-
-    - Stream fields on all pages with a ``body`` (and ``hero`` when present) are
-      walked recursively; ``?category=`` becomes ``?collection=`` or ``?theme=``
-      when the slug was migrated.
-    - ``blog_recent_entries`` blocks with a ``category_filter`` pointing at a
-      migrated category have that filter cleared (see module docstring).
-    """
-    from wagtail.models import Page
-
-    report = _migration_report(
-        "4-fix_embedded_links",
-        dry_run=dry_run,
-        log_file=log_file,
-        log_stdout=log_stdout,
-    )
-    _collection_slugs, _theme_slugs, migrated_category_slugs = _migrated_category_slugs()
-
-    if not migrated_category_slugs:
-        report.log("No collections/themes in database — run phase 2 first.")
-
-    pages_updated = 0
-    for page in Page.objects.all():
-        specific = page.specific
-        if not _page_has_stream_content(specific):
-            continue
-        category_slug_rewrites = _build_category_slug_rewrites(
-            migrated_category_slugs,
-            specific.locale,
-        )
-        if _update_page_streams(
-            specific,
-            category_slug_rewrites,
-            migrated_category_slugs,
-            report,
-            dry_run=dry_run,
-        ):
-            pages_updated += 1
-
-    report.log(f"Updated stream content on {pages_updated} page(s).")
-    return report
-
-
 def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: MigrationReport, *, dry_run: bool):
     from publications.models import Collection, Theme
 
@@ -778,180 +702,6 @@ def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: Migrati
         post.save()
 
 
-def _build_category_slug_rewrites(migrated_slugs: set[str], locale) -> dict[str, tuple[str, str]]:
-    """Map category slug -> ('collection'|'theme', new_slug). Same slug after phase 2."""
-    from publications.models import Collection, Theme
-
-    rewrites = {}
-    for slug in migrated_slugs:
-        if Collection.objects.filter(slug=slug, locale=locale).exists():
-            rewrites[slug] = ("collection", slug)
-        elif Theme.objects.filter(slug=slug, locale=locale).exists():
-            rewrites[slug] = ("theme", slug)
-    return rewrites
-
-
-def _page_has_stream_content(page) -> bool:
-    return hasattr(page, "body") or hasattr(page, "hero")
-
-
-def _update_page_streams(
-    page,
-    slug_rewrites: dict[str, tuple[str, str]],
-    migrated_category_slugs: set[str],
-    report: MigrationReport,
-    *,
-    dry_run: bool,
-) -> bool:
-    updated_fields: list[str] = []
-    for field_name in ("hero", "body"):
-        if not hasattr(page, field_name):
-            continue
-        stream = getattr(page, field_name)
-        if not stream:
-            continue
-        raw = stream.raw_data
-        new_raw, field_changed = _transform_stream_json(
-            raw,
-            slug_rewrites,
-            migrated_category_slugs,
-            report,
-            page_label=f"{page.__class__.__name__} pk={page.pk} .{field_name}",
-        )
-        if field_changed:
-            report.log(f"  Rewrote links in {page.__class__.__name__} pk={page.pk} field '{field_name}'.")
-            if not dry_run:
-                from wagtail.blocks import StreamValue
-
-                stream_block = stream.stream_block
-                setattr(
-                    page,
-                    field_name,
-                    StreamValue(stream_block, json.loads(json.dumps(new_raw)), is_lazy=False),
-                )
-                updated_fields.append(field_name)
-    if updated_fields and not dry_run:
-        page.save(update_fields=updated_fields)
-    return bool(updated_fields)
-
-
-def _transform_stream_json(
-    node,
-    slug_rewrites: dict[str, tuple[str, str]],
-    migrated_category_slugs: set[str],
-    report: MigrationReport,
-    *,
-    page_label: str,
-):
-    """Recursively update strings and blog_recent_entries blocks in stream JSON."""
-    if isinstance(node, list):
-        results = [
-            _transform_stream_json(item, slug_rewrites, migrated_category_slugs, report, page_label=page_label)
-            for item in node
-        ]
-        changed = any(r[1] for r in results)
-        return [r[0] for r in results], changed
-
-    if isinstance(node, dict):
-        changed = False
-        new_node = {}
-        block_type = node.get("type")
-        value = node.get("value")
-
-        if block_type == BLOG_RECENT_ENTRIES_BLOCK and isinstance(value, dict):
-            value, block_changed = _transform_blog_recent_entries_block(
-                value,
-                migrated_category_slugs,
-                report,
-                page_label=page_label,
-            )
-            changed = changed or block_changed
-
-        if isinstance(value, (dict, list)):
-            value, child_changed = _transform_stream_json(
-                value,
-                slug_rewrites,
-                migrated_category_slugs,
-                report,
-                page_label=page_label,
-            )
-            changed = changed or child_changed
-        elif isinstance(value, str):
-            new_value, str_changed = _rewrite_category_urls_in_text(value, slug_rewrites)
-            if str_changed:
-                value = new_value
-                changed = True
-
-        new_node["type"] = block_type
-        new_node["value"] = value
-        if "id" in node:
-            new_node["id"] = node["id"]
-        return new_node, changed
-
-    if isinstance(node, str):
-        return _rewrite_category_urls_in_text(node, slug_rewrites)
-
-    return node, False
-
-
-def _transform_blog_recent_entries_block(
-    value: dict,
-    migrated_category_slugs: set[str],
-    report: MigrationReport,
-    *,
-    page_label: str,
-) -> tuple[dict, bool]:
-    """
-    Clear category_filter when it points at a category that became a collection/theme.
-
-    The block cannot filter by collection/theme without a code change in Sites Conformes.
-    """
-    from sites_conformes.blog.models import Category
-
-    changed = False
-    new_value = dict(value)
-    category_filter_id = new_value.get("category_filter")
-    if not category_filter_id:
-        return new_value, False
-
-    try:
-        category = Category.objects.get(pk=category_filter_id)
-    except Category.DoesNotExist:
-        return new_value, False
-
-    if category.slug not in migrated_category_slugs:
-        return new_value, False
-
-    report.log(
-        f"  {page_label}: cleared blog_recent_entries category_filter "
-        f"'{category.name}' (reconfigure block for collections/themes).",
-    )
-    new_value["category_filter"] = None
-    return new_value, True
-
-
-def _rewrite_category_urls_in_text(
-    text: str,
-    slug_rewrites: dict[str, tuple[str, str]],
-) -> tuple[str, bool]:
-    if "category=" not in text:
-        return text, False
-
-    changed = False
-
-    def replace(match: re.Match) -> str:
-        nonlocal changed
-        separator = match.group(1)
-        slug = match.group(2)
-        if slug not in slug_rewrites:
-            return match.group(0)
-        param, new_slug = slug_rewrites[slug]
-        changed = True
-        return f"{separator}{param}={new_slug}"
-
-    return CATEGORY_QUERY_RE.sub(replace, text), changed
-
-
 def run_phase(
     phase: int,
     config: MigrationConfig | None = None,
@@ -960,15 +710,17 @@ def run_phase(
     log_file: TextIO | None = None,
     log_stdout: LogWriter | None = None,
 ) -> MigrationReport:
-    """Run one migration phase; non-dry-run work is wrapped in ``transaction.atomic()``."""
+    """Run one migration phase (1–3); non-dry-run work is wrapped in ``transaction.atomic()``."""
     config = config or MigrationConfig()
     runners: dict[int, Callable[..., MigrationReport]] = {
         1: migrate_pages,
         2: create_taxonomies,
         3: assign_taxonomies,
-        4: fix_embedded_links,
     }
-    runner = runners[phase]
+    try:
+        runner = runners[phase]
+    except KeyError as exc:
+        raise ValueError(f"Unknown phase {phase!r}; expected 1, 2, or 3.") from exc
     if dry_run:
         return runner(config, dry_run=True, log_file=log_file, log_stdout=log_stdout)
     with transaction.atomic():
