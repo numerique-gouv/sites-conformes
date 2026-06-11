@@ -63,11 +63,6 @@ makemessages:
     {{docker_cmd}} {{uv_run}} django-admin makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles  --no-location
     {{docker_cmd}} {{uv_run}} django-admin makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --no-location
 
-# Drop publications msgids that sites_conformes already translates.
-[group('Internationalization')]
-remove-sc-strings:
-    {{docker_cmd}} {{uv_run}} python publications/scripts/remove_sites_conformes_strings.py
-
 alias mm:= makemigrations
 makemigrations app="":
     {{docker_cmd}} {{uv_run}} python manage.py makemigrations {{app}}
