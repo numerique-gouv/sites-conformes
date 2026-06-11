@@ -94,6 +94,9 @@ class MigrationConfig:
     # If set, only these blog index slugs are migrated; if empty, all BlogIndexPages are.
     blog_index_slugs: list[str] = field(default_factory=list)
 
+    # Wagtail language code (e.g. ``fr``) used for slug lookups; default site locale if unset.
+    locale_language_code: str | None = None
+
     # Root blog categories: only their children and grandchildren are migrated.
     collections_root_names: tuple[str, ...] = ("Collections",)
     collections_root_slugs: tuple[str, ...] = ("collections",)
@@ -141,23 +144,50 @@ def _migration_report(
     )
 
 
+def resolve_migration_locale(config: MigrationConfig):
+    """Locale used for slug-based lookups (blog indexes, category roots)."""
+    from wagtail.models import Locale
+
+    if config.locale_language_code:
+        return Locale.objects.get(language_code=config.locale_language_code)
+    locale = (
+        Locale.get_default()
+        or Locale.objects.filter(language_code="fr").first()
+        or Locale.objects.first()
+    )
+    if locale is None:
+        raise Locale.DoesNotExist("no locales configured")
+    return locale
+
+
+def _get_blog_index_by_slug(slug: str, locale):
+    from sites_conformes.blog.models import BlogIndexPage
+
+    return BlogIndexPage.objects.get(slug=slug, locale=locale)
+
+
 def _get_blog_indexes(config: MigrationConfig, report: MigrationReport):
     from sites_conformes.blog.models import BlogIndexPage
 
     if config.blog_index_slugs:
+        locale = resolve_migration_locale(config)
         indexes = []
         for slug in config.blog_index_slugs:
             try:
-                indexes.append(BlogIndexPage.objects.get(slug=slug))
+                indexes.append(_get_blog_index_by_slug(slug, locale))
             except BlogIndexPage.DoesNotExist:
-                report.log(f"Blog index with slug '{slug}' not found — skipped.")
+                report.log(
+                    f"Blog index with slug '{slug}' (locale={locale.language_code}) not found — skipped.",
+                )
         return indexes
     return list(BlogIndexPage.objects.all())
 
 
 def blog_index_scope_label(config: MigrationConfig) -> str:
     if config.blog_index_slugs:
-        return ", ".join(config.blog_index_slugs)
+        locale = resolve_migration_locale(config)
+        slugs = ", ".join(config.blog_index_slugs)
+        return f"{slugs} (locale={locale.language_code})"
     return "all BlogIndexPage(s)"
 
 
@@ -168,6 +198,7 @@ class BlogIndexSummary:
     title: str | None = None
     pk: int | None = None
     entry_count: int | None = None
+    locale_language_code: str | None = None
 
 
 @dataclass
@@ -191,12 +222,19 @@ def get_blog_index_summaries(config: MigrationConfig) -> list[BlogIndexSummary]:
     from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
 
     if config.blog_index_slugs:
+        locale = resolve_migration_locale(config)
         summaries = []
         for slug in config.blog_index_slugs:
             try:
-                index = BlogIndexPage.objects.get(slug=slug)
+                index = _get_blog_index_by_slug(slug, locale)
             except BlogIndexPage.DoesNotExist:
-                summaries.append(BlogIndexSummary(slug=slug, found=False))
+                summaries.append(
+                    BlogIndexSummary(
+                        slug=slug,
+                        found=False,
+                        locale_language_code=locale.language_code,
+                    ),
+                )
                 continue
             summaries.append(
                 BlogIndexSummary(
@@ -205,6 +243,7 @@ def get_blog_index_summaries(config: MigrationConfig) -> list[BlogIndexSummary]:
                     title=index.title,
                     pk=index.pk,
                     entry_count=BlogEntryPage.objects.child_of(index).count(),
+                    locale_language_code=locale.language_code,
                 ),
             )
         return summaries
@@ -216,6 +255,7 @@ def get_blog_index_summaries(config: MigrationConfig) -> list[BlogIndexSummary]:
             title=index.title,
             pk=index.pk,
             entry_count=BlogEntryPage.objects.child_of(index).count(),
+            locale_language_code=index.locale.language_code,
         )
         for index in BlogIndexPage.objects.all().order_by("slug")
     ]
@@ -228,7 +268,8 @@ def format_blog_index_summaries(summaries: list[BlogIndexSummary]) -> list[str]:
         return lines
     for summary in summaries:
         if not summary.found:
-            lines.append(f"  - slug '{summary.slug}' NOT FOUND")
+            locale_label = f", locale={summary.locale_language_code}" if summary.locale_language_code else ""
+            lines.append(f"  - slug '{summary.slug}' NOT FOUND{locale_label}")
             continue
         entry_label = "entry" if summary.entry_count == 1 else "entries"
         lines.append(
@@ -240,13 +281,16 @@ def format_blog_index_summaries(summaries: list[BlogIndexSummary]) -> list[str]:
 
 def get_taxonomy_migration_summary(config: MigrationConfig) -> TaxonomyMigrationSummary:
     """Category roots and how many blog categories phase 2 would migrate."""
+    locale = resolve_migration_locale(config)
     collections_root = _find_root_category(
         config.collections_root_names,
         config.collections_root_slugs,
+        locale=locale,
     )
     themes_root = _find_root_category(
         config.themes_root_names,
         config.themes_root_slugs,
+        locale=locale,
     )
     return TaxonomyMigrationSummary(
         collections_root_name=collections_root.name if collections_root else None,
@@ -358,12 +402,15 @@ def migrate_pages(
 def _find_root_category(
     names: tuple[str, ...],
     slugs: tuple[str, ...],
+    *,
+    locale,
 ):
     from django.db.models import Q
     from sites_conformes.blog.models import Category
 
     return Category.objects.filter(
         Q(name__in=names) | Q(slug__in=slugs),
+        locale=locale,
     ).first()
 
 
@@ -401,12 +448,17 @@ def create_taxonomies(
         log_stdout=log_stdout,
     )
 
+    locale = resolve_migration_locale(config)
     collections_root = _find_root_category(
         config.collections_root_names,
         config.collections_root_slugs,
+        locale=locale,
     )
     if not collections_root:
-        report.log("Root category for collections not found — no collections created.")
+        report.log(
+            f"Root category for collections not found (locale={locale.language_code}) "
+            "— no collections created.",
+        )
     else:
         report.log(
             f"Collections root: '{collections_root.name}' (pk={collections_root.pk}).",
@@ -421,9 +473,12 @@ def create_taxonomies(
     themes_root = _find_root_category(
         config.themes_root_names,
         config.themes_root_slugs,
+        locale=locale,
     )
     if not themes_root:
-        report.log("Root category for themes not found — no themes created.")
+        report.log(
+            f"Root category for themes not found (locale={locale.language_code}) — no themes created.",
+        )
     else:
         report.log(f"Themes root: '{themes_root.name}' (pk={themes_root.pk}).")
         _create_taxonomies_from_categories(
@@ -447,9 +502,12 @@ def _create_taxonomies_from_categories(categories, model, report: MigrationRepor
         key=lambda category: (category.parent_id in category_pks, category.name),
     )
     for category in categories:
-        if model.objects.filter(slug=category.slug).exists():
+        if model.objects.filter(slug=category.slug, locale=category.locale).exists():
             report.log(f"  {model.__name__} slug='{category.slug}' already exists — skipped.")
-            slug_to_instance[category.slug] = model.objects.get(slug=category.slug)
+            slug_to_instance[category.slug] = model.objects.get(
+                slug=category.slug,
+                locale=category.locale,
+            )
             continue
 
         report.log(f"  Create {model.__name__} '{category.name}' (slug={category.slug}).")
@@ -475,8 +533,8 @@ def _create_taxonomies_from_categories(categories, model, report: MigrationRepor
         if not category.parent_id:
             continue
         parent_slug = category.parent.slug
-        child = model.objects.filter(slug=category.slug).first()
-        parent = model.objects.filter(slug=parent_slug).first()
+        child = model.objects.filter(slug=category.slug, locale=category.locale).first()
+        parent = model.objects.filter(slug=parent_slug, locale=category.locale).first()
         if child and parent and child.parent_id != parent.pk:
             child.parent = parent
             child.save(update_fields=["parent"])
@@ -554,12 +612,15 @@ def fix_embedded_links(
     if not migrated_category_slugs:
         report.log("No collections/themes in database — run phase 2 first.")
 
-    category_slug_rewrites = _build_category_slug_rewrites(migrated_category_slugs)
     pages_updated = 0
     for page in Page.objects.all():
         specific = page.specific
         if not _page_has_stream_content(specific):
             continue
+        category_slug_rewrites = _build_category_slug_rewrites(
+            migrated_category_slugs,
+            specific.locale,
+        )
         if _update_page_streams(
             specific,
             category_slug_rewrites,
@@ -582,11 +643,13 @@ def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: Migrati
                 f"  Post pk={post.pk}: add collection '{category.name}' (slug={category.slug}).",
             )
             if not dry_run:
-                post.collections.add(Collection.objects.get(slug=category.slug))
+                post.collections.add(
+                    Collection.objects.get(slug=category.slug, locale=category.locale),
+                )
         elif category.slug in theme_slugs:
             report.log(f"  Post pk={post.pk}: add theme '{category.name}' (slug={category.slug}).")
             if not dry_run:
-                post.themes.add(Theme.objects.get(slug=category.slug))
+                post.themes.add(Theme.objects.get(slug=category.slug, locale=category.locale))
         else:
             report.log(
                 f"  Post pk={post.pk}: category '{category.name}' (slug={category.slug}) "
@@ -594,15 +657,15 @@ def _assign_post_taxonomies(post, collection_slugs, theme_slugs, report: Migrati
             )
 
 
-def _build_category_slug_rewrites(migrated_slugs: set[str]) -> dict[str, tuple[str, str]]:
+def _build_category_slug_rewrites(migrated_slugs: set[str], locale) -> dict[str, tuple[str, str]]:
     """Map category slug -> ('collection'|'theme', new_slug). Same slug after phase 2."""
     from publications.models import Collection, Theme
 
     rewrites = {}
     for slug in migrated_slugs:
-        if Collection.objects.filter(slug=slug).exists():
+        if Collection.objects.filter(slug=slug, locale=locale).exists():
             rewrites[slug] = ("collection", slug)
-        elif Theme.objects.filter(slug=slug).exists():
+        elif Theme.objects.filter(slug=slug, locale=locale).exists():
             rewrites[slug] = ("theme", slug)
     return rewrites
 

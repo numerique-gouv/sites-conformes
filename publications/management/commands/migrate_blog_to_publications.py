@@ -26,6 +26,7 @@ no one edits pages while types and stream fields are being rewritten.
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
+from wagtail.models import Locale
 
 from publications.migrations.data_migrations.migrate_from_blog import (
     MigrationConfig,
@@ -37,6 +38,7 @@ from publications.migrations.data_migrations.migrate_from_blog import (
     get_blog_index_summaries,
     get_taxonomy_migration_summary,
     migration_log_path,
+    resolve_migration_locale,
     run_phase,
 )
 
@@ -68,6 +70,12 @@ class Command(BaseCommand):
             help="Limit migration to these blog index slugs (repeatable; default: all indexes).",
         )
         parser.add_argument(
+            "--locale",
+            dest="locale_language_code",
+            default=None,
+            help="Wagtail language code for slug lookups (default: site default locale).",
+        )
+        parser.add_argument(
             "--log-file",
             default=None,
             help=(
@@ -90,6 +98,15 @@ class Command(BaseCommand):
         config = MigrationConfig()
         if options["blog_index_slugs"]:
             config.blog_index_slugs = options["blog_index_slugs"]
+        if options["locale_language_code"]:
+            config.locale_language_code = options["locale_language_code"]
+
+        try:
+            resolve_migration_locale(config)
+        except Locale.DoesNotExist:
+            if config.locale_language_code:
+                raise CommandError(f"Unknown locale: {config.locale_language_code!r}") from None
+            raise CommandError("No Wagtail locale configured.") from None
 
         dry_run = options["dry_run"]
         phases = [1, 2, 3, 4] if options["all_phases"] else [options["phase"]]
