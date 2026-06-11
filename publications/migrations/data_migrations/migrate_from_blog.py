@@ -348,6 +348,26 @@ def format_assign_taxonomies_summary(summary: AssignTaxonomiesSummary) -> list[s
     ]
 
 
+def _promote_page_to_child_model(page, child_model, *, content_type) -> None:
+    """
+    Add an MTI child-table row and point ``wagtailcore_page.content_type`` at ``child_model``.
+
+    Uses ``save_base(raw=True)`` so Django inserts only the child table row without
+    calling ``Page.save()`` / ``full_clean()`` (see Django MTI downcast workarounds).
+    """
+    from wagtail.models import Page
+
+    if child_model.objects.filter(pk=page.pk).exists():
+        Page.objects.filter(pk=page.pk).update(content_type=content_type)
+        return
+
+    parent_model = next(iter(child_model._meta.parents))
+    ptr_field = child_model._meta.parents[parent_model]
+    child = child_model(**{ptr_field.attname: page.pk})
+    child.save_base(raw=True, force_insert=True)
+    Page.objects.filter(pk=page.pk).update(content_type=content_type)
+
+
 def migrate_pages(
     config: MigrationConfig,
     *,
@@ -381,9 +401,11 @@ def migrate_pages(
         else:
             report.log(f"Promoting index '{index.title}' (pk={index.pk}, slug={slug}).")
             if not dry_run:
-                PublicationIndexPage.objects.get_or_create(blogindexpage_ptr_id=index.pk)
-                index.content_type = index_ct
-                index.save(update_fields=["content_type"])
+                _promote_page_to_child_model(
+                    index,
+                    PublicationIndexPage,
+                    content_type=index_ct,
+                )
 
         entries = BlogEntryPage.objects.child_of(index).specific()
         for entry in entries:
@@ -392,9 +414,11 @@ def migrate_pages(
                 continue
             report.log(f"  Promoting entry '{entry.title}' (pk={entry.pk}).")
             if not dry_run:
-                PublicationPage.objects.get_or_create(blogentrypage_ptr_id=entry.pk)
-                entry.content_type = entry_ct
-                entry.save(update_fields=["content_type"])
+                _promote_page_to_child_model(
+                    entry,
+                    PublicationPage,
+                    content_type=entry_ct,
+                )
 
     return report
 
