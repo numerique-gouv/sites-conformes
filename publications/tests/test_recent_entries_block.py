@@ -5,6 +5,7 @@ from itertools import combinations
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
 from django.test import SimpleTestCase
+from django.utils.translation import gettext
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
@@ -66,12 +67,12 @@ class PublicationRecentEntriesBlockRegistrationTestCase(SimpleTestCase):
 
 class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
     def setUp(self):
-        home_page = Page.objects.get(slug="home")
+        self.home = Page.objects.get(slug="home")
         self.admin = User.objects.create_superuser("test", "test@test.test", "pass")
 
         lorem_body = [("paragraph", RichText("<p>Lorem ipsum.</p>"))]
 
-        self.index_page = home_page.add_child(
+        self.index_page = self.home.add_child(
             instance=PublicationIndexPage(title="Publications", body=lorem_body, slug="publications"),
         )
         self.collection = Collection.objects.create(name="Agriculture", slug="agriculture")
@@ -87,6 +88,12 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
             ),
         )
 
+        self.content_page = self._content_page_with_block(
+            slug="publication-recent-block",
+            show_filters=True,
+        )
+
+    def _content_page_with_block(self, slug, show_filters):
         body = [
             (
                 PUBLICATION_RECENT_ENTRIES_BLOCK,
@@ -96,21 +103,57 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
                     "index_page": self.index_page,
                     "entries_count": 4,
                     "collection_filter": self.collection,
-                    "show_filters": True,
+                    "show_filters": show_filters,
                 },
             ),
         ]
-        self.content_page = home_page.add_child(
-            instance=ContentPage(title="Sample page", slug="publication-recent-block", owner=self.admin, body=body),
+        return self.home.add_child(
+            instance=ContentPage(title="Sample page", slug=slug, owner=self.admin, body=body),
         )
+
+    def _block_soup(self, response):
+        block = BeautifulSoup(response.content, "html.parser").select_one(
+            ".cmsfr-block-publication-recent-entries",
+        )
+        self.assertIsNotNone(block)
+        return block
 
     def test_publication_recent_entries_is_renderable(self):
         self.assertPageIsRenderable(self.content_page)
 
     def test_publication_recent_entries_shows_collection_tags(self):
+        # Themes are not asserted here: they are hidden on result cards for now (too verbose).
         response = self.client.get(self.content_page.url)
-        self.assertContains(response, self.collection.name)
-        self.assertContains(response, self.post.title)
+        block = self._block_soup(response)
+        collection_tag = f'<p class="fr-tag">{self.collection.name}</p>'
+        matching_card = None
+        for card in block.select("div.fr-card"):
+            tag_html = "".join(str(tag) for tag in card.select("p.fr-tag"))
+            if self.post.title in card.get_text() and collection_tag in tag_html:
+                matching_card = card
+                break
+        self.assertIsNotNone(
+            matching_card,
+            "Expected a post card containing the title and the collection tag.",
+        )
+
+    def test_filters_visible_when_enabled(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        self.assertIn(gettext("Filter by collection"), block.get_text())
+        pressed_filter = block.select_one('a.fr-tag[aria-pressed="true"]')
+        self.assertIsNotNone(pressed_filter)
+        self.assertEqual(pressed_filter.get_text(strip=True), self.collection.name)
+
+    def test_filters_hidden_when_disabled(self):
+        content_page = self._content_page_with_block(
+            slug="publication-recent-block-no-filters",
+            show_filters=False,
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        self.assertNotIn(gettext("Filter by collection"), block.get_text())
+        self.assertIsNone(block.select_one("a.fr-tag[aria-pressed]"))
 
 
 class PublicationRecentEntriesBlockFilterTestCase(WagtailPageTestCase):

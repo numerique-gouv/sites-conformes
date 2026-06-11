@@ -107,11 +107,14 @@
                         <p class="fr-tag">{{ collection.name }}</p>
                       </li>
                     {% endfor %}
+                    {% comment %}
+                    {# Remove themes from display for now, they are too noisy #}
                     {% for theme in post.themes.all %}
                       <li>
                         <p class="fr-tag">{{ theme.name }}</p>
                       </li>
                     {% endfor %}
+                    {% endcomment %}
                   </ul>
                 </div>
               {% endif %}
