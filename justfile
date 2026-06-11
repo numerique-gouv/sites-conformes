@@ -114,8 +114,6 @@ web-prompt:
 [group('Production')]
 scalingo-postdeploy:
     python manage.py migrate
-    # Consider disabling/hiding Wagtail admin during blog→publications data migration.
-    python manage.py migrate_blog_to_publications --all-phases --no-input
     python manage.py create_starter_pages
     python manage.py import_page_templates
     python manage.py update_index

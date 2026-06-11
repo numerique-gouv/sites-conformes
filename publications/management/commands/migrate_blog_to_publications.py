@@ -8,6 +8,7 @@ Run each phase separately after verifying the previous one on staging::
     python manage.py migrate_blog_to_publications --phase=2
     python manage.py migrate_blog_to_publications --phase=3
     python manage.py migrate_blog_to_publications --phase=4
+    python manage.py migrate_blog_to_publications --phases 1 2 3 --no-input
 
 See ``publications/migrations/data_migrations/migrate_from_blog.py`` for design
 notes (ContentType, PKs, blog blocks, link rewriting).
@@ -53,7 +54,16 @@ class Command(BaseCommand):
             "--phase",
             type=int,
             choices=[1, 2, 3, 4],
+            default=None,
             help="1=pages, 2=taxonomies, 3=assign taxonomies, 4=fix embedded links",
+        )
+        parser.add_argument(
+            "--phases",
+            type=int,
+            nargs="+",
+            metavar="N",
+            choices=[1, 2, 3, 4],
+            help="Run these phases in order (e.g. --phases 1 2 3).",
         )
         parser.add_argument(
             "--all-phases",
@@ -111,9 +121,7 @@ class Command(BaseCommand):
             raise CommandError("No Wagtail locale configured.") from None
 
         dry_run = options["dry_run"]
-        phases = [1, 2, 3, 4] if options["all_phases"] else [options["phase"]]
-        if not phases or phases == [None]:
-            raise CommandError("Pass --phase or --all-phases.")
+        phases = self._resolve_phases(options)
 
         log_file = None
         if not options["no_log_file"]:
@@ -154,6 +162,19 @@ class Command(BaseCommand):
         finally:
             if log_file is not None:
                 log_file.close()
+
+    def _resolve_phases(self, options) -> list[int]:
+        phase = options["phase"]
+        phases = options["phases"]
+        all_phases = options["all_phases"]
+        selected = sum(x is not None and x is not False for x in (phase, phases, all_phases))
+        if selected != 1:
+            raise CommandError("Pass exactly one of --phase, --phases, or --all-phases.")
+        if phases is not None:
+            return phases
+        if all_phases:
+            return [1, 2, 3, 4]
+        return [phase]
 
     def _log_stdout_writer(self):
         def write(line: str) -> None:
