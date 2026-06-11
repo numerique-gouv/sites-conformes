@@ -16,12 +16,12 @@ from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.translation import gettext_lazy as _
 from wagtail.blocks import StreamBlock
-from wagtail.models import Page
 
 from publications.blocks.recent_entries import (
     PUBLICATION_RECENT_ENTRIES_BLOCK,
     PublicationRecentEntriesBlock,
 )
+from sites_conformes.core.abstract import SitesFacilesBasePage
 
 _publication_recent_entries_block = PublicationRecentEntriesBlock(
     label=_("Publication recent entries"),
@@ -36,12 +36,12 @@ def _is_migration_authoring_command() -> bool:
 
 
 def register_sites_conformes_blocks():
-    """Add publications blocks to every page model that has a ``body`` StreamField."""
+    """Add publications blocks to Sites Conformes page types with a ``body`` StreamField."""
     if _is_migration_authoring_command():
         return
 
     for model in apps.get_models():
-        if not issubclass(model, Page):
+        if model._meta.abstract or not issubclass(model, SitesFacilesBasePage):
             continue
         try:
             field = model._meta.get_field("body")
