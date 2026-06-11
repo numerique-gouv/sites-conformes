@@ -246,24 +246,26 @@ class PublicationIndexPageFilterQueryTest(PublicationIndexPageFilterTestBase):
 
 
 class PublicationIndexPagePostsDisplayTest(PublicationIndexPageFilterTestBase):
-    def test_posts_display_collections_and_themes(self):
+    def test_posts_display_collections_and_not_themes(self):
+        # Themes are hidden on result cards (publication_index_posts_list.html) because
+        # they are too verbose alongside collection tags.
         post = self._create_post(
             "Post with taxonomies",
             collections=[self.collection],
             themes=[self.theme],
         )
         response = self.client.get(self.index.url)  # no filters
-        # Find the post card containing the title and both taxonomy tags.
         collection_tag = f'<p class="fr-tag">{self.collection.name}</p>'
         theme_tag = f'<p class="fr-tag">{self.theme.name}</p>'
         soup = BeautifulSoup(response.content, "html.parser")
         matching_card = None
         for card in soup.select("div.fr-card"):
             tag_html = "".join(str(tag) for tag in card.select("p.fr-tag"))
-            if post.title in card.get_text() and collection_tag in tag_html and theme_tag in tag_html:
+            if post.title in card.get_text() and collection_tag in tag_html:
                 matching_card = card
                 break
         self.assertIsNotNone(
             matching_card,
-            "Expected a post card containing the title and both taxonomy tags.",
+            "Expected a post card containing the title and the collection tag.",
         )
+        self.assertNotIn(theme_tag, "".join(str(tag) for tag in matching_card.select("p.fr-tag")))
