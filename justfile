@@ -68,13 +68,6 @@ makemessages:
 remove-sc-strings:
     {{docker_cmd}} {{uv_run}} python publications/scripts/remove_sites_conformes_strings.py
 
-# Extract, prune shared publications strings, then compile .mo files.
-[group('Internationalization')]
-messages-no-sc:
-    just makemessages
-    just remove-sc-strings
-    just compilemessages
-
 alias mm:= makemigrations
 makemigrations app="":
     {{docker_cmd}} {{uv_run}} python manage.py makemigrations {{app}}
