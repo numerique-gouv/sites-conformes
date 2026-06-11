@@ -131,7 +131,7 @@ class Command(BaseCommand):
         try:
             for phase in phases:
                 if not options["no_input"]:
-                    self._prompt_for_phase(phase, config, log_file)
+                    self._prompt_for_phase(phase, config, log_file, dry_run=dry_run)
 
                 phase_header = f"Phase {phase} — blog indexes: {blog_index_scope_label(config)}"
                 self._write_line(phase_header, log_file, style=self.style.NOTICE)
@@ -170,19 +170,31 @@ class Command(BaseCommand):
             log_file.write(line + "\n")
             log_file.flush()
 
-    def _prompt_for_phase(self, phase, config, log_file):
+    def _dry_run_mode_label(self, dry_run: bool) -> str:
+        if dry_run:
+            return "Mode: dry run (no database writes)."
+        return "Mode: live run (will write to the database)."
+
+    def _prompt_for_phase(self, phase, config, log_file, *, dry_run: bool):
+        mode_label = self._dry_run_mode_label(dry_run)
+        run_kind = "dry run" if dry_run else "live run"
+
         if phase == 1:
-            lines = format_blog_index_summaries(get_blog_index_summaries(config))
-            prompt = "Proceed with phase 1 (promote blog pages)? [y/N] "
+            lines = [mode_label, ""] + format_blog_index_summaries(get_blog_index_summaries(config))
+            prompt = f"Proceed with phase 1 ({run_kind}: promote blog pages)? [y/N] "
         elif phase == 2:
-            lines = format_taxonomy_migration_summary(get_taxonomy_migration_summary(config))
-            prompt = "Proceed with phase 2 (create collections and themes)? [y/N] "
+            lines = [mode_label, ""] + format_taxonomy_migration_summary(
+                get_taxonomy_migration_summary(config),
+            )
+            prompt = f"Proceed with phase 2 ({run_kind}: create collections and themes)? [y/N] "
         elif phase == 3:
-            lines = format_assign_taxonomies_summary(get_assign_taxonomies_summary(config))
-            prompt = "Proceed with phase 3 (assign collections and themes to publications)? [y/N] "
+            lines = [mode_label, ""] + format_assign_taxonomies_summary(
+                get_assign_taxonomies_summary(config),
+            )
+            prompt = f"Proceed with phase 3 ({run_kind}: assign collections and themes to publications)? [y/N] "
         elif phase == 4:
-            lines = []
-            prompt = "Proceed with phase 4 (fix embedded links and blog_recent_entries blocks)? [y/N] "
+            lines = [mode_label]
+            prompt = f"Proceed with phase 4 ({run_kind}: fix embedded links and " "blog_recent_entries blocks)? [y/N] "
         else:
             return
 
