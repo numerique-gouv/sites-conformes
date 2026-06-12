@@ -25,7 +25,7 @@ msgstr "Filtrer par collection"
 msgid "Filter by theme"
 msgstr "Filtrer par thématique"
 
-msgid "Publication recent entries"
+msgid "Recent publications"
 msgstr "Publications récentes"
 
 msgid "Collection"

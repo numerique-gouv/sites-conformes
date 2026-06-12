@@ -116,6 +116,7 @@ class PublicationRecentEntriesBlock(blocks.StructBlock):
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
 
     class Meta:
+        label = _("Recent publications")
         icon = "placeholder"
         template = "publications/blocks/publication_recent_entries.html"
         value_class = PublicationRecentEntriesStructValue
