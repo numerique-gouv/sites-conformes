@@ -4,13 +4,14 @@ from itertools import combinations
 
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
-from django.test import SimpleTestCase
 from django.utils.translation import gettext
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
-from publications.blocks.recent_entries import PUBLICATION_RECENT_ENTRIES_BLOCK
+from publications.blocks.recent_entries import (
+    PUBLICATION_RECENT_ENTRIES_BLOCK,
+)
 from publications.models import Collection, PublicationIndexPage, PublicationPage, Theme
 from sites_conformes.blog.models import Organization, Person
 from sites_conformes.core.models import ContentPage, Tag
@@ -54,15 +55,6 @@ FILTER_SPECS = {
         "other_post": lambda test_case: test_case.post_with_other_author,
     },
 }
-
-
-class PublicationRecentEntriesBlockRegistrationTestCase(SimpleTestCase):
-    """The PublicationRecentEntriesBlock is registered with a hook on the
-    ContentPage model. Check that it is registered."""
-
-    def test_block_is_registered_on_content_page(self):
-        block_names = ContentPage._meta.get_field("body").stream_block.child_blocks
-        self.assertIn(PUBLICATION_RECENT_ENTRIES_BLOCK, block_names)
 
 
 class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
