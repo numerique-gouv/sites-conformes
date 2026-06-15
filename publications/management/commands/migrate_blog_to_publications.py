@@ -9,6 +9,16 @@ Run each phase separately after verifying the previous one on staging::
     python manage.py migrate_blog_to_publications --phase=3
     python manage.py migrate_blog_to_publications --phases 1 2 3 --no-input
 
+If after phase 1 you see search results twice for the same page, you need to reset the index
+and then rebuild it. During the procedure, the search will return no results.
+In a django shell, run:
+```
+from modelsearch.backends import get_search_backend
+get_search_backend().reset_indexes()
+```
+Then in normal shell, run:
+``just index`
+
 See ``publications/migrations/data_migrations/migrate_from_blog.py`` for design
 notes (ContentType, PKs, blog blocks).
 
