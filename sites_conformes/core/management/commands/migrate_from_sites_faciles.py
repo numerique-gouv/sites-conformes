@@ -64,6 +64,11 @@ class Command(BaseCommand):
         self.stdout.write("=" * 60)
 
         with connection.cursor() as cursor:
+            # Dans le cas où le site est tout neuf, on ne veut pas renommer
+            # les tables. Celles-ci vont être automatiquement créées avec le
+            # préfixe sites_conformes, ce qui n'était pas le cas avant la
+            # v4.0.0 qui a introduit le namespacing de toutes les tables
+            # et applications django.
             if not self._table_exists(cursor, "django_migrations") or self._table_exists(
                 cursor, "sites_conformes_core_contentpage"
             ):
