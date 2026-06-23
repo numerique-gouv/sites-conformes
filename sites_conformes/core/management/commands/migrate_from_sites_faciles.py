@@ -28,6 +28,18 @@ class Command(BaseCommand):
     # e.g. "content_manager" → "sites_conformes_core_*".
     APP_RENAMES = {"content_manager": "core"}
 
+    def _table_exists(self, cursor, table_name: str) -> bool:
+        cursor.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.tables
+                WHERE table_schema = 'public' AND table_name = %s
+            );
+            """,
+            [table_name],
+        )
+        return cursor.fetchone()[0]
+
     def _new_app_label(self, app: str) -> str:
         label = self.APP_RENAMES.get(app, app)
         return "sites_conformes_" + label
@@ -52,6 +64,12 @@ class Command(BaseCommand):
         self.stdout.write("=" * 60)
 
         with connection.cursor() as cursor:
+            if not self._table_exists(cursor, "django_migrations"):
+                self.stdout.write(
+                    self.style.SUCCESS("Fresh database — no legacy Sites Faciles schema to migrate, skipping.")
+                )
+                return
+
             table_renames = self._plan_table_renames(cursor)
             migration_updates = self._plan_migration_updates(cursor)
             content_type_updates = self._plan_content_type_updates(cursor)
