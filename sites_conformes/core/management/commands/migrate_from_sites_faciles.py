@@ -64,7 +64,9 @@ class Command(BaseCommand):
         self.stdout.write("=" * 60)
 
         with connection.cursor() as cursor:
-            if not self._table_exists(cursor, "django_migrations"):
+            if not self._table_exists(cursor, "django_migrations") or self._table_exists(
+                cursor, "sites_conformes_core_contentpage"
+            ):
                 self.stdout.write(
                     self.style.SUCCESS("Fresh database — no legacy Sites Faciles schema to migrate, skipping.")
                 )
