@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.images import ImageFile
 from django.utils import timezone
-from wagtail.images.models import Image
+from wagtail.images import get_image_model
 from wagtail.models import Page
 from wagtail.utils.file import hash_filelike
 
@@ -24,6 +24,7 @@ TEMPLATES_DATA_FILE = PAGE_TEMPLATES_ROOT / "pages_data.json"
 IMAGES_FOLDER = PAGE_TEMPLATES_ROOT / "img"
 
 User = get_user_model()
+Image = get_image_model()
 
 
 class ExportPage:
