@@ -1,9 +1,8 @@
-publiccodeYmlVersion: "0.5.0"
-name: Sites Conformes
-url: https://github.com/numerique-gouv/sites-conformes
-landingURL: https://sites.beta.gouv.fr/
-logo: https://github.com/numerique-gouv.png
-usedBy: []
+publiccodeYmlVersion: "0"
+name: "Sites Conformes"
+url: "https://github.com/numerique-gouv/sites-conformes"
+landingURL: "https://sites.beta.gouv.fr/"
+logo: "https://github.com/numerique-gouv.png"
 developmentStatus: stable
 localisation:
   localisationReady: true
@@ -11,26 +10,35 @@ localisation:
     - en
     - fr
 fundedBy:
-  - name: Direction interministérielle du numérique
-    uri: https://lannuaire.service-public.fr/gouvernement/d1a97841-b4bf-46df-a089-1003e4e266b4
+  - name: "Direction interministérielle du numérique"
+    uri: "https://lannuaire.service-public.fr/gouvernement/d1a97841-b4bf-46df-a089-1003e4e266b4"
 roadmap: "https://sites.beta.gouv.fr/"
 platforms:
   - web
 softwareType: "standalone/web"
 description:
   fr:
-    shortDescription:
+    shortDescription: >-
       Gestionnaire de contenu permettant de créer et gérer un site
       internet basé sur le Système de design de l'État, accessible et responsive
+    longDescription: >-
+      Sites Conformes est un gestionnaire de contenu basé sur Wagtail et Django,
+      conçu pour permettre la création simplifiée de sites en .gouv.fr. Il
+      fournit des composants prêts à l'emploi issus du Système de design de
+      l'État (DSFR), garantissant la conformité aux normes numériques en
+      vigueur. Il inclut la gestion de blog, d'événements, de formulaires de
+      contact et l'authentification via ProConnect.
+    features:
+      - "Composants DSFR intégrés"
+      - "Gestion de blog et d'événements"
+      - "Formulaires de contact"
+      - "Authentification ProConnect"
     documentation: "https://sites.beta.gouv.fr/documentation/"
 legal:
-  license: agpl-3.0
+  license: "AGPL-3.0-only"
   mainCopyrightOwner: "État français - Direction interministérielle du numérique"
-  authorsFile: ""
 maintenance:
   type: community
   contacts:
     - name: "Équipe Sites Conformes"
       email: "contact@sites.beta.gouv.fr"
-# awesomeScore: 5
-# awesomeShield: https://img.shields.io/badge/awesome-codegouvfr_5/10-blue

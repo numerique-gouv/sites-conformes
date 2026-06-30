@@ -104,6 +104,7 @@ upgrade:
     {{docker_cmd}} uv lock --upgrade
     {{docker_cmd}} {{uv_run}} pre-commit autoupdate
     {{docker_cmd}} npm update
+    {{docker_cmd}} uv lock --upgrade --project ./demo
 
 web-prompt:
     {{docker_cmd}} bash
@@ -113,6 +114,7 @@ web-prompt:
 # Commands run by the Scalingo Procfile
 [group('Production')]
 scalingo-postdeploy:
+    #python manage.py migrate_from_sites_faciles --no-input
     python manage.py migrate
     python manage.py create_starter_pages
     python manage.py import_page_templates

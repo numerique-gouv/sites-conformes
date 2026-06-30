@@ -37,11 +37,10 @@ Les tests automatisés couvrent les versions suivantes :
 - PostgreSQL 14 à 17 (cf. [versions de PostgreSQL supportées par Django](https://code.djangoproject.com/wiki/SupportedDatabaseVersions))
 
 ## Installation et contribution
-* Pour déployer le projet en production sur un serveur, voir la [documentation d'installation](https://sites.beta.gouv.fr/documentation/installation/)
-* Pour installer le projet en local pour le développement, voir la [documentation d'embarquement](./ONBOARDING.md)
-* Avant de soumettre une contribution, consulter la  [documentation de contribution](./CONTRIBUTING.md)
 
-[![Déployer sur Scalingo (en test)](https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/static/artwork/logo-white-bg.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/numerique-gouv/sites-conformes#production)
+- Pour déployer le projet en production sur un serveur, voir la [documentation d'installation](https://sites.beta.gouv.fr/documentation/installation/)
+- Pour installer le projet en local pour le développement, voir la [documentation d'embarquement](./ONBOARDING.md)
+- Avant de soumettre une contribution, consulter la [documentation de contribution](./CONTRIBUTING.md)
 
 ### Git blame
 
@@ -78,10 +77,11 @@ En plus des applications déjà citées, le dépôt contient les répertoires su
 - **static** : des fichiers statiques communs à l’ensemble du site (CSS global, JS global, quelques images intégrées par défaut) ainsi que la librairie tierce TarteaucitronJS (utilisée pour la gestion des cookies tiers)
 - **templates** : les templates de base du site.
 
-## Schéma
-![Schéma montrant les apps listées ci-dessus ainsi que l’interconnection avec la BDD, le S3 et les services tiers (dont ProConnect)](static/doc/sites-conformes-schema.svg)
+### Schéma
 
-Schéma de l’application dans le cas d’un hébergement sur Scalingo
+![Schéma montrant les apps listées ci-dessus ainsi que l’interconnection avec la BDD, le S3 et les services tiers (dont ProConnect)](sites_conformes/static/doc/sites-conformes-schema.svg)
+
+Schéma de l’application dans le cas d’un hébergement sur Scalingo.
 
 ## Indexation des contenus
 Les contenus des pages sont indexés pour la recherche par un script `python manage.py update_index` (cf. [documentation de Wagtail](https://docs.wagtail.org/en/stable/topics/search/indexing.html))

@@ -21,9 +21,17 @@ WORKDIR $APP_DIR
 COPY pyproject.toml uv.lock ./
 # Deploy in the global env of the container instead of a uv-specific venv
 ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
-RUN uv sync --locked
+# Install dependencies only. The project itself can't be built yet: its version
+# is dynamic (resolved from sites_conformes/_version.py via setuptools' attr
+# directive), and that module hasn't been copied at this layer. Installing deps
+# separately also keeps this layer cached across source-only changes.
+RUN uv sync --locked --no-install-project
 
 COPY --chown=app:app . .
+
+# Now the source (incl. sites_conformes/_version.py) is present, so the dynamic
+# version resolves and the project can be installed editable into the env.
+RUN uv sync --locked
 
 RUN uv run python manage.py collectstatic --no-input
 
