@@ -36,13 +36,24 @@ jobs:
           echo "create_release=true" >> "$GITHUB_OUTPUT"
           echo "Creating release ${TAG} for merge commit ${{ github.event.pull_request.merge_commit_sha }}"
 
-      - name: Create GitHub release
+      - name: Skip if release already exists
+        id: existing
         if: steps.version.outputs.create_release == 'true'
-        uses: softprops/action-gh-release@v2
+        shell: bash
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release ${TAG} already exists, skipping."
+            echo "create_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub release
+        if: steps.version.outputs.create_release == 'true' && steps.existing.outputs.create_release != 'false'
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.tag }}
           target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
           generate_release_notes: true
           make_latest: true
-          skip_if_tag_exists: true
