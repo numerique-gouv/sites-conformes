@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n wagtail_dsfr_tags %}
 {% for post in posts %}
   <div class="fr-col fr-col-md-6">
     <div class="fr-card fr-enlarge-link">
@@ -8,15 +8,7 @@
             <a href="{{ post.url }}">{{ post.title }}</a>
           </h3>
           <p class="fr-card__desc fr-icon-calendar-event-fill">
-            {% if post.event_date_start.date == post.event_date_end.date %}
-              {{ post.event_date_start.date }}
-            {% elif post.event_date_start.year == post.event_date_end.year and post.event_date_start.month == post.event_date_end.month %}
-              {{ post.event_date_start.day }} – {{ post.event_date_end.date }}
-            {% elif post.event_date_start.year == post.event_date_end.year %}
-              {{ post.event_date_start|date:"j F" }} – {{ post.event_date_end|date:"j F Y" }}
-            {% else %}
-              {{ post.event_date_start.date }} – {{ post.event_date_end.date }}
-            {% endif %}
+            {% event_date_range post.event_date_start post.event_date_end %}
           </p>
           {% if post.event_categories.all %}
             <div class="fr-card__start">

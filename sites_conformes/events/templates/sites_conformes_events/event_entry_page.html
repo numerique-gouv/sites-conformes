@@ -52,15 +52,7 @@
       <p>
         <strong>
           <span class="fr-icon-calendar-event-fill click-to-copy" aria-hidden="true"></span>
-          {% if page.event_date_start.date == page.event_date_end.date %}
-            {{ page.event_date_start.date }}
-          {% elif page.event_date_start.year == page.event_date_end.year and page.event_date_start.month == page.event_date_end.month %}
-            {{ page.event_date_start.day }} – {{ page.event_date_end.date }}
-          {% elif page.event_date_start.year == page.event_date_end.year %}
-            {{ page.event_date_start|date:"j F" }} – {{ page.event_date_end|date:"j F Y" }}
-          {% else %}
-            {{ page.event_date_start.date }} – {{ page.event_date_end.date }}
-          {% endif %}
+          {% event_date_range page.event_date_start page.event_date_end %}
         </strong>
         {% if categories %}
           |
@@ -104,7 +96,7 @@
           <h2 class="fr-card__title">{{ page.title }}</h2>
           <ul class="fr-card__desc">
             <li>
-              <strong>{% translate "Date:" %}</strong> {{ page.event_date_start }} - {{ page.event_date_end }}
+              <strong>{% translate "Date:" %}</strong>{{ page.event_date_start }} - {{ page.event_date_end }}
             </li>
             <li>
               <strong>{% translate "Location:" %}</strong> {{ page.location }}
