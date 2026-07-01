@@ -80,7 +80,7 @@
               <h2 class="fr-card__title">
                 <a href="{{ post.url }}">{{ post.title|truncatewords:8 }}</a>
               </h2>
-              <p class="fr-card__desc">Publié le {{ post.date |date:'l j F Y' }}</p>
+              <p class="fr-card__desc">{% translate "Published on" %} {{ post.date |date:'l j F Y' }}</p>
               {% if post.event_categories.all %}
                 <div class="fr-card__start">
                   <ul class="fr-tags-group">

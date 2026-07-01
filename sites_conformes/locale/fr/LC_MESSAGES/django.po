@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-09 13:08+0200\n"
+"POT-Creation-Date: 2026-07-01 11:54+0200\n"
 "PO-Revision-Date: 2026-04-09 13:09+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -24,6 +24,9 @@ msgstr "Erreur 404 — Page non trouvée"
 
 msgid "Page not found"
 msgstr "Page non trouvée"
+
+msgid "Error 404"
+msgstr "Erreur 404"
 
 msgid ""
 "The page you are looking for could not be found. We apologize for any "
