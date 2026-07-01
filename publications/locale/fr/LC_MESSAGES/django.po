@@ -31,6 +31,15 @@ msgstr "Publications récentes"
 msgid "See all publications"
 msgstr "Voir toutes les publications"
 
+msgid "“See all publications” button navigates to the index page with :"
+msgstr "Le bouton « Voir toutes les publications » pointe vers la page d’index avec :"
+
+msgid "No filters"
+msgstr "Aucun filtre"
+
+msgid "The selected filters"
+msgstr "Les filtres sélectionnés"
+
 msgid "Collection"
 msgstr "Collection"
 

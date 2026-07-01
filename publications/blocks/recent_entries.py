@@ -7,6 +7,14 @@ from sites_conformes.core.constants import HEADING_CHOICES_2_5
 
 PUBLICATION_RECENT_ENTRIES_BLOCK = "publication_recent_entries"
 
+SEE_ALL_LINK_UNFILTERED = "unfiltered"
+SEE_ALL_LINK_FILTERED = "filtered"
+
+SEE_ALL_LINK_CHOICES = [
+    (SEE_ALL_LINK_UNFILTERED, _("No filters")),
+    (SEE_ALL_LINK_FILTERED, _("The selected filters")),
+]
+
 
 class PublicationRecentEntriesStructValue(blocks.StructValue):
     """Filter and list recent publications for a ``PublicationIndexPage``."""
@@ -68,6 +76,11 @@ class PublicationRecentEntriesStructValue(blocks.StructValue):
 
         return filters
 
+    def see_all_link_filters(self) -> dict:
+        if self.get("see_all_link", SEE_ALL_LINK_UNFILTERED) == SEE_ALL_LINK_FILTERED:
+            return self.current_filters()
+        return {}
+
     def sub_heading_tag(self):
         heading_tag = self.get("heading_tag")
         if heading_tag == "h2":
@@ -114,6 +127,12 @@ class PublicationRecentEntriesBlock(blocks.StructBlock):
         required=False,
     )
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
+    see_all_link = blocks.ChoiceBlock(
+        label=_("“See all publications” button navigates to the index page with :"),
+        choices=SEE_ALL_LINK_CHOICES,
+        default=SEE_ALL_LINK_UNFILTERED,
+        required=False,
+    )
 
     class Meta:
         label = _("Recent publications")

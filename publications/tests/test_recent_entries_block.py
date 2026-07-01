@@ -11,6 +11,7 @@ from wagtail.test.utils import WagtailPageTestCase
 
 from publications.blocks.recent_entries import (
     PUBLICATION_RECENT_ENTRIES_BLOCK,
+    SEE_ALL_LINK_FILTERED,
 )
 from publications.models import Collection, PublicationIndexPage, PublicationPage, Theme
 from sites_conformes.blog.models import Organization, Person
@@ -149,8 +150,21 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         self.assertNotIn(gettext("Filter by collection"), block.get_text())
         self.assertIsNone(block.select_one("a.fr-tag[aria-pressed]"))
 
-    def test_see_all_publications_link_includes_block_filters(self):
+    def test_see_all_publications_link_defaults_to_unfiltered_index(self):
         response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertNotIn("?", link["href"])
+        self.assertTrue(link["href"].endswith("#posts-list"))
+
+    def test_see_all_publications_link_includes_block_filters_when_configured(self):
+        content_page = self._content_page_with_block(
+            slug="publication-recent-block-filtered-link",
+            show_filters=True,
+            see_all_link=SEE_ALL_LINK_FILTERED,
+        )
+        response = self.client.get(content_page.url)
         block = self._block_soup(response)
         link = block.select_one("a.fr-btn")
         self.assertIsNotNone(link)
