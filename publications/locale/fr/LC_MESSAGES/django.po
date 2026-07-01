@@ -28,6 +28,9 @@ msgstr "Filtrer par thématique"
 msgid "Recent publications"
 msgstr "Publications récentes"
 
+msgid "See all publications"
+msgstr "Voir toutes les publications"
+
 msgid "Collection"
 msgstr "Collection"
 
