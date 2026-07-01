@@ -18,7 +18,6 @@ import os
 
 import boto3
 from botocore.exceptions import ClientError
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -39,7 +38,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
-        header_value = options["cache-control"] or os.getenv("S3_CACHE_CONTROL", settings.MEDIA_CACHE_CONTROL)
+        header_value = options.get("cache_control") or os.getenv("S3_CACHE_CONTROL", "public, max-age=3600")
 
         s3_config = self._get_s3_config()
         if not s3_config:

@@ -20,7 +20,7 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 # Cache-Control default for all served media files.
 # Used by S3 object_parameters, db_storage view, and backfill command.
