@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from django import template
 from django.conf import settings
 from django.template.context import Context
+from django.utils.formats import date_format
 from django.utils.html import mark_safe
 from wagtail.models import Site
 from wagtail.rich_text import RichText
@@ -177,6 +178,26 @@ def toggle_url_filter(context, *_, **kwargs):
         return f"?{url_string}"
     else:
         return ""
+
+
+@register.simple_tag
+def event_date_range(event_date_start, event_date_end):
+    """
+    Formatting the date range of an event by factoring out common parts (same day, same month, or same year).
+    """
+    if not event_date_start or not event_date_end:
+        return ""
+
+    start = event_date_start.date() if hasattr(event_date_start, "date") else event_date_start
+    end = event_date_end.date() if hasattr(event_date_end, "date") else event_date_end
+
+    if start == end:
+        return date_format(start)
+    if start.year == end.year and start.month == end.month:
+        return f"{start.day} – {date_format(end)}"
+    if start.year == end.year:
+        return f"{date_format(start, 'j F')} – {date_format(end, 'j F Y')}"
+    return f"{date_format(start)} – {date_format(end)}"
 
 
 @register.filter

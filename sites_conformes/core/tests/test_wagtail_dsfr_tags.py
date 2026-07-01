@@ -1,5 +1,7 @@
+from datetime import date, datetime
+
 from django.template import Context
-from django.test import RequestFactory
+from django.test import RequestFactory, SimpleTestCase
 from django.utils.translation import override
 from wagtail.models import Locale, Page, Site
 from wagtail.test.utils import WagtailPageTestCase
@@ -160,3 +162,46 @@ class LanguageSelectorTagManualTestCase(LanguageSelectorTagBaseTestCase):
             "</a>",
             html,
         )
+
+
+class EventDateRangeTagTestCase(SimpleTestCase):
+    def test_same_day(self):
+        from sites_conformes.core.templatetags.wagtail_dsfr_tags import event_date_range
+
+        with override("fr"):
+            result = event_date_range(date(2026, 1, 5), date(2026, 1, 5))
+        self.assertEqual(result, "5 janvier 2026")
+
+    def test_same_month_and_year(self):
+        from sites_conformes.core.templatetags.wagtail_dsfr_tags import event_date_range
+
+        with override("fr"):
+            result = event_date_range(date(2026, 1, 5), date(2026, 1, 8))
+        self.assertEqual(result, "5 – 8 janvier 2026")
+
+    def test_same_year_different_month(self):
+        from sites_conformes.core.templatetags.wagtail_dsfr_tags import event_date_range
+
+        with override("fr"):
+            result = event_date_range(date(2026, 1, 5), date(2026, 3, 8))
+        self.assertEqual(result, "5 janvier – 8 mars 2026")
+
+    def test_different_year(self):
+        from sites_conformes.core.templatetags.wagtail_dsfr_tags import event_date_range
+
+        with override("fr"):
+            result = event_date_range(date(2026, 1, 5), date(2027, 1, 8))
+        self.assertEqual(result, "5 janvier 2026 – 8 janvier 2027")
+
+    def test_accepts_datetimes(self):
+        from sites_conformes.core.templatetags.wagtail_dsfr_tags import event_date_range
+
+        with override("fr"):
+            result = event_date_range(datetime(2026, 1, 5, 9, 0), datetime(2026, 1, 5, 18, 0))
+        self.assertEqual(result, "5 janvier 2026")
+
+    def test_returns_empty_when_missing_date(self):
+        from sites_conformes.core.templatetags.wagtail_dsfr_tags import event_date_range
+
+        self.assertEqual(event_date_range(None, date(2026, 1, 5)), "")
+        self.assertEqual(event_date_range(date(2026, 1, 5), None), "")
