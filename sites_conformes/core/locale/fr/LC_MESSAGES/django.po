@@ -1470,6 +1470,10 @@ msgstr "Auteur :"
 msgid "Source:"
 msgstr "Source :"
 
+#, python-format
+msgid "- Page %(current)s / %(total)s"
+msgstr "- Page %(current)s / %(total)s"
+
 msgid "Filters"
 msgstr "Filtres"
 
