@@ -1397,6 +1397,9 @@ msgstr "Méga menu"
 msgid "Home page"
 msgstr "Accueil"
 
+msgid "Published on"
+msgstr "Publié le"
+
 msgid "No article found."
 msgstr "Aucun article trouvé."
 
