@@ -17,8 +17,7 @@ To upgrade of Sites Conformes :
  - Merge `production` into `main-agreste`, by making a PR and merging it.
  - Update the version number in `agreste_version.txt` : `VERSION="3.1.0-1.1.0"; git checkout main-agreste; git pull; echo $VERSION > agreste_version.txt; git add agreste_version.txt; git commit -m "Bump version to $VERSION"; git push`
  - Create the release : 
-   - Open a PR to merge `main-agreste` into `production-agreste`. Name it with the new version number. Solve any conflicts and merge (this will trigger the release if autodeploy is configured on `production-agreste` branch)
-   - Make a release in github, creating a tag named e.g. `v2.3.5-0.1.0`, on branch `production-agreste`.
+   - Open a PR to merge `main-agreste` into `production-agreste`. Name it with the new version number. Solve any conflicts and merge. This will trigger a github action that will create the release and tag. If the auto-deploy is configured on Scalingo, it will deploy the release.
 
 -----
 # Sites Conformes
