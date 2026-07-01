@@ -11,13 +11,51 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  garage:
+    image: dxflrs/garage:v2.3.0
+    ports:
+      - "3900:3900"  # S3-compatible API
+      - "3902:3902"  # S3 web (browser access)
+    volumes:
+      - garage_data:/data
+      - ./garage/garage.toml:/etc/garage.toml:ro
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: GKarageKEY00000000000000000
+      GARAGE_DEFAULT_SECRET_KEY: GKarageSECRETe1087f810d44b283bd7a61077c363893
+      GARAGE_DEFAULT_BUCKET: sites-conformes-media
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+
+  garage-bootstrap:
+    image: alpine:3.20
+    profiles:
+      - bootstrap
+    depends_on:
+      garage:
+        condition: service_started
+    command:
+      - sh
+      - -c
+      - |
+        apk add --no-cache curl >/dev/null 2>&1
+        echo ""
+        echo "Garage S3 cluster — ready!"
+        echo ""
+        echo "Use these in your .env:"
+        echo "  S3_HOST=garage:3900"
+        echo "  S3_KEY_ID=GKarageKEY00000000000000000"
+        echo "  S3_SECRET_KEY=GKarageSECRETe1087f810d44b283bd7a61077c363893"
+        echo "  S3_BUCKET_NAME=sites-conformes-media"
+        echo "  S3_BUCKET_REGION=fr"
+        echo "  S3_PROTOCOL=http"
+        echo "  (do NOT set S3_PUBLIC_HOST — presigned URLs work via garage:3900)"
+
   web:
     build: .
     user: "1000:1000"
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@db:${DATABASE_PORT}/${DATABASE_NAME}
+      DATABASE_URL: postgres://${DATABASE_USER}:***@db:${DATABASE_PORT}/${DATABASE_NAME}
     ports:
       - "${HOST_PORT}:${HOST_PORT}"
     volumes:
@@ -27,9 +65,13 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      - db
+      db:
+        condition: service_started
+      garage:
+        condition: service_started
 
 volumes:
   postgres_data:
   medias:
   staticfiles:
+  garage_data:
