@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-10 17:26+0200\n"
+"POT-Creation-Date: 2026-07-01 16:16+0200\n"
 "PO-Revision-Date: 2026-06-08 15:16+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -70,8 +70,15 @@ msgstr "Texte affiché à la fin de chaque page de la taxonomie"
 msgid "Parent %(type)s cannot be self."
 msgstr "Le/La %(type)s ne peut être sa propre catégorie parente."
 
+msgid "Published on"
+msgstr "Publié le"
+
 msgid "Collection:"
 msgstr "Collection :"
 
 msgid "Theme:"
 msgstr "Thématique :"
+
+#, python-format
+msgid "- Page %(current)s / %(total)s"
+msgstr "- Page %(current)s / %(total)s"

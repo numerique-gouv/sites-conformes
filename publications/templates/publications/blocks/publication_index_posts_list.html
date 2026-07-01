@@ -8,7 +8,7 @@
           <h3 class="fr-card__title">
             <a href="{{ post.url }}">{{ post.title }}</a>
           </h3>
-          <p class="fr-card__desc">Publié le {{ post.date |date:'l j F Y' }}</p>
+          <p class="fr-card__desc">{% translate "Published on" %} {{ post.date |date:'l j F Y' }}</p>
           {% if post.collections.all or post.themes.all %}
             <div class="fr-card__start">
               <ul class="fr-tags-group">
