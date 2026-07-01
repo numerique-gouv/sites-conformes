@@ -184,6 +184,25 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         self.assertNotIn("?", link["href"])
         self.assertTrue(link["href"].endswith("#posts-list"))
 
+    def test_see_all_publications_button_uses_default_text(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertEqual(link.get_text(strip=True), gettext("See all publications"))
+
+    def test_see_all_publications_button_uses_custom_text(self):
+        content_page = self._content_page_with_block(
+            slug="publication-recent-block-custom-button",
+            show_filters=False,
+            see_all_button_text="Browse all reports",
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertEqual(link.get_text(strip=True), "Browse all reports")
+
 
 class PublicationRecentEntriesBlockFilterTestCase(WagtailPageTestCase):
     def setUp(self):

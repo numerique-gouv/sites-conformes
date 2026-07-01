@@ -81,6 +81,14 @@ class PublicationRecentEntriesStructValue(blocks.StructValue):
             return self.current_filters()
         return {}
 
+    def see_all_button_label(self):
+        from django.utils.translation import gettext
+
+        text = self.get("see_all_button_text")
+        if text:
+            return text
+        return gettext("See all publications")
+
     def sub_heading_tag(self):
         heading_tag = self.get("heading_tag")
         if heading_tag == "h2":
@@ -127,6 +135,11 @@ class PublicationRecentEntriesBlock(blocks.StructBlock):
         required=False,
     )
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
+    see_all_button_text = blocks.CharBlock(
+        label=_("“See all publications” button text"),
+        required=False,
+        default=_("See all publications"),
+    )
     see_all_link = blocks.ChoiceBlock(
         label=_("“See all publications” button navigates to the index page with :"),
         choices=SEE_ALL_LINK_CHOICES,
