@@ -85,18 +85,20 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
             show_filters=True,
         )
 
-    def _content_page_with_block(self, slug, show_filters):
+    def _content_page_with_block(self, slug, show_filters, **block_overrides):
+        block_data = {
+            "title": "Latest",
+            "heading_tag": "h2",
+            "index_page": self.index_page,
+            "entries_count": 4,
+            "collection_filter": self.collection,
+            "show_filters": show_filters,
+        }
+        block_data.update(block_overrides)
         body = [
             (
                 PUBLICATION_RECENT_ENTRIES_BLOCK,
-                {
-                    "title": "Latest",
-                    "heading_tag": "h2",
-                    "index_page": self.index_page,
-                    "entries_count": 4,
-                    "collection_filter": self.collection,
-                    "show_filters": show_filters,
-                },
+                block_data,
             ),
         ]
         return self.home.add_child(
@@ -146,6 +148,27 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         block = self._block_soup(response)
         self.assertNotIn(gettext("Filter by collection"), block.get_text())
         self.assertIsNone(block.select_one("a.fr-tag[aria-pressed]"))
+
+    def test_see_all_publications_link_includes_block_filters(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertIn("collection=agriculture", link["href"])
+        self.assertTrue(link["href"].endswith("#posts-list"))
+
+    def test_see_all_publications_link_omits_query_when_unfiltered(self):
+        content_page = self._content_page_with_block(
+            slug="publication-recent-block-unfiltered",
+            show_filters=False,
+            collection_filter=None,
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertNotIn("?", link["href"])
+        self.assertTrue(link["href"].endswith("#posts-list"))
 
 
 class PublicationRecentEntriesBlockFilterTestCase(WagtailPageTestCase):

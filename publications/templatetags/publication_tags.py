@@ -56,3 +56,12 @@ def toggle_url_filter(context, *_, **kwargs):
     with collection and theme query parameters.
     """
     return build_toggle_url_query_string(context, PUBLICATION_INDEX_FILTERS, **kwargs)
+
+
+@register.simple_tag
+def filters_query(filters_dict=None):
+    """Build a ``?key=val`` query string from publication index filter params."""
+    if not filters_dict:
+        return ""
+    url_string = urlencode(filters_dict, doseq=True)
+    return f"?{url_string}" if url_string else ""
