@@ -34,14 +34,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--cache-control",
             default="",
-            help='Cache-Control header value (default: same as settings.py, i.e. "public, max-age=31536000, immutable").',
+            help="Cache-Control header value",
         )
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
-        header_value = options["cache-control"] or os.getenv(
-            "S3_CACHE_CONTROL", settings.MEDIA_CACHE_CONTROL
-        )
+        header_value = options["cache-control"] or os.getenv("S3_CACHE_CONTROL", settings.MEDIA_CACHE_CONTROL)
 
         s3_config = self._get_s3_config()
         if not s3_config:
@@ -128,10 +126,7 @@ class Command(BaseCommand):
                         continue
 
                     if dry_run:
-                        self.stdout.write(
-                            f"  [DRY RUN] Would update: {key}  "
-                            f"(current: {current_cc or 'none'})"
-                        )
+                        self.stdout.write(f"  [DRY RUN] Would update: {key}  " f"(current: {current_cc or 'none'})")
                         updated += 1
                         continue
 
