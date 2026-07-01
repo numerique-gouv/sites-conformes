@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
-from wagtail.blocks import BooleanBlock
+from wagtail.blocks import BlockGroup, BooleanBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.constants import HEADING_CHOICES_2_5
@@ -136,12 +136,12 @@ class PublicationRecentEntriesBlock(blocks.StructBlock):
     )
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
     see_all_button_text = blocks.CharBlock(
-        label=_("“See all publications” button text"),
+        label=_("Button text"),
         required=False,
         default=_("See all publications"),
     )
     see_all_link = blocks.ChoiceBlock(
-        label=_("“See all publications” button navigates to the index page with :"),
+        label=_("Button navigates to the index page with :"),
         choices=SEE_ALL_LINK_CHOICES,
         default=SEE_ALL_LINK_UNFILTERED,
         required=False,
@@ -152,3 +152,21 @@ class PublicationRecentEntriesBlock(blocks.StructBlock):
         icon = "placeholder"
         template = "publications/blocks/publication_recent_entries.html"
         value_class = PublicationRecentEntriesStructValue
+        form_layout = BlockGroup(
+            children=[
+                "title",
+                "heading_tag",
+                "index_page",
+                "entries_count",
+                "collection_filter",
+                "theme_filter",
+                "tag_filter",
+                "author_filter",
+                "source_filter",
+                "show_filters",
+                BlockGroup(
+                    children=["see_all_button_text", "see_all_link"],
+                    heading=_("“See all publications” button"),
+                ),
+            ],
+        )
