@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound
 from django.views import View
 
@@ -25,5 +26,5 @@ class ServeFileView(View):
             content_type=stored_file.content_type,
         )
         response["Content-Length"] = stored_file.size
-        response["Cache-Control"] = "public, max-age=3600"
+        response["Cache-Control"] = settings.MEDIA_CACHE_CONTROL
         return response
