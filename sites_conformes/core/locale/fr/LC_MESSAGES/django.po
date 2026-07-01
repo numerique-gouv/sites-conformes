@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 11:53+0200\n"
+"POT-Creation-Date: 2026-07-01 12:02+0200\n"
 "PO-Revision-Date: 2026-06-04 20:23+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1481,6 +1481,10 @@ msgstr "Auteur :"
 
 msgid "Source:"
 msgstr "Source :"
+
+#, python-format
+msgid "- Page %(current)s / %(total)s"
+msgstr "- Page %(current)s / %(total)s"
 
 msgid "Filters"
 msgstr "Filtres"
