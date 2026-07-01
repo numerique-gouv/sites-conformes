@@ -1,0 +1,48 @@
+# Create a GitHub release when a versioned PR is merged into production-agreste.
+#
+# Expected PR title format (optional leading v):
+#   - v1.2.3
+#   - v1.2.3-4.0.1 (Agreste version + Sites Conformes version, see agreste_version.txt)
+#   - v1.2.3-ci-test (optional suffix: letters, digits, ., _, -)
+name: Release Agreste
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - production-agreste
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Extract version from PR title
+        id: version
+        shell: bash
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          TITLE="$(printf '%s' "$PR_TITLE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          if [[ -z "$TITLE" ]] || [[ "$TITLE" == *..* ]] || [[ "$TITLE" == *. ]] \
+            || [[ ! "$TITLE" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9._-]+)?$ ]]; then
+            echo "PR title is not a valid release tag (expected e.g. v1.2.3, v3.1.1-4.0.1, v1.2.3-ci-test): $TITLE"
+            exit 0
+          fi
+          TAG="v${TITLE#v}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "create_release=true" >> "$GITHUB_OUTPUT"
+          echo "Creating release ${TAG} for merge commit ${{ github.event.pull_request.merge_commit_sha }}"
+
+      - name: Create GitHub release
+        if: steps.version.outputs.create_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
+          generate_release_notes: true
+          make_latest: true
+          skip_if_tag_exists: true
