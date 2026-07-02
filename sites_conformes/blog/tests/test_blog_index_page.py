@@ -65,8 +65,31 @@ FILTER_CASES = [
     },
 ]
 
-for case in FILTER_CASES:
-    case["filter_url"] = lambda self, case=case: (f"{self.index.url}?{case['query_param'](self)}")
+
+def attach_filter_urls(filter_cases):
+    """Add a ``filter_url`` helper to each filter case dict.
+
+    Each case already has a ``query_param`` callable that returns the query
+    string (e.g. ``"tag=news"``). This function adds ``filter_url``, which
+    prepends the index page URL at test runtime::
+
+        case = {
+            "name": "tag",
+            "query_param": lambda self: "tag=news",
+        }
+        attach_filter_urls([case])
+
+        # In a test, after setUp has created self.index:
+        case["filter_url"](self)  # -> "/blog-index/?tag=news"
+
+    The ``case=case`` default argument binds each lambda to the correct dict
+    entry (without it, every lambda would use the last case from the loop).
+    """
+    for case in filter_cases:
+        case["filter_url"] = lambda self, case=case: (f"{self.index.url}?{case['query_param'](self)}")
+
+
+attach_filter_urls(FILTER_CASES)
 
 
 def list_settings_in_panel(panels):
@@ -80,21 +103,31 @@ def list_settings_in_panel(panels):
 
 
 class BlogIndexPageSettingsTest(WagtailPageTestCase):
+    """In the admin pages, test the 'Show filters' panel in the settings of the BlogIndexPage."""
+
+    index_page_class = BlogIndexPage
+    filter_settings_defaults = FILTER_SETTINGS_DEFAULTS
+
     def test_settings_show_filters_panel_includes_all_fields(self):
-        field_names = list_settings_in_panel(BlogIndexPage.settings_panels)
-        for field_name in FILTER_SETTINGS_DEFAULTS:
+        field_names = list_settings_in_panel(self.index_page_class.settings_panels)
+        for field_name in self.filter_settings_defaults:
             self.assertIn(field_name, field_names)
 
     def test_filter_settings_default_values(self):
         home = Page.objects.get(slug="home")
         page = home.add_child(
-            instance=BlogIndexPage(title="Defaults", slug="defaults"),
+            instance=self.index_page_class(title="Defaults", slug="defaults"),
         )
-        for field_name, expected_default in FILTER_SETTINGS_DEFAULTS.items():
+        for field_name, expected_default in self.filter_settings_defaults.items():
             self.assertEqual(getattr(page, field_name), expected_default, field_name)
 
 
 class BlogIndexPageFilterTestBase(WagtailPageTestCase):
+    index_page_class = BlogIndexPage
+    index_title = "Blog"
+    index_slug = "blog-index"
+    filter_cases = FILTER_CASES
+
     def setUp(self):
         self.home = Page.objects.get(slug="home")
         self.admin = User.objects.create_superuser("test", "test@test.test", "pass")
@@ -102,25 +135,18 @@ class BlogIndexPageFilterTestBase(WagtailPageTestCase):
         self.paris_tz = zoneinfo.ZoneInfo("Europe/Paris")
 
         self.index = self.home.add_child(
-            instance=BlogIndexPage(
-                title="Blog",
-                slug="blog-index",
+            instance=self.index_page_class(
+                title=self.index_title,
+                slug=self.index_slug,
                 owner=self.admin,
             )
         )
         self.index.save_revision().publish()
 
-        locale = self.index.locale
-        self.category = Category.objects.create(
-            name="Agriculture",
-            slug="agriculture",
-            locale=locale,
-        )
-        self.other_category = Category.objects.create(
-            name="Environment",
-            slug="environment",
-            locale=locale,
-        )
+        self.setup_filter_fixtures()
+        self.setup_taxonomy_filter_fixtures()
+
+    def setup_filter_fixtures(self):
         self.tag = Tag.objects.create(name="News", slug="news")
         self.other_tag = Tag.objects.create(name="Report", slug="report")
         self.organization = Organization.objects.create(name="INRAE", slug="inrae")
@@ -136,6 +162,24 @@ class BlogIndexPageFilterTestBase(WagtailPageTestCase):
             organization=self.other_organization,
         )
 
+        self.post_with_tag = self._create_post("Post News", tags=[self.tag])
+        self.post_with_other_tag = self._create_post("Post Report", tags=[self.other_tag])
+        self.post_with_author = self._create_post("Post Jane", authors=[self.author])
+        self.post_with_other_author = self._create_post("Post John", authors=[self.other_author])
+
+    def setup_taxonomy_filter_fixtures(self):
+        locale = self.index.locale
+        self.category = Category.objects.create(
+            name="Agriculture",
+            slug="agriculture",
+            locale=locale,
+        )
+        self.other_category = Category.objects.create(
+            name="Environment",
+            slug="environment",
+            locale=locale,
+        )
+
         self.post_with_category = self._create_post(
             "Post Agriculture",
             blog_categories=[self.category],
@@ -144,10 +188,6 @@ class BlogIndexPageFilterTestBase(WagtailPageTestCase):
             "Post Environment",
             blog_categories=[self.other_category],
         )
-        self.post_with_tag = self._create_post("Post News", tags=[self.tag])
-        self.post_with_other_tag = self._create_post("Post Report", tags=[self.other_tag])
-        self.post_with_author = self._create_post("Post Jane", authors=[self.author])
-        self.post_with_other_author = self._create_post("Post John", authors=[self.other_author])
 
     def _create_post(self, title, blog_categories=None, tags=None, authors=None):
         post = BlogEntryPage(
@@ -173,7 +213,7 @@ class BlogIndexPageFilterTestBase(WagtailPageTestCase):
 
 class BlogIndexPageFilterVisibilityTest(BlogIndexPageFilterTestBase):
     def test_filter_shown_when_enabled(self):
-        for case in FILTER_CASES:
+        for case in self.filter_cases:
             with self.subTest(case["name"]):
                 self._set_filter_settings(**{case["setting"]: True})
                 response = self.client.get(self.index.url)
@@ -181,7 +221,7 @@ class BlogIndexPageFilterVisibilityTest(BlogIndexPageFilterTestBase):
                 self.assertContains(response, case["visible_label"](self))
 
     def test_filter_hidden_when_disabled(self):
-        for case in FILTER_CASES:
+        for case in self.filter_cases:
             with self.subTest(case["name"]):
                 self._set_filter_settings(**{case["setting"]: False})
                 response = self.client.get(self.index.url)
@@ -190,7 +230,7 @@ class BlogIndexPageFilterVisibilityTest(BlogIndexPageFilterTestBase):
 
 class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
     def test_filters_posts(self):
-        for case in FILTER_CASES:
+        for case in self.filter_cases:
             with self.subTest(case["name"]):
                 response = self.client.get(case["filter_url"](self))
                 self.assertContains(response, case["matching_title"](self))
@@ -201,7 +241,7 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
         Disabling a filter hides its sidemenu block, but get_context still
         filters posts from the query param.
         """
-        for case in FILTER_CASES:
+        for case in self.filter_cases:
             with self.subTest(case["name"]):
                 self._set_filter_settings(**{case["setting"]: False})
                 response = self.client.get(case["filter_url"](self))
@@ -212,7 +252,7 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
     def test_filters_posts_with_two_query_params(self):
         # Remove the "source" case, because there's interactions with the "author" case that make testing complicated.
         # We'll have less coverage but reliable tests.
-        filter_cases = [case for case in FILTER_CASES if case["name"] != "source"]
+        filter_cases = [case for case in self.filter_cases if case["name"] != "source"]
         for case_a, case_b in combinations(filter_cases, 2):
             with self.subTest(f"{case_a['name']}+{case_b['name']}"):
                 title = f"Post with {case_a['name']} and {case_b['name']}"
@@ -228,7 +268,7 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
 
 
 class BlogIndexPagePostsDisplayTest(BlogIndexPageFilterTestBase):
-    def test_posts_display_categories_on_cards(self):
+    def test_posts_display_taxonomies_on_cards(self):
         post = self._create_post(
             "Post with category",
             blog_categories=[self.category],
