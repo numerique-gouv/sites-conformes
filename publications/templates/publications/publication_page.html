@@ -52,7 +52,7 @@
         </div>
       </div>
       <p>
-        Publié le <a href="{% pageurl page.get_parent %}{% toggle_url_filter year=page.date.year %}">{{ page.date |date:'l j F Y' }}</a>
+        {% translate "Published on" %} <a href="{% pageurl page.get_parent %}{% toggle_url_filter year=page.date.year %}">{{ page.date |date:'l j F Y' }}</a>
         {% if collections %}
           |
           {% for collection in collections %}

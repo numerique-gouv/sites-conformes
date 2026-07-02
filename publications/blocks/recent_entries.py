@@ -1,11 +1,19 @@
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
-from wagtail.blocks import BooleanBlock
+from wagtail.blocks import BlockGroup, BooleanBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.constants import HEADING_CHOICES_2_5
 
 PUBLICATION_RECENT_ENTRIES_BLOCK = "publication_recent_entries"
+
+SEE_ALL_LINK_UNFILTERED = "unfiltered"
+SEE_ALL_LINK_FILTERED = "filtered"
+
+SEE_ALL_LINK_CHOICES = [
+    (SEE_ALL_LINK_UNFILTERED, _("No filters")),
+    (SEE_ALL_LINK_FILTERED, _("The selected filters")),
+]
 
 
 class PublicationRecentEntriesStructValue(blocks.StructValue):
@@ -68,6 +76,19 @@ class PublicationRecentEntriesStructValue(blocks.StructValue):
 
         return filters
 
+    def see_all_link_filters(self) -> dict:
+        if self.get("see_all_link", SEE_ALL_LINK_UNFILTERED) == SEE_ALL_LINK_FILTERED:
+            return self.current_filters()
+        return {}
+
+    def see_all_button_label(self):
+        from django.utils.translation import gettext
+
+        text = self.get("see_all_button_text")
+        if text:
+            return text
+        return gettext("See all publications")
+
     def sub_heading_tag(self):
         heading_tag = self.get("heading_tag")
         if heading_tag == "h2":
@@ -114,9 +135,38 @@ class PublicationRecentEntriesBlock(blocks.StructBlock):
         required=False,
     )
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
+    see_all_button_text = blocks.CharBlock(
+        label=_("Button text"),
+        required=False,
+        default=_("See all publications"),
+    )
+    see_all_link = blocks.ChoiceBlock(
+        label=_("Button navigates to the index page with :"),
+        choices=SEE_ALL_LINK_CHOICES,
+        default=SEE_ALL_LINK_UNFILTERED,
+        required=False,
+    )
 
     class Meta:
         label = _("Recent publications")
         icon = "placeholder"
         template = "publications/blocks/publication_recent_entries.html"
         value_class = PublicationRecentEntriesStructValue
+        form_layout = BlockGroup(
+            children=[
+                "title",
+                "heading_tag",
+                "index_page",
+                "entries_count",
+                "collection_filter",
+                "theme_filter",
+                "tag_filter",
+                "author_filter",
+                "source_filter",
+                "show_filters",
+                BlockGroup(
+                    children=["see_all_button_text", "see_all_link"],
+                    heading=_("“See all publications” button"),
+                ),
+            ],
+        )

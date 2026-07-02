@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-10 17:26+0200\n"
+"POT-Creation-Date: 2026-07-01 16:16+0200\n"
 "PO-Revision-Date: 2026-06-08 15:16+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,6 +27,24 @@ msgstr "Filtrer par thématique"
 
 msgid "Recent publications"
 msgstr "Publications récentes"
+
+msgid "See all publications"
+msgstr "Voir toutes les publications"
+
+msgid "“See all publications” button"
+msgstr "Bouton « Voir toutes les publications »"
+
+msgid "Button text"
+msgstr "Texte du bouton"
+
+msgid "Button navigates to the index page with :"
+msgstr "Le bouton pointe vers la page d’index avec :"
+
+msgid "No filters"
+msgstr "Aucun filtre"
+
+msgid "The selected filters"
+msgstr "Les filtres sélectionnés"
 
 msgid "Collection"
 msgstr "Collection"
@@ -70,8 +88,15 @@ msgstr "Texte affiché à la fin de chaque page de la taxonomie"
 msgid "Parent %(type)s cannot be self."
 msgstr "Le/La %(type)s ne peut être sa propre catégorie parente."
 
+msgid "Published on"
+msgstr "Publié le"
+
 msgid "Collection:"
 msgstr "Collection :"
 
 msgid "Theme:"
 msgstr "Thématique :"
+
+#, python-format
+msgid "- Page %(current)s / %(total)s"
+msgstr "- Page %(current)s / %(total)s"

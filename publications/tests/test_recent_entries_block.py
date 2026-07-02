@@ -11,6 +11,7 @@ from wagtail.test.utils import WagtailPageTestCase
 
 from publications.blocks.recent_entries import (
     PUBLICATION_RECENT_ENTRIES_BLOCK,
+    SEE_ALL_LINK_FILTERED,
 )
 from publications.models import Collection, PublicationIndexPage, PublicationPage, Theme
 from sites_conformes.blog.models import Organization, Person
@@ -85,18 +86,20 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
             show_filters=True,
         )
 
-    def _content_page_with_block(self, slug, show_filters):
+    def _content_page_with_block(self, slug, show_filters, **block_overrides):
+        block_data = {
+            "title": "Latest",
+            "heading_tag": "h2",
+            "index_page": self.index_page,
+            "entries_count": 4,
+            "collection_filter": self.collection,
+            "show_filters": show_filters,
+        }
+        block_data.update(block_overrides)
         body = [
             (
                 PUBLICATION_RECENT_ENTRIES_BLOCK,
-                {
-                    "title": "Latest",
-                    "heading_tag": "h2",
-                    "index_page": self.index_page,
-                    "entries_count": 4,
-                    "collection_filter": self.collection,
-                    "show_filters": show_filters,
-                },
+                block_data,
             ),
         ]
         return self.home.add_child(
@@ -109,6 +112,13 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         )
         self.assertIsNotNone(block)
         return block
+
+    def _assert_see_all_link_targets_index_page(self, link, index_page=None):
+        index_page = index_page or self.index_page
+        self.assertTrue(
+            link["href"].startswith(index_page.url),
+            f"Expected link to target {index_page.url!r}, got {link['href']!r}",
+        )
 
     def test_publication_recent_entries_is_renderable(self):
         self.assertPageIsRenderable(self.content_page)
@@ -146,6 +156,59 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         block = self._block_soup(response)
         self.assertNotIn(gettext("Filter by collection"), block.get_text())
         self.assertIsNone(block.select_one("a.fr-tag[aria-pressed]"))
+
+    def test_see_all_publications_link_defaults_to_unfiltered_index(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_index_page(link)
+        self.assertNotIn("?", link["href"])
+
+    def test_see_all_publications_link_includes_block_filters_when_configured(self):
+        content_page = self._content_page_with_block(
+            slug="publication-recent-block-filtered-link",
+            show_filters=True,
+            see_all_link=SEE_ALL_LINK_FILTERED,
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_index_page(link)
+        self.assertIn("collection=agriculture", link["href"])
+
+    def test_see_all_publications_link_omits_query_when_unfiltered(self):
+        content_page = self._content_page_with_block(
+            slug="publication-recent-block-unfiltered",
+            show_filters=False,
+            collection_filter=None,
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_index_page(link)
+        self.assertNotIn("?", link["href"])
+
+    def test_see_all_publications_button_uses_default_text(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertEqual(link.get_text(strip=True), gettext("See all publications"))
+
+    def test_see_all_publications_button_uses_custom_text(self):
+        content_page = self._content_page_with_block(
+            slug="publication-recent-block-custom-button",
+            show_filters=False,
+            see_all_button_text="Browse all reports",
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertEqual(link.get_text(strip=True), "Browse all reports")
 
 
 class PublicationRecentEntriesBlockFilterTestCase(WagtailPageTestCase):
