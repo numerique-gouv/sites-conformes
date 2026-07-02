@@ -5,12 +5,12 @@ from django.utils.translation import gettext
 
 from publications.models import Collection, PublicationIndexPage, PublicationPage, Theme
 from sites_conformes.blog.tests.test_blog_index_page import (
+    SHARED_FILTER_CASES,
     BlogIndexPageFilterQueryTest,
     BlogIndexPageFilterTestBase,
     BlogIndexPageFilterVisibilityTest,
     BlogIndexPagePostsDisplayTest,
     BlogIndexPageSettingsTest,
-    attach_filter_urls,
 )
 
 FILTER_SETTINGS_DEFAULTS = {
@@ -21,13 +21,14 @@ FILTER_SETTINGS_DEFAULTS = {
     "filter_by_source": False,
 }
 
-FILTER_CASES = [
+TAXONOMY_FILTER_CASES = [
     {
         "name": "collection",
         "setting": "filter_by_collection",
         "heading": gettext("Filter by collection"),
         "visible_label": lambda self: self.collection.name,
         "query_param": lambda self: "collection=agriculture",
+        "filter_url": lambda self: f"{self.index.url}?collection=agriculture",
         "post_kwargs": lambda self: {"collections": [self.collection]},
         "matching_title": lambda self: self.post_with_collection.title,
         "other_title": lambda self: self.post_with_other_collection.title,
@@ -38,43 +39,14 @@ FILTER_CASES = [
         "heading": gettext("Filter by theme"),
         "visible_label": lambda self: self.theme.name,
         "query_param": lambda self: "theme=climate",
+        "filter_url": lambda self: f"{self.index.url}?theme=climate",
         "post_kwargs": lambda self: {"themes": [self.theme]},
         "matching_title": lambda self: self.post_with_theme.title,
         "other_title": lambda self: self.post_with_other_theme.title,
     },
-    {
-        "name": "tag",
-        "setting": "filter_by_tag",
-        "heading": gettext("Filter by tag"),
-        "visible_label": lambda self: self.tag.name,
-        "query_param": lambda self: "tag=news",
-        "post_kwargs": lambda self: {"tags": [self.tag]},
-        "matching_title": lambda self: self.post_with_tag.title,
-        "other_title": lambda self: self.post_with_other_tag.title,
-    },
-    {
-        "name": "author",
-        "setting": "filter_by_author",
-        "heading": gettext("Filter by author"),
-        "visible_label": lambda self: self.author.name,
-        "query_param": lambda self: f"author={self.author.id}",
-        "post_kwargs": lambda self: {"authors": [self.author]},
-        "matching_title": lambda self: self.post_with_author.title,
-        "other_title": lambda self: self.post_with_other_author.title,
-    },
-    {
-        "name": "source",
-        "setting": "filter_by_source",
-        "heading": gettext("Filter by source"),
-        "visible_label": lambda self: self.organization.name,
-        "query_param": lambda self: "source=inrae",
-        # You can't assign a source to a post directly, so we assign an author associated to the source.
-        "post_kwargs": lambda self: {"authors": [self.author]},
-        "matching_title": lambda self: self.post_with_author.title,
-        "other_title": lambda self: self.post_with_other_author.title,
-    },
 ]
-attach_filter_urls(FILTER_CASES)
+
+FILTER_CASES = TAXONOMY_FILTER_CASES + SHARED_FILTER_CASES
 
 
 class PublicationIndexPageSettingsTest(BlogIndexPageSettingsTest):

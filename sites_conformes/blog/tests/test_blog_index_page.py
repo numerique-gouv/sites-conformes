@@ -21,23 +21,28 @@ FILTER_SETTINGS_DEFAULTS = {
     "filter_by_source": False,
 }
 
-FILTER_CASES = [
+TAXONOMY_FILTER_CASES = [
     {
         "name": "category",
         "setting": "filter_by_category",
         "heading": gettext("Filter by category"),
         "visible_label": lambda self: self.category.name,
         "query_param": lambda self: "category=agriculture",
+        "filter_url": lambda self: f"{self.index.url}?category=agriculture",
         "post_kwargs": lambda self: {"blog_categories": [self.category]},
         "matching_title": lambda self: self.post_with_category.title,
         "other_title": lambda self: self.post_with_other_category.title,
     },
+]
+
+SHARED_FILTER_CASES = [
     {
         "name": "tag",
         "setting": "filter_by_tag",
         "heading": gettext("Filter by tag"),
         "visible_label": lambda self: self.tag.name,
         "query_param": lambda self: "tag=news",
+        "filter_url": lambda self: f"{self.index.url}?tag=news",
         "post_kwargs": lambda self: {"tags": [self.tag]},
         "matching_title": lambda self: self.post_with_tag.title,
         "other_title": lambda self: self.post_with_other_tag.title,
@@ -48,6 +53,7 @@ FILTER_CASES = [
         "heading": gettext("Filter by author"),
         "visible_label": lambda self: self.author.name,
         "query_param": lambda self: f"author={self.author.id}",
+        "filter_url": lambda self: f"{self.index.url}?author={self.author.id}",
         "post_kwargs": lambda self: {"authors": [self.author]},
         "matching_title": lambda self: self.post_with_author.title,
         "other_title": lambda self: self.post_with_other_author.title,
@@ -58,6 +64,7 @@ FILTER_CASES = [
         "heading": gettext("Filter by source"),
         "visible_label": lambda self: self.organization.name,
         "query_param": lambda self: "source=inrae",
+        "filter_url": lambda self: f"{self.index.url}?source=inrae",
         # You can't assign a source to a post directly, so we assign an author associated to the source.
         "post_kwargs": lambda self: {"authors": [self.author]},
         "matching_title": lambda self: self.post_with_author.title,
@@ -65,31 +72,7 @@ FILTER_CASES = [
     },
 ]
 
-
-def attach_filter_urls(filter_cases):
-    """Add a ``filter_url`` helper to each filter case dict.
-
-    Each case already has a ``query_param`` callable that returns the query
-    string (e.g. ``"tag=news"``). This function adds ``filter_url``, which
-    prepends the index page URL at test runtime::
-
-        case = {
-            "name": "tag",
-            "query_param": lambda self: "tag=news",
-        }
-        attach_filter_urls([case])
-
-        # In a test, after setUp has created self.index:
-        case["filter_url"](self)  # -> "/blog-index/?tag=news"
-
-    The ``case=case`` default argument binds each lambda to the correct dict
-    entry (without it, every lambda would use the last case from the loop).
-    """
-    for case in filter_cases:
-        case["filter_url"] = lambda self, case=case: (f"{self.index.url}?{case['query_param'](self)}")
-
-
-attach_filter_urls(FILTER_CASES)
+FILTER_CASES = TAXONOMY_FILTER_CASES + SHARED_FILTER_CASES
 
 
 def list_settings_in_panel(panels):
