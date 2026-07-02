@@ -99,24 +99,6 @@
                       aria-expanded="false">{% translate "Filters" %}</button>
               <div class="fr-collapse" id="fr-sidemenu-wrapper-{{ page.slug }}">
                 <h2 class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters" %}</h2>
-                {% if collections and page.filter_by_collection %}
-                  <div class="fr-my-3w">
-                    <h3 class="fr-h6">{% translate "Filter by collection" %}</h3>
-                    <ul class="fr-tags-group">
-                      {% for collection in collections %}
-                        <li>
-                          <a type="button"
-                             class="fr-tag"
-                             href="{% pageurl page %}{% toggle_url_filter collection=collection %}#posts-list"
-                             {% if collection.slug == current_collection.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
-                            {{ collection.name }}
-                          </a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                {% endif %}
-
                 {% if themes and page.filter_by_theme %}
                   <div class="fr-my-3w">
                     <h3 class="fr-h6">{% translate "Filter by theme" %}</h3>
@@ -128,6 +110,24 @@
                              href="{% pageurl page %}{% toggle_url_filter theme=theme %}#posts-list"
                              {% if theme.slug == current_theme.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
                             {{ theme.name }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+
+                {% if collections and page.filter_by_collection %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by collection" %}</h3>
+                    <ul class="fr-tags-group">
+                      {% for collection in collections %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter collection=collection %}#posts-list"
+                             {% if collection.slug == current_collection.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                            {{ collection.name }}
                           </a>
                         </li>
                       {% endfor %}
