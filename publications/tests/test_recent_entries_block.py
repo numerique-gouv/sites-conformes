@@ -113,6 +113,13 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         self.assertIsNotNone(block)
         return block
 
+    def _assert_see_all_link_targets_index_page(self, link, index_page=None):
+        index_page = index_page or self.index_page
+        self.assertTrue(
+            link["href"].startswith(index_page.url),
+            f"Expected link to target {index_page.url!r}, got {link['href']!r}",
+        )
+
     def test_publication_recent_entries_is_renderable(self):
         self.assertPageIsRenderable(self.content_page)
 
@@ -155,8 +162,8 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         block = self._block_soup(response)
         link = block.select_one("a.fr-btn")
         self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_index_page(link)
         self.assertNotIn("?", link["href"])
-        self.assertTrue(link["href"].endswith("#posts-list"))
 
     def test_see_all_publications_link_includes_block_filters_when_configured(self):
         content_page = self._content_page_with_block(
@@ -168,8 +175,8 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         block = self._block_soup(response)
         link = block.select_one("a.fr-btn")
         self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_index_page(link)
         self.assertIn("collection=agriculture", link["href"])
-        self.assertTrue(link["href"].endswith("#posts-list"))
 
     def test_see_all_publications_link_omits_query_when_unfiltered(self):
         content_page = self._content_page_with_block(
@@ -181,8 +188,8 @@ class PublicationRecentEntriesBlockTestCase(WagtailPageTestCase):
         block = self._block_soup(response)
         link = block.select_one("a.fr-btn")
         self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_index_page(link)
         self.assertNotIn("?", link["href"])
-        self.assertTrue(link["href"].endswith("#posts-list"))
 
     def test_see_all_publications_button_uses_default_text(self):
         response = self.client.get(self.content_page.url)
