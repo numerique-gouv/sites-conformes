@@ -85,26 +85,6 @@ def list_settings_in_panel(panels):
     return names
 
 
-class BlogIndexPageSettingsTest(WagtailPageTestCase):
-    """In the admin pages, test the 'Show filters' panel in the settings of the BlogIndexPage."""
-
-    index_page_class = BlogIndexPage
-    filter_settings_defaults = FILTER_SETTINGS_DEFAULTS
-
-    def test_settings_show_filters_panel_includes_all_fields(self):
-        field_names = list_settings_in_panel(self.index_page_class.settings_panels)
-        for field_name in self.filter_settings_defaults:
-            self.assertIn(field_name, field_names)
-
-    def test_filter_settings_default_values(self):
-        home = Page.objects.get(slug="home")
-        page = home.add_child(
-            instance=self.index_page_class(title="Defaults", slug="defaults"),
-        )
-        for field_name, expected_default in self.filter_settings_defaults.items():
-            self.assertEqual(getattr(page, field_name), expected_default, field_name)
-
-
 class BlogIndexPageFilterTestBase(WagtailPageTestCase):
     index_page_class = BlogIndexPage
     index_title = "Blog"
@@ -194,7 +174,24 @@ class BlogIndexPageFilterTestBase(WagtailPageTestCase):
         self.index.save_revision().publish()
 
 
-class BlogIndexPageFilterVisibilityTest(BlogIndexPageFilterTestBase):
+class BlogIndexPageSettingsTest(BlogIndexPageFilterTestBase):
+    """Test the "Show filters" panel in the page settings, and that it shows/hides filters in
+    the left sidebar of the page."""
+
+    filter_settings_defaults = FILTER_SETTINGS_DEFAULTS
+
+    def test_settings_show_filters_panel_includes_all_fields(self):
+        field_names = list_settings_in_panel(self.index_page_class.settings_panels)
+        for field_name in self.filter_settings_defaults:
+            self.assertIn(field_name, field_names)
+
+    def test_filter_settings_default_values(self):
+        page = self.home.add_child(
+            instance=self.index_page_class(title="Defaults", slug="defaults"),
+        )
+        for field_name, expected_default in self.filter_settings_defaults.items():
+            self.assertEqual(getattr(page, field_name), expected_default, field_name)
+
     def test_filter_shown_when_enabled(self):
         for case in self.filter_cases:
             with self.subTest(case["name"]):
@@ -212,6 +209,8 @@ class BlogIndexPageFilterVisibilityTest(BlogIndexPageFilterTestBase):
 
 
 class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
+    """Test the filtering of the posts on the index page."""
+
     def test_filters_posts(self):
         for case in self.filter_cases:
             with self.subTest(case["name"]):
@@ -251,6 +250,8 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
 
 
 class BlogIndexPagePostsDisplayTest(BlogIndexPageFilterTestBase):
+    """Test the display of the taxonomies on the post list's cards."""
+
     def test_posts_display_taxonomies_on_cards(self):
         post = self._create_post(
             "Post with category",

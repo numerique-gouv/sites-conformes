@@ -8,7 +8,6 @@ from sites_conformes.blog.tests.test_blog_index_page import (
     SHARED_FILTER_CASES,
     BlogIndexPageFilterQueryTest,
     BlogIndexPageFilterTestBase,
-    BlogIndexPageFilterVisibilityTest,
     BlogIndexPagePostsDisplayTest,
     BlogIndexPageSettingsTest,
 )
@@ -47,11 +46,6 @@ TAXONOMY_FILTER_CASES = [
 ]
 
 FILTER_CASES = TAXONOMY_FILTER_CASES + SHARED_FILTER_CASES
-
-
-class PublicationIndexPageSettingsTest(BlogIndexPageSettingsTest):
-    index_page_class = PublicationIndexPage
-    filter_settings_defaults = FILTER_SETTINGS_DEFAULTS
 
 
 class PublicationIndexPageFilterTestBase(BlogIndexPageFilterTestBase):
@@ -105,11 +99,8 @@ class PublicationIndexPageFilterTestBase(BlogIndexPageFilterTestBase):
         return post
 
 
-class PublicationIndexPageFilterVisibilityTest(
-    PublicationIndexPageFilterTestBase,
-    BlogIndexPageFilterVisibilityTest,
-):
-    pass
+class PublicationIndexPageSettingsTest(PublicationIndexPageFilterTestBase, BlogIndexPageSettingsTest):
+    filter_settings_defaults = FILTER_SETTINGS_DEFAULTS
 
 
 class PublicationIndexPageFilterQueryTest(
