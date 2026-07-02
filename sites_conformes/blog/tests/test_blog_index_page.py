@@ -75,16 +75,6 @@ SHARED_FILTER_CASES = [
 FILTER_CASES = TAXONOMY_FILTER_CASES + SHARED_FILTER_CASES
 
 
-def list_settings_in_panel(panels):
-    names = []
-    for panel in panels:
-        if hasattr(panel, "field_name"):
-            names.append(panel.field_name)
-        if hasattr(panel, "children"):
-            names.extend(list_settings_in_panel(panel.children))
-    return names
-
-
 class BlogIndexPageFilterTestBase(WagtailPageTestCase):
     index_page_class = BlogIndexPage
     index_title = "Blog"
@@ -181,6 +171,15 @@ class BlogIndexPageSettingsTest(BlogIndexPageFilterTestBase):
     filter_settings_defaults = FILTER_SETTINGS_DEFAULTS
 
     def test_settings_show_filters_panel_includes_all_fields(self):
+        def list_settings_in_panel(panels):
+            names = []
+            for panel in panels:
+                if hasattr(panel, "field_name"):
+                    names.append(panel.field_name)
+                if hasattr(panel, "children"):
+                    names.extend(list_settings_in_panel(panel.children))
+            return names
+
         field_names = list_settings_in_panel(self.index_page_class.settings_panels)
         for field_name in self.filter_settings_defaults:
             self.assertIn(field_name, field_names)
@@ -220,8 +219,7 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
 
     def test_url_filter_applies_even_when_filter_disabled_in_settings(self):
         """
-        Disabling a filter hides its sidemenu block, but get_context still
-        filters posts from the query param.
+        Disabling a filter hides its sidemenu block, but passing it in the URL still filters the posts.
         """
         for case in self.filter_cases:
             with self.subTest(case["name"]):
@@ -232,6 +230,7 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
                 self.assertNotContains(response, case["other_title"](self))
 
     def test_filters_posts_with_two_query_params(self):
+        """Tests pairs of filters, to check that they interact correctly."""
         # Remove the "source" case, because there's interactions with the "author" case that make testing complicated.
         # We'll have less coverage but reliable tests.
         filter_cases = [case for case in self.filter_cases if case["name"] != "source"]
@@ -249,8 +248,8 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
                     self.assertNotContains(response, case["other_title"](self))
 
 
-class BlogIndexPagePostsDisplayTest(BlogIndexPageFilterTestBase):
-    """Test the display of the taxonomies on the post list's cards."""
+class BlogIndexPagePostsTest(BlogIndexPageFilterTestBase):
+    """Test the display of the post list on the index page."""
 
     def test_posts_display_taxonomies_on_cards(self):
         post = self._create_post(

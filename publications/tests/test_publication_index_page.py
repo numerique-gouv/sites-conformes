@@ -8,7 +8,7 @@ from sites_conformes.blog.tests.test_blog_index_page import (
     SHARED_FILTER_CASES,
     BlogIndexPageFilterQueryTest,
     BlogIndexPageFilterTestBase,
-    BlogIndexPagePostsDisplayTest,
+    BlogIndexPagePostsTest,
     BlogIndexPageSettingsTest,
 )
 
@@ -110,9 +110,9 @@ class PublicationIndexPageFilterQueryTest(
     pass
 
 
-class PublicationIndexPagePostsDisplayTest(
+class PublicationIndexPagePostsTest(
     PublicationIndexPageFilterTestBase,
-    BlogIndexPagePostsDisplayTest,
+    BlogIndexPagePostsTest,
 ):
     def test_posts_display_taxonomies_on_cards(self):
         # Themes are hidden on result cards (publication_index_posts_list.html) because
