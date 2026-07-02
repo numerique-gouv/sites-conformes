@@ -1,11 +1,19 @@
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
-from wagtail.blocks import BooleanBlock
+from wagtail.blocks import BlockGroup, BooleanBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.constants import (
     HEADING_CHOICES_2_5,
 )
+
+SEE_ALL_LINK_UNFILTERED = "unfiltered"
+SEE_ALL_LINK_FILTERED = "filtered"
+
+SEE_ALL_LINK_CHOICES = [
+    (SEE_ALL_LINK_UNFILTERED, _("No filters")),
+    (SEE_ALL_LINK_FILTERED, _("The selected filters")),
+]
 
 
 class RecentEntriesStructValue(blocks.StructValue):
@@ -81,6 +89,21 @@ class RecentEntriesStructValue(blocks.StructValue):
             return "h6"
 
 
+class BlogRecentEntriesStructValue(RecentEntriesStructValue):
+    def see_all_link_filters(self) -> dict:
+        if self.get("see_all_link", SEE_ALL_LINK_UNFILTERED) == SEE_ALL_LINK_FILTERED:
+            return self.current_filters()
+        return {}
+
+    def see_all_button_label(self):
+        from django.utils.translation import gettext
+
+        text = self.get("see_all_button_text")
+        if text:
+            return text
+        return gettext("See all posts")
+
+
 class BlogRecentEntriesBlock(blocks.StructBlock):
     title = blocks.CharBlock(label=_("Title"), required=False)
     heading_tag = blocks.ChoiceBlock(
@@ -106,11 +129,39 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
         required=False,
     )
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
+    see_all_button_text = blocks.CharBlock(
+        label=_("Button text"),
+        required=False,
+        default=_("See all posts"),
+    )
+    see_all_link = blocks.ChoiceBlock(
+        label=_("Button navigates to the index page with :"),
+        choices=SEE_ALL_LINK_CHOICES,
+        default=SEE_ALL_LINK_UNFILTERED,
+        required=False,
+    )
 
     class Meta:
         icon = "placeholder"
         template = ("sites_conformes_core/blocks/blog_recent_entries.html",)
-        value_class = RecentEntriesStructValue
+        value_class = BlogRecentEntriesStructValue
+        form_layout = BlockGroup(
+            children=[
+                "title",
+                "heading_tag",
+                "blog",
+                "entries_count",
+                "category_filter",
+                "tag_filter",
+                "author_filter",
+                "source_filter",
+                "show_filters",
+                BlockGroup(
+                    children=["see_all_button_text", "see_all_link"],
+                    heading=_("“See all posts” button"),
+                ),
+            ],
+        )
 
 
 class EventsRecentEntriesBlock(blocks.StructBlock):

@@ -1,11 +1,14 @@
+from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.urls import reverse
+from django.utils.translation import gettext
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
+from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category
+from sites_conformes.core.blocks.related_entries import SEE_ALL_LINK_FILTERED
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
@@ -495,33 +498,138 @@ class TileBlockTestCase(WagtailPageTestCase):
 
 class BlogRecentEntriesBlockTestCase(WagtailPageTestCase):
     def setUp(self):
-        home_page = Page.objects.get(slug="home")
+        self.home_page = Page.objects.get(slug="home")
         self.admin = User.objects.create_superuser("test", "test@test.test", "pass")
-        self.admin.save()
 
         lorem_raw = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>"
-        lorem_body = []
-        lorem_body.append(("paragraph", RichText(lorem_raw)))
+        lorem_body = [("paragraph", RichText(lorem_raw))]
 
-        blog_index = home_page.add_child(
-            instance=BlogIndexPage(title="Actualités", body=lorem_body, slug="actualités", show_in_menus=True)
+        self.blog_index = self.home_page.add_child(
+            instance=BlogIndexPage(title="Actualités", body=lorem_body, slug="actualites", show_in_menus=True),
+        )
+        self.category = Category.objects.create(name="Agriculture", slug="agriculture")
+
+        self.blog_entry = self.blog_index.add_child(
+            instance=BlogEntryPage(
+                title="Article",
+                slug="article",
+                body=lorem_body,
+                blog_categories=[self.category],
+            ),
         )
 
-        _blog_entry = blog_index.add_child(instance=BlogEntryPage(title="Article", body=lorem_body, slug="article"))
+        self.content_page = self._content_page_with_block(
+            slug="blog-recent-block",
+            show_filters=True,
+        )
 
+    def _content_page_with_block(self, slug, show_filters, **block_overrides):
+        block_data = {
+            "title": "Actus",
+            "heading_tag": "h2",
+            "blog": self.blog_index,
+            "entries_count": 4,
+            "category_filter": self.category,
+            "show_filters": show_filters,
+        }
+        block_data.update(block_overrides)
         body = [
             (
                 "blog_recent_entries",
-                {"title": "Actus", "heading_tag": "h2", "blog": blog_index, "entries_count": 4},
-            )
+                block_data,
+            ),
         ]
-        self.content_page = home_page.add_child(
-            instance=ContentPage(title="Sample page", slug="content-page", owner=self.admin, body=body)
+        return self.home_page.add_child(
+            instance=ContentPage(title="Sample page", slug=slug, owner=self.admin, body=body),
         )
-        self.content_page.save()
+
+    def _block_soup(self, response):
+        block = BeautifulSoup(response.content, "html.parser").select_one(
+            ".cmsfr-block-blog-recent-entries",
+        )
+        self.assertIsNotNone(block)
+        return block
+
+    def _assert_see_all_link_targets_blog_index(self, link, blog_index=None):
+        blog_index = blog_index or self.blog_index
+        self.assertTrue(
+            link["href"].startswith(blog_index.url),
+            f"Expected link to target {blog_index.url!r}, got {link['href']!r}",
+        )
 
     def test_blog_recent_entries_is_renderable(self):
         self.assertPageIsRenderable(self.content_page)
+
+    def test_filters_visible_when_enabled(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        self.assertIn(gettext("Filter by category"), block.get_text())
+        pressed_filter = block.select_one('a.fr-tag[aria-pressed="true"]')
+        self.assertIsNotNone(pressed_filter)
+        self.assertEqual(pressed_filter.get_text(strip=True), self.category.name)
+
+    def test_filters_hidden_when_disabled(self):
+        content_page = self._content_page_with_block(
+            slug="blog-recent-block-no-filters",
+            show_filters=False,
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        self.assertNotIn(gettext("Filter by category"), block.get_text())
+        self.assertIsNone(block.select_one("a.fr-tag[aria-pressed]"))
+
+    def test_see_all_posts_link_defaults_to_unfiltered_index(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_blog_index(link)
+        self.assertNotIn("?", link["href"])
+
+    def test_see_all_posts_link_includes_block_filters_when_configured(self):
+        content_page = self._content_page_with_block(
+            slug="blog-recent-block-filtered-link",
+            show_filters=True,
+            see_all_link=SEE_ALL_LINK_FILTERED,
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_blog_index(link)
+        self.assertIn("category=agriculture", link["href"])
+
+    def test_see_all_posts_link_omits_query_when_unfiltered(self):
+        content_page = self._content_page_with_block(
+            slug="blog-recent-block-unfiltered",
+            show_filters=False,
+            category_filter=None,
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self._assert_see_all_link_targets_blog_index(link)
+        self.assertNotIn("?", link["href"])
+
+    def test_see_all_posts_button_uses_default_text(self):
+        response = self.client.get(self.content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertEqual(link.get_text(strip=True), gettext("See all posts"))
+
+    def test_see_all_posts_button_uses_custom_text(self):
+        content_page = self._content_page_with_block(
+            slug="blog-recent-block-custom-button",
+            show_filters=False,
+            see_all_button_text="Browse all articles",
+        )
+        response = self.client.get(content_page.url)
+        block = self._block_soup(response)
+        link = block.select_one("a.fr-btn")
+        self.assertIsNotNone(link)
+        self.assertEqual(link.get_text(strip=True), "Browse all articles")
 
 
 class EventsRecentEntriesBlockTestCase(WagtailPageTestCase):

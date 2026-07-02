@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from bs4 import BeautifulSoup
 from django import template
 from django.conf import settings
@@ -177,6 +179,15 @@ def toggle_url_filter(context, *_, **kwargs):
         return f"?{url_string}"
     else:
         return ""
+
+
+@register.simple_tag
+def filters_query(filters_dict=None):
+    """Build a ``?key=val`` query string from blog index filter params."""
+    if not filters_dict:
+        return ""
+    url_string = urlencode(filters_dict, doseq=True)
+    return f"?{url_string}" if url_string else ""
 
 
 @register.filter
