@@ -1,3 +1,10 @@
+"""Blog index page tests.
+
+The tests are structured to allow easier future transition from single Categories to multiple Taxonomies.
+The test classes are structured so that page types with multiple taxonomies can reuse them by subclassing.
+Taxonomy-specific elements are overridden in subclasses (see publications tests in https://github.com/betagouv/agreste).
+"""
+
 import zoneinfo
 from datetime import datetime
 from itertools import combinations
