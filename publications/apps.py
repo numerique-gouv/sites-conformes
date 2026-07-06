@@ -17,3 +17,9 @@ class PublicationsConfig(AppConfig):
 
         api_router.register_endpoint("collections", CollectionsAPIViewSet)
         api_router.register_endpoint("themes", ThemesAPIViewSet)
+
+        from publications.models import PublicationPage
+        from publications.taxonomies import COLLECTION, THEME
+        from sites_conformes.blog.taxonomy import register_taxonomies
+
+        register_taxonomies(PublicationPage, [COLLECTION, THEME])

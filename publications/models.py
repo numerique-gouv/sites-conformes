@@ -1,8 +1,5 @@
-from django.core.paginator import Paginator
 from django.db import models
-from django.db.models import BooleanField, QuerySet
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
@@ -10,13 +7,8 @@ from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import path
 from wagtail.models import Orderable
 
-from publications.taxonomy import (
-    AbstractTaxonomy,
-    get_taxonomies_for_index,
-    list_taxonomies_for_index,
-)
-from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Person
-from sites_conformes.core.models import Tag
+from publications.taxonomy import AbstractTaxonomy
+from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
 
 
 class Collection(AbstractTaxonomy):
@@ -125,225 +117,26 @@ class PublicationIndexPage(BlogIndexPage):
     class Meta:
         verbose_name = _("Publication index")
 
-    @property
-    def posts(self):
-        posts = PublicationPage.objects.descendant_of(self).live()
-        posts = (
-            posts.order_by("-date")
-            .select_related("owner")
-            .prefetch_related("tags", "collections", "themes", "date__year")
-        )
-        return posts
+    def get_collections(self):
+        from publications.taxonomies import COLLECTION
+        from sites_conformes.blog.taxonomy import get_taxonomy_values
 
-    def get_context(self, request, *args, **kwargs):
-        context = super(BlogIndexPage, self).get_context(request, *args, **kwargs)
-        posts = self.posts
+        return get_taxonomy_values(self, COLLECTION)
 
-        extra_breadcrumbs = None
-        extra_title = ""
+    def get_themes(self):
+        from publications.taxonomies import THEME
+        from sites_conformes.blog.taxonomy import get_taxonomy_values
 
-        tag = None
-        collection = None
-        theme = None
-        source = None
-        author = None
-
-        tag_slug = request.GET.get("tag")
-        if tag_slug:
-            tag = get_object_or_404(Tag, slug=tag_slug)
-            posts = posts.filter(tags=tag)
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                    {
-                        "url": f"{self.get_url()}{self.reverse_subpage('tags_list')}",
-                        "title": _("Tags"),
-                    },
-                ],
-                "current": tag,
-            }
-            extra_title = _("Posts tagged with %(tag)s") % {"tag": tag}
-
-        collection_slug = request.GET.get("collection")
-        if collection_slug:
-            collection = get_object_or_404(Collection, slug=collection_slug, locale=self.locale)
-            posts = posts.filter(collections=collection)
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                    {
-                        "url": f"{self.get_url()}{self.reverse_subpage('collections_list')}",
-                        "title": _("Collections"),
-                    },
-                ],
-                "current": collection.name,
-            }
-            extra_title = _("Posts in collection %(collection)s") % {"collection": collection.name}
-
-        theme_slug = request.GET.get("theme")
-        if theme_slug:
-            theme = get_object_or_404(Theme, slug=theme_slug, locale=self.locale)
-            posts = posts.filter(themes=theme)
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                    {
-                        "url": f"{self.get_url()}{self.reverse_subpage('themes_list')}",
-                        "title": _("Themes"),
-                    },
-                ],
-                "current": theme.name,
-            }
-            extra_title = _("Posts in theme %(theme)s") % {"theme": theme.name}
-
-        source_slug = request.GET.get("source")
-        if source_slug:
-            from sites_conformes.blog.models import Organization
-
-            source = get_object_or_404(Organization, slug=source_slug)
-            posts = posts.filter(authors__organization=source)
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": _("Posts written by") + f" {source.name}",
-            }
-            extra_title = _("Posts written by") + f" {source.name}"
-
-        author_id = request.GET.get("author")
-        if author_id:
-            author = get_object_or_404(Person, id=author_id)
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": _("Posts written by") + f" {author.name}",
-            }
-            posts = posts.filter(authors=author)
-            extra_title = _("Posts written by") + f" {author.name}"
-
-        year = request.GET.get("year")
-        if year:
-            posts = posts.filter(date__year=year)
-            extra_title = _("Posts published in %(year)s") % {"year": year}
-
-        page_number = request.GET.get("page")
-        paginator = Paginator(posts, self.posts_per_page)
-        posts = paginator.get_page(page_number)
-
-        context["posts"] = posts
-        context["current_collection"] = collection
-        context["current_theme"] = theme
-        context["current_tag"] = tag
-        context["current_source"] = source
-        context["current_author"] = author
-        context["year"] = year
-        context["paginator"] = paginator
-        context["extra_title"] = extra_title
-
-        context["collections"] = self.get_collections()
-        context["themes"] = self.get_themes()
-        context["authors"] = self.get_authors()
-        context["sources"] = self.get_sources()
-        context["tags"] = self.get_tags()
-
-        if extra_breadcrumbs:
-            context["extra_breadcrumbs"] = extra_breadcrumbs
-
-        return context
-
-    def get_collections(self) -> QuerySet:
-        return get_taxonomies_for_index(self, Collection, "collections")
-
-    def get_themes(self) -> QuerySet:
-        return get_taxonomies_for_index(self, Theme, "themes")
-
-    def list_collections(self) -> list:
-        return list_taxonomies_for_index(
-            self, prefix="coll", slug_path="collections__slug", name_path="collections__name"
-        )
-
-    def list_themes(self) -> list:
-        return list_taxonomies_for_index(self, prefix="theme", slug_path="themes__slug", name_path="themes__name")
-
-    @property
-    def show_filters(self) -> bool | BooleanField:
-        return (
-            self.filter_by_collection
-            or self.filter_by_theme
-            or self.filter_by_tag
-            or self.filter_by_author
-            or self.filter_by_source
-        )
-
-    def feed_posts(self, feed, request):
-        posts = self.posts
-
-        collection = request.GET.get("collection")
-        if collection:
-            collection = get_object_or_404(Collection, slug=collection, locale=self.locale)
-            posts = posts.filter(collections=collection)
-
-        theme = request.GET.get("theme")
-        if theme:
-            theme = get_object_or_404(Theme, slug=theme, locale=self.locale)
-            posts = posts.filter(themes=theme)
-
-        limit = int(request.GET.get("limit", self.feed_posts_limit))
-        posts = posts[:limit]
-
-        for post in posts:
-            feed.add_item(
-                post.title,
-                post.full_url,
-                pubdate=post.date,
-                description=post.search_description,
-            )
-
-        return feed
+        return get_taxonomy_values(self, THEME)
 
     @path("collections/", name="collections_list")
     def collections_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        extra_title = _("Collections")
-        collections = self.list_collections()
+        from publications.taxonomies import COLLECTION
 
-        extra_breadcrumbs = {
-            "links": [
-                {"url": self.get_url(), "title": self.title},
-            ],
-            "current": _("Collections"),
-        }
-
-        return self.render(
-            request,
-            context_overrides={
-                "collections": collections,
-                "page": self,
-                "extra_title": extra_title,
-                "extra_breadcrumbs": extra_breadcrumbs,
-            },
-            template="publications/collections_list_page.html",
-        )
+        return self.render_taxonomy_list(request, COLLECTION)
 
     @path("themes/", name="themes_list")
     def themes_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        extra_title = _("Themes")
-        themes = self.list_themes()
+        from publications.taxonomies import THEME
 
-        extra_breadcrumbs = {
-            "links": [
-                {"url": self.get_url(), "title": self.title},
-            ],
-            "current": _("Themes"),
-        }
-
-        return self.render(
-            request,
-            context_overrides={
-                "themes": themes,
-                "page": self,
-                "extra_title": extra_title,
-                "extra_breadcrumbs": extra_breadcrumbs,
-            },
-            template="publications/themes_list_page.html",
-        )
+        return self.render_taxonomy_list(request, THEME)

@@ -1,7 +1,5 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count
-from django.db.models.expressions import F
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel, TitleFieldPanel
@@ -89,21 +87,3 @@ class AbstractTaxonomy(TranslatableMixin, index.Indexed, Orderable):
         if not self.slug:
             self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
-
-
-def get_taxonomies_for_index(index_page, taxonomy_model, m2m_field: str):
-    ids = index_page.posts.specific().values_list(m2m_field, flat=True)
-    return taxonomy_model.objects.filter(id__in=ids).order_by("name")
-
-
-def list_taxonomies_for_index(index_page, *, prefix: str, slug_path: str, name_path: str):
-    posts = index_page.posts.specific()
-    slug_key = f"{prefix}_slug"
-    name_key = f"{prefix}_name"
-    count_key = f"{prefix}_count"
-    return (
-        posts.values(**{slug_key: F(slug_path), name_key: F(name_path)})
-        .annotate(**{count_key: Count(slug_key)})
-        .filter(**{f"{count_key}__gte": 1})
-        .order_by(f"-{count_key}")
-    )
