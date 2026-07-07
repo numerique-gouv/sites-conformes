@@ -154,13 +154,15 @@ def richtext_p_add_class(value, class_name: str):
 
 
 def build_toggle_url_query_string(context, filters: list[FilterSpec], **kwargs) -> str:
-    filters_dict = kwargs.get("filters_dict", None)
+    filters_dict = kwargs.get("filters_dict", {})
     if filters_dict:
         url_params = filters_dict.copy()
     else:
         url_params = context["request"].GET.copy()
 
-    for param, attr in filters:
+    for f in filters:
+        param = f[0]
+        attr = f[1]
         val = kwargs.get(param, "")
         current_val = context.get(f"current_{param}", "")
 
@@ -175,7 +177,8 @@ def build_toggle_url_query_string(context, filters: list[FilterSpec], **kwargs) 
     url_string = urlencode(url_params, doseq=True)
     if url_string:
         return f"?{url_string}"
-    return ""
+    else:
+        return ""
 
 
 @register.simple_tag(takes_context=True)
