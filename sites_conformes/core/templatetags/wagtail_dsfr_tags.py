@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from bs4 import BeautifulSoup
 from django import template
 from django.conf import settings
@@ -9,6 +11,16 @@ from wagtail.rich_text import RichText
 from sites_conformes.core.models import CmsDsfrConfig
 
 register = template.Library()
+
+FilterSpec = tuple[str, str]
+
+FILTERS: list[FilterSpec] = [
+    ("author", "id"),
+    ("category", "slug"),
+    ("source", "slug"),
+    ("tag", "slug"),
+    ("year", ""),
+]
 
 
 @register.simple_tag
@@ -141,42 +153,41 @@ def richtext_p_add_class(value, class_name: str):
     return mark_safe(str(soup))
 
 
-@register.simple_tag(takes_context=True)
-def toggle_url_filter(context, *_, **kwargs):
-    """
-    Sets a URL filter, or removes it if it is already in use.
-
-    The other filters can be passed through a dictionary or the GET parameters
-    """
-
-    filters_dict = kwargs.get("filters_dict", {})
+def build_toggle_url_query_string(context, filters: list[FilterSpec], **kwargs) -> str:
+    filters_dict = kwargs.pop("filters_dict", None)
     if filters_dict:
-        url_params = filters_dict.copy()
+        base_params = filters_dict.copy()
     else:
-        url_params = context["request"].GET.copy()
+        base_params = context["request"].GET.copy()
 
-    filters = [("author", "id"), ("category", "slug"), ("source", "slug"), ("tag", "slug"), ("year", "")]
-
-    for f in filters:
-        param = f[0]
-        attr = f[1]
+    for param, attr in filters:
         val = kwargs.get(param, "")
         current_val = context.get(f"current_{param}", "")
 
         if val and val != current_val:
             if attr:
-                url_params[param] = getattr(val, attr)
+                base_params[param] = getattr(val, attr)
             else:
-                url_params[param] = val
+                base_params[param] = val
         elif val and val == current_val:
-            url_params.pop(param, None)
+            base_params.pop(param, None)
 
-    url_string = "&".join(["{}={}".format(x[0], x[1]) for x in url_params.items()])
-
+    url_string = urlencode(base_params, doseq=True)
     if url_string:
         return f"?{url_string}"
-    else:
-        return ""
+    return ""
+
+
+@register.simple_tag(takes_context=True)
+def toggle_url_filter(context, *_, **kwargs):
+    """
+    Sets a URL filter, or removes it if it is already in use.
+
+    The other filters can be passed through a dictionary or the GET parameters.
+    ``kwargs`` are filter values from the template (e.g. category=category).
+    Optional ``filters_dict`` overrides ``request.GET`` as the starting query params.
+    """
+    return build_toggle_url_query_string(context, FILTERS, **kwargs)
 
 
 @register.filter
