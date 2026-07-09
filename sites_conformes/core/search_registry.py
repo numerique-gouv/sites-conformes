@@ -12,8 +12,10 @@ template without editing ``sites_conformes``.
 2. Subclass :class:`~sites_conformes.core.views.SearchResultsView` and override
    the extension points as needed:
 
-   - ``filter_search_queryset(queryset, site)`` — narrow the queryset before
-     ``.search()`` is called
+   - ``filter_before_search(queryset, site)`` — narrow candidates before
+     ``.search()`` (e.g. facet filters)
+   - ``filter_after_search(queryset, site)`` — refine results after
+     ``.search()`` (e.g. custom ranking, deduplication)
    - ``get_search_filter_context(site)`` — extra template context (e.g. a
      filter sidebar)
    - ``template_name`` — your app's search results template

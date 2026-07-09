@@ -76,7 +76,7 @@ def resolve_active_filters(request, site) -> ActiveFilters:
 
 
 def filter_queryset(request, queryset, site):
-    """Apply GET filter params to the searchable page queryset before .search()."""
+    """Apply GET filter params before full-text search (see ``filter_before_search``)."""
     root = site.root_page.localized
     active = resolve_active_filters(request, site)
     page_ids: set[int] | None = None
