@@ -22,9 +22,8 @@
 
 {% block content %}
   {% comment %}
-  Fork projects: extend this template outside sites_conformes/ to add a sidebar.
-  Override search_sidebar (filters) and search_results_column_class (e.g. fr-col fr-col-md-8 fr-col-12).
-  Example: faceted_search/templates/faceted_search/search_results.html extends this file and fills those blocks.
+  Fork projects: extend this template to add a sidebar.
+  Override search_sidebar and search_results_column_class to adjust column width with/without a sidebar (e.g. fr-col fr-col-md-8 fr-col-12).
   {% endcomment %}
   <div class="fr-container fr-my-4w">
     {% block search_heading %}

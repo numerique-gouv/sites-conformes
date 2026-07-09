@@ -1,18 +1,9 @@
-from django.apps import apps as django_apps
 from django.urls import include, path
 from django.utils.translation import gettext_lazy as _
 from wagtail import urls as wagtail_urls
 
-from sites_conformes.core.views import SearchResultsView, SiteMapView, TagsListView, TagView
-
-
-def get_search_results_view():
-    if django_apps.is_installed("faceted_search"):
-        from faceted_search.views import FacetedSearchResultsView
-
-        return FacetedSearchResultsView.as_view()
-    return SearchResultsView.as_view()
-
+from sites_conformes.core.search_registry import get_search_results_view
+from sites_conformes.core.views import SiteMapView, TagsListView, TagView
 
 urlpatterns = [
     path(_("search/"), get_search_results_view(), name="cms_search"),

@@ -5,6 +5,8 @@ from sites_conformes.core.views import SearchResultsView as BaseSearchResultsVie
 class FacetedSearchResultsView(BaseSearchResultsView):
     """Search with sidebar filters (collection, theme, tag, etc.)."""
 
+    template_name = "faceted_search/search_results.html"
+
     def filter_search_queryset(self, queryset, site):
         return filter_queryset(self.request, queryset, site)
 

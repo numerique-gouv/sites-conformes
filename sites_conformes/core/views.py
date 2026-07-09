@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -27,11 +26,6 @@ class SearchResultsView(ListView):
 
     model = Page
     template_name = "sites_conformes_core/search_results.html"
-
-    def get_template_names(self):
-        if apps.is_installed("faceted_search"):
-            return ["faceted_search/search_results.html"]
-        return [self.template_name]
 
     def get_searchable_queryset(self, site):
         root_page = site.root_page.localized
