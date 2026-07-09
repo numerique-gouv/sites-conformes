@@ -33,7 +33,7 @@ class ActiveFilters:
     year: str | None = None
 
 
-def resolve_active_filters(request, site) -> ActiveFilters:
+def get_active_filters_from_request_params(request, site) -> ActiveFilters:
     """Resolve active filter objects from GET parameters."""
     locale = site.root_page.localized.locale
     active = ActiveFilters()
@@ -69,7 +69,7 @@ def resolve_active_filters(request, site) -> ActiveFilters:
 def filter_queryset(request, queryset, site):
     """Apply GET filter params before full-text search (see ``filter_before_search``)."""
     root = site.root_page.localized
-    active = resolve_active_filters(request, site)
+    active = get_active_filters_from_request_params(request, site)
     page_ids: set[int] | None = None
 
     def intersect_page_ids(ids):
@@ -149,7 +149,7 @@ def get_filter_context(request, site) -> dict:
     blog_entries = BlogEntryPage.objects.descendant_of(root).live()
     content_pages = ContentPage.objects.descendant_of(root).live()
     publication_pages = PublicationPage.objects.descendant_of(root).live()
-    active = resolve_active_filters(request, site)
+    active = get_active_filters_from_request_params(request, site)
 
     context = {
         **get_enabled_filters(),
