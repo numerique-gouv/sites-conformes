@@ -108,6 +108,6 @@
     {% endfor %}
   </div>
   <div class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--center">
-    <a class="fr-btn" href="{% pageurl value.blog %}">{% translate "See all posts" %}</a>
+    <a class="fr-btn" href="{% pageurl value.blog %}{% filters_query value.see_all_link_filters %}">{{ value.see_all_button_label }}</a>
   </div>
 </div>
