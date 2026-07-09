@@ -12,7 +12,7 @@ from sites_conformes.core.models import ContentPage, Tag
 def get_enabled_filters() -> dict[str, bool]:
     """Which filter sections to show on the search page."""
     return {
-        "filter_by_category": True,
+        "filter_by_category": False,
         "filter_by_collection": True,
         "filter_by_theme": True,
         "filter_by_tag": True,
@@ -77,6 +77,9 @@ def filter_queryset(request, queryset, site):
         ids = set(ids)
         page_ids = ids if page_ids is None else page_ids & ids
 
+    # BlogEntryPage.objects also matches PublicationPage (subclass): shared fields
+    # (tags, authors, date, blog_categories) apply to both.
+
     if active.category:
         intersect_page_ids(
             BlogEntryPage.objects.descendant_of(root)
@@ -103,7 +106,11 @@ def filter_queryset(request, queryset, site):
             ContentPage.objects.descendant_of(root).live().filter(tags=active.tag).values_list("pk", flat=True)
         )
         tag_page_ids |= set(
-            BlogEntryPage.objects.descendant_of(root).live().filter(tags=active.tag).values_list("pk", flat=True)
+            # PublicationPage entries are included (subclass of BlogEntryPage).
+            BlogEntryPage.objects.descendant_of(root)
+            .live()
+            .filter(tags=active.tag)
+            .values_list("pk", flat=True)
         )
         intersect_page_ids(tag_page_ids)
 
@@ -138,6 +145,7 @@ def get_filter_context(request, site) -> dict:
     """Build context for the filter sidebar: enabled filters, filter values lists, active filter values."""
     root = site.root_page.localized
     locale = root.locale
+    # Includes PublicationPage entries (subclass of BlogEntryPage).
     blog_entries = BlogEntryPage.objects.descendant_of(root).live()
     content_pages = ContentPage.objects.descendant_of(root).live()
     publication_pages = PublicationPage.objects.descendant_of(root).live()
