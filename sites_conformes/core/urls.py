@@ -7,10 +7,10 @@ from sites_conformes.core.views import SearchResultsView, SiteMapView, TagsListV
 
 
 def get_search_results_view():
-    if django_apps.is_installed("search"):
-        from search.views import SearchResultsView as FilteredSearchResultsView
+    if django_apps.is_installed("faceted_search"):
+        from faceted_search.views import FacetedSearchResultsView
 
-        return FilteredSearchResultsView.as_view()
+        return FacetedSearchResultsView.as_view()
     return SearchResultsView.as_view()
 
 

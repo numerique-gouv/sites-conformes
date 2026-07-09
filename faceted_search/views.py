@@ -1,8 +1,8 @@
-from search.filters import filter_queryset, get_filter_context
+from faceted_search.filters import filter_queryset, get_filter_context
 from sites_conformes.core.views import SearchResultsView as BaseSearchResultsView
 
 
-class SearchResultsView(BaseSearchResultsView):
+class FacetedSearchResultsView(BaseSearchResultsView):
     """Search with sidebar filters (collection, theme, tag, etc.)."""
 
     def filter_search_queryset(self, queryset, site):
