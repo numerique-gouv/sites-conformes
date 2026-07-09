@@ -8,14 +8,13 @@ publications, not a standalone blog.
 """
 
 from itertools import combinations
-from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.core.management import call_command
 from django.urls import reverse
 from wagtail.models import Site
 
-from faceted_search.filters import get_active_filters_from_request_params, get_filter_context
+from faceted_search.filters import ENABLED_FILTERS, get_active_filters_from_request_params, get_filter_context
 from faceted_search.views import FacetedSearchResultsView
 from publications.tests.test_publication_index_page import (
     FILTER_CASES as PUBLICATION_FILTER_CASES,
@@ -40,16 +39,6 @@ def _replace_filter_url_for_search(case):
 
 SEARCH_FILTER_CASES = [_replace_filter_url_for_search(case) for case in PUBLICATION_FILTER_CASES]
 
-DISABLED_FILTER_FLAGS = {
-    "filter_by_category": False,
-    "filter_by_collection": False,
-    "filter_by_theme": False,
-    "filter_by_tag": False,
-    "filter_by_author": False,
-    "filter_by_source": False,
-    "filter_by_year": False,
-}
-
 FILTER_CONTEXT_KEYS = {
     "filter_by_collection": "collections",
     "filter_by_theme": "themes",
@@ -65,6 +54,10 @@ FILTER_FIXTURE_OBJECTS = {
     "filter_by_author": lambda self: self.author,
     "filter_by_source": lambda self: self.organization,
 }
+
+
+def _all_filters_disabled() -> dict[str, bool]:
+    return dict.fromkeys(ENABLED_FILTERS, False)
 
 
 class FacetedSearchFilterTestBase(PublicationIndexPageFilterTestBase):
@@ -97,7 +90,7 @@ class FacetedSearchRegistrationTest(FacetedSearchFilterTestBase):
 
 
 class FacetedSearchFilterContextTest(FacetedSearchFilterTestBase):
-    """``get_filter_context`` reflects enabled filter flags from ``get_enabled_filters``."""
+    """``get_filter_context`` builds sidebar lists according to ``enabled_filters``."""
 
     def _request_and_site(self):
         request = self.client.request().wsgi_request
@@ -106,34 +99,28 @@ class FacetedSearchFilterContextTest(FacetedSearchFilterTestBase):
 
     def test_enabled_filter_flags_populate_context_lists(self):
         for case in self.filter_cases:
+            enabled_flags = {**_all_filters_disabled(), case["setting"]: True}
             with self.subTest(case["name"]):
-                enabled_flags = {**DISABLED_FILTER_FLAGS, case["setting"]: True}
-                with patch("faceted_search.filters.get_enabled_filters", return_value=enabled_flags):
-                    context = get_filter_context(*self._request_and_site())
-
+                context = get_filter_context(*self._request_and_site(), enabled_filters=enabled_flags)
                 context_key = FILTER_CONTEXT_KEYS[case["setting"]]
                 fixture_object = FILTER_FIXTURE_OBJECTS[case["setting"]](self)
-                self.assertEqual(context[case["setting"]], True)
+                self.assertTrue(context[case["setting"]])
                 self.assertIn(fixture_object, list(context[context_key]))
 
     def test_disabled_filter_flags_omit_context_lists(self):
-        with patch("faceted_search.filters.get_enabled_filters", return_value=DISABLED_FILTER_FLAGS):
-            context = get_filter_context(*self._request_and_site())
-
+        context = get_filter_context(*self._request_and_site(), enabled_filters=_all_filters_disabled())
         for case in self.filter_cases:
             with self.subTest(case["name"]):
                 context_key = FILTER_CONTEXT_KEYS[case["setting"]]
-                self.assertEqual(context[case["setting"]], False)
+                self.assertFalse(context[case["setting"]])
                 self.assertNotIn(context_key, context)
 
     def test_show_search_filters_follows_enabled_flags(self):
-        enabled_flags = {**DISABLED_FILTER_FLAGS, "filter_by_collection": True}
-        with patch("faceted_search.filters.get_enabled_filters", return_value=enabled_flags):
-            context = get_filter_context(*self._request_and_site())
+        enabled_flags = {**_all_filters_disabled(), "filter_by_collection": True}
+        context = get_filter_context(*self._request_and_site(), enabled_filters=enabled_flags)
         self.assertTrue(context["show_search_filters"])
 
-        with patch("faceted_search.filters.get_enabled_filters", return_value=DISABLED_FILTER_FLAGS):
-            context = get_filter_context(*self._request_and_site())
+        context = get_filter_context(*self._request_and_site(), enabled_filters=_all_filters_disabled())
         self.assertFalse(context["show_search_filters"])
 
 

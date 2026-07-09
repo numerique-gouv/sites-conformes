@@ -8,18 +8,16 @@ from publications.models import Collection, PublicationPage, Theme
 from sites_conformes.blog.models import BlogEntryPage, Category, Organization, Person
 from sites_conformes.core.models import ContentPage, Tag
 
-
-def get_enabled_filters() -> dict[str, bool]:
-    """Which filter sections to show on the search page."""
-    return {
-        "filter_by_category": False,
-        "filter_by_collection": True,
-        "filter_by_theme": True,
-        "filter_by_tag": True,
-        "filter_by_author": True,
-        "filter_by_source": True,
-        "filter_by_year": True,
-    }
+"""Which filter sections to show on the search page."""
+ENABLED_FILTERS: dict[str, bool] = {
+    "filter_by_category": False,
+    "filter_by_collection": True,
+    "filter_by_theme": True,
+    "filter_by_tag": True,
+    "filter_by_author": True,
+    "filter_by_source": True,
+    "filter_by_year": True,
+}
 
 
 @dataclass
@@ -141,8 +139,11 @@ def filter_queryset(request, queryset, site):
     return queryset
 
 
-def get_filter_context(request, site) -> dict:
+def get_filter_context(request, site, *, enabled_filters: dict[str, bool] | None = None) -> dict:
     """Build context for the filter sidebar: enabled filters, filter values lists, active filter values."""
+    if enabled_filters is None:
+        enabled_filters = ENABLED_FILTERS
+
     root = site.root_page.localized
     locale = root.locale
     # Includes PublicationPage entries (subclass of BlogEntryPage).
@@ -152,7 +153,7 @@ def get_filter_context(request, site) -> dict:
     active = get_active_filters_from_request_params(request, site)
 
     context = {
-        **get_enabled_filters(),
+        **enabled_filters,
         "current_category": active.category,
         "current_collection": active.collection,
         "current_theme": active.theme,
