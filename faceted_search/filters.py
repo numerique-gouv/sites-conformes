@@ -1,38 +1,32 @@
-"""Search result filters (fork-specific; mirrors BlogIndexPage / PublicationIndexPage)."""
+"""Search result filters (fork-specific; mirrors PublicationIndexPage and blog facets)."""
 
 from dataclasses import dataclass
 
-from django.apps import apps
 from django.shortcuts import get_object_or_404
 
+from publications.models import Collection, PublicationPage, Theme
 from sites_conformes.blog.models import BlogEntryPage, Category, Organization, Person
 from sites_conformes.core.models import ContentPage, Tag
 
 
 def get_enabled_filters() -> dict[str, bool]:
     """Which filter sections to show on the search page."""
-    settings = {
-        "filter_by_category": False,
+    return {
+        "filter_by_category": True,
+        "filter_by_collection": True,
+        "filter_by_theme": True,
         "filter_by_tag": True,
-        "filter_by_author": False,
-        "filter_by_source": False,
+        "filter_by_author": True,
+        "filter_by_source": True,
         "filter_by_year": True,
-        "filter_by_collection": False,
-        "filter_by_theme": False,
     }
-    if apps.is_installed("publications"):
-        settings["filter_by_collection"] = True
-        settings["filter_by_theme"] = True
-    else:
-        settings["filter_by_category"] = True
-    return settings
 
 
 @dataclass
 class ActiveFilters:
     category: Category | None = None
-    collection = None  # untyped because we might not have the publications app
-    theme = None  # untyped because we might not have the publications app
+    collection: Collection | None = None
+    theme: Theme | None = None
     tag: Tag | None = None
     source: Organization | None = None
     author: Person | None = None
@@ -48,16 +42,13 @@ def resolve_active_filters(request, site) -> ActiveFilters:
     if category_slug:
         active.category = get_object_or_404(Category, slug=category_slug, locale=locale)
 
-    if apps.is_installed("publications"):
-        from publications.models import Collection, Theme
+    collection_slug = request.GET.get("collection")
+    if collection_slug:
+        active.collection = get_object_or_404(Collection, slug=collection_slug, locale=locale)
 
-        collection_slug = request.GET.get("collection")
-        if collection_slug:
-            active.collection = get_object_or_404(Collection, slug=collection_slug, locale=locale)
-
-        theme_slug = request.GET.get("theme")
-        if theme_slug:
-            active.theme = get_object_or_404(Theme, slug=theme_slug, locale=locale)
+    theme_slug = request.GET.get("theme")
+    if theme_slug:
+        active.theme = get_object_or_404(Theme, slug=theme_slug, locale=locale)
 
     tag_slug = request.GET.get("tag")
     if tag_slug:
@@ -94,24 +85,18 @@ def filter_queryset(request, queryset, site):
             .values_list("pk", flat=True)
         )
 
-    if apps.is_installed("publications"):
-        from publications.models import PublicationPage
+    if active.collection:
+        intersect_page_ids(
+            PublicationPage.objects.descendant_of(root)
+            .live()
+            .filter(collections=active.collection)
+            .values_list("pk", flat=True)
+        )
 
-        if active.collection:
-            intersect_page_ids(
-                PublicationPage.objects.descendant_of(root)
-                .live()
-                .filter(collections=active.collection)
-                .values_list("pk", flat=True)
-            )
-
-        if active.theme:
-            intersect_page_ids(
-                PublicationPage.objects.descendant_of(root)
-                .live()
-                .filter(themes=active.theme)
-                .values_list("pk", flat=True)
-            )
+    if active.theme:
+        intersect_page_ids(
+            PublicationPage.objects.descendant_of(root).live().filter(themes=active.theme).values_list("pk", flat=True)
+        )
 
     if active.tag:
         tag_page_ids = set(
@@ -155,6 +140,7 @@ def get_filter_context(request, site) -> dict:
     locale = root.locale
     blog_entries = BlogEntryPage.objects.descendant_of(root).live()
     content_pages = ContentPage.objects.descendant_of(root).live()
+    publication_pages = PublicationPage.objects.descendant_of(root).live()
     active = resolve_active_filters(request, site)
 
     context = {
@@ -186,18 +172,13 @@ def get_filter_context(request, site) -> dict:
         org_ids = blog_entries.values_list("authors__organization", flat=True)
         context["sources"] = Organization.objects.filter(id__in=org_ids).order_by("name")
 
-    if apps.is_installed("publications"):
-        from publications.models import Collection, PublicationPage, Theme
+    if context["filter_by_collection"]:
+        collection_ids = publication_pages.values_list("collections", flat=True)
+        context["collections"] = Collection.objects.filter(id__in=collection_ids, locale=locale).order_by("name")
 
-        publication_pages = PublicationPage.objects.descendant_of(root).live()
-
-        if context["filter_by_collection"]:
-            collection_ids = publication_pages.values_list("collections", flat=True)
-            context["collections"] = Collection.objects.filter(id__in=collection_ids, locale=locale).order_by("name")
-
-        if context["filter_by_theme"]:
-            theme_ids = publication_pages.values_list("themes", flat=True)
-            context["themes"] = Theme.objects.filter(id__in=theme_ids, locale=locale).order_by("name")
+    if context["filter_by_theme"]:
+        theme_ids = publication_pages.values_list("themes", flat=True)
+        context["themes"] = Theme.objects.filter(id__in=theme_ids, locale=locale).order_by("name")
 
     context["show_search_filters"] = _show_search_filters(context)
     return context
