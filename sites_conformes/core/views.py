@@ -13,6 +13,10 @@ class SearchResultsView(ListView):
     """
     Search results page view.
 
+    Fork projects can implement a different search by replacing this view via
+    :mod:`sites_conformes.core.search_registry` — see that module's
+    documentation for how to register a custom search app.
+
     The search should only return pages that are:
 
     - live
@@ -35,11 +39,13 @@ class SearchResultsView(ListView):
         return queryset
 
     def filter_search_queryset(self, queryset, site):
-        """Extension point for fork apps. Return the filtered queryset."""
+        """Custom search apps : override this
+        Narrow the searchable queryset before ``.search()`` is called."""
         return queryset
 
     def get_search_filter_context(self, site):
-        """Extension point for fork apps. Return template context for the filter sidebar."""
+        """Custom search apps : override this
+        Return extra template context (e.g. filter sidebar options)."""
         return {}
 
     def get_queryset(self):
