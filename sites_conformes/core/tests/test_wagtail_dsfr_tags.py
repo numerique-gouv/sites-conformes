@@ -1,10 +1,11 @@
 from django.template import Context
-from django.test import RequestFactory
+from django.test import RequestFactory, SimpleTestCase
 from django.utils.translation import override
 from wagtail.models import Locale, Page, Site
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.core.models import CmsDsfrConfig, ContentPage, LanguageSelectorItem
+from sites_conformes.core.templatetags.wagtail_dsfr_tags import toggle_url_filter
 
 
 class LanguageSelectorTagBaseTestCase(WagtailPageTestCase):
@@ -160,3 +161,110 @@ class LanguageSelectorTagManualTestCase(LanguageSelectorTagBaseTestCase):
             "</a>",
             html,
         )
+
+
+class ToggleUrlFilterTestBase(SimpleTestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def _context(self, query_string="", **current):
+        path = f"/?{query_string}" if query_string else "/"
+        return {"request": self.factory.get(path), **current}
+
+
+class ToggleUrlFilterBaselineTest(ToggleUrlFilterTestBase):
+    def test_returns_empty_string_with_no_params(self):
+        result = toggle_url_filter(self._context())
+        self.assertEqual(result, "")
+
+    def test_preserves_unrelated_get_params(self):
+        result = toggle_url_filter(self._context("page=2"))
+        self.assertEqual(result, "?page=2")
+
+
+class ToggleUrlFilterAddFilterTest(ToggleUrlFilterTestBase):
+    def test_adds_category_filter(self):
+        category = type("Category", (), {"slug": "agriculture"})()
+        result = toggle_url_filter(self._context(), category=category)
+        self.assertEqual(result, "?category=agriculture")
+
+    def test_adds_tag_filter(self):
+        tag = type("Tag", (), {"slug": "news"})()
+        result = toggle_url_filter(self._context(), tag=tag)
+        self.assertEqual(result, "?tag=news")
+
+    def test_adds_author_filter(self):
+        author = type("Author", (), {"id": 7})()
+        result = toggle_url_filter(self._context(), author=author)
+        self.assertEqual(result, "?author=7")
+
+    def test_adds_source_filter(self):
+        source = type("Source", (), {"slug": "inrae"})()
+        result = toggle_url_filter(self._context(), source=source)
+        self.assertEqual(result, "?source=inrae")
+
+    def test_adds_year_filter(self):
+        result = toggle_url_filter(self._context(), year=2024)
+        self.assertEqual(result, "?year=2024")
+
+    def test_adds_filter_while_keeping_existing_params(self):
+        author = type("Author", (), {"id": 3})()
+        result = toggle_url_filter(self._context("tag=old"), author=author)
+        self.assertEqual(result, "?tag=old&author=3")
+
+
+class ToggleUrlFilterToggleOffTest(ToggleUrlFilterTestBase):
+    def test_removes_active_category_when_it_is_the_only_param(self):
+        category = type("Category", (), {"slug": "agriculture"})()
+        result = toggle_url_filter(
+            self._context("category=agriculture", current_category=category),
+            category=category,
+        )
+        self.assertEqual(result, "")
+
+    def test_removes_active_tag_when_it_is_the_only_param(self):
+        tag = type("Tag", (), {"slug": "news"})()
+        result = toggle_url_filter(
+            self._context("tag=news", current_tag=tag),
+            tag=tag,
+        )
+        self.assertEqual(result, "")
+
+    def test_removes_active_tag_while_keeping_other_params(self):
+        tag = type("Tag", (), {"slug": "news"})()
+        result = toggle_url_filter(
+            self._context("tag=news&author=3", current_tag=tag),
+            tag=tag,
+        )
+        self.assertEqual(result, "?author=3")
+
+
+class ToggleUrlFilterReplaceFilterTest(ToggleUrlFilterTestBase):
+    def test_replaces_tag_with_different_value(self):
+        current = type("Tag", (), {"slug": "old"})()
+        new_tag = type("Tag", (), {"slug": "new"})()
+        result = toggle_url_filter(
+            self._context("tag=old", current_tag=current),
+            tag=new_tag,
+        )
+        self.assertEqual(result, "?tag=new")
+
+
+class ToggleUrlFilterFiltersDictTest(ToggleUrlFilterTestBase):
+    def test_uses_filters_dict_instead_of_request_get(self):
+        tag = type("Tag", (), {"slug": "news"})()
+        result = toggle_url_filter(
+            self._context("ignored=1"),
+            filters_dict={"author": "7"},
+            tag=tag,
+        )
+        self.assertEqual(result, "?author=7&tag=news")
+
+    def test_empty_filters_dict_falls_back_to_request_get(self):
+        author = type("Author", (), {"id": 3})()
+        result = toggle_url_filter(
+            self._context("tag=news"),
+            filters_dict={},
+            author=author,
+        )
+        self.assertEqual(result, "?tag=news&author=3")
