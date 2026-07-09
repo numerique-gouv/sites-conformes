@@ -33,25 +33,36 @@ class SearchResultsView(ListView):
             return ["search/search_results.html"]
         return [self.template_name]
 
+    def get_searchable_queryset(self, site):
+        root_page = site.root_page.localized
+        queryset = Page.objects.descendant_of(root_page, inclusive=True).live()
+        if not self.request.user.is_authenticated:
+            queryset = queryset.public()
+        return queryset
+
+    def filter_search_queryset(self, queryset, site):
+        """Extension point for fork apps. Return the filtered queryset."""
+        return queryset
+
+    def get_search_filter_context(self, site):
+        """Extension point for fork apps. Return template context for the filter sidebar."""
+        return {}
+
     def get_queryset(self):
         site = Site.find_for_request(self.request)
-        root_page = site.root_page.localized
-
         query = self.request.GET.get("q", None)
-        if query:
-            object_list = Page.objects.descendant_of(root_page, inclusive=True).live()
+        if not query:
+            return Page.objects.none()
 
-            if not self.request.user.is_authenticated:
-                object_list = object_list.public()
-
-            object_list = object_list.search(query)
-        else:
-            object_list = Page.objects.none()
-        return object_list
+        object_list = self.get_searchable_queryset(site)
+        object_list = self.filter_search_queryset(object_list, site)
+        return object_list.search(query)
 
     def get_context_data(self, **kwargs):
         context = super(SearchResultsView, self).get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q")
+        site = Site.find_for_request(self.request)
+        context.update(self.get_search_filter_context(site))
         return context
 
 

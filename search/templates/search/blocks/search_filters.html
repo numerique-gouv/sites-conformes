@@ -1,0 +1,105 @@
+{% load i18n search_tags %}
+
+{% if collections and filter_by_collection %}
+  <div class="fr-my-3w">
+    <h3 class="fr-h6">{% translate "Filter by collection" %}</h3>
+    <ul class="fr-tags-group">
+      {% for collection in collections %}
+        <li>
+          <a type="button"
+             class="fr-tag"
+             href="{% url 'cms_search' %}{% toggle_url_filter collection=collection %}#search-results"
+             {% if collection.slug == current_collection.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+            {{ collection.name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if themes and filter_by_theme %}
+  <div class="fr-my-3w">
+    <h3 class="fr-h6">{% translate "Filter by theme" %}</h3>
+    <ul class="fr-tags-group">
+      {% for theme in themes %}
+        <li>
+          <a class="fr-tag"
+             type="button"
+             href="{% url 'cms_search' %}{% toggle_url_filter theme=theme %}#search-results"
+             {% if theme.slug == current_theme.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+            {{ theme.name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if categories and filter_by_category %}
+  <div class="fr-my-3w">
+    <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
+    <ul class="fr-tags-group">
+      {% for category in categories %}
+        <li>
+          <a type="button"
+             class="fr-tag"
+             href="{% url 'cms_search' %}{% toggle_url_filter category=category %}#search-results"
+             {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+            {{ category.name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if tags and filter_by_tag %}
+  <div class="fr-my-3w">
+    <h3 class="fr-h6">{% translate "Filter by tag" %}</h3>
+    <ul class="fr-tags-group">
+      {% for tag in tags %}
+        <li>
+          <a class="fr-tag"
+             type="button"
+             href="{% url 'cms_search' %}{% toggle_url_filter tag=tag %}#search-results"
+             {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+            {{ tag }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if authors and filter_by_author %}
+  <div class="fr-my-3w">
+    <h3 class="fr-h6">{% translate "Filter by author" %}</h3>
+    <ul class="fr-tags-group">
+      {% for author in authors %}
+        <li>
+          <a class="fr-tag"
+             type="button"
+             href="{% url 'cms_search' %}{% toggle_url_filter author=author %}#search-results"
+             {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if sources and filter_by_source %}
+  <div class="fr-my-3w">
+    <h3 class="fr-h6">{% translate "Filter by source" %}</h3>
+    <ul class="fr-tags-group">
+      {% for source in sources %}
+        <li>
+          <a class="fr-tag"
+             type="button"
+             href="{% url 'cms_search' %}{% toggle_url_filter source=source %}#search-results"
+             {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
