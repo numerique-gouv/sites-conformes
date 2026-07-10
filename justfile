@@ -22,7 +22,7 @@ collectstatic:
 # Compile the translation files
 [group('Internationalization')]
 compilemessages:
-    {{docker_cmd}} {{uv_run}} django-admin compilemessages -l fr --ignore=.venv
+    {{docker_cmd}} {{uv_run}} python manage.py compilemessages -l fr --ignore=.venv
 
 alias csu := createsuperuser
 createsuperuser:
@@ -60,8 +60,8 @@ alias messages := makemessages
 # Update the translation files
 [group('Internationalization')]
 makemessages:
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles  --no-location
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --no-location
+    {{docker_cmd}} {{uv_run}} python manage.py makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles  --no-location
+    {{docker_cmd}} {{uv_run}} python manage.py makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --no-location
 
 alias mm:= makemigrations
 makemigrations app="":
