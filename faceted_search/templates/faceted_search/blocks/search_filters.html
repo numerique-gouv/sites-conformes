@@ -9,6 +9,7 @@
           <a class="fr-tag"
              type="button"
              href="{% url 'cms_search' %}{% toggle_url_filter theme=theme %}#search-results"
+             title="{% if theme.slug == current_theme.slug %}{% translate 'selected' %}{% else %}{% translate 'unselected' %} {% endif %}"
              {% if theme.slug == current_theme.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
             {{ theme.name }}
           </a>
@@ -27,6 +28,7 @@
           <a type="button"
              class="fr-tag"
              href="{% url 'cms_search' %}{% toggle_url_filter collection=collection %}#search-results"
+             title="{% if collection.slug == current_collection.slug %}{% translate 'selected' %}{% else %}{% translate 'unselected' %} {% endif %}"
              {% if collection.slug == current_collection.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
             {{ collection.name }}
           </a>
@@ -45,6 +47,7 @@
           <a type="button"
              class="fr-tag"
              href="{% url 'cms_search' %}{% toggle_url_filter category=category %}#search-results"
+             title="{% if category.slug == current_category.slug %}{% translate 'selected' %}{% else %}{% translate 'unselected' %} {% endif %}"
              {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
             {{ category.name }}
           </a>
@@ -63,7 +66,8 @@
           <a class="fr-tag"
              type="button"
              href="{% url 'cms_search' %}{% toggle_url_filter tag=tag %}#search-results"
-             {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+             title="{% if tag.slug in current_tag %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
+             {% if tag.id == current_tag.id %} aria-pressed="true" {% else %} aria-pressed="false" {% endif %}>
             {{ tag }}
           </a>
         </li>
@@ -81,6 +85,7 @@
           <a class="fr-tag"
              type="button"
              href="{% url 'cms_search' %}{% toggle_url_filter author=author %}#search-results"
+             title="{% if author == current_author %}{% translate 'selected' %}{% else %}{% translate 'unselected' %} {% endif %}"
              {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
         </li>
       {% endfor %}
@@ -97,6 +102,7 @@
           <a class="fr-tag"
              type="button"
              href="{% url 'cms_search' %}{% toggle_url_filter source=source %}#search-results"
+             title="{% if source == current_source %}{% translate 'selected' %}{% else %}{% translate 'unselected' %} {% endif %}"
              {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
         </li>
       {% endfor %}
