@@ -67,8 +67,10 @@ class FacetedSearchFilterTestBase(PublicationIndexPageFilterTestBase):
     def setUp(self):
         super().setUp()
         # Indexed for search but title does not match ``search_query`` ("Post").
-        self.post_without_search_match = self._create_post(
-            "Annual Report",
+        self.post_without_search_match = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
+            title="Annual Report",
             collections=[self.collection],
         )
         call_command("update_index")
@@ -152,9 +154,8 @@ class FacetedSearchFilterCombinationTest(FacetedSearchFilterTestBase):
         filter_cases = [case for case in self.filter_cases if case["name"] != "source"]
         for case_a, case_b in combinations(filter_cases, 2):
             with self.subTest(f"{case_a['name']}+{case_b['name']}"):
-                title = f"Post with {case_a['name']} and {case_b['name']}"
                 kwargs = {**case_a["post_kwargs"](self), **case_b["post_kwargs"](self)}
-                matching = self._create_post(title, **kwargs)
+                matching = self.entry_page_factory(parent=self.index, owner=self.admin, **kwargs)
                 call_command("update_index")
                 params = {
                     **_query_param_dict(case_a["query_param"](self)),
@@ -173,8 +174,8 @@ class FacetedSearchGetActiveFiltersTest(FacetedSearchFilterTestBase):
     def test_get_active_filters_from_request_params(self):
         request = self.client.request().wsgi_request
         request.GET = request.GET.copy()
-        request.GET["collection"] = "agriculture"
-        request.GET["tag"] = "news"
+        request.GET["collection"] = self.collection.slug
+        request.GET["tag"] = self.tag.slug
         site = Site.objects.get(is_default_site=True)
         active = get_active_filters_from_request_params(request, site)
         self.assertEqual(active.collection, self.collection)

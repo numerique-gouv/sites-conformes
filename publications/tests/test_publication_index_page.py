@@ -1,9 +1,13 @@
-from datetime import datetime
-
 from bs4 import BeautifulSoup
 from django.utils.translation import gettext
 
-from publications.models import Collection, PublicationIndexPage, PublicationPage, Theme
+from publications.models import PublicationIndexPage
+from publications.tests.factories import (
+    CollectionFactory,
+    PublicationIndexPageFactory,
+    PublicationPageFactory,
+    ThemeFactory,
+)
 from sites_conformes.blog.tests.test_blog_index_page import (
     SHARED_FILTER_CASES,
     BlogIndexPageFilterQueryTest,
@@ -26,8 +30,8 @@ TAXONOMY_FILTER_CASES = [
         "setting": "filter_by_collection",
         "heading": gettext("Filter by collection"),
         "visible_label": lambda self: self.collection.name,
-        "query_param": lambda self: "collection=agriculture",
-        "filter_url": lambda self: f"{self.index.url}?collection=agriculture",
+        "query_param": lambda self: f"collection={self.collection.slug}",
+        "filter_url": lambda self: f"{self.index.url}?collection={self.collection.slug}",
         "post_kwargs": lambda self: {"collections": [self.collection]},
         "matching_title": lambda self: self.post_with_collection.title,
         "other_title": lambda self: self.post_with_other_collection.title,
@@ -37,8 +41,8 @@ TAXONOMY_FILTER_CASES = [
         "setting": "filter_by_theme",
         "heading": gettext("Filter by theme"),
         "visible_label": lambda self: self.theme.name,
-        "query_param": lambda self: "theme=climate",
-        "filter_url": lambda self: f"{self.index.url}?theme=climate",
+        "query_param": lambda self: f"theme={self.theme.slug}",
+        "filter_url": lambda self: f"{self.index.url}?theme={self.theme.slug}",
         "post_kwargs": lambda self: {"themes": [self.theme]},
         "matching_title": lambda self: self.post_with_theme.title,
         "other_title": lambda self: self.post_with_other_theme.title,
@@ -50,53 +54,37 @@ FILTER_CASES = TAXONOMY_FILTER_CASES + SHARED_FILTER_CASES
 
 class PublicationIndexPageFilterTestBase(BlogIndexPageFilterTestBase):
     index_page_class = PublicationIndexPage
-    index_title = "Publications"
-    index_slug = "publications-index"
+    index_page_factory = PublicationIndexPageFactory
+    entry_page_factory = PublicationPageFactory
     filter_cases = FILTER_CASES
 
     def setup_taxonomy_filter_fixtures(self):
         locale = self.index.locale
-        self.collection = Collection.objects.create(
-            name="Agriculture",
-            slug="agriculture",
-            locale=locale,
-        )
-        self.other_collection = Collection.objects.create(
-            name="Environment",
-            slug="environment",
-            locale=locale,
-        )
-        self.theme = Theme.objects.create(name="Climate", slug="climate", locale=locale)
-        self.other_theme = Theme.objects.create(name="Health", slug="health", locale=locale)
+        self.collection = CollectionFactory(locale=locale)
+        self.other_collection = CollectionFactory(locale=locale)
+        self.theme = ThemeFactory(locale=locale)
+        self.other_theme = ThemeFactory(locale=locale)
 
-        self.post_with_collection = self._create_post(
-            "Post Agriculture",
+        self.post_with_collection = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
             collections=[self.collection],
         )
-        self.post_with_other_collection = self._create_post(
-            "Post Environment",
+        self.post_with_other_collection = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
             collections=[self.other_collection],
         )
-        self.post_with_theme = self._create_post("Post Climate", themes=[self.theme])
-        self.post_with_other_theme = self._create_post("Post Health", themes=[self.other_theme])
-
-    def _create_post(self, title, collections=None, themes=None, tags=None, authors=None, **_ignored):
-        post = PublicationPage(
-            title=title,
-            date=datetime(2024, 1, 1, 12, 0, 0, tzinfo=self.paris_tz),
+        self.post_with_theme = self.entry_page_factory(
+            parent=self.index,
             owner=self.admin,
+            themes=[self.theme],
         )
-        self.index.add_child(instance=post)
-        for collection in collections or []:
-            post.collections.add(collection)
-        for theme in themes or []:
-            post.themes.add(theme)
-        for tag in tags or []:
-            post.tags.add(tag)
-        for author in authors or []:
-            post.authors.add(author)
-        post.save_revision().publish()
-        return post
+        self.post_with_other_theme = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
+            themes=[self.other_theme],
+        )
 
 
 class PublicationIndexPageSettingsTest(PublicationIndexPageFilterTestBase, BlogIndexPageSettingsTest):
@@ -117,8 +105,9 @@ class PublicationIndexPagePostsTest(
     def test_posts_display_taxonomies_on_cards(self):
         # Themes are hidden on result cards (publication_index_posts_list.html) because
         # they are too verbose alongside collection tags.
-        post = self._create_post(
-            "Post with taxonomies",
+        post = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
             collections=[self.collection],
             themes=[self.theme],
         )

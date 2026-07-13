@@ -5,8 +5,6 @@ The test classes are structured so that page types with multiple taxonomies can 
 Taxonomy-specific elements are overridden in subclasses (see publications tests in https://github.com/betagouv/agreste).
 """
 
-import zoneinfo
-from datetime import datetime
 from itertools import combinations
 
 from bs4 import BeautifulSoup
@@ -15,8 +13,15 @@ from django.utils.translation import gettext
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category, Organization, Person
-from sites_conformes.core.models import Tag
+from sites_conformes.blog.models import BlogIndexPage
+from sites_conformes.blog.tests.factories import (
+    BlogEntryPageFactory,
+    BlogIndexPageFactory,
+    CategoryFactory,
+    OrganizationFactory,
+    PersonFactory,
+    TagFactory,
+)
 
 User = get_user_model()
 
@@ -34,8 +39,8 @@ TAXONOMY_FILTER_CASES = [
         "setting": "filter_by_category",
         "heading": gettext("Filter by category"),
         "visible_label": lambda self: self.category.name,
-        "query_param": lambda self: "category=agriculture",
-        "filter_url": lambda self: f"{self.index.url}?category=agriculture",
+        "query_param": lambda self: f"category={self.category.slug}",
+        "filter_url": lambda self: f"{self.index.url}?category={self.category.slug}",
         "post_kwargs": lambda self: {"blog_categories": [self.category]},
         "matching_title": lambda self: self.post_with_category.title,
         "other_title": lambda self: self.post_with_other_category.title,
@@ -48,8 +53,8 @@ SHARED_FILTER_CASES = [
         "setting": "filter_by_tag",
         "heading": gettext("Filter by tag"),
         "visible_label": lambda self: self.tag.name,
-        "query_param": lambda self: "tag=news",
-        "filter_url": lambda self: f"{self.index.url}?tag=news",
+        "query_param": lambda self: f"tag={self.tag.slug}",
+        "filter_url": lambda self: f"{self.index.url}?tag={self.tag.slug}",
         "post_kwargs": lambda self: {"tags": [self.tag]},
         "matching_title": lambda self: self.post_with_tag.title,
         "other_title": lambda self: self.post_with_other_tag.title,
@@ -70,8 +75,8 @@ SHARED_FILTER_CASES = [
         "setting": "filter_by_source",
         "heading": gettext("Filter by source"),
         "visible_label": lambda self: self.organization.name,
-        "query_param": lambda self: "source=inrae",
-        "filter_url": lambda self: f"{self.index.url}?source=inrae",
+        "query_param": lambda self: f"source={self.organization.slug}",
+        "filter_url": lambda self: f"{self.index.url}?source={self.organization.slug}",
         # You can't assign a source to a post directly, so we assign an author associated to the source.
         "post_kwargs": lambda self: {"authors": [self.author]},
         "matching_title": lambda self: self.post_with_author.title,
@@ -84,86 +89,50 @@ FILTER_CASES = TAXONOMY_FILTER_CASES + SHARED_FILTER_CASES
 
 class BlogIndexPageFilterTestBase(WagtailPageTestCase):
     index_page_class = BlogIndexPage
-    index_title = "Blog"
-    index_slug = "blog-index"
+    index_page_factory = BlogIndexPageFactory
+    entry_page_factory = BlogEntryPageFactory
     filter_cases = FILTER_CASES
 
     def setUp(self):
         self.home = Page.objects.get(slug="home")
         self.admin = User.objects.create_superuser("test", "test@test.test", "pass")
         self.admin.save()
-        self.paris_tz = zoneinfo.ZoneInfo("Europe/Paris")
 
-        self.index = self.home.add_child(
-            instance=self.index_page_class(
-                title=self.index_title,
-                slug=self.index_slug,
-                owner=self.admin,
-            )
-        )
-        self.index.save_revision().publish()
+        self.index = self.index_page_factory(parent=self.home, owner=self.admin)
 
         self.setup_filter_fixtures()
         self.setup_taxonomy_filter_fixtures()
 
     def setup_filter_fixtures(self):
-        self.tag = Tag.objects.create(name="News", slug="news")
-        self.other_tag = Tag.objects.create(name="Report", slug="report")
-        self.organization = Organization.objects.create(name="INRAE", slug="inrae")
-        self.other_organization = Organization.objects.create(name="ANSES", slug="anses")
-        self.author = Person.objects.create(
-            name="Jane Doe",
-            role="Writer",
-            organization=self.organization,
-        )
-        self.other_author = Person.objects.create(
-            name="John Smith",
-            role="Editor",
-            organization=self.other_organization,
-        )
+        self.tag = TagFactory()
+        self.other_tag = TagFactory()
+        self.organization = OrganizationFactory()
+        self.other_organization = OrganizationFactory()
+        self.author = PersonFactory(organization=self.organization)
+        self.other_author = PersonFactory(organization=self.other_organization)
 
-        self.post_with_tag = self._create_post("Post News", tags=[self.tag])
-        self.post_with_other_tag = self._create_post("Post Report", tags=[self.other_tag])
-        self.post_with_author = self._create_post("Post Jane", authors=[self.author])
-        self.post_with_other_author = self._create_post("Post John", authors=[self.other_author])
+        self.post_with_tag = self.entry_page_factory(parent=self.index, owner=self.admin, tags=[self.tag])
+        self.post_with_other_tag = self.entry_page_factory(parent=self.index, owner=self.admin, tags=[self.other_tag])
+        self.post_with_author = self.entry_page_factory(parent=self.index, owner=self.admin, authors=[self.author])
+        self.post_with_other_author = self.entry_page_factory(
+            parent=self.index, owner=self.admin, authors=[self.other_author]
+        )
 
     def setup_taxonomy_filter_fixtures(self):
         locale = self.index.locale
-        self.category = Category.objects.create(
-            name="Agriculture",
-            slug="agriculture",
-            locale=locale,
-        )
-        self.other_category = Category.objects.create(
-            name="Environment",
-            slug="environment",
-            locale=locale,
-        )
+        self.category = CategoryFactory(locale=locale)
+        self.other_category = CategoryFactory(locale=locale)
 
-        self.post_with_category = self._create_post(
-            "Post Agriculture",
+        self.post_with_category = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
             blog_categories=[self.category],
         )
-        self.post_with_other_category = self._create_post(
-            "Post Environment",
+        self.post_with_other_category = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
             blog_categories=[self.other_category],
         )
-
-    def _create_post(self, title, blog_categories=None, tags=None, authors=None):
-        post = BlogEntryPage(
-            title=title,
-            date=datetime(2024, 1, 1, 12, 0, 0, tzinfo=self.paris_tz),
-            owner=self.admin,
-        )
-        self.index.add_child(instance=post)
-        for category in blog_categories or []:
-            post.blog_categories.add(category)
-        for tag in tags or []:
-            post.tags.add(tag)
-        for author in authors or []:
-            post.authors.add(author)
-        post.save_revision().publish()
-        return post
 
     def _set_filter_settings(self, **settings):
         for field, value in settings.items():
@@ -192,9 +161,7 @@ class BlogIndexPageSettingsTest(BlogIndexPageFilterTestBase):
             self.assertIn(field_name, field_names)
 
     def test_filter_settings_default_values(self):
-        page = self.home.add_child(
-            instance=self.index_page_class(title="Defaults", slug="defaults"),
-        )
+        page = self.index_page_factory(parent=self.home, title="Defaults", slug="defaults", publish=False)
         for field_name, expected_default in self.filter_settings_defaults.items():
             self.assertEqual(getattr(page, field_name), expected_default, field_name)
 
@@ -243,9 +210,8 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
         filter_cases = [case for case in self.filter_cases if case["name"] != "source"]
         for case_a, case_b in combinations(filter_cases, 2):
             with self.subTest(f"{case_a['name']}+{case_b['name']}"):
-                title = f"Post with {case_a['name']} and {case_b['name']}"
                 kwargs = {**case_a["post_kwargs"](self), **case_b["post_kwargs"](self)}
-                matching = self._create_post(title, **kwargs)
+                matching = self.entry_page_factory(parent=self.index, owner=self.admin, **kwargs)
                 query = f"{self.index.url}?" f"{case_a['query_param'](self)}&{case_b['query_param'](self)}"
                 response = self.client.get(query)
                 self.assertContains(response, matching.title)
@@ -259,8 +225,9 @@ class BlogIndexPagePostsTest(BlogIndexPageFilterTestBase):
     """Test the display of the post list on the index page."""
 
     def test_posts_display_taxonomies_on_cards(self):
-        post = self._create_post(
-            "Post with category",
+        post = self.entry_page_factory(
+            parent=self.index,
+            owner=self.admin,
             blog_categories=[self.category],
         )
         response = self.client.get(self.index.url)  # no filters
