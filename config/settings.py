@@ -111,6 +111,7 @@ INSTALLED_APPS = [
     "wagtail_honeypot",
     "sites_conformes.dashboard",
     "publications",
+    "faceted_search",
     "wagtail.admin",
 ]
 
