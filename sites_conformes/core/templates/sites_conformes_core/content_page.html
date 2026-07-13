@@ -51,11 +51,11 @@
 
   {% include "sites_conformes_core/blocks/blocks_stream.html" with stream=page.body %}
 
-  <div class="fr-container fr-my-4w">
+  <ul class="fr-container fr-my-4w">
     {% for tag in page.tags.all|dictsort:"slug" %}
       <a class="fr-tag" target="_self" href="{% url 'global_tag' tag.slug %}">{{ tag }}</a>
     {% endfor %}
-  </div>
+  </ul>
 
   {% if settings.sites_conformes_core.CmsDsfrConfig.show_share_links and settings.sites_conformes_core.CmsDsfrConfig.share_links_content_pages %}
     {% include "sites_conformes_core/blocks/share.html" %}

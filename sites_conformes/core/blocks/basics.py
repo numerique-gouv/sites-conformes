@@ -268,6 +268,12 @@ class StepsListBlock(blocks.StreamBlock):
 
 class StepperBlock(blocks.StructBlock):
     title = blocks.CharBlock(label=_("Title"))
+    heading_tag = blocks.ChoiceBlock(
+        label=_("Heading level"),
+        choices=HEADING_CHOICES,
+        default="h2",
+        help_text=_("Adapt to the page layout. Defaults to heading 2."),
+    )
     total = blocks.IntegerBlock(label=_("Number of steps"), min_value=1, max_value=8)
     current = blocks.IntegerBlock(label=_("Current step"), min_value=1, max_value=8)
     steps = StepsListBlock(label=_("Steps"))

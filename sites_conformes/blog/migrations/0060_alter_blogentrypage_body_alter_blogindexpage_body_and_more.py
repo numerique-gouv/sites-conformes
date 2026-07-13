@@ -1207,7 +1207,7 @@ class Migration(migrations.Migration):
                             "required": False,
                         },
                     ),
-                    152: (
+                   152: (
                         "wagtail.blocks.StructBlock",
                         [
                             [
