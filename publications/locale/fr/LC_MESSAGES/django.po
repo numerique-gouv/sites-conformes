@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 16:16+0200\n"
+"POT-Creation-Date: 2026-07-13 09:49+0200\n"
 "PO-Revision-Date: 2026-06-08 15:16+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -16,8 +16,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "No filters"
+msgstr "Aucun filtre"
+
+msgid "The selected filters"
+msgstr "Les filtres sélectionnés"
+
+msgid "See all publications"
+msgstr "Voir toutes les publications"
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Heading level"
+msgstr "Niveau de titre"
+
+msgid "Adapt to the page layout. Defaults to heading 2."
+msgstr "À adapter à la structure de la page. Par défaut en-tête 2."
+
 msgid "Publications"
 msgstr "Publications"
+
+msgid "Number of entries"
+msgstr "Nombre d’articles"
 
 msgid "Filter by collection"
 msgstr "Filtrer par collection"
@@ -25,14 +46,21 @@ msgstr "Filtrer par collection"
 msgid "Filter by theme"
 msgstr "Filtrer par thématique"
 
-msgid "Recent publications"
-msgstr "Publications récentes"
+msgid "Filter by tag"
+msgstr "Filtrer par étiquette"
 
-msgid "See all publications"
-msgstr "Voir toutes les publications"
+msgid "Filter by author"
+msgstr "Filtrer par auteur"
 
-msgid "“See all publications” button"
-msgstr "Bouton « Voir toutes les publications »"
+msgid "Filter by source"
+msgstr "Filtrer par organisation"
+
+msgid "The source is the organization of the post author"
+msgstr ""
+"La source est l’organisation à laquelle appartient l’auteur de l’article"
+
+msgid "Show filters"
+msgstr "Afficher les filtres"
 
 msgid "Button text"
 msgstr "Texte du bouton"
@@ -40,11 +68,11 @@ msgstr "Texte du bouton"
 msgid "Button navigates to the index page with :"
 msgstr "Le bouton pointe vers la page d’index avec :"
 
-msgid "No filters"
-msgstr "Aucun filtre"
+msgid "Recent publications"
+msgstr "Publications récentes"
 
-msgid "The selected filters"
-msgstr "Les filtres sélectionnés"
+msgid "“See all publications” button"
+msgstr "Bouton « Voir toutes les publications »"
 
 msgid "Collection"
 msgstr "Collection"
@@ -58,6 +86,9 @@ msgstr "Thématique"
 msgid "Themes"
 msgstr "Thématiques"
 
+msgid "Tags and Categories"
+msgstr "Étiquettes et Catégories"
+
 msgid "Tags, collections and themes"
 msgstr "Étiquettes, collections et thématiques"
 
@@ -67,6 +98,13 @@ msgstr "Page de publication"
 msgid "Publication index"
 msgstr "Index de publications"
 
+msgid "Tags"
+msgstr "Étiquettes"
+
+#, python-format
+msgid "Posts tagged with %(tag)s"
+msgstr "Articles avec l’étiquette %(tag)s"
+
 #, python-format
 msgid "Posts in collection %(collection)s"
 msgstr "Articles dans la collection %(collection)s"
@@ -75,8 +113,21 @@ msgstr "Articles dans la collection %(collection)s"
 msgid "Posts in theme %(theme)s"
 msgstr "Articles dans la thématique %(theme)s"
 
+msgid "Posts written by"
+msgstr "Articles écrits par"
+
+#, python-format
+msgid "Posts published in %(year)s"
+msgstr "Articles publiés en %(year)s"
+
+msgid "Name"
+msgstr "Nom"
+
 msgid "Parent"
 msgstr "Parent"
+
+msgid "Description"
+msgstr "Description"
 
 msgid "Displayed at the top of the taxonomy listing page"
 msgstr "Affiché en haut de la page de liste de la taxonomie"
@@ -88,8 +139,14 @@ msgstr "Texte affiché à la fin de chaque page de la taxonomie"
 msgid "Parent %(type)s cannot be self."
 msgstr "Le/La %(type)s ne peut être sa propre catégorie parente."
 
+msgid "Cannot have circular Parents."
+msgstr "Le parent du parent ne peut pas être l'élément lui-même."
+
 msgid "Published on"
 msgstr "Publié le"
+
+msgid "No article found."
+msgstr "Aucun article trouvé."
 
 msgid "Collection:"
 msgstr "Collection :"
@@ -97,6 +154,24 @@ msgstr "Collection :"
 msgid "Theme:"
 msgstr "Thématique :"
 
+msgid "Tag:"
+msgstr "Étiquette :"
+
+msgid "Author:"
+msgstr "Auteur :"
+
+msgid "Source:"
+msgstr "Source :"
+
 #, python-format
 msgid "- Page %(current)s / %(total)s"
 msgstr "- Page %(current)s / %(total)s"
+
+msgid "Filters"
+msgstr "Filtres"
+
+msgid "Posts"
+msgstr "Articles"
+
+msgid "Posted by:"
+msgstr "Écrit par :"
