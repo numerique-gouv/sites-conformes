@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-29 16:53+0200\n"
-"PO-Revision-Date: 2026-04-29 16:56+0200\n"
+"PO-Revision-Date: 2026-06-04 20:23+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -280,6 +280,9 @@ msgstr "Détail"
 
 msgid "Step"
 msgstr "Étape"
+
+msgid "Adapt to the page layout. Defaults to heading 2."
+msgstr "À adapter à la structure de la page. Par défaut en-tête 2."
 
 msgid "Number of steps"
 msgstr "Nombre d’étapes"
@@ -784,9 +787,6 @@ msgstr "Colonne ajustable"
 
 msgid "Background image"
 msgstr "Image de fond"
-
-msgid "Adapt to the page layout. Defaults to heading 2."
-msgstr "À adapter à la structure de la page. Par défaut en-tête 2."
 
 msgid "Columns"
 msgstr "Colonnes"
@@ -1481,6 +1481,12 @@ msgstr "Source :"
 
 msgid "Filters"
 msgstr "Filtres"
+
+msgid "selected"
+msgstr "étiquette sélectionnée"
+
+msgid "unselected"
+msgstr "étiquette non-sélectionnée"
 
 msgid "Pages"
 msgstr "Pages"

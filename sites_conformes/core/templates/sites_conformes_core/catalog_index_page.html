@@ -116,6 +116,7 @@
                             <a class="fr-tag"
                                type="button"
                                href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
+                               title="{% if tag.slug in selected_tag_slugs %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
                                aria-pressed="{% if tag.slug in selected_tag_slugs %}true{% else %}false{% endif %}">
                               {{ tag }}
                             </a>
@@ -140,7 +141,8 @@
                                             pointer-events: none">
                               <label class="fr-tag"
                                      for="tag-{{ tag.slug }}"
-                                     aria-pressed="{% if tag.slug in selected_tag_slugs %}true{% else %}false{% endif %}">
+                                     aria-pressed="{% if tag.slug in selected_tag_slugs %}true{% else %}false{% endif %}"
+                                     title="{% if tag.slug in selected_tag_slugs %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}">
                                 {{ tag.name }}
                               </label>
                             </li>

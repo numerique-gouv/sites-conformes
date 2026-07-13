@@ -74,7 +74,7 @@
 
 {% block burger_menu %}
   {% translate "Search" as search_label %}
-  <div class="fr-header__navbar">
+  <nav role=navigation class="fr-header__navbar">
     {% if settings.sites_conformes_core.CmsDsfrConfig.search_bar %}
       <button class="fr-btn--search fr-btn"
               data-fr-opened="false"
@@ -88,7 +88,7 @@
             aria-controls="fr-menu-mobile"
             id="fr-btn-menu-mobile"
             title="{{ menu_label }}">{{ menu_label }}</button>
-  </div>
+  </nav>
 {% endblock burger_menu %}
 
 {% block main_menu %}
