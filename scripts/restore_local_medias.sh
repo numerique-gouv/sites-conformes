@@ -16,10 +16,17 @@ if [[ -z "$BACKUP_DIR" ]]; then
 fi
 
 MEDIA_BACKUP_FILE=`ls ${BACKUP_DIR}/sites-conformes-local-medias-*.tar.gz -c | head -1`
+if [[ ! -f "${MEDIA_BACKUP_FILE}" ]]; then
+    echo "ERROR: media backup file not found. Cannot restore medias." >&2
+    exit 1
+fi
+
 BASE_PATH="${SCRIPT_DIR}/.."
-
-echo "Moving media files from ${MEDIA_BACKUP_FILE} to ${MEDIA_ROOT:=medias}"
-
 cd ${BASE_PATH}
-echo `pwd`
-rm ${MEDIA_ROOT}/* -rf && tar xvzf ${MEDIA_BACKUP_FILE}
+echo "Extracting ${MEDIA_BACKUP_FILE} into ${MEDIA_ROOT:=medias}..."
+if ! (rm -rf "${MEDIA_ROOT:?}"/* && tar xzf "${MEDIA_BACKUP_FILE}"); then
+    echo "ERROR: media extraction failed (tar exit $?)" >&2
+    exit 1
+fi
+member_count=$(find "${MEDIA_ROOT}" -type f 2>/dev/null | wc -l | awk '{print $1}')
+echo "Media restoration succeeded (${member_count} files in ${MEDIA_ROOT})"

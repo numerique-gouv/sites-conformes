@@ -49,11 +49,11 @@
 
     {% include "sites_conformes_core/blocks/messages.html" %}
 
-    <div class="fr-mb-2w">
+    <nav role="navigation" class="fr-mb-2w">
       {% for first_letter in sorted_tags.keys|dictsort:0 %}
         <a href="#{{ first_letter }}" class="fr-tag">{{ first_letter }}</a>
       {% endfor %}
-    </div>
+    </nav>
 
     {% for first_letter, tags in sorted_tags.items|dictsort:0 %}
       <h2 id="{{ first_letter }}">{{ first_letter }}</h2>

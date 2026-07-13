@@ -102,7 +102,8 @@
                           <a type="button"
                              class="fr-tag"
                              href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
-                             {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                             title="{% if category.slug == current_category.slug %}{% translate 'selected' %}{% else %}{% translate 'unselected' %} {% endif %}"
+                             {% if category.slug == current_category.slug %} aria-pressed="true" {% else %} aria-pressed="false" {% endif %}>
                             {{ category.name }}
                           </a>
                         </li>
@@ -120,7 +121,8 @@
                           <a class="fr-tag"
                              type="button"
                              href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
-                             {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                             title="{% if tag.slug in current_tag %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
+                             {% if tag.id == current_tag.id %} aria-pressed="true" {% else %} aria-pressed="false" {% endif %}>
                             {{ tag }}
                           </a>
                         </li>

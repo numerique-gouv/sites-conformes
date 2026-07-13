@@ -103,6 +103,7 @@
                         <a type="button"
                            class="fr-tag"
                            href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
+                           title="{% if category.slug == current_category.slug %}{% translate 'selected' %} {% else %}{% translate 'unselected' %} {% endif %}"
                            {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
                           {{ category.name }}
                         </a>
@@ -121,7 +122,8 @@
                         <a type="button"
                            class="fr-tag"
                            href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
-                           {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                           {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}
+                           title="{% if tag.slug in current_tag %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}">
                           {{ tag }}
                         </a>
                       </li>
@@ -139,6 +141,7 @@
                         <a type="button"
                            class="fr-tag"
                            href="{% pageurl page %}{% toggle_url_filter author=author %}#posts-list"
+                           title="{% if author == current_author %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
                            {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
                       </li>
                     {% endfor %}
@@ -155,6 +158,7 @@
                         <a type="button"
                            class="fr-tag"
                            href="{% pageurl page %}{% toggle_url_filter source=source %}#posts-list"
+                           title="{% if source == current_source %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
                            {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
                       </li>
                     {% endfor %}

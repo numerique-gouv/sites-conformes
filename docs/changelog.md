@@ -70,3 +70,19 @@ Purgez-les à la main :
 rm -rf blog/ config/ content_manager/ core/ dashboard/ db_storage/ docs/ \
        events/ forms/ locale/ menus/ proconnect/ static/ templates/ utils/
 ```
+
+### ProConnect
+
+La variable `PROCONNECT_USER_CREATION_FILTER` utilise le chemin complet de la fonction
+de filtre. Si une fonction commençant par `proconnect.utils` était définie, il faut
+ajouter `sites_conformes.` devant. Par exemple
+
+```sh
+PROCONNECT_USER_CREATION_FILTER=proconnect.utils.email_domain_db_whitelist
+```
+
+devient
+
+```sh
+PROCONNECT_USER_CREATION_FILTER=sites_conformes.proconnect.utils.email_domain_db_whitelist
+```
