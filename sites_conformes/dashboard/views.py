@@ -94,11 +94,10 @@ class NotificationPanel(Component):
     def get_context_data(self, parent_context=None):
         notifications = []
         for item in get_all_notifications():
-            item = {**item}  # copie pour ne pas muter les objets en cache
+            item = dict(item)
             raw_start_date = item.get("start_date")
             if raw_start_date:
                 try:
-                    # Objet date pour un affichage localisé (ex. "1 mai 2026") via le filtre |date
                     item["start_date"] = date.fromisoformat(raw_start_date)
                 except ValueError:
                     pass

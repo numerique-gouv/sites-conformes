@@ -408,7 +408,7 @@ WAGTAIL_MODERATION_ENABLED = False
 # Settings for the notifications panel of the dashboard admin
 NOTIFICATIONS_FILE_URL = os.getenv(
     "NOTIFICATIONS_FILE_URL",
-    "https://raw.githubusercontent.com/numerique-gouv/sites-conformes/main/notifications.json",
+    "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json",
 )
 # GitHub API endpoint used to detect the latest published version (overridable for forks)
 LATEST_RELEASE_URL = os.getenv(
