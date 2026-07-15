@@ -142,7 +142,8 @@ class BlogIndexPageSettingsTest(BlogIndexPageFilterTestBase):
             filter_name = case["name"]
             taxonomy = getattr(self, filter_name)
             setting_field = f"filter_by_{filter_name}"
-            sidebar_heading = gettext(f"Filter by {filter_name}")
+            untranslated_sidebar_heading = "Filter by " + filter_name
+            sidebar_heading = gettext(untranslated_sidebar_heading)
 
             with self.subTest(filter_name):
                 self._set_filter_settings(**{setting_field: True})
@@ -177,7 +178,8 @@ class BlogIndexPageSettingsTest(BlogIndexPageFilterTestBase):
         for case in self.filter_cases:
             filter_name = case["name"]
             setting_field = f"filter_by_{filter_name}"
-            sidebar_heading = gettext(f"Filter by {filter_name}")
+            untranslated_sidebar_heading = "Filter by " + filter_name
+            sidebar_heading = gettext(untranslated_sidebar_heading)
 
             with self.subTest(filter_name):
                 self._set_filter_settings(**{setting_field: False})
@@ -235,7 +237,8 @@ class BlogIndexPageFilterQueryTest(BlogIndexPageFilterTestBase):
             filter_name = case["name"]
             taxonomy = getattr(self, filter_name)
             setting_field = f"filter_by_{filter_name}"
-            sidebar_heading = gettext(f"Filter by {filter_name}")
+            untranslated_sidebar_heading = "Filter by " + filter_name
+            sidebar_heading = gettext(untranslated_sidebar_heading)
             filter_url = f"{self.index.url}?{filter_name}={taxonomy.slug}"
             matching_post_title = getattr(self, f"post_with_{filter_name}").title
             other_post_title = getattr(self, f"post_with_other_{filter_name}").title
