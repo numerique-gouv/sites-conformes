@@ -105,7 +105,7 @@ class TestGetAllNotifications(TestCase):
             "type": "info",
             "title": "Notification de test",
             "description": "Description de test",
-            "date": date.today().isoformat(),
+            "start_date": date.today().isoformat(),
         }
         item.update(kwargs)
         return item
@@ -137,7 +137,7 @@ class TestGetAllNotifications(TestCase):
         mock_get.return_value = mock_response
 
         items = get_all_notifications()
-        json_items = [i for i in items if "date" in i]
+        json_items = [i for i in items if "start_date" in i]
         self.assertEqual(json_items, [])
 
     # --- Cache ---
@@ -154,7 +154,7 @@ class TestGetAllNotifications(TestCase):
     @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_no_date(self, mock_get):
         item = self._valid_item()
-        del item["date"]
+        del item["start_date"]
         self._mock_response(mock_get, [item])
 
         items = get_all_notifications()
@@ -181,7 +181,7 @@ class TestGetAllNotifications(TestCase):
     @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_date_in_future(self, mock_get):
         future_date = (date.today() + timedelta(days=5)).isoformat()
-        self._mock_response(mock_get, [self._valid_item(date=future_date)])
+        self._mock_response(mock_get, [self._valid_item(start_date=future_date)])
 
         items = get_all_notifications()
         titles = [i["title"] for i in items]
@@ -197,7 +197,7 @@ class TestGetAllNotifications(TestCase):
 
     @patch("sites_conformes.dashboard.utils.requests.get")
     def test_item_not_displayed_if_date_malformed(self, mock_get):
-        self._mock_response(mock_get, [self._valid_item(date="pas-une-date")])
+        self._mock_response(mock_get, [self._valid_item(start_date="pas-une-date")])
 
         items = get_all_notifications()
         titles = [i["title"] for i in items]

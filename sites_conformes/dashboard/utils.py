@@ -8,7 +8,7 @@ from packaging.version import Version
 from sites_conformes import __version__ as actual_version
 
 VALID_TYPES = ["info", "warning", "alert"]
-REQUIRED_FIELDS = ["type", "title", "date"]
+REQUIRED_FIELDS = ["type", "title", "start_date"]
 
 
 def is_last_version(installed_version, latest_version):
@@ -28,7 +28,7 @@ def is_displayable_notification(item):
     today = date.today()
 
     try:
-        if date.fromisoformat(item["date"]) > today:
+        if date.fromisoformat(item["start_date"]) > today:
             return False
     except ValueError:
         return False
@@ -63,7 +63,7 @@ def push_version_notification(items):
                         "Rapprochez-vous de la personne qui a installé votre site "
                         "pour réaliser la mise à jour."
                     ),
-                    "url": "https://github.com/numerique-gouv/sites-faciles/releases",
+                    "more_info_link": "https://github.com/numerique-gouv/sites-faciles/releases",
                 },
             )
         return items
