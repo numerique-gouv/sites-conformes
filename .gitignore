@@ -151,3 +151,6 @@ test-results
 __screenshots__
 playwright-report
 blob-report
+
+# qfdmod (unrelated monorepo subfolder)
+qfdmod/
