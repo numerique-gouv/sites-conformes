@@ -1,23 +1,8 @@
-{% load i18n wagtailcore_tags wagtailadmin_tags static %}
+{% load dsfr_tags i18n %}
 {% for item in notifications %}
-  <div class="cmsfr-fr-notice cmsfr-fr-notice--{{ item.type|default:"info" }}">
-    <div class="fr-container">
-      <div class="cmsfr-fr-notice__body">
-        <div>
-          <div>
-            <p class="cmsfr-fr-notice__title">
-              {{ item.title }}
-              {% if item.start_date %}<span class="cmsfr-fr-notice__date">— {{ item.start_date }}</span>{% endif %}
-            </p>
-            <p>
-              {{ item.description }}
-              {% if item.more_info_link %}
-                <a href="{{ item.more_info_link }}">{% trans "Learn more" %}</a>
-              {% endif %}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% if item.start_date %}
+    {% dsfr_notice title=item.title|add:" — "|add:item.start_date description=item.description type=item.type link=item.more_info_link %}
+  {% else %}
+    {% dsfr_notice title=item.title description=item.description type=item.type link=item.more_info_link %}
+  {% endif %}
 {% endfor %}

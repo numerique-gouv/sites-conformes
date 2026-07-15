@@ -52,7 +52,7 @@ def test_information_panel_not_displayed_if_request_fails(self, mock_get):
 
     self.client.force_login(self.admin)
     response = self.client.get("/cms-admin/")
-    self.assertNotContains(response, "cmsfr-fr-notice")
+    self.assertNotContains(response, 'class="fr-notice')
 
 
 class TestGetAllNotifications(TestCase):

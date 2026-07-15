@@ -102,100 +102,23 @@
     vertical-align: baseline;
 }
 
-/* Reprend le composant Notice du DSFR (https: //www.systeme-de-design.gouv.fr/version-courante/fr/composants/bandeau-d-information-importante) */
-.cmsfr-fr-notice {
-    --title-spacing: 0;
-    --text-spacing: 0;
-    background-color: var(--background-contrast-grey, #eee);
-    color: var(--text-title-grey, #161616);
-    padding: 1rem;
-    position: relative;
+/* Le composant Notice du DSFR est chargé de façon scopée dans le back-office via
+   dsfr/dist/component/notice/notice.min.css (cf. wagtail_hooks.global_admin_css) : ce fichier ne cible
+   que les classes .fr-notice*, sans toucher au reste de l'admin Wagtail (contrairement à dsfr.min.css complet).
+   On définit ici uniquement les variables de thème DSFR dont le composant a besoin, ainsi que quelques
+   ajustements d'espacement propres au panneau (le core DSFR, qui les fournirait, n'est pas chargé). */
+.fr-notice {
+    --background-contrast-grey: #eee;
+    --text-title-grey: #161616;
+    --background-contrast-info: #e8edff;
+    --text-default-info: #0063cb;
+    --background-contrast-warning: #ffe9e6;
+    --text-default-warning: #b34000;
+    --background-contrast-error: #ffe9e9;
+    --text-default-error: #ce0500;
+    padding-left: 1rem;
+    padding-right: 1rem;
     margin-bottom: 1rem;
     border-radius: 4px;
     overflow: hidden;
-}
-
-.cmsfr-fr-notice__body {
-    align-items: flex-start;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    position: relative;
-}
-
-.cmsfr-fr-notice__title {
-    font-weight: 700;
-    margin-right: .25rem;
-    position: relative;
-}
-
-.cmsfr-fr-notice__title:before {
-    --icon-size: 1.5rem;
-    background-color: currentColor;
-    content: "";
-    display: inline-block;
-    flex: 0 0 auto;
-    height: var(--icon-size);
-    margin-right: .5rem;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    vertical-align: calc((.75em - var(--icon-size)) * .5);
-    width: var(--icon-size);
-}
-
-.cmsfr-fr-notice__date {
-    font-weight: normal;
-    opacity: 0.7;
-    font-size: 0.875rem;
-}
-
-.cmsfr-fr-notice p,
-.cmsfr-fr-notice__title {
-    margin: 0;
-}
-
-.cmsfr-fr-notice--no-icon .cmsfr-fr-notice__title:before {
-    display: none;
-}
-
-/* Info */
-.cmsfr-fr-notice--info {
-    background-color: var(--background-contrast-info, #e8edff);
-    color: var(--text-default-info, #0063cb);
-}
-
-.cmsfr-fr-notice--info .cmsfr-fr-notice__title:not([class^=cmsfr-fr-icon-]):not([class*=" cmsfr-fr-icon-"]):before {
-    -webkit-mask-image: url("../dsfr/dist/icons/system/fr--info-fill.svg");
-    mask-image: url("../dsfr/dist/icons/system/fr--info-fill.svg");
-}
-
-/* Warning */
-.cmsfr-fr-notice--warning {
-    background-color: var(--background-contrast-warning, #ffe9e6);
-    color: var(--text-default-warning, #b34000);
-}
-
-.cmsfr-fr-notice--warning .cmsfr-fr-notice__title:not([class^=cmsfr-fr-icon-]):not([class*=" cmsfr-fr-icon-"]):before {
-    -webkit-mask-image: url("../dsfr/dist/icons/system/fr--warning-fill.svg");
-    mask-image: url("../dsfr/dist/icons/system/fr--warning-fill.svg");
-}
-
-/* Alert */
-.cmsfr-fr-notice--alert {
-    background-color: var(--background-contrast-error, #ffe9e9);
-    color: var(--text-default-error, #ce0500);
-}
-
-.cmsfr-fr-notice--alert .cmsfr-fr-notice__title:not([class^=cmsfr-fr-icon-]):not([class*=" cmsfr-fr-icon-"]):before {
-    -webkit-mask-image: url("../dsfr/dist/icons/system/error-warning-fill.svg");
-    mask-image: url("../dsfr/dist/icons/system/error-warning-fill.svg");
-}
-
-@media (min-width: 768px) {
-    .cmsfr-fr-notice__link,
-    .cmsfr-fr-notice__title {
-        font-size: 1rem;
-        line-height: 1.5rem;
-    }
-
 }
