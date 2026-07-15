@@ -1,3 +1,5 @@
+from datetime import date
+
 import requests
 from django.contrib.admin.utils import quote
 from django.core.cache import cache
@@ -90,4 +92,15 @@ class NotificationPanel(Component):
     panel_id = "notifications"
 
     def get_context_data(self, parent_context=None):
-        return {"notifications": get_all_notifications()}
+        notifications = []
+        for item in get_all_notifications():
+            item = {**item}  # copie pour ne pas muter les objets en cache
+            raw_start_date = item.get("start_date")
+            if raw_start_date:
+                try:
+                    # Objet date pour un affichage localisé (ex. "1 mai 2026") via le filtre |date
+                    item["start_date"] = date.fromisoformat(raw_start_date)
+                except ValueError:
+                    pass
+            notifications.append(item)
+        return {"notifications": notifications}
