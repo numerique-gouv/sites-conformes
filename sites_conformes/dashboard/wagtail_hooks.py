@@ -14,7 +14,13 @@ from sites_conformes.dashboard.views import NotificationPanel, ShortcutsPanel, T
 
 @hooks.register("insert_global_admin_css")
 def global_admin_css():
-    return format_html('\n<link rel="stylesheet" href="{}">', static("css/admin.css"))
+    # On charge uniquement le CSS du composant Notice du DSFR (et non dsfr.min.css complet, qui casserait
+    # le style du back-office Wagtail). Ce fichier ne cible que les classes .fr-notice*.
+    return format_html(
+        '\n<link rel="stylesheet" href="{}">\n<link rel="stylesheet" href="{}">',
+        static("dsfr/dist/component/notice/notice.min.css"),
+        static("css/admin.css"),
+    )
 
 
 @hooks.register("construct_help_menu")
