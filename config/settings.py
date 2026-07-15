@@ -405,14 +405,18 @@ WAGTAIL_RICHTEXT_FIELD_FEATURES = [
 WAGTAILEMBEDS_RESPONSIVE_HTML = True
 WAGTAIL_MODERATION_ENABLED = False
 
-# Settings for the dashboard admin panel
-INFORMATION_URL = os.getenv(
-    "INFORMATION_URL", "https://raw.githubusercontent.com/Luzzzi/test-information-panel/main/test.json"
+# Settings for the notifications panel of the dashboard admin
+NOTIFICATIONS_FILE_URL = os.getenv(
+    "NOTIFICATIONS_FILE_URL",
+    "https://raw.githubusercontent.com/numerique-gouv/sites-conformes/main/notifications.json",
 )
-LATEST_RELEASE_URL = "https://api.github.com/repos/numerique-gouv/sites-faciles/releases/latest"
-INFORMATION_CACHE_KEY = "sf_information_panel"
-INFORMATION_CACHE_TIMEOUT = 60 * 60
-ADVERTISE_LATEST_VERSION = os.getenv("ADVERTISE_LATEST_VERSION", "True")
+# GitHub API endpoint used to detect the latest published version (overridable for forks)
+LATEST_RELEASE_URL = os.getenv(
+    "LATEST_RELEASE_URL", "https://api.github.com/repos/numerique-gouv/sites-conformes/releases/latest"
+)
+# Human-facing releases page linked from the "new version available" notification (overridable for forks)
+RELEASES_URL = os.getenv("RELEASES_URL", "https://github.com/numerique-gouv/sites-conformes/releases")
+ADVERTISE_LATEST_VERSION = getenv_bool("ADVERTISE_LATEST_VERSION", True)
 
 
 # Wagtailmenus: Obsolete, to be removed in a future version (replaced by "sites_conformes.menus")
