@@ -9,7 +9,7 @@ from wagtail.admin.ui.components import Component
 from wagtail.rich_text import LinkHandler
 
 from sites_conformes import __version__
-from sites_conformes.dashboard.views import InformationPanel, ShortcutsPanel, TutorialsPanel
+from sites_conformes.dashboard.views import NotificationPanel, ShortcutsPanel, TutorialsPanel
 
 
 @hooks.register("insert_global_admin_css")
@@ -17,15 +17,16 @@ def global_admin_css():
     return format_html('\n<link rel="stylesheet" href="{}">', static("css/admin.css"))
 
 
-@hooks.register("insert_global_admin_js")
-def insert_sidebar_extra():
-    return format_html(
-        """
-        <script>window.__version__ = "{}";</script>
-        <script src="{}"></script>
-        """,
-        __version__,
-        static("js/sidebar_extra.js"),
+@hooks.register("construct_help_menu")
+def add_version_help_menu_item(request, menu_items):
+    menu_items.append(
+        MenuItem(
+            _("Sites Conformes %(version)s") % {"version": __version__},
+            settings.RELEASES_URL,
+            icon_name="help",
+            attrs={"target": "_blank", "rel": "noopener noreferrer"},
+            order=1000,
+        )
     )
 
 
@@ -111,7 +112,7 @@ def remove_all_summary_items(request, items):
 
 @hooks.register("construct_homepage_panels")
 def add_shortcuts_panel(request, panels):
-    panels.insert(0, InformationPanel())
+    panels.insert(0, NotificationPanel())
     panels.append(ShortcutsPanel())
     if not settings.SF_DISABLE_TUTORIALS:
         panels.append(TutorialsPanel())

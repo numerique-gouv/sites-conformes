@@ -7,7 +7,7 @@ from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.core.models import ContentPage
-from sites_conformes.dashboard.utils import get_all_notifications
+from sites_conformes.dashboard.notifications import get_all_notifications
 
 User = get_user_model()
 
@@ -45,7 +45,7 @@ class DashboardTestCase(WagtailPageTestCase):
         )
 
 
-@patch("sites_conformes.dashboard.utils.requests.get")
+@patch("sites_conformes.dashboard.notifications.requests.get")
 def test_information_panel_not_displayed_if_request_fails(self, mock_get):
     """Rien ne s'affiche dans le back-office si la requête vers le JSON échoue."""
     mock_get.side_effect = Exception("Network error")
@@ -59,7 +59,7 @@ class TestGetAllNotifications(TestCase):
     def setUp(self):
         cache.clear()
 
-    @patch("sites_conformes.dashboard.utils.requests.get")
+    @patch("sites_conformes.dashboard.notifications.requests.get")
     def test_second_call_uses_cache(self, mock_get):
         """La deuxième requête utilise le cache et n'appelle pas requests.get."""
         mock_get.return_value.json.return_value = {"items": []}
