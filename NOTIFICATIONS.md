@@ -2,9 +2,11 @@
 
 ## À propos du fichier `notifications.json`
 
-Ce fichier est consommé par le panneau d'information de l'admin Sites Conformes. Il permet d'envoyer des notifications sur les différents back-office.
+Ce fichier est consommé par le panneau d'information de l'admin Sites Conformes. Son contenu est affiché dans un message dans le back-office, que verront les utilisateurs qui y ont accès.
 
 > 💡 Une notification est également envoyée automatiquement si la version installée n'est pas la même que la dernière version publiée.
+
+<!-- TODO : ajouter ici une capture d'écran du panneau d'information dans le back-office (cf. PR #472). -->
 
 ---
 
@@ -28,14 +30,16 @@ Il existe 3 types de notifications :
 
 ## 📌 Règles importantes
 
-| Champ | Obligatoire | Format | Peut être vide |
-|-------|-------------|--------|----------------|
+| Champ | Obligatoire | Format | Peut être vide ou absent |
+|-------|-------------|--------|--------------------------|
 | `type` | ✅ | `info`, `alert` ou `warning` | ❌ |
 | `title` | ✅ | Texte libre | ❌ |
-| `description` | ✅ | Texte libre | ✅ |
-| `url` | ✅ | URL complète (`https://...`) | ✅ |
-| `date` | ✅ | `YYYY-MM-DD` (ex: `2026-05-01`) | ✅ |
-| `end_date` | ✅ | `YYYY-MM-DD` (ex: `2026-05-31`) | ✅ |
+| `description` | ❌ | Texte libre | ✅ |
+| `more_info_link` | ❌ | Lien complet vers plus d'informations (`https://...`) | ✅ |
+| `start_date` | ❌ | `YYYY-MM-DD` (ex: `2026-05-01`) | ✅ |
+| `end_date` | ❌ | `YYYY-MM-DD` (ex: `2026-05-31`) | ✅ |
+
+> 💡 Les champs non obligatoires peuvent être laissés vides (`""`) ou complètement retirés du bloc.
 
 > 💡 **Les templates en haut du fichier** (ceux avec "à ne pas supprimer") servent d'exemples. Ne pas les supprimer, mais s'en inspirer pour créer de nouvelles notifications.
 
@@ -66,8 +70,8 @@ Le fichier ressemble à ceci :
             "type": "info",
             "title": "Ma nouveauté",
             "description": "Description courte.",
-            "url": "https://lien-vers-plus-info.fr",
-            "date": "2026-04-01",
+            "more_info_link": "https://lien-vers-plus-info.fr",
+            "start_date": "2026-04-01",
             "end_date": "2026-04-30"
         }
     ]
@@ -108,16 +112,16 @@ Copier un bloc existant et le modifier. Ne pas oublier la **virgule** entre chaq
             "type": "info",
             "title": "Nouvelle fonctionnalité : exports CSV",
             "description": "Vous pouvez désormais exporter vos données en CSV.",
-            "url": "https://docs.monsite.fr/exports",
-            "date": "2026-05-01",
+            "more_info_link": "https://docs.monsite.fr/exports",
+            "start_date": "2026-05-01",
             "end_date": "2026-05-31"
         },
         {
             "type": "alert",
             "title": "Maintenance le 15 mai",
             "description": "Le service sera indisponible de 22h à 23h.",
-            "url": "",
-            "date": "2026-05-05",
+            "more_info_link": "",
+            "start_date": "2026-05-05",
             "end_date": "2026-05-15"
         }
     ]
@@ -126,7 +130,7 @@ Copier un bloc existant et le modifier. Ne pas oublier la **virgule** entre chaq
 
 ### Désactiver une notification sans la supprimer
 
-Modifier la `end_date` pour une date **dans le passé** :
+Modifier la `end_date` pour mettre une date **dans le passé**, afin que le système considère que la période d'affichage est terminée :
 
 ```json
 "end_date": "2020-01-01"
@@ -142,7 +146,7 @@ Si la vérification échoue, cliquer sur **"Details"** à côté de la croix rou
 |---------|----------------|
 | `'type' is a required property` | Le champ `type` est manquant |
 | `'warning' is not valid` | Valeur incorrecte pour `type` (vérifier l'orthographe) |
-| `'end_date' does not match pattern` | Format de date incorrect (utiliser `YYYY-MM-DD`) |
+| `'end_date' does not match pattern` | Format de date incorrect (utiliser `YYYY-MM-DD`, par exemple "2026-05-31" pour le 31 mai 2026) |
 | `Additional properties are not allowed` | Un champ inconnu a été ajouté (ex: faute de frappe dans un nom de champ) |
 
 En cas de doute, contacte l'équipe technique en mentionnant le message d'erreur.
@@ -152,7 +156,7 @@ En cas de doute, contacte l'équipe technique en mentionnant le message d'erreur
 ## ❓ Questions fréquentes
 
 **La notification n'apparaît plus, mais la date de fin n'est pas passée ?**
-Vérifier que la `date` de début n'est pas dans le futur.
+Vérifier que la `start_date` (date de début) n'est pas dans le futur.
 
 **Comment rendre une notification permanente ?**
 Ne pas mettre de `end_date` rendra la notification permanente.

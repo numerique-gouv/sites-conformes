@@ -4,24 +4,24 @@
             "type": "info",
             "title": "Exemple de nouveauté -- Template -- à ne pas supprimer",
             "description": "Description courte de la fonctionnalité. -- template, date de fin à garder au passé.",
-            "url": "https://sites.beta.gouv.fr/",
-            "date": "2026-03-28",
+            "more_info_link": "https://sites.beta.gouv.fr/",
+            "start_date": "2026-03-28",
             "end_date": "2016-04-01"
         },
         {
             "type": "alert",
             "title": "Exemple d'alerte -- Template -- à ne pas supprimer",
             "description": "Description courte de l'alerte. -- template, date de fin à garder au passé.",
-            "url": "https://github.com/numerique-gouv/sites-faciles/releases",
-            "date": "",
+            "more_info_link": "https://github.com/numerique-gouv/sites-faciles/releases",
+            "start_date": "",
             "end_date": "2016-04-30"
-        }, 
+        },
         {
             "type": "warning",
             "title": "Exemple d'avertissement -- Template -- à ne pas supprimer",
             "description": "Description courte de l'avertissement. -- template, date de fin à garder au passé.",
-            "url": "",
-            "date": "2026-03-28",
+            "more_info_link": "",
+            "start_date": "2026-03-28",
             "end_date": "2016-04-30"
         }
     ]
