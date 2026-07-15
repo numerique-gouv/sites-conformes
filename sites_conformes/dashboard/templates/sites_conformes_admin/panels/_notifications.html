@@ -1,8 +1,17 @@
-{% load dsfr_tags i18n %}
+{% load i18n %}
+{# Markup du composant Notice du DSFR écrit à la main (plutôt que le tag {% dsfr_notice %}) afin de #}
+{# maîtriser le libellé du lien et l'affichage de la date, sans surcharger le template DSFR partagé #}
+{# avec le site public. Le style vient du CSS scopé dsfr/dist/component/notice/notice.min.css. #}
 {% for item in notifications %}
-  {% if item.start_date %}
-    {% dsfr_notice title=item.title|add:" — "|add:item.start_date description=item.description type=item.type link=item.more_info_link %}
-  {% else %}
-    {% dsfr_notice title=item.title description=item.description type=item.type link=item.more_info_link %}
-  {% endif %}
+  <div class="fr-notice fr-notice--{{ item.type|default:"info" }}">
+    <div class="fr-notice__body">
+      <p>
+        <span class="fr-notice__title">{{ item.title }}{% if item.start_date %} <span class="sf-notice-date">— {{ item.start_date|date:"j F Y" }}</span>{% endif %}</span>
+        {% if item.description %}<span class="fr-notice__desc">{{ item.description }}</span>{% endif %}
+        {% if item.more_info_link %}
+          <a class="fr-notice__link" href="{{ item.more_info_link }}" target="_blank" rel="noopener noreferrer">{% trans "Learn more" %}</a>
+        {% endif %}
+      </p>
+    </div>
+  </div>
 {% endfor %}
