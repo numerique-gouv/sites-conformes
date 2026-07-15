@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 10:22+0200\n"
+"POT-Creation-Date: 2026-07-16 11:51+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1220,6 +1220,15 @@ msgstr "Afficher le bouton de choix du thème"
 msgid "Mourning"
 msgstr "Mise en berne"
 
+msgid "Allowed iframe origins"
+msgstr ""
+
+msgid ""
+"One domain per line, without scheme or path (e.g. 'example.com'). Pages can "
+"then be embedded in an iframe from these HTTPS origins. The CMS admin can "
+"never be embedded from another origin."
+msgstr ""
+
 msgid "Newsletter description"
 msgstr "Description de la lettre d’information"
 
@@ -1550,6 +1559,12 @@ msgstr "La chaîne de requête doit commencer par '?'."
 
 msgid "Query string must not contain '#'."
 msgstr "La chaîne de requête ne doit pas contenir de '#'."
+
+#, python-format
+msgid ""
+"'%(domain)s' is not a valid domain. Enter one bare domain per line, without "
+"scheme, path or wildcard (e.g. 'example.com')."
+msgstr ""
 
 msgid "List of all the tags."
 msgstr "Liste de toutes les étiquettes."

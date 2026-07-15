@@ -1,0 +1,23 @@
+{% load static dsfr_tags %}
+
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    {% dsfr_css %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+    {% block extra_css %}{% endblock extra_css %}
+  </head>
+
+  <body>
+    <main id="content" role="main">
+      {% block content %}
+      {% endblock content %}
+    </main>
+
+    {% dsfr_js nonce=request.csp_nonce %}
+    {% block extra_js %}{% endblock extra_js %}
+  </body>
+</html>

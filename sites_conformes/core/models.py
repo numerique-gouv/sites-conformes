@@ -27,6 +27,7 @@ from wagtail.snippets.models import register_snippet
 from sites_conformes.core.abstract import SitesFacilesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
+from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
@@ -487,6 +488,18 @@ class CmsDsfrConfig(ClusterableModel, BaseSiteSetting):
     theme_modale_button = models.BooleanField(_("Display theme modale button"), default=False)  # type: ignore
     mourning = models.BooleanField(_("Mourning"), default=False)  # type: ignore
 
+    iframe_allow_origins = models.TextField(
+        _("Allowed iframe origins"),
+        default="",
+        blank=True,
+        validators=[validate_iframe_allow_origins],
+        help_text=_(
+            "One domain per line, without scheme or path (e.g. 'example.com'). "
+            "Pages can then be embedded in an iframe from these HTTPS origins. "
+            "The CMS admin can never be embedded from another origin."
+        ),
+    )
+
     newsletter_description = models.TextField(_("Newsletter description"), default="", blank=True)
 
     newsletter_url = models.URLField(
@@ -577,6 +590,7 @@ class CmsDsfrConfig(ClusterableModel, BaseSiteSetting):
                 FieldPanel("beta_tag"),
                 FieldPanel("theme_modale_button"),
                 FieldPanel("header_login_button"),
+                FieldPanel("iframe_allow_origins"),
             ],
             heading=_("Advanced settings"),
         ),

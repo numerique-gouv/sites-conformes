@@ -20,7 +20,7 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,6 +137,7 @@ MIDDLEWARE = [
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "sites_conformes.core.middleware.IframeMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
@@ -187,6 +188,7 @@ TEMPLATES = [
                 "wagtailmenus.context_processors.wagtailmenus",
                 "sites_conformes.core.context_processors.skiplinks",
                 "sites_conformes.core.context_processors.mega_menus",
+                "sites_conformes.core.context_processors.iframe",
             ],
         },
     },
@@ -527,6 +529,12 @@ DSFR_USE_INTEGRITY_CHECKSUMS = True if os.getenv("DSFR_USE_INTEGRITY_CHECKSUMS")
 
 SF_DISABLE_TUTORIALS = True if os.getenv("SF_DISABLE_TUTORIALS") in ["1", "True"] else False
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# Legacy clickjacking fallback for browsers without CSP frame-ancestors
+# support. Browsers that support frame-ancestors ignore X-Frame-Options,
+# so this does not conflict with the per-site policy emitted by
+# sites_conformes.core.middleware.IframeMiddleware.
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 
 if sentry_dsn := os.getenv("SENTRY_DSN"):
