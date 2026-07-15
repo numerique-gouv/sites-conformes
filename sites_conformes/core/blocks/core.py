@@ -53,42 +53,42 @@ STREAMFIELD_COMMON_BLOCKS = [
     ("link", SingleLinkBlock(label=_("Single link"))),
     (
         "layout_richtext",
-        ResizedTextSection(label=_("Rich text with layout"), group=_("1. Section templates to be adapted")),
+        ResizedTextSection(label=_("Rich text with layout"), group=_("Section templates to be adapted")),
     ),
     (
         "image_text_grid_section",
-        ImageAndTextGridSection(label=_("Items grid (image and text)"), group=_("1. Section templates to be adapted")),
+        ImageAndTextGridSection(label=_("Items grid (image and text)"), group=_("Section templates to be adapted")),
     ),
     (
         "image_text_cta_section",
-        ImageTextCTASection(label=_("Image, text and cta"), group=_("1. Section templates to be adapted")),
+        ImageTextCTASection(label=_("Image, text and cta"), group=_("Section templates to be adapted")),
     ),
-    ("cta_section", CTASection(label=_("Text and button"), group=_("1. Section templates to be adapted"))),
+    ("cta_section", CTASection(label=_("Text and button"), group=_("Section templates to be adapted"))),
     (
         "spotlight_section",
-        SpotlightSection(label=_("In the spotlight"), group=_("1. Section templates to be adapted")),
+        SpotlightSection(label=_("In the spotlight"), group=_("Section templates to be adapted")),
     ),
     (
         "accordion_section",
-        AccordionSection(label=_("Accordions with layout"), group=_("1. Section templates to be adapted")),
+        AccordionSection(label=_("Accordions with layout"), group=_("Section templates to be adapted")),
     ),
-    ("accordions", AccordionsBlock(label=_("Accordions"), group=_("2. DSFR components"))),
-    ("callout", CalloutBlock(label=_("Callout"), group=_("2. DSFR components"))),
-    ("highlight", HighlightBlock(label=_("Highlight"), group=_("2. DSFR components"))),
-    ("quote", QuoteBlock(label=_("Quote"), group=_("2. DSFR components"))),
-    ("stepper", StepperBlock(label=_("Stepper"), group=_("2. DSFR components"))),
-    ("card", HorizontalCardBlock(label=_("Horizontal card"), group=_("2. DSFR components"))),
-    ("tile", TileBlock(label=_("Tile"), group=_("2. DSFR components"))),
-    ("tabs", TabsBlock(label=_("Tabs"), group=_("2. DSFR components"))),
-    ("anchor", AnchorBlock(label=_("Anchor"), group=_("3. Page structure"))),
-    ("separator", SeparatorBlock(label=_("Separator"), group=_("3. Page structure"))),
-    ("multicolumns", MultiColumnsWithTitleBlock(label=_("Multiple columns"), group=_("3. Page structure"))),
-    ("item_grid", ItemGridBlock(label=_("Item grid"), group=_("3. Page structure"))),
-    ("fullwidthbackground", FullWidthBackgroundBlock(label=_("Full width background"), group=_("3. Page structure"))),
+    ("accordions", AccordionsBlock(label=_("Accordions"), group=_("DSFR components"))),
+    ("callout", CalloutBlock(label=_("Callout"), group=_("DSFR components"))),
+    ("highlight", HighlightBlock(label=_("Highlight"), group=_("DSFR components"))),
+    ("quote", QuoteBlock(label=_("Quote"), group=_("DSFR components"))),
+    ("stepper", StepperBlock(label=_("Stepper"), group=_("DSFR components"))),
+    ("card", HorizontalCardBlock(label=_("Horizontal card"), group=_("DSFR components"))),
+    ("tile", TileBlock(label=_("Tile"), group=_("DSFR components"))),
+    ("tabs", TabsBlock(label=_("Tabs"), group=_("DSFR components"))),
+    ("anchor", AnchorBlock(label=_("Anchor"), group=_("Page structure"))),
+    ("separator", SeparatorBlock(label=_("Separator"), group=_("Page structure"))),
+    ("multicolumns", MultiColumnsWithTitleBlock(label=_("Multiple columns"), group=_("Page structure"))),
+    ("item_grid", ItemGridBlock(label=_("Item grid"), group=_("Page structure"))),
+    ("fullwidthbackground", FullWidthBackgroundBlock(label=_("Full width background"), group=_("Page structure"))),
     (
         "fullwidthbackgroundwithsidemenu",
         FullWidthBackgroundWithSidemenuBlock(
-            label=_("Full width background with side menu"), group=_("3. Page structure")
+            label=_("Full width background with side menu"), group=_("Page structure")
         ),
     ),
     (
@@ -97,19 +97,19 @@ STREAMFIELD_COMMON_BLOCKS = [
             label=_("Subpages list"),
             admin_text=_("A simple, alphabetical list of the subpages of the current page."),
             template="sites_conformes_core/blocks/subpages_list.html",
-            group=_("4. Website structure"),
+            group=_("Website structure"),
         ),
     ),
     (
         "blog_recent_entries",
-        BlogRecentEntriesBlock(label=_("Blog recent entries"), group=_("4. Website structure")),
+        BlogRecentEntriesBlock(label=_("Blog recent entries"), group=_("Website structure")),
     ),
     (
         "events_recent_entries",
-        EventsRecentEntriesBlock(label=_("Event calendar recent entries"), group=_("4. Website structure")),
+        EventsRecentEntriesBlock(label=_("Event calendar recent entries"), group=_("Website structure")),
     ),
-    ("markdown", MarkdownBlock(label=_("Markdown"), group=_("5. Expert syntax"))),
-    ("iframe", IframeBlock(label=_("Iframe"), group=_("5. Expert syntax"))),
+    ("markdown", MarkdownBlock(label=_("Markdown"), group=_("Expert syntax"))),
+    ("iframe", IframeBlock(label=_("Iframe"), group=_("Expert syntax"))),
     (
         "html",
         blocks.RawHTMLBlock(
@@ -117,7 +117,7 @@ STREAMFIELD_COMMON_BLOCKS = [
             help_text=_(
                 "Warning: Use HTML block with caution. Malicious code can compromise the security of the site."
             ),
-            group=_("5. Expert syntax"),
+            group=_("Expert syntax"),
         ),
     ),
 ]
