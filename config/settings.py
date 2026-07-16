@@ -20,7 +20,12 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
+
+# Cache-Control default for all served media files.
+# Used by S3 object_parameters, db_storage view, and backfill command.
+# Override per-deployment via the MEDIA_CACHE_CONTROL env var.
+MEDIA_CACHE_CONTROL = os.getenv("MEDIA_CACHE_CONTROL", "public, max-age=3600")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -286,6 +291,8 @@ if os.getenv("S3_HOST"):
     bucket_name = os.getenv("S3_BUCKET_NAME", "set-bucket-name")
     public_host = os.getenv("S3_PUBLIC_HOST", "")
 
+    s3_cache_control = os.getenv("S3_CACHE_CONTROL", MEDIA_CACHE_CONTROL)
+
     options = {
         "bucket_name": bucket_name,
         "access_key": os.getenv("S3_KEY_ID", "123"),
@@ -294,6 +301,9 @@ if os.getenv("S3_HOST"):
         "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
         "file_overwrite": False,
         "location": os.getenv("S3_LOCATION", ""),
+        "object_parameters": {
+            "CacheControl": s3_cache_control,
+        },
     }
 
     if public_host:

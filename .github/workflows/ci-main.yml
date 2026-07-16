@@ -53,3 +53,42 @@ jobs:
         run: |
           just init
           uv run python manage.py create_demo_pages
+
+  integration-s3:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings_s3_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: 📔 Install just
+        uses: extractions/setup-just@v2
+      - name: 🐍 Set up Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+      - name: 🐍 Set up uv
+        uses: astral-sh/setup-uv@v5
+      - name: 🌍 Install dependencies
+        run: |
+          uv sync --no-group dev
+      - name: 📄 Copy empty .env.test to .env
+        run: |
+          cp .env.test .env
+      - name: 🐳 Start Garage cluster
+        run: |
+          docker compose up -d garage
+          echo "Waiting for Garage to be ready..."
+          sleep 5
+          docker compose logs garage
+      - name: 🤹‍ Run S3 integration tests
+        env:
+          GARAGE_INTEGRATION_TESTS: "1"
+          S3_HOST: garage:3900
+          S3_KEY_ID: GKarageKEY00000000000000000
+          S3_KEY_SECRET: GKarag...
+          S3_BUCKET_NAME: sites-conformes-media
+          S3_BUCKET_REGION: fr
+          S3_PROTOCOL: http
+        run: |
+          uv run python manage.py test \
+            sites_conformes.core.tests.test_s3_integration
