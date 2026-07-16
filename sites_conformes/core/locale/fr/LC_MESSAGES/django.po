@@ -1397,6 +1397,9 @@ msgstr "Méga menu"
 msgid "Home page"
 msgstr "Accueil"
 
+msgid "Published on"
+msgstr "Publié le"
+
 msgid "No article found."
 msgstr "Aucun article trouvé."
 
@@ -1466,6 +1469,10 @@ msgstr "Auteur :"
 
 msgid "Source:"
 msgstr "Source :"
+
+#, python-format
+msgid "- Page %(current)s / %(total)s"
+msgstr "- Page %(current)s / %(total)s"
 
 msgid "Filters"
 msgstr "Filtres"

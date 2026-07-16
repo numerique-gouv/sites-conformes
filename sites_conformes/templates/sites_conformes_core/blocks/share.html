@@ -24,7 +24,7 @@
              rel="noopener"
              title="{{ share_twitter }} - {{ new_window }}"
              id="share-{{ block.id }}-twitter"
-             onclick="window.open(this.href,'Partager sur X (anciennement Twitter)','toolbar=no,location=yes,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=420'); event.preventDefault();"
+             onclick="window.open(this.href,'{{ share_twitter }}','toolbar=no,location=yes,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=420'); event.preventDefault();"
              href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ page.title|urlencode }}">
             {{ share_twitter }}
           </a>
@@ -38,7 +38,7 @@
              rel="noopener"
              title="{{ share_linkedin }} - {{ new_window }}"
              id="share-{{ block.id }}-linkedin"
-             onclick="window.open(this.href,'Partager sur LinkedIn','toolbar=no,location=yes,status=no,menubar=no,scrollbars=yes,resizable=yes,width=550,height=550'); event.preventDefault();"
+             onclick="window.open(this.href,'{{ share_linkedin }}','toolbar=no,location=yes,status=no,menubar=no,scrollbars=yes,resizable=yes,width=550,height=550'); event.preventDefault();"
              href="https://www.linkedin.com/shareArticle?url={{ request.build_absolute_uri }}&title={{ page.title|urlencode }}">
             {{ share_linkedin }}
           </a>

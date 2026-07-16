@@ -18,7 +18,7 @@
       - {% translate "Source:" %} {{ current_source }}
     {% endif %}
 
-    {% if paginator.num_pages > 1 %}- Page {{ posts.number }}  / {{ paginator.num_pages }}{% endif %}
+    {% if paginator.num_pages > 1 %}{% blocktranslate with current=posts.number total=paginator.num_pages %}- Page {{ current }} / {{ total }}{% endblocktranslate %}{% endif %}
 
     — {{ settings.sites_conformes_core.CmsDsfrConfig.site_title }}
   </title>
