@@ -40,7 +40,6 @@ dependencies = [
     "wand>=0.6.13",
     "wagtail-honeypot>=1.2.1",
     "sentry-sdk[django]>=2.61.0",
-    "minio>=7.2.20",
 ]
 
 [dependency-groups]
