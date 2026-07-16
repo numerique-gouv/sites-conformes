@@ -112,10 +112,13 @@ web-prompt:
 #### Production-related recipes
 
 # Commands run by the Scalingo Procfile
+# TODO: remove fix_svg_image_extensions once https://github.com/numerique-gouv/sites-faciles/pull/441
+# has been merged and deployed on all Sites Conformes instances
 [group('Production')]
 scalingo-postdeploy:
     python manage.py migrate_from_sites_faciles --no-input
     python manage.py migrate
+    python manage.py fix_svg_images_extensions
     python manage.py create_starter_pages
     python manage.py import_page_templates
     python manage.py update_index
