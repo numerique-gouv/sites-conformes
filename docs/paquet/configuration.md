@@ -9,6 +9,10 @@ les modifier sans toucher au code. Les valeurs par défaut indiquées ci-dessous
 sont celles utilisées dans le `config/settings.py` fourni en exemple par le
 package.
 
+> 🔗 Pour la **liste exhaustive** de toutes les variables d'environnement lues
+> par l'application (au-delà de celles spécifiques à l'intégration), voir la
+> {doc}`référence des variables d'environnement <../deploiement/variables-environnement>`.
+
 ## HOST_URL
 
 Hôte de votre site (sans protocole). Sert à construire les URL absolues.

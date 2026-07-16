@@ -1,0 +1,194 @@
+# Installer le projet en local
+
+Le projet peut se lancer en local ou avec Docker.
+
+Dans le cas d’une installation en local, voir la section « Préparation de l’environnement de travail » ci-dessous.
+
+## Mise en route rapide
+
+### Dans tous les cas, copier les variables d’environnement
+
+- Copier le fichier
+
+```sh
+cp .env.example .env
+```
+
+- Générer la `SECRET_KEY`
+
+```sh
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+- Mettre les valeurs pertinentes dans le fichier `.env`, notamment :
+  - `DEBUG=True`
+  - `HOST_PROTO=http`
+
+### En local
+
+#### Variables d’environnement
+
+- mettre la variable d’environnement `USE_UV` à `1` dans le fichier `.env`
+- il est possible de configurer l’envoi des emails vers la console Django (cf. {doc}`guide-contribution`)
+
+#### Installer le projet
+
+- La commande suivante installe les dépendances, fait les migrations et collecte les fichiers
+
+```sh
+just init-dev
+```
+
+#### Créer un utilisateur
+
+- La commande suivante crée un utilisateur administrateur avec tous les droits:
+
+```sh
+just createsuperuser
+```
+
+#### Lancer le serveur
+
+```sh
+just runserver
+```
+
+### via Docker
+
+#### Lancer les containers
+
+```sh
+docker compose up
+```
+
+## Préparation de l’environnement de travail
+
+Procédure testée sous Ubuntu.
+
+### Prérequis
+
+Installer :
+
+- [Python 3](https://www.python.org/) (normalement déjà installé sur un système moderne)
+- [git](https://git-scm.com/)
+- [pipx](https://pipx.pypa.io/stable/)
+- [uv](https://docs.astral.sh/uv/)
+- [just](https://just.systems/)
+- [npm](https://docs.npmjs.com/)
+- [gettext](https://www.gnu.org/software/gettext/gettext.html)
+
+Sous Ubuntu, la commande pour cela est :
+
+```sh
+sudo apt install -y git python3 pipx just gettext
+pipx ensurepath
+pipx install uv
+```
+
+### Cloner le dépôt
+
+```sh
+git clone https://github.com/numerique-gouv/sites-conformes.git
+
+# ou en ssh
+git clone git@github.com:numerique-gouv/sites-conformes.git
+```
+
+Et rentrer dans le dossier du dépôt
+
+```sh
+cd sites-conformes
+```
+
+### PostgreSQL (base de données)
+
+Avoir un PostgreSQL qui tourne en local (cf. procédure d’installation sur [Ubuntu](https://documentation.ubuntu.com/server/how-to/databases/install-postgresql/index.html) ou sur [Mac](https://postgresapp.com/).)
+
+```sh
+# créer un utilisateur avec les droits nécessaires aux scripts d’administration
+psql -c "CREATE USER sitesconformes WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_passe';" -U postgres
+
+
+# créer la base de données (vide pour l’instant)
+psql -c "CREATE DATABASE sitesconformes OWNER sitesconformes;" -U postgres
+```
+
+### Utilisation de MinIO
+
+[MinIO](https://min.io/) permet de simuler un stockage objet compatible S3 en local, utile pour tester la configuration de production sans avoir besoin d'un vrai bucket S3.
+
+#### Lancer MinIO
+
+```sh
+docker run -d \
+  --name minio \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v ~/minio-data:/data \
+  -e MINIO_ROOT_USER=admin \
+  -e MINIO_ROOT_PASSWORD=password123 \
+  quay.io/minio/minio server /data --console-address ":9001"
+```
+
+#### Créer le bucket
+
+Accéder à la console MinIO sur <http://localhost:9001> (identifiants : `admin` / `password123`), puis créer un bucket (par exemple `sc-local`).
+
+Pour éviter l'utilisation d'URLs signées (plus simple en local), rendre le bucket public : _Buckets → sc-local → Anonymous → Add Access Rule → Prefix `/`, Access `readonly`_.
+
+#### Variables d'environnement
+
+Ajouter les variables suivantes dans le fichier `.env` :
+
+```sh
+S3_HOST=host.docker.internal:9000
+S3_PUBLIC_HOST=localhost:9000
+S3_PROTOCOL=http
+S3_KEY_ID=admin
+S3_KEY_SECRET=password123
+S3_BUCKET_NAME=sc-local
+S3_BUCKET_REGION=
+S3_LOCATION=medias/
+```
+
+> **Note :** C'est la variable `S3_HOST` qui active le stockage S3 dans l'application. Sans elle, les médias seront stockés sur le système de fichiers local, quelle que soit la configuration MinIO.
+
+Alternativement, il est également possible de passer par un stockage des fichiers directement dans la base PostgreSQL, cf. {doc}`../donnees/stockage-medias`.
+
+## Fonctionnement depuis un sous-répertoire
+
+Lorsque la variable `FORCE_SCRIPT_NAME` est configurée, le site tourne dans un sous-répertoire, fonctionnalité qui n’est pas gérée par le serveur de développement de base de Django (`runserver`).
+
+Pour tester le fonctionnement en local, il faut donc passer par [gunicorn](https://gunicorn.org/) et [nginx](https://nginx.org/). À cette fin :
+
+- Installer nginx si ce n'est pas déjà fait : <https://nginx.org/en/docs/install.html>
+- Après avoir configuré les variables d’environnement (cf. ci-dessus), lancer la commande suivante pour générer et mettre en place la configuration nginx :
+
+```sh
+just nginx-generate-config-file
+```
+
+- Lancer le serveur local via gunicorn avec la commande suivante (à la place de `just runserver` donc) :
+
+```sh
+just run_gunicorn
+```
+
+- Accéder au site via nginx en ajoutant 1 au port utilisé par gunicorn. Par exemple, si le `.env` contient les valeurs suivantes :
+
+```sh
+DEBUG=False
+HOST_PROTO=http
+HOST_URL=sites-conformes.localhost
+HOST_PORT=8000
+FORCE_SCRIPT_NAME="/pages"
+ALLOWED_HOSTS=localhost,0.0.0.0,127.0.0.1,.localhost
+CSRF_TRUSTED_ORIGINS="http://127.0.0.1:18000,http://localhost:18000,http://*.localhost:18000"
+```
+
+- On peut alors accéder au site via http:/sites-conformes.localhost:18000/pages/
+
+## Gestion de la base de données et des médias
+
+La sauvegarde, la récupération des données de production et la restauration sont
+décrites dans la section Exploitation : voir {doc}`../donnees/sauvegarde-restauration`.
