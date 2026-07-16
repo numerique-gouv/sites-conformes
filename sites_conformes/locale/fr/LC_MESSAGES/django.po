@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 11:54+0200\n"
+"POT-Creation-Date: 2026-07-16 16:39+0200\n"
 "PO-Revision-Date: 2026-04-09 13:09+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -18,6 +18,86 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.9\n"
+
+msgid ""
+"Tout ce qui se trouve après ce bloc est masqué lorsque la page est affichée "
+"dans une iframe (par ex. intégration sur un site partenaire). Utilisez-le "
+"sur les fiches qui n'ont pas de « Carte sur mesure »."
+msgstr ""
+
+msgid "Vertical card"
+msgstr ""
+
+msgid "DSFR components"
+msgstr ""
+
+msgid "Contact card"
+msgstr ""
+
+msgid "Extra components"
+msgstr ""
+
+msgid "Content"
+msgstr ""
+
+msgid "Tab"
+msgstr ""
+
+msgid "Tabs"
+msgstr ""
+
+msgid "Close"
+msgstr "Fermer"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
+msgid "Pagination"
+msgstr ""
+
+msgid "First page"
+msgstr ""
+
+#, fuzzy
+#| msgid "Share this page"
+msgid "Previous page"
+msgstr "Partager cette page"
+
+msgid "Page"
+msgstr ""
+
+#, fuzzy
+#| msgid "Home page"
+msgid "Next page"
+msgstr "Accueil"
+
+msgid "Last page"
+msgstr ""
+
+msgid "Tabs group"
+msgstr ""
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Main menu"
+msgstr "Menu principal"
 
 msgid "Error 404 — Page not found"
 msgstr "Erreur 404 — Page non trouvée"
@@ -101,17 +181,8 @@ msgstr "Ce site est fait avec"
 msgid "Home page"
 msgstr "Accueil"
 
-msgid "Search"
-msgstr "Rechercher"
-
-msgid "Close"
-msgstr "Fermer"
-
 msgid "Menu"
 msgstr "Menu"
-
-msgid "Main menu"
-msgstr "Menu principal"
 
 msgid "Hide message"
 msgstr "Masquer le message"

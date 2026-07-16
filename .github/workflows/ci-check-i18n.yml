@@ -51,6 +51,5 @@ jobs:
         run: |
           just makemessages
           just compilemessages
-          # Only check .po files — .mo binaries differ between gettext versions
-          git diff --exit-code sites_conformes/locale/fr/LC_MESSAGES/*.po
-          git diff --exit-code sites_conformes/*/locale/fr/LC_MESSAGES/*.po
+          git diff --exit-code sites_conformes/locale/
+          git diff --exit-code sites_conformes/*/locale/
