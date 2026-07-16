@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 09:41+0200\n"
+"POT-Creation-Date: 2026-05-27 11:55+0200\n"
 "PO-Revision-Date: 2026-05-27 12:04+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -539,8 +539,8 @@ msgstr "Lien isolé"
 msgid "Rich text with layout"
 msgstr "Texte avec mise en page"
 
-msgid "Section templates to be adapted"
-msgstr "Modèles de sections à adapter"
+msgid "1. Section templates to be adapted"
+msgstr "1. Modèles de sections à adapter"
 
 msgid "Items grid (image and text)"
 msgstr "Grille d’items (image et texte)"
@@ -560,8 +560,8 @@ msgstr "Accordéons avec mise en page"
 msgid "Accordions"
 msgstr "Accordéons"
 
-msgid "DSFR components"
-msgstr "Composants du DSFR"
+msgid "2. DSFR components"
+msgstr "2. Composants du DSFR"
 
 msgid "Callout"
 msgstr "Mise en avant"
@@ -584,8 +584,8 @@ msgstr "Onglets"
 msgid "Anchor"
 msgstr "Ancre"
 
-msgid "Page structure"
-msgstr "Structure de la page"
+msgid "3. Page structure"
+msgstr "3. Structure de la page"
 
 msgid "Separator"
 msgstr "Séparateur"
@@ -609,8 +609,8 @@ msgid "A simple, alphabetical list of the subpages of the current page."
 msgstr ""
 "Une liste alphabétique toute simple des sous-pages de la page actuelle."
 
-msgid "Website structure"
-msgstr "Structure du site"
+msgid "4. Website structure"
+msgstr "4. Structure du site"
 
 msgid "Blog recent entries"
 msgstr "Articles récents du blog"
@@ -621,8 +621,8 @@ msgstr "Articles récents de l’agenda"
 msgid "Markdown"
 msgstr "Markdown"
 
-msgid "Expert syntax"
-msgstr "Syntaxe experte"
+msgid "5. Expert syntax"
+msgstr "5. Syntaxe experte"
 
 msgid "Iframe"
 msgstr "Iframe"
@@ -739,6 +739,18 @@ msgid ""
 msgstr ""
 "Cette partie vous permet de choisir la mise en page de votre bloc (arrière-"
 "plan, marge...) "
+
+msgid "DSFR components"
+msgstr "Composants du DSFR"
+
+msgid "Website structure"
+msgstr "Structure du site"
+
+msgid "Expert syntax"
+msgstr "Syntaxe experte"
+
+msgid "Page structure"
+msgstr "Structure de la page"
 
 msgid "Contact card"
 msgstr "Carte contact"
@@ -1554,18 +1566,6 @@ msgstr "Pages avec l’étiquette {tag}"
 #, python-brace-format
 msgid "List of pages tagged with {tag}"
 msgstr "Liste de pages avec l’étiquette {tag}"
-
-#~ msgid "2. DSFR components"
-#~ msgstr "2. Composants du DSFR"
-
-#~ msgid "3. Page structure"
-#~ msgstr "3. Structure de la page"
-
-#~ msgid "4. Website structure"
-#~ msgstr "4. Structure du site"
-
-#~ msgid "5. Expert syntax"
-#~ msgstr "5. Syntaxe experte"
 
 #~ msgid ""
 #~ "The name of the language in said language (exemples: Français, Deutsch, "
