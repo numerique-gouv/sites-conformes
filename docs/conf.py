@@ -24,7 +24,12 @@ release = _read_package_version()
 extensions = [
     "sphinx_wagtail_theme",
     "myst_parser",  # For Markdown support
+    "sphinx_copybutton",  # "Copier" button on code blocks
 ]
+
+# Ne pas copier les invites de shell ni les commentaires de sortie
+copybutton_prompt_text = r"\$ "
+copybutton_prompt_is_regexp = True
 
 # MyST Parser configuration for Markdown support
 myst_enable_extensions = [

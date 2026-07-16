@@ -20,50 +20,23 @@ package fournit un ensemble de blocs DSFR (cartes, alertes, accordéons,
 tableaux, héros, etc.) que `ContentPage` et les autres modèles utilisent
 directement, sans système maison à apprendre.
 
+## Par où commencer ?
+
+- 🚀 **Mettre un site en ligne** → {doc}`deploiement/index` (Scalingo, serveur Linux, Docker…). C'est le cas le plus courant.
+- 💾 **Sauvegardes et stockage des médias** → {doc}`donnees/index`.
+- 📦 **Intégrer Sites Conformes à un projet Django existant** → {doc}`paquet/index`.
+- 🛠️ **Contribuer au projet** → {doc}`contrib/index`.
+
 ```{toctree}
 ---
 maxdepth: 2
-caption: Documentation
 ---
-guide/installation
-guide/configuration
+deploiement/index
+donnees/index
+paquet/index
+contrib/index
 changelog
 ```
-
-```{toctree}
----
-maxdepth: 2
-caption: Guides
----
-guide/db-storage
-guide/cas-pratique-annuaire
-```
-
-```{toctree}
----
-maxdepth: 2
-caption: Contribuer
----
-contrib/git-blame-ignore-revs
-```
-
-## Démarrage rapide
-
-```bash
-# Installation
-uv add sites-conformes
-
-# Ajouter à INSTALLED_APPS
-INSTALLED_APPS = [
-    "sites_conformes",
-    "sites_conformes.core",
-    "sites_conformes.blog",
-    "sites_conformes.events",
-    # ...
-]
-```
-
-[Voir le guide complet d'installation](guide/installation.md)
 
 ## Besoin d'aide ?
 
