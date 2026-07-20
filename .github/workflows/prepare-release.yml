@@ -1,0 +1,67 @@
+# Opens a pull request bumping sites_conformes/_version.py to the target version.
+#
+# main is protected (changes must go through a pull request), so the version bump
+# cannot be pushed straight from CI. The release flow is therefore:
+#   1. Run this workflow with the version to release (e.g. 4.1.0, 4.1-rc2).
+#   2. Review and merge the PR it opens — main now carries the right version, so
+#      Scalingo (and any other source-based deployment) picks it up.
+#   3. Cut the GitHub Release with the matching tag (v4.1.0) on main. publish.yml
+#      checks the tag against _version.py, then builds and publishes to PyPI.
+#
+# Bumping before tagging means the tagged commit already contains the released
+# version, so the tag, main, PyPI and the running app never disagree.
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, without the leading v (e.g. 4.1.0 or 4.1-rc2)"
+        required: true
+        type: string
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          # Pushing a new branch is allowed by main's protection rule, so the
+          # default token is enough. A PAT stored as VERSION_BUMP_TOKEN can be
+          # used instead so that the PR also triggers the CI workflows (GitHub
+          # deliberately does not run them for events raised by GITHUB_TOKEN).
+          token: ${{ secrets.VERSION_BUMP_TOKEN || github.token }}
+
+      - name: Open the version bump pull request
+        env:
+          GH_TOKEN: ${{ secrets.VERSION_BUMP_TOKEN || github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          BRANCH="chore/release-${VERSION}"
+          printf '__version__ = "%s"\n' "${VERSION}" > sites_conformes/_version.py
+
+          if git diff --quiet; then
+            echo "::notice::_version.py is already at ${VERSION}, nothing to do."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${BRANCH}"
+          git commit -am "chore: set version to ${VERSION}"
+          git push --force origin "${BRANCH}"
+
+          # Reuse the existing PR when the workflow is re-run for the same version.
+          if [ -n "$(gh pr list --head "${BRANCH}" --state open --json number --jq '.[].number')" ]; then
+            echo "::notice::PR already open for ${BRANCH}, updated it."
+          else
+            gh pr create --base main --head "${BRANCH}" \
+              --title "chore: release ${VERSION}" \
+              --body "Bumps \`sites_conformes/_version.py\` to \`${VERSION}\`.
+
+          Merge this before cutting the \`v${VERSION}\` release: \`publish.yml\` refuses to publish if the tag and \`_version.py\` disagree."
+          fi

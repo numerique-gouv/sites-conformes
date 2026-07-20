@@ -6,63 +6,24 @@
 # publishes sites-conformes==4.0.0 to PyPI. There is no manual version bump
 # in pyproject.toml.
 #
-# The version lives in sites_conformes/_version.py (single source of truth for
-# both the PyPI build and the runtime). On release we (1) build & publish the
-# wheel with that version, and (2) commit the bumped _version.py back to main so
-# that every source-based deployment (Scalingo, an internal server, the Docker
-# image built from the repo) picks up the right number without any extra wiring.
+# The version lives in sites_conformes/_version.py, committed on main. It is the
+# single source of truth, read both by setuptools at build time and by
+# sites_conformes/__init__.py at runtime — so every deployment mode (Scalingo, an
+# internal server, the Docker image) runs the right number without extra wiring.
+#
+# Because main is protected (changes must go through a pull request), the bump is
+# NOT done from here. Run the "Prepare release" workflow first: it opens a PR
+# setting _version.py to the target version. Merge it, then cut the GitHub
+# Release on main. This job only checks that the tag and the committed version
+# agree, then builds and publishes.
 name: Publish to PyPI
 
 on:
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to publish (e.g. 4.0.0). Ignored when triggered by a release."
-        required: false
-        type: string
 
 jobs:
-  # Commit the resolved version into _version.py on main so that source-based
-  # deployments (Scalingo, internal servers, Docker built from the repo) run the
-  # published number instead of the committed dev fallback. This is what makes
-  # the version correct "peu importe le mode de déploiement".
-  bump-version:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          # A token allowed to push to main (branch protection may require a
-          # PAT / GitHub App token rather than the default GITHUB_TOKEN).
-          token: ${{ secrets.VERSION_BUMP_TOKEN || github.token }}
-
-      - name: Resolve version from release tag
-        if: github.event_name == 'release'
-        run: echo "VERSION=${TAG#v}" >> $GITHUB_ENV
-        env:
-          TAG: ${{ github.event.release.tag_name }}
-
-      - name: Resolve version from manual input
-        if: github.event_name == 'workflow_dispatch'
-        run: echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
-
-      - name: Write and commit _version.py
-        run: |
-          printf '__version__ = "%s"\n' "${VERSION}" > sites_conformes/_version.py
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sites_conformes/_version.py
-          if git diff --staged --quiet; then
-            echo "Version already at ${VERSION}, nothing to commit."
-          else
-            git commit -m "chore: set version to ${VERSION}"
-            git push origin main
-          fi
-
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -73,22 +34,22 @@ jobs:
       - name: 🐍 Set up uv
         uses: astral-sh/setup-uv@v5
 
-      - name: Resolve version from release tag
+      # Guard against publishing a wheel whose version disagrees with the tag —
+      # which would also mean main (and therefore Scalingo) is running a
+      # different number than the one being released.
+      - name: Check _version.py matches the release tag
         if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
         run: |
-          TAG="${{ github.event.release.tag_name }}"
-          VERSION="${TAG#v}"
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-
-      - name: Resolve version from manual input
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
-
-      - name: Write _version.py
-        run: |
-          echo "Publishing version: ${VERSION}"
-          printf '__version__ = "%s"\n' "${VERSION}" > sites_conformes/_version.py
+          EXPECTED="${TAG#v}"
+          ACTUAL=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' sites_conformes/_version.py)
+          echo "Tag: ${EXPECTED} — _version.py: ${ACTUAL}"
+          if [ "${ACTUAL}" != "${EXPECTED}" ]; then
+            echo "::error::_version.py is at '${ACTUAL}' but the release tag is '${EXPECTED}'."
+            echo "::error::Run the 'Prepare release' workflow for ${EXPECTED}, merge the PR it opens, then re-cut this release."
+            exit 1
+          fi
 
       - name: Build package
         run: uv build
