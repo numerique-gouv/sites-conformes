@@ -1,9 +1,7 @@
 [project]
 name = "sites-conformes"
-# Version is driven by the GitHub Release tag at publish time. See
-# .github/workflows/publish.yml, which writes sites_conformes/_version.py
-# from github.event.release.tag_name (stripped of a leading "v").
-# The committed _version.py value is the local/dev fallback.
+# Version is read from sites_conformes.__version__, which is derived from
+# the VERSION tuple in sites_conformes/__init__.py (following Wagtail's pattern).
 dynamic = ["version"]
 description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l’État, accessible et responsive"
 authors = [
@@ -62,7 +60,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
-version = { attr = "sites_conformes._version.__version__" }
+version = { attr = "sites_conformes.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]

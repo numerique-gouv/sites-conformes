@@ -1,0 +1,25 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  deploy-staging:
+    name: Deploy staging
+    needs: ci
+    uses: ./.github/workflows/_deploy-scalingo.yml
+    secrets: inherit
+    with:
+      environment: staging
+
+  release-drafter:
+    name: Release drafter
+    needs: deploy-staging
+    uses: ./.github/workflows/_release-drafter.yml
+    secrets: inherit

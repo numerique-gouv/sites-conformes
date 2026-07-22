@@ -1,6 +1,6 @@
 name: 🎭 CI - E2E tests
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   # Generate the trusted visual baseline from the target branch (main). The

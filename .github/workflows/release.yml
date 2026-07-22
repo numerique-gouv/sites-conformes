@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish to PyPI
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit
+
+  sync-production:
+    name: Sync production branch
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Push tag to production branch
+        run: git push origin "${{ github.event.release.tag_name }}":production --force
