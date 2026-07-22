@@ -1,25 +1,18 @@
 # Configuration file for the Sphinx documentation builder.
 
-import tomllib
+import sys
 from pathlib import Path
 
 project = "sites-conformes"
 copyright = "2025, DINUM"
 author = "DINUM"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-# Read the package version from sites_conformes/pyproject.toml so the doc
-# header never drifts out of sync with the published package.
-def _read_package_version() -> str:
-    pyproject = Path(__file__).resolve().parent.parent / "sites_conformes" / "pyproject.toml"
-    try:
-        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-        return data.get("project", {}).get("version", "unknown")
-    except Exception:
-        return "unknown"
-
-
-release = _read_package_version()
+try:
+    from sites_conformes import __version__ as release
+except Exception:
+    release = "unknown"
 
 extensions = [
     "sphinx_wagtail_theme",

@@ -1,53 +1,21 @@
-# See https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-# for a detailed guide.
-#
-# Triggers on GitHub Release publish or manually via workflow_dispatch.
-# The release tag IS the package version: cutting a release named e.g. v4.0.0
-# publishes sites-conformes==4.0.0 to PyPI. There is no manual version bump
-# in pyproject.toml.
 name: Publish to PyPI
 
 on:
-  release:
-    types: [published]
+  workflow_call:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to publish (e.g. 4.0.0). Ignored when triggered by a release."
-        required: false
-        type: string
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
-
-      - name: 🐍 Set up uv
+      - name: Set up uv
         uses: astral-sh/setup-uv@v5
-
-      - name: Resolve version from release tag
-        if: github.event_name == 'release'
-        run: |
-          TAG="${{ github.event.release.tag_name }}"
-          VERSION="${TAG#v}"
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-
-      - name: Resolve version from manual input
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
-
-      - name: Write _version.py
-        run: |
-          echo "Publishing version: ${VERSION}"
-          printf '__version__ = "%s"\n' "${VERSION}" > sites_conformes/_version.py
-
       - name: Build package
         run: uv build
-
       - name: Upload dist
         uses: actions/upload-artifact@v4
         with:
@@ -59,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: none
-      id-token: write  # required for PyPI trusted publishing
+      id-token: write
     environment: publish
     steps:
       - name: Download dist
@@ -67,7 +35,6 @@ jobs:
         with:
           name: dist
           path: dist
-
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

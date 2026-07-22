@@ -1,0 +1,43 @@
+name: Deploy to Scalingo
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Scalingo SSH deploy key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SCALINGO_SSH_PRIVATE_KEY }}
+          SCALINGO_KNOWN_HOST: ${{ vars.SCALINGO_KNOWN_HOST || 'ssh.osc-fr1.scalingo.com' }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_scalingo
+          chmod 600 ~/.ssh/id_scalingo
+          ssh-keyscan -t rsa,ecdsa,ed25519 "${SCALINGO_KNOWN_HOST}" >> ~/.ssh/known_hosts
+          {
+            echo "Host ${SCALINGO_KNOWN_HOST}"
+            echo "  IdentityFile ~/.ssh/id_scalingo"
+            echo "  IdentitiesOnly yes"
+          } >> ~/.ssh/config
+
+      - name: Push to Scalingo to trigger redeploy
+        env:
+          SCALINGO_GIT_REMOTE: ${{ vars.SCALINGO_GIT_REMOTE }}
+        run: |
+          git remote add scalingo "${SCALINGO_GIT_REMOTE}"
+          git push scalingo HEAD:master --force
