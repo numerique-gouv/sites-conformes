@@ -4,4 +4,4 @@
 # Release tag, writes it here, and commits this file back to main so every
 # source-based deployment (Scalingo, internal server, Docker) picks it up.
 # The value committed below is the local/dev fallback between releases.
-__version__ = "0.0.0.dev0"
+__version__ = "4.1-rc3"
