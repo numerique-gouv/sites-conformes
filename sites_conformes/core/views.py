@@ -22,6 +22,13 @@ class SearchResultsView(ListView):
     If user is anonymous, only public pages are returned.
 
     If there is no result, an empty page list is returned.
+
+    Custom search apps:
+    ------------------
+
+    Fork projects can implement a different search by setting the
+    ``SEARCH_VIEW`` Django setting to a dotted path of their own view class.
+    See :mod:`sites_conformes.core.search_registry` for documentation.
     """
 
     model = Page
