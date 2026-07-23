@@ -1,8 +1,10 @@
+from django.contrib.auth.models import AnonymousUser
 from django.core.management import call_command
-from django.urls import reverse
+from django.test import RequestFactory
 from wagtail.test.utils import WagtailPageTestCase
 from wagtail_localize.models import TranslationSource
 
+from sites_conformes.core.views import SearchResultsView
 from sites_conformes.forms.models import FormField, FormPage
 
 
@@ -118,9 +120,18 @@ class FormsTestCase(WagtailPageTestCase):
     def test_form_page_is_found_in_search_results(self):
         call_command("update_index")
 
-        search_url = reverse("cms_search")
-        response = self.client.get(f"{search_url}?q=contact")
+        # Call the default search view by hand instead of using client.get(reverse("cms_search")).
+        # This is because a custom search view could be registered, and it would change the content
+        # of the search results and their page template.
+        factory = RequestFactory()
+        request = factory.get("/search/", {"q": "contact"})
+        request.user = AnonymousUser()
+        response = SearchResultsView.as_view()(request)
+        response.render()
 
         self.assertEqual(response.status_code, 200)
         self.assertInHTML("""<a href="/contact/">Contact</a>""", response.content.decode())
-        self.assertInHTML("""<h1>1 résultat pour la recherche «\xa0contact\xa0»</h1>""", response.content.decode())
+        self.assertInHTML(
+            """<h1>1 résultat pour la recherche «\xa0contact\xa0»</h1>""",
+            response.content.decode(),
+        )
