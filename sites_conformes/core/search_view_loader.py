@@ -1,4 +1,4 @@
-"""Registry for fork apps to plug a custom search results view into ``/search/``.
+"""Mechanism for fork apps to plug a custom search results view into ``/search/``.
 
 How to add a custom search view
 ===============================

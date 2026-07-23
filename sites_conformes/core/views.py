@@ -28,7 +28,7 @@ class SearchResultsView(ListView):
 
     Fork projects can implement a different search by setting the
     ``SEARCH_VIEW`` Django setting to a dotted path of their own view class.
-    See :mod:`sites_conformes.core.search_registry` for documentation.
+    See :mod:`sites_conformes.core.search_view_loader` for documentation.
     """
 
     model = Page
