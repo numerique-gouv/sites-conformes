@@ -1,4 +1,4 @@
-# Plateformes mutualisées (grande échelle)
+# Plateformes mutualisées (grande échelle) — 🟣 Expert
 
 Les autres méthodes de cette section déploient **un** site à la fois. Lorsqu'une administration doit héberger **un grand nombre** d'instances de Sites Conformes (une « usine à sites »), on passe à une plateforme mutualisée qui crée et gère ces instances automatiquement. Deux approches existent : une plateforme Kubernetes auto-hébergée (Ciel7) ou un gestionnaire qui pilote des PaaS externes (`sites-faciles-saas`).
 

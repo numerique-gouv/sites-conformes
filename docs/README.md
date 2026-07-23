@@ -2,9 +2,9 @@
 orphan: true
 ---
 
-# Documentation sites-conformes
+# Documentation Sites Conformes
 
-Documentation officielle de sites-conformes en français, construite avec Sphinx et le thème Wagtail.
+Documentation technique officielle de Sites Conformes en français, construite avec Sphinx et le thème Wagtail.
 
 ## Build local
 

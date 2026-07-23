@@ -3,7 +3,7 @@
 import tomllib
 from pathlib import Path
 
-project = "sites-conformes"
+project = "Sites Conformes"
 copyright = "2025, DINUM"
 author = "DINUM"
 
@@ -52,15 +52,15 @@ language = "fr"
 
 html_theme = "sphinx_wagtail_theme"
 html_static_path = ["_static"]
-# TODO: point this at the canonical doc host once it is decided. Currently a
-# personal preview; do NOT keep this URL when publishing on PyPI.
-html_baseurl = "https://sites-conformes.fabien.cool/"
+# Host de publication : GitHub Pages, déployé par .github/workflows/docs.yml.
+# À mettre à jour si un domaine personnalisé (CNAME) est mis en place.
+html_baseurl = "https://numerique-gouv.github.io/sites-conformes/"
 
 html_theme_options = {
-    "project_name": "sites-conformes",
-    "github_url": "https://github.com/numerique-gouv/sites-conformes/",
-    "logo": "logo.svg",
-    "logo_alt": "sites-conformes",
+    "project_name": "Sites Conformes",
+    # Le thème accole le nom du fichier source à cette URL : elle doit donc
+    # pointer jusqu'au dossier des sources de la doc, pas à la racine du dépôt.
+    "github_url": "https://github.com/numerique-gouv/sites-conformes/blob/main/docs/",
 }
 
 html_context = {
