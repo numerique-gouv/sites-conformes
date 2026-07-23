@@ -1,7 +1,7 @@
 # Contribuer
 
 Cette section regroupe la documentation destinée aux personnes qui **développent
-sites-conformes** : mise en place de l'environnement local, conventions,
+Sites Conformes** : mise en place de l'environnement local, conventions,
 processus de contribution et architecture du projet.
 
 Pour installer le *package* dans un projet Django existant (et non contribuer au
