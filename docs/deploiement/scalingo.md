@@ -173,6 +173,26 @@ scalingo -a ${APP_NAME} run python manage.py create_starter_pages
 
 Votre site est maintenant en ligne à l'adresse définie dans `HOST_URL`, et son administration est accessible (par défaut à l'adresse de votre site suivie de `/cms-admin/`).
 
+## Indexation des contenus
+
+Les contenus des pages sont indexés pour permettre la recherche sur le site, par la commande `update_index` (cf. la [documentation de Wagtail](https://docs.wagtail.org/en/stable/topics/search/indexing.html)).
+
+Sur Scalingo, cette commande est **lancée automatiquement après chaque déploiement** : vous n'avez rien à faire pour que la recherche fonctionne.
+
+Il est toutefois recommandé de programmer une **réindexation hebdomadaire**, pour corriger d'éventuels écarts entre l'index et les contenus. Le dépôt fournit un fichier `cron.json.example` prêt à l'emploi :
+
+```json
+{
+  "jobs": [
+    {
+      "command": "0 3 * * SUN python manage.py update_index"
+    }
+  ]
+}
+```
+
+Renommez-le en `cron.json` à la racine du projet et redéployez : Scalingo lancera la réindexation chaque dimanche à 3 h du matin. Voir la [documentation du planificateur Scalingo](https://doc.scalingo.com/platform/app/task-scheduling/scalingo-scheduler).
+
 ## Mise à jour
 
 La mise à jour est presque entièrement automatique et se fait dans le navigateur.

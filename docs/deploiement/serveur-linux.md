@@ -148,7 +148,12 @@ sudo systemctl reload nginx
 
 ## Étape 6 — Indexation de la recherche
 
-Ajouter une tâche cron pour la réindexation hebdomadaire :
+Les contenus des pages sont indexés pour permettre la recherche sur le site, par
+la commande `update_index` (cf. la [documentation de Wagtail](https://docs.wagtail.org/en/stable/topics/search/indexing.html)).
+Elle est déjà lancée par `just deploy` à chaque déploiement.
+
+Il est recommandé d'y ajouter une **réindexation hebdomadaire**, pour corriger
+d'éventuels écarts entre l'index et les contenus. Ajoutez une tâche cron :
 
 ```text
 crontab -e

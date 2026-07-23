@@ -18,3 +18,20 @@ Ce document liste les éléments à vérifier afin de déclarer qu’une fonctio
   - [ ] L’application reste utilisable avec un agrandissement de police de 200%
   - [ ] Les formulaires sont correctement balisés (utilisation de labels, intitulés des boutons explicites)
 - [ ] La navigation est facilitée (fil d’Ariane, contenus faciles à trouver, pas d’imbrication trop profondes des pages, etc.)
+- [ ] L’application est conforme au RGPD
+  - [ ] Les données personnelles collectées sont pertinentes et nécessaires au fonctionnement du service
+  - [ ] Les données sont collectées après recueil d’un consentement explicite de l’usager·e
+  - [ ] L’usager·e est informé·e de l’utilisation qui sera faite des données collectées
+  - [ ] L’usager·e dispose d'un moyen de consulter / rectifier / supprimer ses données
+  - [ ] L’application ne génère pas de requête http vers un autre domaine (trackers)
+- [ ] L’application est sécurisée
+  - [ ] Aucun secret ou mot de passe n’est en dur dans le code
+  - [ ] Aucune donnée sensible n’apparaît dans les messages d’erreur. En particulier, la stacktrace ne doit pas appaître en production.
+  - [ ] Les formulaires utilisent CSRF
+  - [ ] Les droits d’accès à la fonctionnalité et aux pages (public, restreint aux administrateurs et/ou à certains groupes) sont cohérents avec le besoin
+  - [ ] Les injections SQL sont impossibles (Utilisation exclusive de l’ORM de Django, pas de requêtes SQL brutes non sécurisées.)
+  - [ ] Limiter le nombre de dépendances et, si nécessaire d’en ajouter une, vérifier qu’elle est maintenue
+
+---
+
+> Ce document est vivant et doit évoluer avec le projet. Toute modification doit être validée par l’équipe de développement.

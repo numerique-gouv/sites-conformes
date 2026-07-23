@@ -56,6 +56,25 @@ docker compose exec web python manage.py create_starter_pages
 
 > 💡 Avec `USE_DOCKER=1` dans votre `.env`, vous pouvez remplacer la quasi-totalité de ces commandes par un seul `just deploy` (qui enchaîne migrations, fichiers statiques, pages de démarrage, gabarits, illustrations et indexation). Seul `createsuperuser` reste à lancer séparément, via `just createsuperuser` (ou son alias `just csu`).
 
+## Indexation de la recherche
+
+Les contenus des pages sont indexés pour permettre la recherche sur le site, par
+la commande `update_index` (cf. la [documentation de Wagtail](https://docs.wagtail.org/en/stable/topics/search/indexing.html)).
+Elle est déjà lancée par `just deploy` à chaque déploiement.
+
+Il est recommandé d'y ajouter une **réindexation hebdomadaire**, pour corriger
+d'éventuels écarts entre l'index et les contenus. Ajoutez une tâche cron **sur la
+machine hôte**, qui exécutera la commande dans le conteneur :
+
+```text
+crontab -e
+# Ajouter (en adaptant le chemin du projet) :
+0 3 * * 0 cd /opt/sites-conformes && docker compose exec -T web python manage.py update_index
+```
+
+> L'option `-T` désactive l'allocation d'un terminal : elle est indispensable
+> pour une exécution via cron, qui n'en dispose pas.
+
 ## Mise à jour (Docker)
 
 1. **Sauvegarder la base de données** (voir {doc}`../donnees/sauvegarde-restauration`).
