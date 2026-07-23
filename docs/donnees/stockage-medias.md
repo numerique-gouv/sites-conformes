@@ -36,7 +36,7 @@ Les commandes de migration disponibles couvrent tous les trajets possibles entre
 
 Ajoutez dans vos variables d'environnement (Dans Scalingo : onglet Environnement > Nouvelle variable ) :
 
-```env
+```text
 SF_USE_DB_STORAGE=1
 ```
 
@@ -125,7 +125,7 @@ python manage.py migrate_db_to_files --skip-files
 
 Après la migration, désactivez le DB storage dans votre `.env` :
 
-```env
+```text
 SF_USE_DB_STORAGE=0
 ```
 
@@ -152,7 +152,7 @@ python manage.py migrate_db_to_s3 --dry-run
 
 Après la migration, modifiez votre `.env` pour désactiver le DB storage :
 
-```env
+```text
 SF_USE_DB_STORAGE=0
 S3_HOST=s3.example.com
 # ... autres variables S3

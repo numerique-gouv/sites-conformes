@@ -1,4 +1,4 @@
-# Git blame ignore revs
+# Git blame
 
 Le fichier `.git-blame-ignore-revs` liste les commits à exclure de `git blame` — typiquement les PRs de reformatage massif (`black`, `ruff --fix`) qui n'ont pas d'intérêt à être visualisé via un git blame.
 
