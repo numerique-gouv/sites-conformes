@@ -446,6 +446,7 @@ WAGTAILMENUS_MAIN_MENUS_EDITABLE_IN_WAGTAILADMIN = False
 WAGTAILDOCS_MAX_UPLOAD_SIZE = int(os.getenv("WAGTAILDOCS_MAX_UPLOAD_SIZE", 10 * 1024 * 1024))  # 10MB
 
 WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
+WAGTAILDOCS_EXTENSIONS = ["pdf", "docx", "odt", "xlsx", "ods", "pptx", "odp", "csv", "txt"]
 SF_SCHEME_DEPENDENT_SVGS = True if os.getenv("SF_SCHEME_DEPENDENT_SVGS", False) in ["1", "True"] else False
 
 # Allows for complex Streamfields without completely removing checks
