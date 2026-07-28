@@ -120,6 +120,37 @@ Pensez à y mettre **tous** les domaines par lesquels le site est joignable
 À l'adresse de votre site suivie de **`/cms-admin/`** par défaut. Ce chemin est
 configurable via la variable `WAGTAILADMIN_PATH`.
 
+### Comment servir le site depuis un sous-répertoire (ex. `/pages`) ?
+
+Renseignez la variable `FORCE_SCRIPT_NAME` (par exemple `/pages`). Le site est
+alors servi sous ce préfixe.
+
+Attention : le serveur de développement de Django (`runserver`) **ne gère pas**
+cette fonctionnalité. Pour la tester en local, il faut passer par
+[gunicorn](https://gunicorn.org/) et [nginx](https://nginx.org/) :
+
+1. Installez nginx : <https://nginx.org/en/docs/install.html>.
+2. Générez la configuration nginx : `just nginx-generate-config-file`.
+3. Lancez le serveur via gunicorn (à la place de `just runserver`) : `just run_gunicorn`.
+4. Accédez au site via nginx, en ajoutant 1 au port utilisé par gunicorn.
+
+Par exemple, avec ce `.env` :
+
+```sh
+DEBUG=False
+HOST_PROTO=http
+HOST_URL=sites-conformes.localhost
+HOST_PORT=8000
+FORCE_SCRIPT_NAME="/pages"
+ALLOWED_HOSTS=localhost,0.0.0.0,127.0.0.1,.localhost
+CSRF_TRUSTED_ORIGINS="http://127.0.0.1:18000,http://localhost:18000,http://*.localhost:18000"
+```
+
+le site est accessible sur `http://sites-conformes.localhost:18000/pages/`.
+
+En production, votre serveur web (nginx, Apache…) doit être configuré pour servir
+l'application sous ce même préfixe.
+
 ## Contenus et affichage
 
 ### Les images ont disparu après un déploiement

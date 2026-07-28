@@ -30,7 +30,7 @@ sans développement spécifique.
 - 🚀 **Mettre un site en ligne** → {doc}`deploiement/index` (Scalingo, serveur Linux, Docker…). C'est le cas le plus courant.
 - 💾 **Sauvegardes et stockage des médias** → {doc}`donnees/index`.
 - 📦 **Intégrer Sites Conformes à un projet Django existant** → {doc}`paquet/index`.
-- 🛠️ **Contribuer au projet** → {doc}`contrib/index`.
+- 🛠️ **Développer et contribuer au projet** → {doc}`contrib/index`.
 
 ```{toctree}
 ---

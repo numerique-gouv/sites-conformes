@@ -1,71 +1,51 @@
 # Installer le projet en local
 
-Le projet peut se lancer en local ou avec Docker.
+Cette page met en place un environnement de développement sur votre machine. Les
+étapes se suivent **dans l'ordre** : installer les outils, cloner le dépôt,
+configurer, préparer la base, puis lancer le site.
 
-Dans le cas d’une installation en local, voir la section « Préparation de l’environnement de travail » ci-dessous.
+Deux approches sont possibles :
 
-## Mise en route rapide
+- **En natif** (recommandé pour développer) — les étapes ci-dessous ;
+- **Avec Docker** — une alternative auto-suffisante décrite en fin de page.
 
-### Dans tous les cas, copier les variables d’environnement
+> ℹ️ Les commandes système sont données pour Ubuntu/Debian ; adaptez-les à votre
+> système (macOS avec Homebrew, etc.).
 
-- Copier le fichier
+## Les outils du projet
 
-```sh
-cp .env.example .env
-```
+Le projet s'appuie sur deux outils que vous rencontrerez partout :
 
-- Générer la `SECRET_KEY`
+- **[`uv`](https://docs.astral.sh/uv/)** — gestionnaire de paquets et
+  d'environnements Python (un remplaçant rapide de `pip` + `venv`). Il installe
+  les dépendances aux versions exactes verrouillées dans `uv.lock`, outils de
+  développement compris.
+- **[`just`](https://just.systems/)** — lanceur de commandes. Le fichier
+  `justfile` regroupe des *recettes* qui enchaînent des commandes Django/uv.
+  Tapez `just` pour afficher la liste complète.
+- **[`pre-commit`](https://pre-commit.com/)** — vérifie et formate
+  automatiquement votre code (`ruff`, `black`) à chaque `git commit`. Les *hooks*
+  sont installés par `just init-dev` ; sinon, lancez `pre-commit install` une
+  fois le projet installé.
 
-```sh
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-```
+> ⚠️ **N'oubliez pas d'installer les *pre-commit hooks*.** Sans eux, rien ne
+> formate votre code localement, et le **contrôle qualité de la CI échouera** :
+> l'intégration continue rejoue `pre-commit` et `just quality` (ruff + black) sur
+> l'ensemble des fichiers, et bloque la *pull request* au moindre écart de
+> formatage.
 
-- Mettre les valeurs pertinentes dans le fichier `.env`, notamment :
-  - `DEBUG=True`
-  - `HOST_PROTO=http`
+> 🔧 **Si vous ne voulez pas installer ces outils**
+>
+> - **Sans `just`** : chaque recette n'est qu'un raccourci. Vous pouvez lancer
+>   directement les commandes sous-jacentes — les équivalents sont indiqués aux
+>   étapes concernées.
+> - **Sans `uv`** : possible avec `pip` + `venv`, mais vous perdez le
+>   verrouillage exact des versions. `uv` reste fortement recommandé en
+>   développement. Si vous utilisez `uv`, pensez à mettre `USE_UV=1` dans votre
+>   `.env` (voir plus bas) pour que les recettes `just` préfixent les commandes
+>   par `uv run`.
 
-### En local
-
-#### Variables d’environnement
-
-- mettre la variable d’environnement `USE_UV` à `1` dans le fichier `.env`
-- il est possible de configurer l’envoi des emails vers la console Django (cf. {doc}`guide-contribution`)
-
-#### Installer le projet
-
-- La commande suivante installe les dépendances, fait les migrations et collecte les fichiers
-
-```sh
-just init-dev
-```
-
-#### Créer un utilisateur
-
-- La commande suivante crée un utilisateur administrateur avec tous les droits:
-
-```sh
-just createsuperuser
-```
-
-#### Lancer le serveur
-
-```sh
-just runserver
-```
-
-### via Docker
-
-#### Lancer les containers
-
-```sh
-docker compose up
-```
-
-## Préparation de l’environnement de travail
-
-Procédure testée sous Ubuntu.
-
-### Prérequis
+## Prérequis
 
 Installer :
 
@@ -77,7 +57,7 @@ Installer :
 - [npm](https://docs.npmjs.com/)
 - [gettext](https://www.gnu.org/software/gettext/gettext.html)
 
-Sous Ubuntu, la commande pour cela est :
+Sous Ubuntu :
 
 ```sh
 sudo apt install -y git python3 pipx just gettext
@@ -85,7 +65,7 @@ pipx ensurepath
 pipx install uv
 ```
 
-### Cloner le dépôt
+## Cloner le dépôt
 
 ```sh
 git clone https://github.com/numerique-gouv/sites-conformes.git
@@ -94,30 +74,132 @@ git clone https://github.com/numerique-gouv/sites-conformes.git
 git clone git@github.com:numerique-gouv/sites-conformes.git
 ```
 
-Et rentrer dans le dossier du dépôt
+Puis entrez dans le dossier du dépôt :
 
 ```sh
 cd sites-conformes
 ```
 
-### PostgreSQL (base de données)
+## Configurer l'environnement (`.env`)
 
-Avoir un PostgreSQL qui tourne en local (cf. procédure d’installation sur [Ubuntu](https://documentation.ubuntu.com/server/how-to/databases/install-postgresql/index.html) ou sur [Mac](https://postgresapp.com/).)
+Les réglages locaux se placent dans un fichier `.env` à la racine du projet.
+Copiez le modèle fourni :
 
 ```sh
-# créer un utilisateur avec les droits nécessaires aux scripts d’administration
+cp .env.example .env
+```
+
+Générez une `SECRET_KEY` :
+
+```sh
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+Puis renseignez dans `.env` au moins :
+
+- `SECRET_KEY` — la valeur générée ci-dessus ;
+- `DEBUG=True` ;
+- `HOST_PROTO=http` ;
+- `USE_UV=1` si vous utilisez `uv` (pour que les recettes `just` passent par `uv run`).
+
+La liste complète des réglages est décrite dans
+{doc}`../deploiement/variables-environnement`.
+
+## Préparer la base de données (PostgreSQL)
+
+Avoir un PostgreSQL qui tourne en local (procédure d'installation sur
+[Ubuntu](https://documentation.ubuntu.com/server/how-to/databases/install-postgresql/index.html)
+ou sur [Mac](https://postgresapp.com/)).
+
+Créez l'utilisateur et la base :
+
+```sh
+# utilisateur avec les droits nécessaires aux scripts d'administration
 psql -c "CREATE USER sitesconformes WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_passe';" -U postgres
 
-
-# créer la base de données (vide pour l’instant)
+# base de données (vide pour l'instant)
 psql -c "CREATE DATABASE sitesconformes OWNER sitesconformes;" -U postgres
 ```
 
-### Utilisation de MinIO
+Renseignez les paramètres de connexion correspondants dans votre `.env`.
 
-[MinIO](https://min.io/) permet de simuler un stockage objet compatible S3 en local, utile pour tester la configuration de production sans avoir besoin d'un vrai bucket S3.
+## Installer et initialiser le projet
 
-#### Lancer MinIO
+Une seule commande installe les dépendances (dont celles de développement), joue
+les migrations, collecte les fichiers statiques, crée les pages de démarrage et
+installe les *pre-commit hooks* :
+
+```sh
+just init-dev
+```
+
+> 🔧 **Sans `just`** — lancez les étapes manuellement (préfixez par `uv run` si
+> vous utilisez `uv`, ou activez d'abord votre `venv`) :
+>
+> ```sh
+> uv sync
+> python manage.py migrate
+> python manage.py collectstatic --noinput
+> python manage.py create_starter_pages
+> python manage.py import_page_templates
+> python manage.py import_illustration_images
+> python manage.py update_index
+> pre-commit install
+> ```
+
+## Créer un compte administrateur
+
+```sh
+just createsuperuser
+```
+
+> 🔧 **Sans `just`** : `python manage.py createsuperuser`.
+
+## Lancer le serveur
+
+```sh
+just runserver
+```
+
+Le site est alors accessible sur <http://localhost:8000>, et l'administration sur
+<http://localhost:8000/cms-admin/>.
+
+> 🔧 **Sans `just`** : `python manage.py runserver localhost:8000`.
+
+> 💡 Pour lister les commandes de gestion Django disponibles : `uv run python manage.py`.
+
+## Avec Docker
+
+Alternative auto-suffisante : le projet fournit un `docker-compose.yml`. Après
+avoir copié le `.env` (voir ci-dessus) et ajouté `USE_DOCKER=1`, lancez les
+conteneurs :
+
+```sh
+docker compose up
+```
+
+Avec `USE_DOCKER=1`, les recettes `just` s'exécutent à l'intérieur du conteneur
+web : vous pouvez donc initialiser le site avec `just init-dev` puis créer un
+compte avec `just createsuperuser`, comme en natif.
+
+## Options avancées
+
+### Courriels en local
+
+Par défaut, les courriels tentent de partir réellement. En développement, vous
+pouvez les afficher dans le terminal plutôt que de les envoyer, en réglant dans
+votre `.env` :
+
+```sh
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+```
+
+### Stockage S3 local avec MinIO
+
+[MinIO](https://min.io/) simule un stockage objet compatible S3 en local, utile
+pour tester la configuration de production sans vrai bucket S3.
+
+Lancez MinIO :
 
 ```sh
 docker run -d \
@@ -130,15 +212,12 @@ docker run -d \
   quay.io/minio/minio server /data --console-address ":9001"
 ```
 
-#### Créer le bucket
+Accédez à la console sur <http://localhost:9001> (identifiants `admin` /
+`password123`) et créez un bucket (par exemple `sc-local`). Pour éviter les URLs
+signées (plus simple en local), rendez-le public : _Buckets → sc-local →
+Anonymous → Add Access Rule → Prefix `/`, Access `readonly`_.
 
-Accéder à la console MinIO sur <http://localhost:9001> (identifiants : `admin` / `password123`), puis créer un bucket (par exemple `sc-local`).
-
-Pour éviter l'utilisation d'URLs signées (plus simple en local), rendre le bucket public : _Buckets → sc-local → Anonymous → Add Access Rule → Prefix `/`, Access `readonly`_.
-
-#### Variables d'environnement
-
-Ajouter les variables suivantes dans le fichier `.env` :
+Ajoutez ensuite dans votre `.env` :
 
 ```sh
 S3_HOST=host.docker.internal:9000
@@ -151,44 +230,11 @@ S3_BUCKET_REGION=
 S3_LOCATION=medias/
 ```
 
-> **Note :** C'est la variable `S3_HOST` qui active le stockage S3 dans l'application. Sans elle, les médias seront stockés sur le système de fichiers local, quelle que soit la configuration MinIO.
-
-Alternativement, il est également possible de passer par un stockage des fichiers directement dans la base PostgreSQL, cf. {doc}`../donnees/stockage-medias`.
-
-## Fonctionnement depuis un sous-répertoire
-
-Lorsque la variable `FORCE_SCRIPT_NAME` est configurée, le site tourne dans un sous-répertoire, fonctionnalité qui n’est pas gérée par le serveur de développement de base de Django (`runserver`).
-
-Pour tester le fonctionnement en local, il faut donc passer par [gunicorn](https://gunicorn.org/) et [nginx](https://nginx.org/). À cette fin :
-
-- Installer nginx si ce n'est pas déjà fait : <https://nginx.org/en/docs/install.html>
-- Après avoir configuré les variables d’environnement (cf. ci-dessus), lancer la commande suivante pour générer et mettre en place la configuration nginx :
-
-```sh
-just nginx-generate-config-file
-```
-
-- Lancer le serveur local via gunicorn avec la commande suivante (à la place de `just runserver` donc) :
-
-```sh
-just run_gunicorn
-```
-
-- Accéder au site via nginx en ajoutant 1 au port utilisé par gunicorn. Par exemple, si le `.env` contient les valeurs suivantes :
-
-```sh
-DEBUG=False
-HOST_PROTO=http
-HOST_URL=sites-conformes.localhost
-HOST_PORT=8000
-FORCE_SCRIPT_NAME="/pages"
-ALLOWED_HOSTS=localhost,0.0.0.0,127.0.0.1,.localhost
-CSRF_TRUSTED_ORIGINS="http://127.0.0.1:18000,http://localhost:18000,http://*.localhost:18000"
-```
-
-- On peut alors accéder au site via http:/sites-conformes.localhost:18000/pages/
+> **Note :** c'est la variable `S3_HOST` qui active le stockage S3. Sans elle, les
+> médias sont stockés sur le système de fichiers local, quelle que soit la
+> configuration MinIO.
 
 ## Gestion de la base de données et des médias
 
 La sauvegarde, la récupération des données de production et la restauration sont
-décrites dans la section Exploitation : voir {doc}`../donnees/sauvegarde-restauration`.
+décrites dans {doc}`../donnees/sauvegarde-restauration`.

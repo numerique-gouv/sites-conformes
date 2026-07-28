@@ -1,14 +1,12 @@
 # Guide de contribution
 
-Merci de contribuer à Sites Conformes ! Cette page décrit d'abord **ce qu'on
-attend d'une contribution** (les *guidelines*), puis les gestes courants du
-développement quotidien : lancer les tests, gérer les dépendances, respecter le
-style de code.
+Ce guide décrit **comment contribuer à Sites Conformes** : ce qu'on attend d'une
+contribution, le processus pour la proposer, et les conventions de code à
+respecter.
 
-Pour mettre en place votre environnement de travail au préalable, voir
-{doc}`installation-locale`. Le projet s'appuie sur [just](https://just.systems/)
-pour lancer des séries de commandes (les *recettes*) : tapez `just` pour afficher
-la liste complète.
+La mise en place de l'environnement de développement (outils, dépôt,
+configuration, base de données) est décrite à part, dans
+{doc}`installation-locale`.
 
 ## Nos principes
 
@@ -18,6 +16,7 @@ Une contribution prête à être intégrée respecte les points suivants :
 - **Nommage et style** : conventions Python/Django standard (`snake_case` pour les fonctions et variables, `PascalCase` pour les classes). L'ordre des imports (isort) et le formatage (`black`, 119 colonnes) sont appliqués automatiquement par les [pre-commit hooks](style-pre-commit).
 - **Tests** : toute fonctionnalité est couverte par des tests automatisés, et l'ensemble de la suite passe sans erreur.
 - **Accessibilité** : l'application est conforme au [RGAA v4.1](https://accessibilite.numerique.gouv.fr/) — équivalents textuels, contrastes suffisants, navigation au clavier, balisage sémantique, utilisation à 200 % de zoom, formulaires correctement étiquetés.
+- **CSS** : utilisez autant que possible les classes du [Système de design de l'État](https://www.systeme-de-design.gouv.fr/) (via [django-dsfr](https://github.com/numerique-gouv/django-dsfr)) plutôt que du style maison.
 - **Documentation** : la documentation technique et utilisateur est mise à jour si nécessaire.
 
 Avant toute mise en production, l'ensemble est passé en revue via la
@@ -25,12 +24,23 @@ Avant toute mise en production, l'ensemble est passé en revue via la
 
 ## Proposer une contribution
 
-1. Créez une **branche dédiée** à partir de `main`.
+1. Créez une **branche dédiée** à partir de `main`, nommée `<votre-identifiant>/<description-courte>` — l'identifiant est votre nom d'utilisateur GitHub (ou vos initiales), et la description est en anglais, en minuscules avec des tirets. Exemple : `lucie/fix-breadcrumb-rgaa`.
 2. Développez en respectant les principes ci-dessus.
 3. Vérifiez localement avant de soumettre : `just quality` (ruff + black), `pre-commit run --all-files`, puis `just test`.
-4. Ouvrez une **pull request** sur le dépôt [numerique-gouv/sites-conformes](https://github.com/numerique-gouv/sites-conformes).
+4. Ouvrez une **pull request** sur le dépôt [numerique-gouv/sites-conformes](https://github.com/numerique-gouv/sites-conformes). GitHub pré-remplit la description avec le [modèle de PR](https://github.com/numerique-gouv/sites-conformes/blob/main/.github/PULL_REQUEST_TEMPLATE) du dépôt : complétez-le. Rédigez le **titre en français** — il sert à générer les notes de version (*release notes*) en français.
+5. Une fois la PR prête, **assignez un·e relecteur·rice** : Sylvain ou Lucie.
 
-> ℹ️ Conventions de nommage des branches et format des messages de commit : *[à compléter].*
+> ℹ️ **Messages de commit** : rédigez un message court et explicite. Il n'y a pas de format strict imposé. Les *pull requests* sont généralement intégrées en *squash*, avec ajout automatique du numéro de PR.
+
+## Échanger entre développeurs
+
+Si vous souhaitez contribuer activement, faites-nous signe pour rejoindre notre
+**canal Tchap dédié aux développeurs**, où l'on discute des évolutions et des
+besoins de Sites Conformes.
+
+Contactez l'équipe à [contact@sites.beta.gouv.fr](mailto:contact@sites.beta.gouv.fr)
+ou depuis le [salon Tchap public](https://www.tchap.gouv.fr/#/room/#sites-faciles:agent.dinum.tchap.gouv.fr)
+pour y être ajouté·e.
 
 ## Lancer les tests
 
@@ -52,66 +62,6 @@ just test sites_conformes.core
 just unittest sites_conformes.blog
 just coverage sites_conformes.events
 ```
-
-## Commandes Django
-
-Pour obtenir la liste des commandes Django disponibles :
-
-```sh
-uv run python manage.py
-```
-
-## Gestion des dépendances avec uv
-
-Le projet utilise [uv](https://docs.astral.sh/uv/) pour gérer les dépendances de paquets Python et produire des *builds*
-déterministes.
-
-Pour installer le projet sans les dépendances de dev :
-
-```sh
-just init
-```
-
-Pour installer le projet avec les dépendances de dev :
-
-```sh
-just init-dev
-```
-
-Pour installer un nouveau paquet et l’ajouter aux dépendances :
-
-```sh
-uv add <paquet>
-```
-
-Pour un paquet ne servant que pour le développement, par exemple `debug-toolbar` :
-
-```sh
-uv add --dev <paquet>
-```
-
-## Configuration : le fichier `.env`
-
-Le projet utilise [django-dotenv](https://github.com/jpadilla/django-dotenv) pour gérer les réglages propres à chaque environnement, qui ne peuvent pas être embarqués dans le dépôt git : configuration locale de chaque intervenant·e (par exemple les paramètres de connexion à la base) et configuration de production.
-
-Pour surcharger la configuration locale de développement, créez un fichier `.env` à la racine du projet Django.
-Cf. [le fichier `.env.example`](https://github.com/numerique-gouv/sites-conformes/blob/main/.env.example) pour l’exemple, et la {doc}`référence des variables d'environnement <../deploiement/variables-environnement>` pour le détail de chaque réglage.
-
-En staging et en production, les variables d’environnement sont spécifiées directement sur Scalingo.
-
-## Envoi de courriels en local
-
-En local, vous pouvez visualiser dans le terminal les courriels dont le template n’est pas hébergé sur Brevo.
-Pour cela, définissez la variable `EMAIL_BACKEND` à `django.core.mail.backends.console.EmailBackend` dans votre fichier `.env`.
-
-La configuration des courriels transactionnels en production (SMTP) est décrite dans {doc}`../deploiement/variables-environnement`.
-
-## CSS
-
-Le projet utilise [le Système de design de l’État](https://www.systeme-de-design.gouv.fr/), par le biais de la librairie
-[django-dsfr](https://github.com/numerique-gouv/django-dsfr).
-
-Il est donc nécessaire d’utiliser autant que possible les classes spécifiques au Système de design de l’État dans le HTML.
 
 (style-pre-commit)=
 
@@ -138,6 +88,24 @@ Il est possible de faire une passe manuelle sur l’ensemble du code via :
 ```sh
 pre-commit run --all-files
 ```
+
+## Ajouter une dépendance
+
+Le projet gère ses dépendances avec [uv](https://docs.astral.sh/uv/) (fichiers `pyproject.toml` et `uv.lock`).
+
+Pour ajouter un paquet :
+
+```sh
+uv add <paquet>
+```
+
+Pour un paquet ne servant qu'au développement, par exemple `debug-toolbar` :
+
+```sh
+uv add --dev <paquet>
+```
+
+Pensez à committer le `uv.lock` mis à jour avec votre modification.
 
 ## Outils d’audit optionnels
 
