@@ -100,19 +100,25 @@ jobs:
           name: regression-screenshots
           path: ${{ env.SCREENSHOTS_BASE_PATH }}
 
-      # Baseline mode: run the full suite and (re)generate every snapshot, then
-      # upload them as the trusted baseline. This step never fails on a visual
-      # diff — that is the point of a baseline.
-      - name: Run Playwright tests (full suite + generate snapshots)
+      # Baseline mode: render only the @regression tests and (re)generate their
+      # snapshots, then upload as the trusted baseline. Functional (non-
+      # @regression) tests are skipped here — main doesn't have the PR's app
+      # changes yet, so asserting behavior against it is meaningless and can
+      # spuriously fail (e.g. a bugfix's new test failing against old main).
+      # This step never fails on a visual diff — that is the point of a
+      # baseline.
+      - name: Run Playwright tests (generate regression snapshots)
         if: ${{ !inputs.compare }}
-        run: npx playwright test --update-snapshots
+        run: npx playwright test --update-snapshots --grep=@regression
 
-      # Compare mode: render only the @regression tests and assert each one
-      # matches the baseline downloaded above. NO --update-snapshots here, so a
-      # visual diff makes this step (and the job) fail.
-      - name: Run Playwright tests (regression comparison only)
+      # Compare mode: run the full suite against the PR branch. Functional
+      # tests execute for real and assert behavior on the new code;
+      # @regression tests additionally assert their screenshot against the
+      # baseline downloaded above (see fixtures.ts). NO --update-snapshots
+      # here, so a visual diff makes this step (and the job) fail.
+      - name: Run Playwright tests (full suite)
         if: inputs.compare
-        run: npx playwright test --grep=@regression
+        run: npx playwright test
 
       - name: Upload baseline screenshots
         if: ${{ !inputs.compare }}
