@@ -14,6 +14,9 @@ from wagtail.documents import urls as wagtaildocs_urls
 from config.api import api_router
 from sites_conformes.proconnect import urls as oidc_urls
 
+TEMPLATE_404 = "sites_conformes_core/404.html"
+TEMPLATE_500 = "sites_conformes_core/500.html"
+
 urlpatterns = [
     path("sitemap.xml", sitemap, name="xml_sitemap"),
     path(settings.WAGTAILADMIN_PATH, include(wagtailadmin_urls)),
@@ -47,9 +50,9 @@ if settings.DEBUG or settings.TESTING:
         path(
             "404/",
             page_not_found,
-            kwargs={"exception": Exception("Page not Found"), "template_name": "sites_conformes_core/404.html"},
+            kwargs={"exception": Exception("Page not Found"), "template_name": TEMPLATE_404},
         ),
-        path("500/", partial(server_error, template_name="sites_conformes_core/500.html")),
+        path("500/", partial(server_error, template_name=TEMPLATE_500)),
         prefix_default_language=False,
     )
 
@@ -59,5 +62,5 @@ urlpatterns += i18n_patterns(
     prefix_default_language=False,
 )
 
-handler404 = partial(page_not_found, template_name="sites_conformes_core/404.html")
-handler500 = partial(server_error, template_name="sites_conformes_core/500.html")
+handler404 = partial(page_not_found, template_name=TEMPLATE_404)
+handler500 = partial(server_error, template_name=TEMPLATE_500)
