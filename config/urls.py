@@ -58,3 +58,6 @@ urlpatterns += i18n_patterns(
     path("", include("sites_conformes.core.urls")),
     prefix_default_language=False,
 )
+
+handler404 = partial(page_not_found, template_name="sites_conformes_core/404.html")
+handler500 = partial(server_error, template_name="sites_conformes_core/500.html")
