@@ -95,6 +95,26 @@ Deux cas :
 Vérifiez également que vous déployez bien la branche **`production`** (la version
 stable) et non `main` (les développements en cours).
 
+### Comment héberger un grand nombre d'instances ?
+
+Les méthodes de cette section déploient un site à la fois. Pour gérer une flotte
+d'instances (une « usine à sites »), plusieurs dispositifs existent :
+
+- **`sites-faciles-saas`** — un gestionnaire officiel maintenu par l'équipe, qui
+  automatise la création d'instances sur des plateformes PaaS (Scalingo,
+  Alwaysdata) via leurs API. C'est ce qui fait tourner l'offre mutualisée
+  officielle.
+- **une plateforme mutualisée fondée sur Kubernetes** — hébergée par une
+  administration (comme l'académie de Nancy), elle fabrique et pilote des
+  instances à la demande.
+
+Sites Conformes propose par ailleurs un **mode multisite**, qui permet de gérer
+plusieurs sites au sein d'une même instance.
+
+Ces dispositifs relèvent d'une équipe d'infrastructure et dépassent le cadre de
+cette documentation. Contactez l'équipe à
+[contact@sites.beta.gouv.fr](mailto:contact@sites.beta.gouv.fr) pour en savoir plus.
+
 ## Configuration
 
 ### Une de mes variables d'environnement est incorrecte

@@ -26,7 +26,6 @@ Chaque méthode de déploiement porte un badge indiquant le niveau technique att
 | --- | --- | --- |
 | 🟢 **Débutant** | Pas (ou peu) d'administration système. On suit les étapes, l'hébergeur s'occupe du reste. | Agent, webmestre, développeur·se peu familier·e des serveurs Linux. |
 | 🔵 **Confirmé** | À l'aise avec la ligne de commande Linux, les services système, les bases de données. | Développeur·se ou administrateur·rice système. |
-| 🟣 **Expert** | Bonne connaissance de l'administration système et des environnements virtuels. | Développeur·se ou administrateur·rice système. |
 
 ## Deux outils que vous croiserez partout
 
