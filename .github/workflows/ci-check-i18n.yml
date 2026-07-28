@@ -50,6 +50,11 @@ jobs:
       - name: 🌍 Check internationalization
         run: |
           just makemessages
+          # Compile to validate the .po files parse, then discard the recompiled
+          # .mo binaries: their layout (hash-table sizing) depends on the local
+          # gettext version, so they are not a reliable diff target across
+          # environments. Only the .po source files are checked.
           just compilemessages
-          git diff --exit-code sites_conformes/locale/
-          git diff --exit-code sites_conformes/*/locale/
+          git checkout -- 'sites_conformes/locale/*.mo' 'sites_conformes/*/locale/*.mo'
+          git diff --exit-code -- 'sites_conformes/locale/*.po'
+          git diff --exit-code -- 'sites_conformes/*/locale/*.po'
