@@ -32,6 +32,29 @@ Avant toute mise en production, l'ensemble est passé en revue via la
 
 > ℹ️ **Messages de commit** : rédigez un message court et explicite. Il n'y a pas de format strict imposé. Les *pull requests* sont généralement intégrées en *squash*, avec ajout automatique du numéro de PR.
 
+(ameliorer-la-documentation)=
+
+## Améliorer la documentation
+
+Cette documentation est **perfectible**, et l'enrichir est une contribution à
+part entière — au même titre que le code. Corriger une coquille, clarifier une
+étape, ajouter un cas d'usage ou une question de FAQ : tout est bienvenu.
+
+Ses sources sont les fichiers Markdown du dossier `docs/`, et le site est
+construit avec [Sphinx](https://www.sphinx-doc.org/). Modifiez le fichier `.md`
+concerné et ouvrez une *pull request*, exactement comme pour du code.
+
+Pour prévisualiser vos changements en local :
+
+```sh
+just docs
+```
+
+La commande construit la documentation, l'ouvre dans votre navigateur et la
+**reconstruit automatiquement à chaque sauvegarde**. Pour une simple construction
+ponctuelle (sans serveur), utilisez `just docs-build`, qui écrit le HTML dans
+`docs/_build/html/`.
+
 ## Échanger entre développeurs
 
 Si vous souhaitez contribuer activement, faites-nous signe pour rejoindre notre

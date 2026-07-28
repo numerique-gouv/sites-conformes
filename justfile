@@ -216,3 +216,17 @@ restore-prod-db:
 [group('Dev DB and medias management')]
 restore-prod-medias:
     cd scripts && bash restore_prod_medias.sh
+
+#### Documentation-related recipes
+
+# Build the documentation and serve it locally with live reload (opens the browser)
+[group('Documentation')]
+docs:
+    uv run --no-project --with-requirements docs/requirements.txt --with sphinx-autobuild \
+        sphinx-autobuild docs docs/_build/html --open-browser
+
+# Build the documentation once (HTML written to docs/_build/html)
+[group('Documentation')]
+docs-build:
+    uv run --no-project --with-requirements docs/requirements.txt \
+        sphinx-build -b html docs docs/_build/html

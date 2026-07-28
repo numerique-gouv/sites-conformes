@@ -8,22 +8,27 @@ Documentation technique officielle de Sites Conformes en français, construite a
 
 ## Build local
 
+Depuis la racine du dépôt :
+
 ```bash
-cd docs
-pip install -r requirements.txt
-make html
-open _build/html/index.html  # Mac
+just docs        # build + serveur local à rechargement auto (ouvre le navigateur)
+just docs-build  # build ponctuel, HTML dans docs/_build/html/
 ```
 
 ## Structure
 
-- `guide/` : guides d'utilisation (installation, configuration)
 - `index.md` : page d'accueil
+- `deploiement/` : déployer une instance (Scalingo, serveur Linux, Docker, migration…)
+- `donnees/` : base de données et médias (sauvegarde, restauration, stockage)
+- `paquet/` : utiliser Sites Conformes comme package Django
+- `contrib/` : développer et contribuer (installation locale, architecture, guide de contribution…)
 - `changelog.md` : pointeurs vers les releases GitHub
 
 ## Publication
 
-La publication automatique (par exemple via GitHub Pages) n'est pas encore configurée. Construisez la documentation localement avec `make html` en attendant qu'une action CI dédiée soit ajoutée.
+La documentation est publiée automatiquement sur **GitHub Pages** à
+<https://numerique-gouv.github.io/sites-conformes/>, via le workflow
+`.github/workflows/docs.yml` (déclenché à chaque push sur `main` touchant `docs/`).
 
 ## Technologies
 
