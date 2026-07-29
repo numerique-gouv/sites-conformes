@@ -1,7 +1,7 @@
-{% load static dsfr_tags %}
+{% load i18n static dsfr_tags %}
 
 <!DOCTYPE html>
-<html lang="fr" data-fr-scheme="light">
+<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}" data-fr-scheme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport"
