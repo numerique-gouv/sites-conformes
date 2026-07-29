@@ -13,3 +13,4 @@ class UtilsTestCase(WagtailPageTestCase):
 
         assert isinstance(image, Image)
         assert image.title == "Sample image"
+        assert image.file.name.endswith(".svg")
