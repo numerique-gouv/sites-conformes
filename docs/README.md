@@ -4,7 +4,8 @@ orphan: true
 
 # Documentation Sites Conformes
 
-Documentation technique officielle de Sites Conformes en français, construite avec Sphinx et le thème Wagtail.
+La documentation technique de Sites Conformes est à lire sur https://numerique-gouv.github.io/sites-conformes/
+Les instructions ci-dessous sont pour la modifier. Elle est construite avec Sphinx et le thème Wagtail.
 
 ## Build local
 

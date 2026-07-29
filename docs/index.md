@@ -1,4 +1,4 @@
-# Documentation Sites Conformes
+# Documentation technique de Sites Conformes
 
 Bienvenue dans la documentation technique de **Sites Conformes**, un gestionnaire de contenu basé sur Wagtail et le Système de design de l'État (DSFR).
 
@@ -15,9 +15,9 @@ Pour la documentation générale de Wagtail, consultez [docs.wagtail.org](https:
 Sites Conformes étend Wagtail pour créer des sites conformes au [Système de Design de l'État français (DSFR)](https://www.systeme-de-design.gouv.fr/).
 
 **Fonctionnalités principales :**
-- 📝 Modèles de pages pour blog, événements et contenu
-- 🧭 Gabarits et menus adaptés au DSFR
-- ♿ Accessibilité RGAA intégrée
+-  Modèles de pages pour blog, événements et contenu
+- Gabarits et menus adaptés au DSFR
+- Accessibilité RGAA intégrée
 
 L'édition de contenu repose sur les `StreamField` standards de Wagtail. L'outil
 fournit une bibliothèque de blocs DSFR prêts à l'emploi (cartes, alertes,
@@ -27,10 +27,10 @@ sans développement spécifique.
 
 ## Par où commencer ?
 
-- 🚀 **Mettre un site en ligne** → {doc}`deploiement/index` (Scalingo, serveur Linux, Docker…). C'est le cas le plus courant.
-- 💾 **Sauvegardes et stockage des médias** → {doc}`donnees/index`.
-- 📦 **Intégrer Sites Conformes à un projet Django existant** → {doc}`paquet/index`.
-- 🛠️ **Développer et contribuer au projet** → {doc}`contrib/index`.
+- **Mettre un site en ligne** → {doc}`deploiement/index` (Scalingo, serveur Linux, Docker…). C'est le cas le plus courant.
+- **Sauvegardes et stockage des médias** → {doc}`donnees/index`.
+- **Intégrer Sites Conformes à un projet Django existant** → {doc}`paquet/index`.
+- **Développer et contribuer au projet** → {doc}`contrib/index`.
 
 ```{toctree}
 ---

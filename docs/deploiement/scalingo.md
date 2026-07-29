@@ -11,7 +11,6 @@ Scalingo est le PaaS (Platform as a Service) utilisé par la DINUM pour déploye
 - Un compte Scalingo
 - **Un compte GitHub** ayant accès au code de Sites Conformes (pour le récupérer). Rapprochez-vous de l'équipe Sites Conformes pour cette étape qui vous indiquera la marche à suivre (récupérer l'accès au répertoire GitHub ou créer un *fork*).
 - **Un espace de stockage S3** (voir l'encart ci-dessous). Ce n'est pas indispensable pour le tout premier essai, mais le deviendra dès que vous ajouterez des images.
-- Le [CLI Scalingo](https://doc.scalingo.com/platform/cli/start) installé en local.
 
 > 💡 **C'est quoi un stockage S3 ?** C'est un espace en ligne, chez un autre prestataire (OVH ou CleverCloud par exemple), où sont rangées les images et les documents que vous mettrez sur votre site. Sur Scalingo, ces fichiers ne peuvent pas rester sur le serveur du site : sans S3, les images ajoutées disparaîtraient à la prochaine mise à jour. On le configure à l'étape 2c.
 

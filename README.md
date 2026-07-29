@@ -15,25 +15,14 @@ Les tests automatisés couvrent les versions suivantes :
 - Python 3.12 à 3.14 (cf. [versions de Python supportées par Django](https://docs.djangoproject.com/en/6.0/faq/install/))
 - PostgreSQL 14 à 17 (cf. [versions de PostgreSQL supportées par Django](https://code.djangoproject.com/wiki/SupportedDatabaseVersions))
 
-## Documentation
+## Déploiement
 
-La documentation du projet est centralisée dans le dossier [`docs/`](./docs/) et construite avec Sphinx (`cd docs && make html`).
+- Pour déployer le projet en production sur un serveur, voir la [documentation d'installation](https://numerique-gouv.github.io/sites-conformes/deploiement/index.html)
+- Pour installer le projet en local pour le développement, voir [installer le projet en local](https://numerique-gouv.github.io/sites-conformes/contrib/installation-locale.html)
+- Avant de soumettre une contribution, consulter le [guide de contribution](https://numerique-gouv.github.io/sites-conformes/contrib/guide-contribution.md)
+- Pour déployer une instance (Scalingo, serveur Linux, Docker…), voir la [documentation de déploiement](https://numerique-gouv.github.io/sites-conformes/deploiement/index.md)
+- Pour les sauvegardes et le stockage des médias, voir la [gestion des données](https://numerique-gouv.github.io/sites-conformes/donnees/index.md)
 
-- Pour déployer le projet en production sur un serveur, voir la [documentation d'installation](https://sites.beta.gouv.fr/documentation/installation/)
-- Pour installer le projet en local pour le développement, voir [installer le projet en local](./docs/contrib/installation-locale.md)
-- Avant de soumettre une contribution, consulter le [guide de contribution](./docs/contrib/guide-contribution.md)
-- Pour déployer une instance (Scalingo, serveur Linux, Docker…), voir la [documentation de déploiement](./docs/deploiement/index.md)
-- Pour les sauvegardes et le stockage des médias, voir la [gestion des données](./docs/donnees/index.md)
-
-### Git blame
-
-Le projet utilise [`.git-blame-ignore-revs`](./.git-blame-ignore-revs) pour exclure les commits de reformatage de `git blame`. À configurer une fois après le clone :
-
-```bash
-git config blame.ignoreRevsFile .git-blame-ignore-revs
-```
-
-Voir [`docs/contrib/git-blame-ignore-revs.md`](./docs/contrib/git-blame-ignore-revs.md) pour plus de détails.
 
 ## Architecture
 

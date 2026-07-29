@@ -2,11 +2,11 @@
 
 Cette page met en place un environnement de développement sur votre machine. Les
 étapes se suivent **dans l'ordre** : installer les outils, cloner le dépôt,
-configurer, préparer la base, puis lancer le site.
+configurer, préparer la base de données, puis lancer le site.
 
 Deux approches sont possibles :
 
-- **En natif** (recommandé pour développer) — les étapes ci-dessous ;
+- **En natif** (méthode utilisée par l'équipe de Sites Conformes) — les étapes ci-dessous ;
 - **Avec Docker** — une alternative auto-suffisante décrite en fin de page.
 
 > ℹ️ Les commandes système sont données pour Ubuntu/Debian ; adaptez-les à votre
@@ -125,7 +125,7 @@ Renseignez les paramètres de connexion correspondants dans votre `.env`.
 
 ## Installer et initialiser le projet
 
-Une seule commande installe les dépendances (dont celles de développement), joue
+Une seule commande installe les dépendances (dont celles de développement), lance
 les migrations, collecte les fichiers statiques, crée les pages de démarrage et
 installe les *pre-commit hooks* :
 

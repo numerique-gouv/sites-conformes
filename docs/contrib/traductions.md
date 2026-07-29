@@ -16,11 +16,10 @@ just makemessages
 Django utilise une version compilée du fichier `.po` — le fichier `.mo` — que l’on obtient avec :
 
 ```sh
-uv run python manage.py compilemessages
+just compilemessages
 ```
 
 ## Poedit
 
 Il est recommandé d’utiliser [Poedit](https://poedit.net/) pour les traductions, afin de profiter de sa mémoire de traduction
-basée sur celles déjà existantes. Il produit directement le fichier `.mo` à la sauvegarde : il n’est alors pas nécessaire de le
-compiler manuellement.
+basée sur celles déjà existantes. Il permet de compiler directement le fichier `.mo` à la sauvegarde : il n’est alors pas nécessaire de le compiler manuellement.

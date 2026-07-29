@@ -1,4 +1,4 @@
-# Gestion de la base de données et des médias
+# Sauvegarde locale de la base de données et des médias
 
 Une instance Sites Conformes conserve ses données à **deux endroits distincts** :
 

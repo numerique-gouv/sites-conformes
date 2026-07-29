@@ -15,7 +15,7 @@ Une contribution prête à être intégrée respecte les points suivants :
 - **Langue du code** : les identifiants (variables, fonctions, classes) **et les commentaires** sont écrits en anglais ; seuls les textes affichés à l'utilisateur sont en français, via les {doc}`traductions`.
 - **Nommage et style** : conventions Python/Django standard (`snake_case` pour les fonctions et variables, `PascalCase` pour les classes). L'ordre des imports (isort) et le formatage (`black`, 119 colonnes) sont appliqués automatiquement par les [pre-commit hooks](style-pre-commit).
 - **Tests** : toute fonctionnalité est couverte par des tests automatisés, et l'ensemble de la suite passe sans erreur.
-- **Accessibilité** : l'application est conforme au [RGAA v4.1](https://accessibilite.numerique.gouv.fr/) — équivalents textuels, contrastes suffisants, navigation au clavier, balisage sémantique, utilisation à 200 % de zoom, formulaires correctement étiquetés.
+- **Accessibilité** : l'application vise la conformité au [RGAA v4.1](https://accessibilite.numerique.gouv.fr/) — équivalents textuels, contrastes suffisants, navigation au clavier, balisage sémantique, utilisation à 200 % de zoom, formulaires correctement étiquetés. Les contributions doivent respecter ces critères pour être approuvées.
 - **CSS** : utilisez autant que possible les classes du [Système de design de l'État](https://www.systeme-de-design.gouv.fr/) (via [django-dsfr](https://github.com/numerique-gouv/django-dsfr)) plutôt que du style maison.
 - **Documentation** : la documentation technique et utilisateur est mise à jour si nécessaire.
 

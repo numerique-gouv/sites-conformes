@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Sur les plateformes PaaS (Scalingo, Heroku, Clever Cloud) ou les déploiements Docker, le système de fichiers est souvent **éphémère** : chaque redéploiement efface les fichiers uploadés (images, documents).
+Sur les plateformes PaaS (Scalingo, Heroku, Clever Cloud) ou les déploiements Docker, le système de fichiers est souvent **éphémère** : chaque redéploiement efface les fichiers uploadés (images, documents). Pour qu'ils ne disparaissent pas, vous avez besoin de les mettre dans un backend de stockage.
 
 Sites Conformes propose trois backends de stockage pour les médias :
 
