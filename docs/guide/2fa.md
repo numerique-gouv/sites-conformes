@@ -16,6 +16,8 @@ WAGTAIL_2FA_REQUIRED=True
 
 Avec cette option, tout utilisateur authentifié sans appareil 2FA configuré est automatiquement redirigé vers la page de configuration avant de pouvoir accéder à l'admin.
 
+Il est également recommandé de configurer `WAGTAIL_2FA_OTP_TOTP_NAME`, sinon le site apparaîtra dans l'application 2FA avec la valeur de `SITE_NAME` (et sous le nom de « Sites Conformes » si aucun des deux n'est configuré.)
+
 ## Fonctionnement
 
 ### Pour l'utilisateur
