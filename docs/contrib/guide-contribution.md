@@ -24,6 +24,9 @@ Avant toute mise en production, l'ensemble est passé en revue via la
 
 ## Proposer une contribution
 
+L'ensemble des travaux en cours est à retrouver sur la [roadmap](https://projets.numerique.gouv.fr/boards/1702370688926483493). Celle-ci reflète les intentions et décisions prises dans le cadre du comité Produit du Club Contributeurs. 
+Si l'évolution que vous souhaitez ne s'y trouve pas, n'hésitez pas à venir en discuter sur Tchap dans le canal [Sites Conformes](https://www.tchap.gouv.fr/#/room/#sites-faciles:agent.dinum.tchap.gouv.fr) ou ouvrir une issue sur Github, nous pourrons vous orienter et en discuter avant que vous entamiez un travail plus important. 
+
 1. Créez une **branche dédiée** à partir de `main`, nommée `<votre-identifiant>/<description-courte>` — l'identifiant est votre nom d'utilisateur GitHub (ou vos initiales), et la description est en anglais, en minuscules avec des tirets. Exemple : `lucie/fix-breadcrumb-rgaa`.
 2. Développez en respectant les principes ci-dessus.
 3. Vérifiez localement avant de soumettre : `just quality` (ruff + black), `pre-commit run --all-files`, puis `just test`.
@@ -135,15 +138,3 @@ Pensez à committer le `uv.lock` mis à jour avec votre modification.
 ### cloc
 
 La recette `just cloc` compte les lignes de code par application. Elle nécessite l’outil [`cloc`](https://github.com/AlDanial/cloc).
-
-Installation sur macOS :
-
-```sh
-brew install cloc
-```
-
-Sur Debian/Ubuntu :
-
-```sh
-sudo apt install cloc
-```

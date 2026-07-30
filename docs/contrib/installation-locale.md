@@ -14,7 +14,7 @@ Deux approches sont possibles :
 
 ## Les outils du projet
 
-Le projet s'appuie sur deux outils que vous rencontrerez partout :
+Le projet s'appuie sur trois outils que vous rencontrerez partout :
 
 - **[`uv`](https://docs.astral.sh/uv/)** — gestionnaire de paquets et
   d'environnements Python (un remplaçant rapide de `pip` + `venv`). Il installe
