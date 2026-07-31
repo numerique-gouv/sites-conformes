@@ -62,6 +62,15 @@ if settings.DEBUG or settings.TESTING:
         prefix_default_language=False,
     )
 
+if settings.SENTRY_USE_DEBUG_URL:
+
+    def trigger_error(request):
+        _division_by_zero = 1 / 0
+
+    urlpatterns += [
+        path("sentry-debug/", trigger_error, name="sentry_debug"),  # type: ignore
+    ]
+
 urlpatterns += i18n_patterns(
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("", include("sites_conformes.core.urls")),

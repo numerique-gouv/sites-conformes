@@ -84,3 +84,17 @@ class VerifyUserStaticFilesMiddlewareTest(TestCase):
         with patch.object(VerifyUserMiddleware, "_require_verified_user", return_value=False):
             result = self.middleware._require_verified_user(request)
         self.assertFalse(result)
+
+    # -- ProConnect (OIDC) logout callback
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=True)
+    def test_oidc_logout_callback_does_not_require_verification(self):
+        """
+        Regression test: clicking "Sign out" on the 2FA code-entry screen redirects
+        through ProConnect and back to the OIDC logout callback. If that callback were
+        gated behind verification, auth.logout() inside it would never run, and the user
+        would be bounced straight back to the 2FA code-entry screen instead of being
+        logged out.
+        """
+        request = self._request("/oidc/logout-callback/")
+        self.assertFalse(self.middleware._require_verified_user(request))
