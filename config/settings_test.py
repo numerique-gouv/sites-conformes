@@ -5,6 +5,11 @@ SF_USE_DB_STORAGE = True
 if "sites_conformes.db_storage" not in INSTALLED_APPS:  # noqa: F405
     INSTALLED_APPS.insert(-1, "sites_conformes.db_storage")  # noqa: F405
 
+# Test-only app providing a custom content page model
+# to exercise the SF_CONTENTPAGE_MODEL setting.
+if "sites_conformes.testapp" not in INSTALLED_APPS:  # noqa: F405
+    INSTALLED_APPS.insert(-1, "sites_conformes.testapp")  # noqa: F405
+
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_MANIFEST_STRICT = False
 

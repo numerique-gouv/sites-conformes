@@ -103,6 +103,16 @@ Désactivé par défaut.
 SF_DISABLE_LOCAL_LOGIN = os.getenv("SF_DISABLE_LOCAL_LOGIN", "") in ("1", "True")
 ```
 
+## SF_CONTENTPAGE_MODEL
+
+Modèle de page de contenu à utiliser, sur le principe de
+`WAGTAILIMAGES_IMAGE_MODEL`. À définir avant la création des premières pages.
+Voir [Personnaliser le modèle de page de contenu](modele-de-page-personnalise.md).
+
+```python
+SF_CONTENTPAGE_MODEL = "sites_conformes_core.ContentPage"
+```
+
 ---
 
 Pour les réglages Django et Wagtail, référez-vous à leurs documentations

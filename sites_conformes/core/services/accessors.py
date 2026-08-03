@@ -5,7 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from wagtail.models import Collection, Page, PageViewRestriction
 
 from sites_conformes.core.constants import HEADER_FIELDS
-from sites_conformes.core.models import CatalogIndexPage, ContentPage
+from sites_conformes.core.model_utils import get_contentpage_model
+from sites_conformes.core.models import CatalogIndexPage
 from sites_conformes.core.utils import get_default_site
 from sites_conformes.menus.models import FooterBottomMenu, MainMenu
 
@@ -31,7 +32,7 @@ def get_or_create_catalog_index_page(
     slug: str,
     title: str,
     body: list,
-    parent_page: Page | ContentPage | None = None,
+    parent_page: Page | None = None,
     restriction_type: str | None = None,
     page_fields: dict | None = None,
 ) -> CatalogIndexPage:
@@ -44,12 +45,12 @@ def get_or_create_catalog_index_page(
     locale = root_page.locale
 
     if parent_page:
-        if not isinstance(parent_page, (Page, ContentPage)):
+        if not isinstance(parent_page, Page):
             # Default "Page" type is allowed to allow the default root page"
             raise TypeError("The parent page should be a content page.")
     else:
         # If parent_page is not passed as parameter, use the Home page of the default site.
-        if not isinstance(root_page, (Page, ContentPage)):
+        if not isinstance(root_page, Page):
             raise TypeError("The parent page should be a content page.")
         parent_page = root_page
 
@@ -87,36 +88,38 @@ def get_or_create_content_page(
     slug: str,
     title: str,
     body: list,
-    parent_page: Page | ContentPage | CatalogIndexPage | None = None,
+    parent_page: Page | None = None,
     restriction_type: str | None = None,
     page_fields: dict | None = None,
-) -> ContentPage:
+) -> Page:
     """
-    Get a ContentPage if it exists, or creates it instead.
+    Get a content page (cf. the SF_CONTENTPAGE_MODEL setting) if it exists, or creates it instead.
     """
+
+    content_page_model = get_contentpage_model()
 
     site = get_default_site()
     root_page = site.root_page
     locale = root_page.locale
 
     if parent_page:
-        if not isinstance(parent_page, (Page, ContentPage, CatalogIndexPage)):
+        if not isinstance(parent_page, Page):
             # Default "Page" type is allowed to allow the default root page"
             raise TypeError("The parent page should be a content page or a catalog index page.")
     else:
         # If parent_page is not passed as parameter, use the Home page of the default site.
-        if not isinstance(root_page, (Page, ContentPage, CatalogIndexPage)):
+        if not isinstance(root_page, Page):
             raise TypeError("The parent page should be a content page or a catalog index page.")
         parent_page = root_page
 
     # Don't replace or duplicate an already existing page
-    already_exists = ContentPage.objects.filter(slug=slug, locale=locale).first()
+    already_exists = content_page_model.objects.filter(slug=slug, locale=locale).first()
     if already_exists:
         sys.stdout.write(f"The {slug} page seem to already exist with id {already_exists.id}\n")
         return already_exists
 
     new_page = parent_page.add_child(
-        instance=ContentPage(
+        instance=content_page_model(
             title=title,
             body=body,
             slug=slug,

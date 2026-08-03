@@ -8,7 +8,7 @@ from wagtail.images import get_image_model
 from wagtail.rich_text import RichText
 
 from sites_conformes.blog.models import BlogIndexPage
-from sites_conformes.core.models import ContentPage
+from sites_conformes.core.model_utils import get_contentpage_model
 from sites_conformes.core.services.accessors import (
     get_or_create_catalog_index_page,
     get_or_create_content_page,
@@ -16,6 +16,8 @@ from sites_conformes.core.services.accessors import (
 )
 from sites_conformes.core.utils import get_default_site, import_image
 from sites_conformes.forms.models import FormField, FormPage
+
+ContentPage = get_contentpage_model()
 
 ALL_ALLOWED_SLUGS = ["blog_index", "publications", "menu_page", "form", "common_blocks", "hero_blocks"]
 

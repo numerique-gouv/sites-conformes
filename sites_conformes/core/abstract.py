@@ -213,3 +213,24 @@ class SitesFacilesBasePage(Page):
         abstract = True
         verbose_name = _("Base page")
         verbose_name_plural = _("Base pages")
+
+
+class AbstractContentPage(SitesFacilesBasePage):
+    """
+    Base class for the swappable content page model.
+
+    To use a custom content page model, subclass this in your own app and
+    point the ``SF_CONTENTPAGE_MODEL`` setting to it. Two things are left to
+    the concrete subclass on purpose:
+
+    - the ``tags`` manager: its taggit through-model needs a ``ParentalKey``
+      to a concrete model, so each subclass must declare its own (see
+      ``ContentPage`` and ``TagContentPage`` in ``sites_conformes.core.models``
+      for the reference implementation);
+    - the ``template``: Wagtail derives it from the subclass's own app label,
+      so set ``template = "sites_conformes_core/content_page.html"`` on your
+      model to reuse the shipped template.
+    """
+
+    class Meta:
+        abstract = True
