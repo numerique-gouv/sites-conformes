@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-30 14:17+0200\n"
-"PO-Revision-Date: 2026-07-30 14:17+0200\n"
+"POT-Creation-Date: 2026-08-03 15:06+0200\n"
+"PO-Revision-Date: 2026-08-03 15:07+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -18,6 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.9\n"
+
+#, python-format
+msgid "Device #%s"
+msgstr "Appareil #%s"
 
 msgid "Learn more"
 msgstr "En savoir plus"
@@ -101,6 +105,21 @@ msgstr "Activer"
 
 msgid "Update"
 msgstr "Mettre à jour"
+
+msgid "Sign in"
+msgstr "Connexion"
+
+msgid "Enter your two-factor authentication code"
+msgstr "Entrez votre code d'authentification à deux facteurs"
+
+msgid "Invalid code"
+msgstr "Code invalide"
+
+msgid "Signing in…"
+msgstr "Connexion…"
+
+msgid "Sign out"
+msgstr "Déconnexion"
 
 msgid "Password change successful"
 msgstr "Mot de passe changé avec succès"
