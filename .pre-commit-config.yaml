@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.0
+    rev: v0.16.1
     hooks:
       - id: ruff-check
         args: [ --fix, --exit-non-zero-on-fix ]
@@ -15,7 +15,7 @@ repos:
         - --target-version=py314
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
-    rev: 0.12.0
+    rev: 0.12.1
     hooks:
       - id: uv-lock
   - repo: https://github.com/igorshubovych/markdownlint-cli
