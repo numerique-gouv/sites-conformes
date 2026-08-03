@@ -83,6 +83,7 @@ sites_conformes = [
 
 [tool.black]
 line-length = 119
+target-version = ["py312", "py313", "py314"]
 
 # force-exclude (not extend-exclude) is required so that black skips migration
 # files even when pre-commit passes them explicitly on the command line.
