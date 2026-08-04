@@ -30,3 +30,16 @@ class OtpFormSignOutButtonTest(TestCase):
         button_markup = content[max(0, sign_out_button_start - 200) : sign_out_button_start]
 
         self.assertIn("formnovalidate", button_markup)
+
+    def test_sign_out_button_logs_the_user_out(self):
+        """
+        Simulates the browser submitting the "Sign out" button: a POST to
+        wagtailadmin_logout with no otp_token, since the whole point of
+        formnovalidate is to let that submission through despite the empty
+        required field. The user must actually be logged out, not bounced
+        back to the code-entry screen.
+        """
+        response = self.client.post(reverse("wagtailadmin_logout"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn("_auth_user_id", self.client.session)
