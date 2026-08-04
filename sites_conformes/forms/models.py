@@ -1,7 +1,7 @@
 from django import forms
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from dsfr.forms import DsfrDjangoTemplates
+from dsfr.forms import DsfrBoundField, DsfrDjangoTemplates
 from dsfr.utils import dsfr_input_class_attr
 from modelcluster.fields import ParentalKey
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, InlinePanel, MultiFieldPanel
@@ -62,6 +62,7 @@ class SitesFacilesCustomForm(BaseForm):
     """
 
     template_name = "dsfr/form_snippet.html"  # type: ignore
+    bound_field_class = DsfrBoundField
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

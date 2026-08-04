@@ -12,6 +12,7 @@ from wagtail.contrib.sitemaps.views import sitemap
 from wagtail.documents import urls as wagtaildocs_urls
 
 from config.api import api_router
+from sites_conformes.dashboard.views import PasswordResetConfirmView
 from sites_conformes.proconnect import urls as oidc_urls
 
 TEMPLATE_404 = "sites_conformes_core/404.html"
@@ -19,6 +20,11 @@ TEMPLATE_500 = "sites_conformes_core/500.html"
 
 urlpatterns = [
     path("sitemap.xml", sitemap, name="xml_sitemap"),
+    path(
+        f"{settings.WAGTAILADMIN_PATH}password_reset/confirm/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(),
+        name="wagtailadmin_password_reset_confirm",
+    ),
     path(settings.WAGTAILADMIN_PATH, include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("api/v2/", api_router.urls),
