@@ -17,12 +17,10 @@ class OtpFormSignOutButtonTest(TestCase):
     stays stuck on the code-entry screen.
     """
 
-    PASSWORD = "correcthorsebatterystaple"
-
     def setUp(self):
-        self.user = User.objects.create_superuser("alice", "alice@test.test", self.PASSWORD)
+        self.user = User.objects.create_superuser("alice", "alice@test.test", "pass")
         TOTPDevice.objects.create(user=self.user, name="Device", confirmed=True)
-        self.client.login(username="alice", password=self.PASSWORD)
+        self.client.login(username="alice", password="pass")
 
     def test_sign_out_button_skips_client_side_validation(self):
         response = self.client.get(reverse("wagtail_2fa_auth"))

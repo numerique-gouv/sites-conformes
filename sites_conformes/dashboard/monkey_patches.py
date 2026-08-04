@@ -4,6 +4,7 @@ Monkey patches applied to third-party libraries at startup.
 Applied from ``DashboardConfig.ready()``.
 """
 
+from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from wagtail_2fa import utils as wagtail_2fa_utils
@@ -57,3 +58,28 @@ def patch_wagtail_2fa_new_unconfirmed_device():
         return TOTPDevice.objects.create(name=_("Device #%s") % (num + 1), user=user, confirmed=False)
 
     wagtail_2fa_utils.new_unconfirmed_device = new_unconfirmed_device
+
+
+def patch_wagtail_2fa_device_create_view_success_message():
+    """
+    Show a success message once two-factor authentication setup is confirmed.
+
+    ``DeviceCreateView.form_valid`` (wagtail-2fa) confirms the device and
+    redirects to the device list page, but does not add any confirmation
+    message, so a user who just finished setup lands on that page with no
+    feedback that it actually worked.
+    """
+
+    from wagtail_2fa.views import DeviceCreateView
+
+    original_form_valid = DeviceCreateView.form_valid
+
+    def form_valid(self, form):
+        response = original_form_valid(self, form)
+        messages.success(
+            self.request,
+            _("Two-factor authentication has been successfully configured."),
+        )
+        return response
+
+    DeviceCreateView.form_valid = form_valid

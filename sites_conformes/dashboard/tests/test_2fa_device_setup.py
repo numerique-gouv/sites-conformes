@@ -49,11 +49,9 @@ class DeviceCreateViewDoubleGetTest(TestCase):
     code, and asserts the secret does not change and setup still succeeds.
     """
 
-    PASSWORD = "correcthorsebatterystaple"
-
     def setUp(self):
-        self.user = User.objects.create_superuser("alice", "alice@test.test", self.PASSWORD)
-        self.client.login(username="alice", password=self.PASSWORD)
+        self.user = User.objects.create_superuser("alice", "alice@test.test", "pass")
+        self.client.login(username="alice", password="pass")
         self.url = reverse("wagtail_2fa_device_new")
 
     def _current_device(self):
@@ -78,7 +76,7 @@ class DeviceCreateViewDoubleGetTest(TestCase):
 
         response = self.client.post(
             self.url,
-            {"name": "My phone", "otp_token": token, "password": self.PASSWORD},
+            {"name": "My phone", "otp_token": token, "password": "pass"},
         )
 
         self.assertRedirects(
@@ -87,3 +85,30 @@ class DeviceCreateViewDoubleGetTest(TestCase):
         )
         device.refresh_from_db()
         self.assertTrue(device.confirmed)
+
+
+@override_settings(WAGTAIL_2FA_REQUIRED=True)
+class DeviceCreateViewSuccessMessageTest(TestCase):
+    """
+    A success message is emitted when the 2FA is successfully activted
+    """
+
+    def setUp(self):
+        self.user = User.objects.create_superuser("alice", "alice@test.test", "pass")
+        self.client.login(username="alice", password="pass")
+        self.url = reverse("wagtail_2fa_device_new")
+
+    def test_confirming_a_device_shows_a_success_message(self):
+        self.client.get(self.url)
+        device = TOTPDevice.objects.get(user=self.user, confirmed=False)
+        token = str(totp(device.bin_key)).zfill(6)
+
+        response = self.client.post(
+            self.url,
+            {"name": "My phone", "otp_token": token, "password": "pass"},
+            follow=True,
+        )
+
+        messages = list(response.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level_tag, "success")

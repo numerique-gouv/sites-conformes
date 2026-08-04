@@ -11,6 +11,10 @@ class DashboardConfig(AppConfig):
     # To be removed once wagtail-2fa fixes the "delete + recreate unconfirmed device on every GET" bug
     # (see monkey_patches.py for details) and the dependency is upgraded past the fixed version.
     def ready(self):
-        from sites_conformes.dashboard.monkey_patches import patch_wagtail_2fa_new_unconfirmed_device
+        from sites_conformes.dashboard.monkey_patches import (
+            patch_wagtail_2fa_device_create_view_success_message,
+            patch_wagtail_2fa_new_unconfirmed_device,
+        )
 
         patch_wagtail_2fa_new_unconfirmed_device()
+        patch_wagtail_2fa_device_create_view_success_message()
