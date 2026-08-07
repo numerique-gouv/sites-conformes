@@ -51,8 +51,7 @@ Installer :
 
 - [Python 3](https://www.python.org/) (normalement déjà installé sur un système moderne)
 - [git](https://git-scm.com/)
-- [pipx](https://pipx.pypa.io/stable/)
-- [uv](https://docs.astral.sh/uv/)
+- [uv](https://docs.astral.sh/uv/) — voir la [page d'installation](https://docs.astral.sh/uv/getting-started/installation/) pour les différentes méthodes
 - [just](https://just.systems/)
 - [npm](https://docs.npmjs.com/)
 - [gettext](https://www.gnu.org/software/gettext/gettext.html)
@@ -60,9 +59,9 @@ Installer :
 Sous Ubuntu :
 
 ```sh
-sudo apt install -y git python3 pipx just gettext
-pipx ensurepath
-pipx install uv
+sudo apt install -y git python3 just gettext
+# uv (autres méthodes sur https://docs.astral.sh/uv/getting-started/installation/) :
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ## Cloner le dépôt
@@ -83,21 +82,24 @@ cd sites-conformes
 ## Configurer l'environnement (`.env`)
 
 Les réglages locaux se placent dans un fichier `.env` à la racine du projet.
-Copiez le modèle fourni :
+Une recette crée ce fichier à partir du modèle et y génère une `SECRET_KEY`
+(elle n'écrase jamais un `.env` existant) :
 
 ```sh
-cp .env.example .env
+just setup-env
 ```
 
-Générez une `SECRET_KEY` :
-
-```sh
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-```
+> 🔧 **Sans `just`** — faites-le à la main :
+>
+> ```sh
+> cp .env.example .env
+> python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+> ```
+>
+> puis reportez la valeur obtenue dans `SECRET_KEY`.
 
 Puis renseignez dans `.env` au moins :
 
-- `SECRET_KEY` — la valeur générée ci-dessus ;
 - `DEBUG=True` ;
 - `HOST_PROTO=http` ;
 - `USE_UV=1` si vous utilisez `uv` (pour que les recettes `just` passent par `uv run`).
@@ -111,17 +113,23 @@ Avoir un PostgreSQL qui tourne en local (procédure d'installation sur
 [Ubuntu](https://documentation.ubuntu.com/server/how-to/databases/install-postgresql/index.html)
 ou sur [Mac](https://postgresapp.com/)).
 
-Créez l'utilisateur et la base :
+Créez l'utilisateur et la base définis dans votre `.env` (variables
+`DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`) :
 
 ```sh
-# utilisateur avec les droits nécessaires aux scripts d'administration
-psql -c "CREATE USER sitesconformes WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_passe';" -U postgres
-
-# base de données (vide pour l'instant)
-psql -c "CREATE DATABASE sitesconformes OWNER sitesconformes;" -U postgres
+just setup-db
 ```
 
-Renseignez les paramètres de connexion correspondants dans votre `.env`.
+> 🔧 **Sans `just`** — créez-les à la main (adaptez aux valeurs de votre `.env`) :
+>
+> ```sh
+> # utilisateur avec les droits nécessaires aux scripts d'administration
+> psql -U postgres -c "CREATE USER sitesconformes WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_passe';"
+> # base de données (vide pour l'instant)
+> psql -U postgres -c "CREATE DATABASE sitesconformes OWNER sitesconformes;"
+> ```
+>
+> puis renseignez les paramètres de connexion correspondants dans votre `.env`.
 
 ## Installer et initialiser le projet
 
@@ -153,6 +161,9 @@ just init-dev
 just createsuperuser
 ```
 
+La commande vous *demande* interactivement une adresse e-mail, un nom
+d'utilisateur et un mot de passe.
+
 > 🔧 **Sans `just`** : `python manage.py createsuperuser`.
 
 ## Lancer le serveur
@@ -164,7 +175,7 @@ just runserver
 Le site est alors accessible sur <http://localhost:8000>, et l'administration sur
 <http://localhost:8000/cms-admin/>.
 
-> 🔧 **Sans `just`** : `python manage.py runserver localhost:8000`.
+> 🔧 **Sans `just`** : `python manage.py runserver`.
 
 > 💡 Pour lister les commandes de gestion Django disponibles : `uv run python manage.py`.
 
@@ -181,6 +192,10 @@ docker compose up
 Avec `USE_DOCKER=1`, les recettes `just` s'exécutent à l'intérieur du conteneur
 web : vous pouvez donc initialiser le site avec `just init-dev` puis créer un
 compte avec `just createsuperuser`, comme en natif.
+
+> ⚠️ Ce setup Docker de développement est encore peu éprouvé par l'équipe (qui
+> travaille en natif) : quelques ajustements peuvent être nécessaires. Vos
+> retours et *pull requests* pour l'améliorer sont les bienvenus.
 
 ## Options avancées
 

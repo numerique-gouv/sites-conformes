@@ -47,6 +47,26 @@ import_domain_whitelist:
 index:
     {{docker_cmd}} {{uv_run}} python manage.py update_index
 
+# Create .env from .env.example with a generated SECRET_KEY (never overwrites an existing .env)
+setup-env:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -f .env ]; then
+        echo ".env existe déjà, on n'écrase rien."
+        exit 0
+    fi
+    cp .env.example .env
+    python3 -c "import secrets,pathlib; c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#%^&*(-_=+)'; k=''.join(secrets.choice(c) for _ in range(50)); p=pathlib.Path('.env'); p.write_text('\n'.join('SECRET_KEY='+k if l.startswith('SECRET_KEY=') else l for l in p.read_text().splitlines())+'\n')"
+    echo "✅ .env créé et SECRET_KEY générée."
+
+# Create the PostgreSQL user and database defined in .env (DATABASE_USER / DATABASE_PASSWORD / DATABASE_NAME)
+setup-db:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    psql -U postgres -c "CREATE USER ${DATABASE_USER} WITH CREATEDB LOGIN PASSWORD '${DATABASE_PASSWORD}';"
+    psql -U postgres -c "CREATE DATABASE ${DATABASE_NAME} OWNER ${DATABASE_USER};"
+    echo "✅ Utilisateur et base PostgreSQL créés (${DATABASE_USER} / ${DATABASE_NAME})."
+
 init:
     {{docker_cmd}} uv sync --no-group dev
     just deploy

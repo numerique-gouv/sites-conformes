@@ -2,6 +2,8 @@
 
 Le projet fournit un `Dockerfile`. Cette méthode encapsule l'application et ses dépendances dans des conteneurs, ce qui rend le déploiement reproductible d'une machine à l'autre. Elle suppose d'être à l'aise avec Docker et Docker Compose.
 
+> ⚠️ Le `Dockerfile` fourni est un **point de départ**, pas une image de production clé en main. Le système de fichiers d'un conteneur est éphémère : ne comptez pas dessus pour stocker les médias uploadés (le `VOLUME` déclaré ne suffit pas en production). Configurez un stockage externe pour les médias — voir {doc}`../donnees/stockage-medias` — et durcissez l'image selon votre contexte avant toute mise en production.
+
 ## Prérequis
 
 - Docker et Docker Compose installés sur le serveur
@@ -63,17 +65,24 @@ la commande `update_index` (cf. la [documentation de Wagtail](https://docs.wagta
 Elle est déjà lancée par `just deploy` à chaque déploiement.
 
 Il est recommandé d'y ajouter une **réindexation hebdomadaire**, pour corriger
-d'éventuels écarts entre l'index et les contenus. Ajoutez une tâche cron **sur la
-machine hôte**, qui exécutera la commande dans le conteneur :
+d'éventuels écarts entre l'index et les contenus. Selon votre plateforme :
 
-```text
-crontab -e
-# Ajouter (en adaptant le chemin du projet) :
-0 3 * * 0 cd /opt/sites-conformes && docker compose exec -T web python manage.py update_index
-```
+- **Si vous disposez de `cron` sur la machine hôte**, ajoutez-y une tâche qui
+  exécute la commande dans le conteneur :
 
-> L'option `-T` désactive l'allocation d'un terminal : elle est indispensable
-> pour une exécution via cron, qui n'en dispose pas.
+  ```text
+  crontab -e
+  # Ajouter (en adaptant le chemin du projet) :
+  0 3 * * 0 cd /opt/sites-conformes && docker compose exec -T web python manage.py update_index
+  ```
+
+  > L'option `-T` désactive l'allocation d'un terminal : elle est indispensable
+  > pour une exécution via cron, qui n'en dispose pas.
+
+- **Sur un hébergement de type *container-as-a-service*** (où `cron` n'est
+  souvent pas disponible), planifiez plutôt `python manage.py update_index` via
+  l'ordonnanceur de tâches de votre plateforme (tâche programmée / *scheduled
+  job*).
 
 ## Mise à jour (Docker)
 
