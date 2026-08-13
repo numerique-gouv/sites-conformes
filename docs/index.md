@@ -46,6 +46,7 @@ deploiement/index
 donnees/index
 paquet/index
 contrib/index
+notifications
 changelog
 ```
 

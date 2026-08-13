@@ -45,9 +45,13 @@ d’ensemble sont décrits dans la [documentation d’architecture](./docs/contr
 
 ## Notifications
 
-Le panneau d’information de l’administration peut afficher des notifications (nouveautés, alertes, maintenances) aux utilisateurs qui ont accès au back-office. Ces notifications sont pilotées par le fichier [`notifications.json`](notifications.json) à la racine du dépôt.
+Le panneau d’information de l’administration peut afficher des notifications
+(nouveautés, alertes, maintenances) aux utilisateurs qui ont accès au back-office.
+Ces notifications sont pilotées par le fichier
+[`notifications.json`](notifications.json) à la racine du dépôt.
 
-Pour savoir comment ajouter, modifier ou désactiver une notification, voir la documentation dédiée : [`NOTIFICATIONS.md`](NOTIFICATIONS.md).
+Pour savoir comment ajouter, modifier ou désactiver une notification, voir la
+documentation dédiée : [`NOTIFICATIONS.md`](./docs/notifications.md).
 
 ## Droit d’utilisation du DSFR
 
