@@ -4,14 +4,16 @@ Ce guide couvre uniquement les réglages spécifiques à `sites_conformes`. Pour
 la configuration générale Wagtail/Django, référez-vous à leurs documentations
 officielles.
 
-La plupart des réglages se lisent depuis l'environnement, ce qui permet de
+La plupart des réglages se lisent depuis l’environnement, ce qui permet de
 les modifier sans toucher au code. Les valeurs par défaut indiquées ci-dessous
 sont celles utilisées dans le `config/settings.py` fourni en exemple par le
 package.
 
-> 🔗 Pour la **liste exhaustive** de toutes les variables d'environnement lues
-> par l'application (au-delà de celles spécifiques à l'intégration), voir la
-> {doc}`référence des variables d'environnement <../deploiement/variables-environnement>`.
+:::{seealso}
+Pour la **liste exhaustive** de toutes les variables d’environnement lues
+par l’application (au-delà de celles spécifiques à l’intégration), voir la
+{doc}`référence des variables d’environnement <../deploiement/variables-environnement>`.
+:::
 
 ## HOST_URL
 
@@ -39,7 +41,7 @@ HOST_PORT = os.getenv("HOST_PORT", "")
 
 ## FORCE_SCRIPT_NAME
 
-Préfixe d'URL si le site est servi depuis un sous-chemin (`/site-conformes/`,
+Préfixe d’URL si le site est servi depuis un sous-chemin (`/site-conformes/`,
 par exemple). Voir [la doc Django](https://docs.djangoproject.com/en/stable/ref/settings/#force-script-name).
 
 ```python
@@ -48,7 +50,7 @@ FORCE_SCRIPT_NAME = os.getenv("FORCE_SCRIPT_NAME", "").rstrip("/")
 
 ## WAGTAILADMIN_PATH
 
-Chemin d'accès à l'administration Wagtail. Par défaut **`cms-admin/`**, pour
+Chemin d’accès à l’administration Wagtail. Par défaut **`cms-admin/`**, pour
 éviter la collision avec `/admin/` (souvent réservé à Django admin).
 
 ```python
@@ -57,7 +59,7 @@ WAGTAILADMIN_PATH = os.getenv("WAGTAILADMIN_PATH", "cms-admin/")
 
 ## WAGTAIL_I18N_ENABLED
 
-Active l'internationalisation de Wagtail :
+Active l’internationalisation de Wagtail :
 
 ```python
 WAGTAIL_I18N_ENABLED = True
@@ -65,8 +67,8 @@ WAGTAIL_I18N_ENABLED = True
 
 ## PROCONNECT_ACTIVATED
 
-Active l'authentification ProConnect (réservée aux agents de l'État). Lue
-depuis l'environnement, désactivée par défaut.
+Active l’authentification ProConnect (réservée aux agents de l’État). Lue
+depuis l’environnement, désactivée par défaut.
 
 ```python
 PROCONNECT_ACTIVATED = os.getenv("PROCONNECT_ACTIVATED", "") in ("1", "True")
@@ -100,14 +102,14 @@ SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 
 ## SF_DISABLE_LOCAL_LOGIN
 
-Désactive la connexion par mot de passe au profit d'un SSO (ProConnect, etc.).
+Désactive la connexion par mot de passe au profit d’un SSO (ProConnect, etc.).
 Désactivé par défaut.
 
 ```python
 SF_DISABLE_LOCAL_LOGIN = os.getenv("SF_DISABLE_LOCAL_LOGIN", "") in ("1", "True")
 ```
 
----
-
+:::{seealso}
 Pour les réglages Django et Wagtail, référez-vous à leurs documentations
 officielles : <https://docs.djangoproject.com/> et <https://docs.wagtail.org/>.
+:::

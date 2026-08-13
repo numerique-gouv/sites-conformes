@@ -9,7 +9,7 @@ puis choisissez la méthode adaptée à votre contexte — de la plus simple (Sc
 Cette documentation est **vivante et perfectible**. Chaque contexte de
 déploiement a ses particularités : si vous rencontrez un cas non couvert, une
 étape imprécise ou une plateforme non documentée, vos retours nous aident à
-l'enrichir. Voir [comment améliorer la documentation](ameliorer-la-documentation)
+l’enrichir. Voir [comment améliorer la documentation](ameliorer-la-documentation)
 pour nous les faire remonter.
 :::
 

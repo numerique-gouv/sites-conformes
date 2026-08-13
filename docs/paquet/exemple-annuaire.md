@@ -1,29 +1,29 @@
 # Cas pratique - annuaire de psychologues sur une carte
 
 Ce guide répond à une question récurrente : comment ajouter une entité métier
-(par exemple un annuaire de psychologues), l'afficher sur une carte
-interactive, et l'exposer via une API ?
+(par exemple un annuaire de psychologues), l’afficher sur une carte
+interactive, et l’exposer via une API ?
 
 Le parcours :
 
 1. Installer `sites-conformes` dans un projet Django existant.
-2. Modéliser l'entité `Psychologue` comme un **snippet** Wagtail.
+2. Modéliser l’entité `Psychologue` comme un **snippet** Wagtail.
 3. Créer un **bloc StreamField** réutilisable qui affiche la liste sur une carte.
-4. Exposer le tout via l'API REST de Wagtail (`/api/v2/`).
+4. Exposer le tout via l’API REST de Wagtail (`/api/v2/`).
 
 ## 0. Prérequis
 
 `sites-conformes` doit être installé et configuré dans votre projet Django.
-Voir [Installation](installation.md) si ce n'est pas fait.
+Voir [Installation](installation.md) si ce n’est pas fait.
 
-Le guide utilise [`uv`](https://docs.astral.sh/uv/) pour gérer l'environnement
+Le guide utilise [`uv`](https://docs.astral.sh/uv/) pour gérer l’environnement
 Python et exécuter les commandes Django (`uv run python ...`). Si vous
 préférez un autre gestionnaire, retirez le préfixe `uv run` : les commandes
 restent identiques.
 
-L'exemple suppose une app Django locale nommée `annuaire` :
+L’exemple suppose une app Django locale nommée `annuaire` :
 
-```bash
+```sh
 uv run python manage.py startapp annuaire
 ```
 
@@ -36,20 +36,20 @@ Pour la lancer :
 
 - clonez le dépôt et placez-vous dans `demo/`
 - lancez `just setup` (installe les dépendances, applique les migrations et
-  insère des psychologues + une page d'annuaire publiée à `/annuaire/`)
+  insère des psychologues + une page d’annuaire publiée à `/annuaire/`)
 - lancez `just runserver` puis ouvrez <http://localhost:8000/annuaire/>
 :::
 
 ## 1. Le snippet `Psychologue`
 
 Un [snippet Wagtail](https://docs.wagtail.org/en/stable/topics/snippets/index.html)
-est un modèle Django éditable depuis le back office sans qu'il s'agisse d'une
+est un modèle Django éditable depuis le back office sans qu’il s’agisse d’une
 page. Parfait pour des données réutilisables sur plusieurs pages : un annuaire
 de psys, une liste de lieux, des contacts.
 
 On stocke les coordonnées en
 [`DecimalField`](https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield)
-plutôt qu'en
+plutôt qu’en
 [`PointField`](https://docs.djangoproject.com/en/stable/ref/contrib/gis/model-api/#pointfield)
 (PostGIS), pour rester sur une stack Postgres ou SQLite standard. Pour les
 requêtes spatiales avancées (recherche par rayon, etc.), passez à
@@ -97,18 +97,18 @@ class Psychologue(models.Model):
 
 Migrations :
 
-```bash
+```sh
 uv run python manage.py makemigrations annuaire
 uv run python manage.py migrate
 ```
 
-Le snippet apparaît dans l'admin Wagtail sous **Snippets → Psychologues**.
+Le snippet apparaît dans l’admin Wagtail sous **Snippets → Psychologues**.
 
 ## 2. Un bloc StreamField qui affiche la carte
 
 Pour intégrer la carte dans une page, on crée un [bloc
 Wagtail](https://docs.wagtail.org/en/stable/topics/streamfield.html). Comme
-l'éditeur ne doit pas saisir manuellement les psys - ils viennent de la base -
+l’éditeur ne doit pas saisir manuellement les psys - ils viennent de la base -
 on utilise
 [`StaticBlock`](https://docs.wagtail.org/en/stable/reference/streamfield/blocks.html#wagtail.blocks.StaticBlock)
 : un bloc sans champs éditables qui rend simplement un template à partir du
@@ -153,7 +153,7 @@ class ListePsychologuesBlock(blocks.StaticBlock):
 
 [Carte Facile](https://fab-geocommuns.github.io/carte-facile-site/) est une
 bibliothèque de styles cartographiques fournie par la Fabrique des Géocommuns
-(IGN). Elle s'appuie sur [`maplibre-gl`](https://maplibre.org/) pour le rendu.
+(IGN). Elle s’appuie sur [`maplibre-gl`](https://maplibre.org/) pour le rendu.
 
 Pour un POC, le plus simple est de charger les deux via CDN (`unpkg.com`) avec
 un *import map* - pas de bundler nécessaire :
@@ -171,7 +171,7 @@ un *import map* - pas de bundler nécessaire :
       <div id="annuaire-carte"
            style="height: 480px; width: 100%;"
            role="application"
-           aria-label="Carte interactive de l'annuaire"></div>
+           aria-label="Carte interactive de l’annuaire"></div>
     </div>
     <div class="fr-col-12 fr-col-md-5">
       <ul class="fr-list" style="max-height: 480px; overflow-y: auto;">
@@ -181,13 +181,13 @@ un *import map* - pas de bundler nécessaire :
             {% if psy.email %}<br><a href="mailto:{{ psy.email }}">{{ psy.email }}</a>{% endif %}
           </li>
         {% empty %}
-          <li>Aucun psychologue dans l'annuaire pour le moment.</li>
+          <li>Aucun psychologue dans l’annuaire pour le moment.</li>
         {% endfor %}
       </ul>
     </div>
   </div>
 
-  {# `json_script` sérialise correctement avec l'échappement requis. #}
+  {# `json_script` sérialise correctement avec l’échappement requis. #}
   {{ psychologues_geojson|json_script:"annuaire-data" }}
 
   <script type="importmap">
@@ -268,16 +268,16 @@ Hériter de `CommonStreamBlock` couple votre site aux blocs `sites-conformes` :
 **à chaque montée de version où `sites-conformes` modifie ses blocs communs,
 Django détectera un changement de `StreamField` et exigera une migration côté
 projet hôte** (`uv run python manage.py makemigrations` puis `migrate`).
-C'est un compromis connu de l'approche par héritage. La page d'exemple ci-dessus
-(`AnnuairePage` avec un `StreamField` qui ne contient que notre bloc) n'a pas
+C’est un compromis connu de l’approche par héritage. La page d’exemple ci-dessus
+(`AnnuairePage` avec un `StreamField` qui ne contient que notre bloc) n’a pas
 ce problème : elle reste stable tant que vous ne touchez pas à
 `ListePsychologuesBlock`.
 :::
 
-Migration, puis dans l'admin Wagtail vous pouvez créer une *Annuaire page* et
+Migration, puis dans l’admin Wagtail vous pouvez créer une *Annuaire page* et
 sa carte se rend automatiquement à partir des `Psychologue` en base.
 
-## 5. Exposer les psychologues via l'API Wagtail
+## 5. Exposer les psychologues via l’API Wagtail
 
 Wagtail fournit nativement une
 [API REST v2](https://docs.wagtail.org/en/stable/advanced_topics/api/v2/configuration.html)
@@ -336,11 +336,11 @@ class AnnuaireConfig(AppConfig):
 ```
 
 Cette approche évite de modifier les `urls.py` du projet : le routeur reste
-celui de `sites-conformes`, on l'enrichit depuis notre app.
+celui de `sites-conformes`, on l‘enrichit depuis notre app.
 
-### 5.3 Exemples d'appels
+### 5.3 Exemples d’appels
 
-```bash
+```sh
 # Liste de tous les psychologues, format JSON
 curl http://localhost:8000/api/v2/psychologues/
 

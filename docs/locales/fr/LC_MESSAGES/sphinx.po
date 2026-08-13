@@ -1,0 +1,40 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: sites-conformes-docs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+
+# Chaînes de sphinx-wagtail-theme sans traduction française fournie par le
+# thème (voir sphinx_wagtail_theme/layout.html, pager.html, globaltoc.html).
+
+msgid "Skip to content"
+msgstr "Aller au contenu"
+
+msgid "Light mode"
+msgstr "Mode clair"
+
+msgid "Dark mode"
+msgstr "Mode sombre"
+
+msgid "Edit on GitHub"
+msgstr "Modifier sur GitHub"
+
+msgid "Previous"
+msgstr "Précédent"
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "Main menu"
+msgstr "Menu principal"
+
+msgid "Toggle menu contents"
+msgstr "Afficher/masquer le contenu du menu"
+
+msgid "menu"
+msgstr "Menu"
+
+msgid "JavaScript is required to toggle light/dark mode."
+msgstr "JavaScript est requis pour activer le mode clair/sombre."

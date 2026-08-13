@@ -1,23 +1,26 @@
 # Installer le projet en local
 
 Cette page met en place un environnement de développement sur votre machine. Les
-étapes se suivent **dans l'ordre** : installer les outils, cloner le dépôt,
+étapes se suivent **dans l’ordre** : installer les outils, cloner le dépôt,
 configurer, préparer la base de données, puis lancer le site.
 
 Deux approches sont possibles :
 
-- **En natif** (méthode utilisée par l'équipe de Sites Conformes) — les étapes ci-dessous ;
+- **En natif** (méthode utilisée par l’équipe de Sites Conformes) — les étapes
+ci-dessous ;
 - **Avec Docker** — une alternative auto-suffisante décrite en fin de page.
 
-> ℹ️ Les commandes système sont données pour Ubuntu/Debian ; adaptez-les à votre
-> système (macOS avec Homebrew, etc.).
+:::{note}
+Les commandes système sont données pour Ubuntu/Debian ; adaptez-les à votre
+système (macOS avec Homebrew, etc.).
+:::
 
 ## Les outils du projet
 
-Le projet s'appuie sur trois outils que vous rencontrerez partout :
+Le projet s’appuie sur trois outils que vous rencontrerez partout :
 
 - **[`uv`](https://docs.astral.sh/uv/)** — gestionnaire de paquets et
-  d'environnements Python (un remplaçant rapide de `pip` + `venv`). Il installe
+  d’environnements Python (un remplaçant rapide de `pip` + `venv`). Il installe
   les dépendances aux versions exactes verrouillées dans `uv.lock`, outils de
   développement compris.
 - **[`just`](https://just.systems/)** — lanceur de commandes. Le fichier
@@ -28,30 +31,36 @@ Le projet s'appuie sur trois outils que vous rencontrerez partout :
   sont installés par `just init-dev` ; sinon, lancez `pre-commit install` une
   fois le projet installé.
 
-> ⚠️ **N'oubliez pas d'installer les *pre-commit hooks*.** Sans eux, rien ne
-> formate votre code localement, et le **contrôle qualité de la CI échouera** :
-> l'intégration continue rejoue `pre-commit` et `just quality` (ruff + black) sur
-> l'ensemble des fichiers, et bloque la *pull request* au moindre écart de
-> formatage.
+:::{tip}
+**N’oubliez pas d’installer les *pre-commit hooks*.** Sans eux, rien ne
+formate votre code localement, et le **contrôle qualité de la CI échouera** :
+l’intégration continue rejoue `pre-commit` et `just quality` (ruff + black) sur
+l’ensemble des fichiers, et bloque la *pull request* au moindre écart de
+formatage.
+:::
 
-> 🔧 **Si vous ne voulez pas installer ces outils**
->
-> - **Sans `just`** : chaque recette n'est qu'un raccourci. Vous pouvez lancer
->   directement les commandes sous-jacentes — les équivalents sont indiqués aux
->   étapes concernées.
-> - **Sans `uv`** : possible avec `pip` + `venv`, mais vous perdez le
->   verrouillage exact des versions. `uv` reste fortement recommandé en
->   développement. Si vous utilisez `uv`, pensez à mettre `USE_UV=1` dans votre
->   `.env` (voir plus bas) pour que les recettes `just` préfixent les commandes
->   par `uv run`.
+:::{hint}
+**Si vous ne voulez pas installer ces outils**
+
+- **Sans `just`** : chaque recette n’est qu’un raccourci. Vous pouvez lancer
+directement les commandes sous-jacentes — les équivalents sont indiqués aux
+étapes concernées.
+- **Sans `uv`** : possible avec `pip` + `venv`, mais vous perdez le
+verrouillage exact des versions. `uv` reste fortement recommandé en
+développement. Si vous utilisez `uv`, pensez à mettre `USE_UV=1` dans votre
+`.env` (voir plus bas) pour que les recettes `just` préfixent les commandes
+par `uv run`.
+:::
 
 ## Prérequis
 
 Installer :
 
-- [Python 3](https://www.python.org/) (normalement déjà installé sur un système moderne)
+- [Python 3](https://www.python.org/) (normalement déjà installé sur le système)
 - [git](https://git-scm.com/)
-- [uv](https://docs.astral.sh/uv/) — voir la [page d'installation](https://docs.astral.sh/uv/getting-started/installation/) pour les différentes méthodes
+- [uv](https://docs.astral.sh/uv/) — voir la
+[page d’installation](https://docs.astral.sh/uv/getting-started/installation/)
+pour les différentes méthodes
 - [just](https://just.systems/)
 - [npm](https://docs.npmjs.com/)
 - [gettext](https://www.gnu.org/software/gettext/gettext.html)
@@ -79,57 +88,62 @@ Puis entrez dans le dossier du dépôt :
 cd sites-conformes
 ```
 
-## Configurer l'environnement (`.env`)
+## Configurer l’environnement (`.env`)
 
 Les réglages locaux se placent dans un fichier `.env` à la racine du projet.
 Une recette crée ce fichier à partir du modèle et y génère une `SECRET_KEY`
-(elle n'écrase jamais un `.env` existant) :
+(elle n’écrase jamais un `.env` existant) :
 
 ```sh
 just setup-env
 ```
 
-> 🔧 **Sans `just`** — faites-le à la main :
->
-> ```sh
-> cp .env.example .env
-> python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-> ```
->
-> puis reportez la valeur obtenue dans `SECRET_KEY`.
+:::{hint}
+**Sans `just`** : faites-le à la main :
+
+```sh
+cp .env.example .env
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+puis reportez la valeur obtenue dans `SECRET_KEY`.
+:::
 
 Puis renseignez dans `.env` au moins :
 
 - `DEBUG=True` ;
 - `HOST_PROTO=http` ;
-- `USE_UV=1` si vous utilisez `uv` (pour que les recettes `just` passent par `uv run`).
+- `USE_UV=1` si vous utilisez `uv` (pour que les recettes `just` passent par
+`uv run`).
 
 La liste complète des réglages est décrite dans
 {doc}`../deploiement/variables-environnement`.
 
 ## Préparer la base de données (PostgreSQL)
 
-Avoir un PostgreSQL qui tourne en local (procédure d'installation sur
+Avoir un PostgreSQL qui tourne en local (procédure d’installation sur
 [Ubuntu](https://documentation.ubuntu.com/server/how-to/databases/install-postgresql/index.html)
 ou sur [Mac](https://postgresapp.com/)).
 
-Créez l'utilisateur et la base définis dans votre `.env` (variables
+Créez l’utilisateur et la base définis dans votre `.env` (variables
 `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`) :
 
 ```sh
 just setup-db
 ```
 
-> 🔧 **Sans `just`** — créez-les à la main (adaptez aux valeurs de votre `.env`) :
->
-> ```sh
-> # utilisateur avec les droits nécessaires aux scripts d'administration
-> psql -U postgres -c "CREATE USER sitesconformes WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_passe';"
-> # base de données (vide pour l'instant)
-> psql -U postgres -c "CREATE DATABASE sitesconformes OWNER sitesconformes;"
-> ```
->
-> puis renseignez les paramètres de connexion correspondants dans votre `.env`.
+:::{hint}
+**Sans `just`** : créez-les à la main (adaptez aux valeurs de votre `.env`) :
+
+```sh
+# utilisateur avec les droits nécessaires aux scripts d’administration
+psql -U postgres -c "CREATE USER sitesconformes WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_passe';"
+# base de données (vide pour l’instant)
+psql -U postgres -c "CREATE DATABASE sitesconformes OWNER sitesconformes;"
+```
+
+puis renseignez les paramètres de connexion correspondants dans votre `.env`.
+:::
 
 ## Installer et initialiser le projet
 
@@ -141,19 +155,22 @@ installe les *pre-commit hooks* :
 just init-dev
 ```
 
-> 🔧 **Sans `just`** — lancez les étapes manuellement (préfixez par `uv run` si
-> vous utilisez `uv`, ou activez d'abord votre `venv`) :
->
-> ```sh
-> uv sync
-> python manage.py migrate
-> python manage.py collectstatic --noinput
-> python manage.py create_starter_pages
-> python manage.py import_page_templates
-> python manage.py import_illustration_images
-> python manage.py update_index
-> pre-commit install
-> ```
+:::{hint}
+**Sans `just`** : lancez les étapes manuellement (préfixez par `uv run` si
+vous utilisez `uv`, ou activez d’abord votre `venv`) :
+
+```sh
+uv sync
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py create_starter_pages
+python manage.py import_page_templates
+python manage.py import_illustration_images
+python manage.py update_index
+pre-commit install
+```
+
+:::
 
 ## Créer un compte administrateur
 
@@ -162,9 +179,16 @@ just createsuperuser
 ```
 
 La commande vous *demande* interactivement une adresse e-mail, un nom
-d'utilisateur et un mot de passe.
+d’utilisateur et un mot de passe.
 
-> 🔧 **Sans `just`** : `python manage.py createsuperuser`.
+:::{hint}
+**Sans `just`** :
+
+```sh
+python manage.py createsuperuser
+```
+
+:::
 
 ## Lancer le serveur
 
@@ -172,12 +196,26 @@ d'utilisateur et un mot de passe.
 just runserver
 ```
 
-Le site est alors accessible sur <http://localhost:8000>, et l'administration sur
+Le site est alors accessible sur <http://localhost:8000>, et l’administration sur
 <http://localhost:8000/cms-admin/>.
 
-> 🔧 **Sans `just`** : `python manage.py runserver`.
+:::{hint}
+**Sans `just`** :
 
-> 💡 Pour lister les commandes de gestion Django disponibles : `uv run python manage.py`.
+```sh
+python manage.py runserver
+```
+
+:::
+
+:::{seealso}
+Pour lister les commandes de gestion Django disponibles :
+
+```sh
+uv run python manage.py
+```
+
+:::
 
 ## Avec Docker
 
@@ -189,13 +227,15 @@ conteneurs :
 docker compose up
 ```
 
-Avec `USE_DOCKER=1`, les recettes `just` s'exécutent à l'intérieur du conteneur
+Avec `USE_DOCKER=1`, les recettes `just` s’exécutent à l’intérieur du conteneur
 web : vous pouvez donc initialiser le site avec `just init-dev` puis créer un
 compte avec `just createsuperuser`, comme en natif.
 
-> ⚠️ Ce setup Docker de développement est encore peu éprouvé par l'équipe (qui
-> travaille en natif) : quelques ajustements peuvent être nécessaires. Vos
-> retours et *pull requests* pour l'améliorer sont les bienvenus.
+:::{caution}
+Ce setup Docker de développement est encore peu éprouvé par l’équipe (qui
+travaille en natif) : quelques ajustements peuvent être nécessaires. Vos
+retours et *pull requests* pour l’améliorer sont les bienvenus.
+:::
 
 ## Options avancées
 
@@ -229,8 +269,8 @@ docker run -d \
 
 Accédez à la console sur <http://localhost:9001> (identifiants `admin` /
 `password123`) et créez un bucket (par exemple `sc-local`). Pour éviter les URLs
-signées (plus simple en local), rendez-le public : _Buckets → sc-local →
-Anonymous → Add Access Rule → Prefix `/`, Access `readonly`_.
+signées (plus simple en local), rendez-le public : *Buckets → sc-local →
+Anonymous → Add Access Rule → Prefix `/`, Access `readonly`*.
 
 Ajoutez ensuite dans votre `.env` :
 
@@ -245,9 +285,11 @@ S3_BUCKET_REGION=
 S3_LOCATION=medias/
 ```
 
-> **Note :** c'est la variable `S3_HOST` qui active le stockage S3. Sans elle, les
-> médias sont stockés sur le système de fichiers local, quelle que soit la
-> configuration MinIO.
+:::{note}
+**Note :** c’est la variable `S3_HOST` qui active le stockage S3. Sans elle, les
+médias sont stockés sur le système de fichiers local, quelle que soit la
+configuration MinIO.
+:::
 
 ## Gestion de la base de données et des médias
 
