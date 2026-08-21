@@ -384,6 +384,20 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         self.assertContains(response, "Entrée 3")
         self.assertNotContains(response, "Entrée 4")
 
+    def test_single_filter_can_be_unselected(self):
+        self.catalog_index_page.filter_selection = CatalogIndexPage.SINGLE_FILTER
+        self.catalog_index_page.save()
+
+        url = self.catalog_index_page.url + "?tag=tag-1"
+        response = self.client.get(url)
+
+        self.assertEqual(response.context["current_tag"], self.tag1)
+
+        # Clicking the already-selected tag again must remove it from the URL
+        # (toggle_url_filter relies on "current_tag" to detect this), instead
+        # of re-adding it and leaving the filter/results unchanged.
+        self.assertNotContains(response, 'href="?tag=tag-1#posts-list"')
+
     def test_multiple_filter_and(self):
         self.catalog_index_page.filter_selection = CatalogIndexPage.MULTIPLE_FILTERS
         self.catalog_index_page.multiple_filter_operator = CatalogIndexPage.AND_OPERATOR
