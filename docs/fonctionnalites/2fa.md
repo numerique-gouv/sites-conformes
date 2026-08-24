@@ -20,13 +20,13 @@ Par défaut, la 2FA est **optionnelle** sur Sites Conformes : les utilisateurs
 peuvent la configurer, mais elle n’est pas obligatoire.
 Pour la rendre obligatoire pour tous les accès à l’interface d’administration :
 
-```env
+```python
 WAGTAIL_2FA_REQUIRED=True
 ```
 
 Avec cette option, tout utilisateur authentifié sans appareil 2FA configuré est
 automatiquement redirigé vers la page de configuration avant de pouvoir accéder
-à l’admin.
+à l’interface d’administration.
 
 ## Fonctionnement
 
@@ -39,6 +39,16 @@ Aegis, Authy, 1Password…).
 3. Il saisit un code de vérification pour confirmer la configuration.
 4. Lors des connexions suivantes, un écran intermédiaire lui demande son code à
 6 chiffres.
+
+## Accéder à la gestion des appareils 2FA
+
+Le lien vers la page de gestion des appareils 2FA est accessible depuis :
+
+- **Liste des utilisateurs** : `/cms-admin/users/` → bouton **"Gérer 2FA"**
+sur chaque ligne (réservé aux administrateurs)
+- **Page de compte** : cliquer sur son avatar/nom en bas à gauche →
+"Paramètres du compte" → onglet **"Plus d’actions"** (onglet visible uniquement
+si des actions sont disponibles) → "Manage your 2FA devices"
 
 ## Middleware et fichiers statiques
 

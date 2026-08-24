@@ -46,6 +46,7 @@ du dépôt fournit un modèle complet et commenté.
 | `ALLOWED_HOSTS` | Domaines autorisés à servir le site, séparés par des virgules. | `127.0.0.1,.localhost` | 🔴 |
 | `DATABASE_URL` | Adresse de connexion à la base PostgreSQL. Rempli automatiquement sur Scalingo. | *(aucun, obligatoire)* | 🔴 |
 | `AUTH_PASSWORD_MINIMUM_LENGTH` | Longueur minimale des mots de passe des comptes. | `15` | ⚪ |
+| `WAGTAIL_2FA_REQUIRED` | Force l’activation de l’authentification à deux facteurs. Voir {doc}`../fonctionnalites/2fa`. | `False` | 🔴 |
 
 ## Domaine et URL
 

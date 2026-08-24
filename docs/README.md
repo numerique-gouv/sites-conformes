@@ -22,6 +22,7 @@ just docs-build  # build ponctuel, HTML dans docs/_build/html/
 - `index.md` : page d’accueil
 - `deploiement/` : déployer une instance (Scalingo, serveur Linux, Docker, migration…)
 - `donnees/` : base de données et médias (sauvegarde, restauration, stockage)
+- `fonctionnalites/` : Fonctionnalités de l’outil ayant une documentation dédiée
 - `paquet/` : utiliser Sites Conformes comme package Django
 - `contrib/` : développer et contribuer (installation locale, architecture,
 guide de contribution…)
