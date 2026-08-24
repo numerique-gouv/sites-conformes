@@ -624,11 +624,11 @@ wheels = [
 
 [[package]]
 name = "gunicorn"
-version = "26.1.0"
+version = "26.2.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/38/b8/ec4ba3f6cace4091c34e27478b576bb80f2f06fab80fd42c0ecc785b308f/gunicorn-26.1.0.tar.gz", hash = "sha256:1413d777bf99d31ebeb08acd354b01f1ecc44db0aa7b811ae7b86c669232e4f7", size = 755923, upload-time = "2026-08-18T11:49:39.438Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/8a/e4ef6ee11701b6cd64702848415ffb69eeff85cb388a3c6c7fe86f22f3f8/gunicorn-26.2.0.tar.gz", hash = "sha256:62b864895d9ebff0b2f9867ba04fe811c93121596540830c9c916d0769668447", size = 787921, upload-time = "2026-08-24T15:05:59.3Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/19/dc/7a55fc605543fd5cb11c003fbbb21a1911d5e88a582cce6c5e063bf5c176/gunicorn-26.1.0-py3-none-any.whl", hash = "sha256:9f45bcddec5e9dc7a25a3bdccb0c6832f11fd5d4739b1ee36c8d2fec25f1dc86", size = 216237, upload-time = "2026-08-18T11:49:38.001Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/85/7522a52e5e2f42faf1a129113ab63e548c42e103e9af395b7bfe65e403e2/gunicorn-26.2.0-py3-none-any.whl", hash = "sha256:bd249d0b3f7972f7432f0a6b6ff3b3ee2d129f70cd1ff6c09a9dd9e29a2b88e3", size = 228389, upload-time = "2026-08-24T15:05:57.67Z" },
 ]
 
 [[package]]
@@ -1061,8 +1061,11 @@ dependencies = [
     { name = "dj-static" },
     { name = "django" },
     { name = "django-dsfr" },
+    { name = "django-modelcluster" },
+    { name = "django-otp" },
     { name = "django-storages", extra = ["s3"] },
     { name = "django-taggit" },
+    { name = "djangorestframework" },
     { name = "faker" },
     { name = "gunicorn" },
     { name = "icalendar" },
@@ -1070,6 +1073,7 @@ dependencies = [
     { name = "packaging" },
     { name = "psycopg2-binary" },
     { name = "python-dotenv" },
+    { name = "requests" },
     { name = "rust-just" },
     { name = "sentry-sdk", extra = ["django"] },
     { name = "unidecode" },
@@ -1078,7 +1082,6 @@ dependencies = [
     { name = "wagtail-honeypot" },
     { name = "wagtail-localize" },
     { name = "wagtail-markdown" },
-    { name = "wagtail-modeladmin" },
     { name = "wagtailmenus" },
     { name = "wand" },
     { name = "whitenoise" },
@@ -1092,8 +1095,11 @@ requires-dist = [
     { name = "dj-static", specifier = ">=0.0.6" },
     { name = "django", specifier = ">=6.0,<6.1" },
     { name = "django-dsfr", specifier = ">=2.4.0" },
+    { name = "django-modelcluster", specifier = ">=6.5" },
+    { name = "django-otp", specifier = ">=1.7.0" },
     { name = "django-storages", extras = ["s3"], specifier = ">=1.14.6" },
     { name = "django-taggit", specifier = ">=6.1.0" },
+    { name = "djangorestframework", specifier = ">=3.18.0" },
     { name = "faker", specifier = ">=37.4.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "icalendar", specifier = ">=6.3.1" },
@@ -1101,6 +1107,7 @@ requires-dist = [
     { name = "packaging", specifier = ">=26.3" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "requests", specifier = ">=2.34.2" },
     { name = "rust-just", specifier = ">=1.40.0" },
     { name = "sentry-sdk", extras = ["django"], specifier = ">=2.61.0" },
     { name = "unidecode", specifier = ">=1.4.0" },
@@ -1109,7 +1116,6 @@ requires-dist = [
     { name = "wagtail-honeypot", specifier = ">=1.2.1" },
     { name = "wagtail-localize", specifier = ">=1.12.1" },
     { name = "wagtail-markdown", specifier = ">=0.12.1" },
-    { name = "wagtail-modeladmin", specifier = ">=2.2.0" },
     { name = "wagtailmenus", specifier = ">=4.0.3" },
     { name = "wand", specifier = ">=0.6.13" },
     { name = "whitenoise", specifier = ">=6.6,<7.0" },
@@ -1119,9 +1125,11 @@ requires-dist = [
 dev = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "coverage", specifier = ">=7.9.1" },
+    { name = "deptry", specifier = ">=0.25.1" },
     { name = "django-compressor", specifier = ">=4.5.1" },
     { name = "django-debug-toolbar", specifier = ">=5.2.0" },
     { name = "djlint", specifier = ">=1.36.4" },
+    { name = "factory-boy", specifier = ">=3.3.3" },
     { name = "ipython", specifier = ">=9.3.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "ruff", specifier = ">=0.12.0" },
@@ -1291,18 +1299,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/42/63/ccdb5d255d91162b3ac7a3f47db6a9ae55584288670b83e2e03fbe8d238a/wagtail_markdown-0.14.1.tar.gz", hash = "sha256:f8685ca937b15c662be9eb972a477aebdbdd4a9aad60716b2a59f7bed898b165", size = 127197, upload-time = "2026-05-31T18:10:11.376Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fe/54/643065b5ff8ae87b4020a459222ed24026a3048e5a5015ddee615c6a6ec3/wagtail_markdown-0.14.1-py3-none-any.whl", hash = "sha256:1e9c42035c9ab5889006b993980ff1882fd09bedff4269b4002a203aafc9310a", size = 128780, upload-time = "2026-05-31T18:10:09.864Z" },
-]
-
-[[package]]
-name = "wagtail-modeladmin"
-version = "2.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "wagtail" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/fc/572d102ffddbb1cdc8ee57f89e110999979dcfb19346dea4270591f87a59/wagtail_modeladmin-2.4.0.tar.gz", hash = "sha256:11b051e4595242cec5f71b9e30acf1ca6b08809d27e3fa148d7f8e77cf60d9fe", size = 141163, upload-time = "2026-06-07T11:37:08.604Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b1/bc/564c02172c3ee1717ebb69b8565f1cacadd59914a5c4b330741a9a9b9705/wagtail_modeladmin-2.4.0-py3-none-any.whl", hash = "sha256:3ddf8d099c402610ac9a5d668c72a0743463395316b23abcb4f9fbf2ddd2984f", size = 265759, upload-time = "2026-06-07T11:37:07.152Z" },
 ]
 
 [[package]]

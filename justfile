@@ -158,6 +158,11 @@ check +apps="":
 quality:
     {{docker_cmd}} {{uv_run}} pre-commit run --all-files
 
+# Check that all imported packages are declared as dependencies (and vice versa)
+[group('Code audit')]
+deps-check:
+    {{docker_cmd}} {{uv_run}} deptry .
+
 # Count lines of code per app. Requires cloc (see CONTRIBUTING.md).
 [group('Code audit')]
 cloc:

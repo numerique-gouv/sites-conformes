@@ -216,7 +216,6 @@ INSTALLED_APPS.extend(
         "wagtail.contrib.settings",
         "wagtail.contrib.typed_table_block",
         "wagtail.contrib.routable_page",
-        "wagtail_modeladmin",
         "wagtailmenus",
         "wagtailmarkdown",
         "sites_conformes.proconnect",

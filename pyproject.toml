@@ -25,7 +25,6 @@ dependencies = [
     "dj-static>=0.0.6",
     "whitenoise<7.0,>=6.6",
     "wagtailmenus>=4.0.3",
-    "wagtail-modeladmin>=2.2.0",
     "wagtail-markdown>=0.12.1",
     "unidecode>=1.4.0",
     "django-storages[s3]>=1.14.6",
@@ -42,15 +41,21 @@ dependencies = [
     "sentry-sdk[django]>=2.61.0",
     "wagtail-2fa==1.8.0",
     "packaging>=26.3",
+    "requests>=2.34.2",
+    "django-otp>=1.7.0",
+    "django-modelcluster>=6.5",
+    "djangorestframework>=3.18.0",
 ]
 
 [dependency-groups]
 dev = [
     "black>=25.1.0",
     "coverage>=7.9.1",
+    "deptry>=0.25.1",
     "django-compressor>=4.5.1",
     "django-debug-toolbar>=5.2.0",
     "djlint>=1.36.4",
+    "factory-boy>=3.3.3",
     "ipython>=9.3.0",
     "pre-commit>=4.2.0",
     "ruff>=0.12.0",
@@ -168,6 +173,36 @@ ignore = ["E203", "E266"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
+
+[tool.deptry]
+# demo/ is a separate project with its own pyproject.toml/dependencies.
+# Migrations only re-import what the corresponding models.py already imports.
+# Per-app tests/ directories aren't matched by deptry's default "tests" exclude
+# (which only matches a top-level tests/ dir), so dev-only imports there (e.g.
+# wagtail_factories) would otherwise be flagged as misplaced (DEP004).
+extend_exclude = ["^demo/", ".*/migrations/", ".*/tests/"]
+
+[tool.deptry.package_module_name_map]
+# Packages whose distributed module name doesn't match deptry's default guess
+# (package name with hyphens replaced by underscores).
+"django-dsfr" = "dsfr"
+"python-dotenv" = "dotenv"
+"wagtail-markdown" = "wagtailmarkdown"
+"django-taggit" = "taggit"
+"beautifulsoup4" = "bs4"
+
+[tool.deptry.per_rule_ignores]
+# Not imported directly in Python: loaded by Django via a string reference
+# (INSTALLED_APPS/MIDDLEWARE/STORAGES) or invoked as an external process.
+DEP002 = [
+    "gunicorn",         # WSGI server, run as a subprocess (Procfile), never imported
+    "whitenoise",       # referenced by string in MIDDLEWARE/STORAGES/INSTALLED_APPS
+    "django-storages",  # referenced by string as "storages" in the STORAGES setting
+    "psycopg2-binary",  # DB driver loaded by Django from DATABASE_URL, not imported directly
+    "rust-just",        # installs the `just` CLI binary, no Python import
+    "wand",             # ImageMagick backend auto-detected by Wagtail's Willow for animated GIFs (#390), never imported directly
+    "wagtailmenus",     # obsolete app kept for its models/migrations (see config/settings.py), referenced only by string
+]
 
 # Blocks installation of known malware (typosquatting, deliberately malicious packages)
 [tool.uv.audit]
