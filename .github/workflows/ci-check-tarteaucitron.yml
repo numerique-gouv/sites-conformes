@@ -9,6 +9,8 @@ on:
       - ready_for_review
     paths:
       - "package-lock.json"
+      - ".github/workflows/ci-check-tarteaucitron.yml"
+      - "scripts/sync_tarteaucitron.sh"
 
 jobs:
   build:
