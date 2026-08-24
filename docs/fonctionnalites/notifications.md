@@ -117,7 +117,7 @@ Une vérification automatique se lance. En bas de la Pull Request, on peut voir 
 
 - ✅ **Checks passed** → tout est bon, l’équipe technique peut valider
 - ❌ **Checks failed** → il y a une erreur dans le fichier
-(voir section [En cas d’erreur](#-en-cas-derreur))
+(voir section [En cas d’erreur](en-cas-derreur))
 
 ---
 
@@ -161,6 +161,8 @@ afin que le système considère que la période d’affichage est terminée :
 ```
 
 ---
+
+(en-cas-derreur)=
 
 ## En cas d’erreur
 

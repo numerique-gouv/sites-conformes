@@ -26,7 +26,7 @@ ces backends :
 | `migrate_s3_to_db` | S3 → DB |
 | `migrate_db_to_s3` | DB → S3 |
 
-:::{alert}
+:::{warning}
 **Ce mode de stockage n’est pas recommandé au-delà de 1 Go de médias.**
 Pour les sites avec beaucoup d’images ou de documents, préférez un stockage S3 compatible.
 Au-delà de cette limite, les performances se dégradent

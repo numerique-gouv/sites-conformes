@@ -18,7 +18,7 @@ transférer ces données. Ils s’adressent surtout au **travail en local**
 (développement) : se prémunir avant une manipulation risquée, ou récupérer
 les données de production pour reproduire un comportement observé en ligne.
 
-:::{info}
+:::{note}
 Ces opérations passent par des recettes `just` regroupées dans la catégorie
 **« Dev DB and medias management »**. Tapez `just` pour afficher la liste complète.
 :::

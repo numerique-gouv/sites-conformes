@@ -249,4 +249,4 @@ docs:
 [group('Documentation')]
 docs-build:
     uv run --no-project --with-requirements docs/requirements.txt \
-        sphinx-build -b html docs docs/_build/html
+        sphinx-build -b html -a docs docs/_build/html
