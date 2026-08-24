@@ -44,7 +44,7 @@ def patch_wagtail_2fa_new_unconfirmed_device():
     stays stable for the lifetime of an in-progress setup.
 
     Bug present in wagtail-2fa 1.8.0 (latest at time of writing).
-    Upstream issue: https://github.com/labd/wagtail-2fa/issues/TODO
+    Upstream issue: https://github.com/labd/wagtail-2fa/issues/282
     Remove this patch once fixed upstream and the ``wagtail-2fa`` dependency
     in pyproject.toml is upgraded past the fixed version.
     """
