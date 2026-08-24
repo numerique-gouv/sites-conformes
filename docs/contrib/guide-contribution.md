@@ -13,8 +13,9 @@ configuration, base de données) est décrite à part, dans
 Une contribution prête à être intégrée respecte les points suivants :
 
 - **Langue du code** : les identifiants (variables, fonctions, classes)
-**et les commentaires** sont écrits en anglais ; seuls les textes affichés à
-l’utilisateur sont en français, via les {doc}`traductions`.
+**et les commentaires** sont écrits en anglais ; les textes affichés à
+l’utilisateur utilisent le système de {doc}`traductions`, avec l’anglais
+pour langue par défaut. La documentation et les PR sont à rédiger en français.
 - **Nommage et style** : conventions Python/Django standard (`snake_case` pour
 les fonctions et variables, `PascalCase` pour les classes). L’ordre des imports
 (`isort`) et le formatage (`black`, 119 colonnes) sont appliqués automatiquement
