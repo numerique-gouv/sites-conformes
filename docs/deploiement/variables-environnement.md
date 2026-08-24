@@ -46,7 +46,7 @@ du dépôt fournit un modèle complet et commenté.
 | `ALLOWED_HOSTS` | Domaines autorisés à servir le site, séparés par des virgules. | `127.0.0.1,.localhost` | 🔴 |
 | `DATABASE_URL` | Adresse de connexion à la base PostgreSQL. Rempli automatiquement sur Scalingo. | *(aucun, obligatoire)* | 🔴 |
 | `AUTH_PASSWORD_MINIMUM_LENGTH` | Longueur minimale des mots de passe des comptes. | `15` | ⚪ |
-| `WAGTAIL_2FA_REQUIRED` | Force l’activation de l’authentification à deux facteurs. Voir {doc}`../fonctionnalites/2fa`. | `False` | 🔴 |
+| `WAGTAIL_2FA_REQUIRED` | Force l’activation de l’authentification à deux facteurs. Voir {doc}`../fonctionnalites/2fa`. | `False` | ⚪ |
 
 ## Domaine et URL
 
@@ -70,6 +70,8 @@ du dépôt fournit un modèle complet et commenté.
 | `SF_USE_WHITENOISE` | Sert les fichiers statiques via WhiteNoise (pratique sans serveur web dédié). | `False` | 🟠 |
 | `SF_PROD_SERVE_STATIC` | Autorise Django à servir les statiques même en production. | `False` | ⚪ |
 | `SF_USE_DB_STORAGE` | Stocke les médias dans la base PostgreSQL (utile sur PaaS sans disque ; déconseillé au-delà d’1 Go). Voir {doc}`../donnees/stockage-medias`. | `False` | 🟠 |
+| `DATA_UPLOAD_MAX_MEMORY_SIZE` | Taille maximale des données de requête (formulaires, etc.), en octets. | `10485760` (10 Mo) | ⚪ |
+| `FILE_UPLOAD_MAX_MEMORY_SIZE` | Taille au-delà de laquelle un fichier téléversé est écrit sur disque plutôt que gardé en mémoire, en octets. | `2621440` (2,5 Mo) | ⚪ |
 
 ## Stockage objet S3
 
@@ -141,6 +143,22 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | `SF_SCHEME_DEPENDENT_SVGS` | Adapte les SVG au thème clair/sombre. | `False` | ⚪ |
 | `WAGTAILDOCS_MAX_UPLOAD_SIZE` | Taille maximale des documents téléversés (en octets). | `10485760` (10 Mo) | ⚪ |
 | `DSFR_USE_INTEGRITY_CHECKSUMS` | Active les sommes de contrôle d’intégrité du DSFR (peut entrer en conflit avec WhiteNoise). | `False` | ⚪ |
+| `DSFR_MARK_OPTIONAL_FIELDS` | Marque les champs optionnels (plutôt que les champs obligatoires) dans les formulaires DSFR. | `True` | ⚪ |
+| `WAGTAIL_2FA_OTP_TOTP_NAME` | Nom affiché dans l’application d’authentification TOTP (Google Authenticator, etc.). | *(valeur de `SITE_NAME`)* | ⚪ |
+| `SEARCH_VIEW` | Chemin pointé vers une vue de résultats de recherche personnalisée (mode paquet). Voir {doc}`../paquet/recherche`. | `sites_conformes.core.views.SearchResultsView` | ⚪ |
+
+## Notifications et mises à jour
+
+Ces réglages pilotent le panneau de notifications et l’alerte "nouvelle
+version disponible" du tableau de bord admin ; ils sont surtout utiles à
+surcharger pour les forks du projet.
+
+| Variable | Rôle | Défaut | Niveau |
+| --- | --- | --- | --- |
+| `NOTIFICATIONS_FILE_URL` | Adresse du fichier JSON listant les notifications affichées dans le tableau de bord admin. | `notifications.json` sur le dépôt `main` | ⚪ |
+| `ADVERTISE_LATEST_VERSION` | Active la notification signalant qu’une nouvelle version est disponible. | `True` | ⚪ |
+| `LATEST_RELEASE_URL` | Endpoint de l’API GitHub utilisé pour détecter la dernière version publiée. | API GitHub releases du dépôt | ⚪ |
+| `RELEASES_URL` | Page de releases liée depuis la notification de nouvelle version. | Page releases GitHub du dépôt | ⚪ |
 
 ## Supervision des erreurs (Sentry)
 
@@ -148,3 +166,4 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | --- | --- | --- | --- |
 | `SENTRY_DSN` | Adresse du projet Sentry. Sa présence active la remontée d’erreurs. | *(vide)* | ⚪ |
 | `SENTRY_ENVIRONMENT` | Nom de l’environnement signalé à Sentry. | `production` | ⚪ |
+| `SENTRY_USE_DEBUG_URL` | Activation de l’URL de test d’activation de Sentry | `False` | ⚪ |

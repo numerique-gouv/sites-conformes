@@ -1,0 +1,26 @@
+name: 🍪 CI - Vendored TarteAuCitron Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 📔 Install just
+        uses: extractions/setup-just@v2
+      - name: 📦 Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: 🍪 Check vendored tarteaucitronjs is up to date
+        run: |
+          just sync-tarteaucitron
+          git diff --exit-code sites_conformes/static/lib/tarteaucitronjs/

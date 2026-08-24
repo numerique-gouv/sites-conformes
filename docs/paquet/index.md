@@ -13,5 +13,6 @@ maxdepth: 1
 ---
 installation
 configuration
+recherche
 exemple-annuaire
 ```

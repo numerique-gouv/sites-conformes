@@ -110,6 +110,11 @@ run_gunicorn host_url=host_url host_port=host_port script_name=script_name:
 shell:
     {{docker_cmd}} {{uv_run}} python manage.py shell
 
+# Re-vendor the TarteAuCitron JS library from the installed npm package
+sync-tarteaucitron:
+    {{docker_cmd}} npm ci
+    cd scripts && bash sync_tarteaucitron.sh
+
 test app="":
     {{docker_cmd}} {{uv_run}} python manage.py test {{app}} --buffer --parallel --settings config.settings_test
 
@@ -124,6 +129,7 @@ upgrade:
     {{docker_cmd}} uv lock --upgrade
     {{docker_cmd}} {{uv_run}} pre-commit autoupdate
     {{docker_cmd}} npm update
+    just sync-tarteaucitron
     {{docker_cmd}} uv lock --upgrade --project ./demo
 
 web-prompt:
