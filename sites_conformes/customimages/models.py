@@ -3,7 +3,7 @@ from wagtail.images.models import AbstractImage, AbstractRendition, Image
 
 
 class CustomImage(AbstractImage):
-    admin_form_fields = Image.admin_form_fields + ()
+    admin_form_fields = Image.admin_form_fields
 
     @property
     def default_alt_text(self):
