@@ -1,5 +1,5 @@
 {% extends "sites_conformes_core/base.html" %}
-{% load widget_tweaks wagtailadmin_tags i18n static dsfr_tags %}
+{% load widget_tweaks wagtailadmin_tags i18n static %}
 {% block content %}
   <div class="fr-container fr-container--fluid fr-my-md-14v">
     {% if validlink %}
@@ -21,8 +21,8 @@
                 <form method="post" novalidate>
                   {% csrf_token %}
 
-                  {% dsfr_form_field form.new_password1 %}
-                  {% dsfr_form_field form.new_password2 %}
+                  {{ form.new_password1.as_field_group }}
+                  {{ form.new_password2.as_field_group }}
 
                   <button type="submit" class="fr-btn">{% translate "Reset password" %}</button>
                 </form>

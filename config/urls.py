@@ -12,10 +12,19 @@ from wagtail.contrib.sitemaps.views import sitemap
 from wagtail.documents import urls as wagtaildocs_urls
 
 from config.api import api_router
+from sites_conformes.dashboard.views import PasswordResetConfirmView
 from sites_conformes.proconnect import urls as oidc_urls
+
+TEMPLATE_404 = "sites_conformes_core/404.html"
+TEMPLATE_500 = "sites_conformes_core/500.html"
 
 urlpatterns = [
     path("sitemap.xml", sitemap, name="xml_sitemap"),
+    path(
+        f"{settings.WAGTAILADMIN_PATH}password_reset/confirm/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(),
+        name="wagtailadmin_password_reset_confirm",
+    ),
     path(settings.WAGTAILADMIN_PATH, include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("api/v2/", api_router.urls),
@@ -47,14 +56,26 @@ if settings.DEBUG or settings.TESTING:
         path(
             "404/",
             page_not_found,
-            kwargs={"exception": Exception("Page not Found"), "template_name": "sites_conformes_core/404.html"},
+            kwargs={"exception": Exception("Page not Found"), "template_name": TEMPLATE_404},
         ),
-        path("500/", partial(server_error, template_name="sites_conformes_core/500.html")),
+        path("500/", partial(server_error, template_name=TEMPLATE_500)),
         prefix_default_language=False,
     )
+
+if settings.SENTRY_USE_DEBUG_URL:
+
+    def trigger_error(request):
+        _division_by_zero = 1 / 0
+
+    urlpatterns += [
+        path("sentry-debug/", trigger_error, name="sentry_debug"),  # type: ignore
+    ]
 
 urlpatterns += i18n_patterns(
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("", include("sites_conformes.core.urls")),
     prefix_default_language=False,
 )
+
+handler404 = partial(page_not_found, template_name=TEMPLATE_404)
+handler500 = partial(server_error, template_name=TEMPLATE_500)

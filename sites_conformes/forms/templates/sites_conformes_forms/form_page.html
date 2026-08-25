@@ -1,5 +1,5 @@
 {% extends "sites_conformes_core/base.html" %}
-{% load wagtailcore_tags dsfr_tags i18n honeypot_tags static %}
+{% load wagtailcore_tags wagtail_dsfr_tags i18n honeypot_tags static %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/honeypot.css' %}">
@@ -22,13 +22,16 @@
     {{ page.intro|richtext }}
 
     <form action="{% pageurl page %}" method="post" autocomplete="on">
-      <div class="fr-fieldset__element">
-        {% if page.all_fields_required %}
-          <p class="fr-text--sm">{% translate "All fields are mandatory." %}</p>
-        {% else %}
-          <p class="fr-text--sm">{% translate "Fields marked with an asterisk (*) are mandatory." %}</p>
-        {% endif %}
-      </div>
+      {% settings_value "DSFR_MARK_OPTIONAL_FIELDS" as dsfr_mark_optional_fields %}
+      {% if not dsfr_mark_optional_fields %}
+        <div class="fr-fieldset__element">
+          {% if page.all_fields_required %}
+            <p class="fr-text--sm">{% translate "All fields are mandatory." %}</p>
+          {% else %}
+            <p class="fr-text--sm">{% translate "Fields marked with an asterisk (*) are mandatory." %}</p>
+          {% endif %}
+        </div>
+      {% endif %}
 
       {% csrf_token %}
       {% if form.non_field_errors %}
@@ -40,7 +43,7 @@
       {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 
       {% for field in form.visible_fields %}
-        <div class="fr-fieldset__element">{% dsfr_form_field field %}</div>
+        <div class="fr-fieldset__element">{{ field.as_field_group }}</div>
       {% endfor %}
 
       {% honeypot_fields page.honeypot %}

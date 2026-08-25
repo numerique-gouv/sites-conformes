@@ -101,3 +101,37 @@
 .sf-tutorials-display tr td {
     vertical-align: baseline;
 }
+
+/* Notice DSFR du panneau de notifications de l'admin. Le composant est chargé de façon scopée via
+   dsfr/dist/component/notice/notice.min.css (cf. wagtail_hooks.global_admin_css) : ce fichier ne cible
+   que les classes .fr-notice*, sans toucher au reste de l'admin Wagtail (contrairement à dsfr.min.css complet).
+   Toutes nos règles ci-dessous sont scopées sous .sf-notice (classe ajoutée uniquement à nos notices admin)
+   afin de ne jamais affecter d'autres notices DSFR — notamment celles utilisées côté site public. */
+
+/* Variables de thème DSFR requises par le composant (le core DSFR, qui les fournirait, n'est pas chargé)
+   + quelques ajustements d'espacement propres au panneau. */
+.sf-notice {
+    --background-contrast-grey: #eee;
+    --text-title-grey: #161616;
+    --background-contrast-info: #e8edff;
+    --text-default-info: #0063cb;
+    --background-contrast-warning: #ffe9e6;
+    --text-default-warning: #b34000;
+    --background-contrast-error: #ffe9e9;
+    --text-default-error: #ce0500;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.sf-notice .sf-notice-date {
+    font-weight: normal;
+    opacity: 0.7;
+    font-size: 0.875rem;
+}
+
+.sf-notice .fr-notice__title {
+    display: block;
+}

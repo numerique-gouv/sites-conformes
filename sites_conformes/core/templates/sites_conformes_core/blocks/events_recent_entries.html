@@ -80,7 +80,9 @@
               <h2 class="fr-card__title">
                 <a href="{{ post.url }}">{{ post.title|truncatewords:8 }}</a>
               </h2>
-              <p class="fr-card__desc">Publié le {{ post.date |date:'l j F Y' }}</p>
+               <p class="fr-card__desc fr-icon-calendar-event-fill">
+                {% event_date_range post.event_date_start post.event_date_end %}
+              </p>
               {% if post.event_categories.all %}
                 <div class="fr-card__start">
                   <ul class="fr-tags-group">
@@ -108,6 +110,6 @@
     {% endfor %}
   </div>
   <div class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--center">
-    <a class="fr-btn" href="{% pageurl value.index_page %}">{% translate "See all events" %}</a>
+    <a class="fr-btn" href="{% pageurl value.index_page %}{% filters_query value.see_all_link_filters %}">{{ value.see_all_button_label }}</a>
   </div>
 </div>

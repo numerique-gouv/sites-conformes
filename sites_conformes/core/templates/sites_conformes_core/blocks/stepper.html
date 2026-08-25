@@ -1,14 +1,14 @@
 {% load i18n %}
 <div class="fr-container fr-my-3w">
   <div class="fr-stepper">
-    <h2 class="fr-stepper__title">
-      {{ value.title }}
-      <span class="fr-stepper__state">
-        {% with current_step=value.current total_steps=value.total %}
-          {% blocktranslate %}Step {{ current_step }} of {{ total_steps }}{% endblocktranslate %}
-        {% endwith %}
-      </span>
-    </h2>
+    <{{ value.heading_tag | default:"h2" }} class="fr-stepper__title">
+    {{ value.title }}
+    <span class="fr-stepper__state">
+      {% with current_step=value.current total_steps=value.total %}
+        {% blocktranslate %}Step {{ current_step }} of {{ total_steps }}{% endblocktranslate %}
+      {% endwith %}
+    </span>
+    </{{ value.heading_tag | default:"h2" }}>
     <div class="fr-stepper__steps"
          data-fr-current-step="{{ value.current }}"
          data-fr-steps="{{ value.total }}"></div>

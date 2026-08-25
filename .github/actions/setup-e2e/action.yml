@@ -1,0 +1,25 @@
+name: Setup E2E Tools
+description: Install Node.js, npm dependencies, and Playwright Chromium
+
+runs:
+  using: composite
+  steps:
+    # Node LTS, per the official Playwright CI guide. The post-download
+    # extract-zip hang seen on Node 24.16.0 (nodejs/node#63487,
+    # microsoft/playwright#41000) is fixed in Playwright >= 1.60.0, which this
+    # project now pins — so no Node version workaround is needed.
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+
+    - name: Install Node dependencies
+      shell: bash
+      run: npm ci
+
+    # Install browsers + system deps as the official CI guide prescribes. The
+    # timeout turns any future extraction stall into a fast failure instead of
+    # eating the full job timeout.
+    - name: Install Playwright Browsers
+      shell: bash
+      run: timeout 300 npx playwright install --with-deps chromium

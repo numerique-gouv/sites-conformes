@@ -1,9 +1,11 @@
 from django.core.management import call_command
+from django.test import SimpleTestCase
 from django.urls import reverse
+from dsfr.forms import DsfrBoundField
 from wagtail.test.utils import WagtailPageTestCase
 from wagtail_localize.models import TranslationSource
 
-from sites_conformes.forms.models import FormField, FormPage
+from sites_conformes.forms.models import FormField, FormPage, SitesFacilesFormBuilder
 
 
 class FormsTestCase(WagtailPageTestCase):
@@ -124,3 +126,38 @@ class FormsTestCase(WagtailPageTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertInHTML("""<a href="/contact/">Contact</a>""", response.content.decode())
         self.assertInHTML("""<h1>1 résultat pour la recherche «\xa0contact\xa0»</h1>""", response.content.decode())
+
+
+class SitesFacilesCustomFormDsfrRenderingTestCase(SimpleTestCase):
+    """
+    Regression test: SitesFacilesCustomForm (used by SitesFacilesFormBuilder for every public
+    FormPage) must keep dispatching to DSFR's per-widget snippet templates. It only sets the
+    "fr-input"/"fr-select" classes itself (via dsfr_input_class_attr); checkboxes and radio
+    buttons get no styling at all unless bound_field_class is DsfrBoundField, since their
+    markup (fr-checkbox-group, fr-fieldset/legend, etc.) comes entirely from those snippets.
+    """
+
+    def build_form(self, **fields):
+        builder = SitesFacilesFormBuilder(list(fields.values()))
+        return builder.get_form_class()()
+
+    def test_checkbox_field_has_dsfr_markup(self):
+        checkbox = FormField(field_type="checkbox", label="Accepte les conditions", required=True)
+        form = self.build_form(checkbox=checkbox)
+
+        bound_field = form["accepte_les_conditions"]
+        self.assertIsInstance(bound_field, DsfrBoundField)
+
+        html = str(bound_field.as_field_group())
+        self.assertIn("fr-checkbox-group", html)
+
+    def test_radio_field_has_dsfr_markup(self):
+        radio = FormField(field_type="radio", label="Choix", required=True, choices="A, B")
+        form = self.build_form(radio=radio)
+
+        bound_field = form["choix"]
+        self.assertIsInstance(bound_field, DsfrBoundField)
+
+        html = str(bound_field.as_field_group())
+        self.assertIn("fr-fieldset", html)
+        self.assertIn("fr-radio-group", html)

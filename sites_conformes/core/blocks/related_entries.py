@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
-from wagtail.blocks import BooleanBlock
+from wagtail.blocks import BlockGroup, BooleanBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.constants import (
@@ -66,6 +66,11 @@ class RecentEntriesStructValue(blocks.StructValue):
 
         return filters
 
+    def see_all_link_filters(self) -> dict:
+        if self.get("is_see_all_link_filtered", False):
+            return self.current_filters()
+        return {}
+
     def sub_heading_tag(self):
         """
         Used for the filters section titles
@@ -79,6 +84,14 @@ class RecentEntriesStructValue(blocks.StructValue):
             return "h5"
         else:
             return "h6"
+
+
+class BlogRecentEntriesStructValue(RecentEntriesStructValue):
+    def see_all_button_label(self):
+        text = self.get("see_all_button_text")
+        if text:
+            return text
+        return _("See all posts")
 
 
 class BlogRecentEntriesBlock(blocks.StructBlock):
@@ -106,11 +119,46 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
         required=False,
     )
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
+    see_all_button_text = blocks.CharBlock(
+        label=_("Button text"),
+        required=False,
+        default=_("See all posts"),
+    )
+    is_see_all_link_filtered = BooleanBlock(
+        label=_('Apply filters in the "See all posts" page'),
+        default=False,
+        required=False,
+    )
 
     class Meta:
         icon = "placeholder"
         template = ("sites_conformes_core/blocks/blog_recent_entries.html",)
-        value_class = RecentEntriesStructValue
+        value_class = BlogRecentEntriesStructValue
+        form_layout = BlockGroup(
+            children=[
+                "title",
+                "heading_tag",
+                "blog",
+                "entries_count",
+                "category_filter",
+                "tag_filter",
+                "author_filter",
+                "source_filter",
+                "show_filters",
+                BlockGroup(
+                    children=["see_all_button_text", "is_see_all_link_filtered"],
+                    heading=_("“See all posts” button"),
+                ),
+            ],
+        )
+
+
+class EventsRecentEntriesStructValue(RecentEntriesStructValue):
+    def see_all_button_label(self):
+        text = self.get("see_all_button_text")
+        if text:
+            return text
+        return _("See all events")
 
 
 class EventsRecentEntriesBlock(blocks.StructBlock):
@@ -138,8 +186,35 @@ class EventsRecentEntriesBlock(blocks.StructBlock):
         required=False,
     )
     show_filters = BooleanBlock(label=_("Show filters"), default=False, required=False)
+    see_all_button_text = blocks.CharBlock(
+        label=_("Button text"),
+        required=False,
+        default=_("See all events"),
+    )
+    is_see_all_link_filtered = BooleanBlock(
+        label=_('Apply filters in the "See all events" page'),
+        default=False,
+        required=False,
+    )
 
     class Meta:
         icon = "placeholder"
         template = ("sites_conformes_core/blocks/events_recent_entries.html",)
-        value_class = RecentEntriesStructValue
+        value_class = EventsRecentEntriesStructValue
+        form_layout = BlockGroup(
+            children=[
+                "title",
+                "heading_tag",
+                "index_page",
+                "entries_count",
+                "category_filter",
+                "tag_filter",
+                "author_filter",
+                "source_filter",
+                "show_filters",
+                BlockGroup(
+                    children=["see_all_button_text", "is_see_all_link_filtered"],
+                    heading=_("“See all events” button"),
+                ),
+            ],
+        )

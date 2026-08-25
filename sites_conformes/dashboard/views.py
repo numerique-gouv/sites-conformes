@@ -1,10 +1,16 @@
+from datetime import date
+
 import requests
 from django.contrib.admin.utils import quote
 from django.core.cache import cache
 from django.urls import reverse
 from wagtail.admin.admin_url_finder import AdminURLFinder
 from wagtail.admin.ui.components import Component
+from wagtail.admin.views.account import PasswordResetConfirmView as WagtailPasswordResetConfirmView
 from wagtail.models import Site
+
+from sites_conformes.dashboard.forms import DsfrSetPasswordForm
+from sites_conformes.dashboard.notifications import get_all_notifications
 
 finder = AdminURLFinder()
 
@@ -80,3 +86,29 @@ class TutorialsPanel(Component):
 
 
 tutorials_panel = TutorialsPanel()
+
+
+class NotificationPanel(Component):
+    order = 20
+    template_name = "sites_conformes_admin/panels/_notifications.html"
+    panel_id = "notifications"
+
+    def get_context_data(self, parent_context=None):
+        notifications = []
+        for item in get_all_notifications():
+            item = dict(item)
+            raw_start_date = item.get("start_date")
+            if raw_start_date:
+                try:
+                    item["start_date"] = date.fromisoformat(raw_start_date)
+                except ValueError:
+                    pass
+            notifications.append(item)
+        return {"notifications": notifications}
+
+
+class PasswordResetConfirmView(WagtailPasswordResetConfirmView):
+    # Wagtail hard-codes django.contrib.auth.forms.SetPasswordForm, which isn't DSFR-styled.
+    # There's no settings hook for it (unlike WAGTAILADMIN_USER_PASSWORD_RESET_FORM), so the
+    # URL below overrides the one from wagtailadmin_urls (matched first by Django).
+    form_class = DsfrSetPasswordForm

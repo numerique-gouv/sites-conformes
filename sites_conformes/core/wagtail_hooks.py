@@ -32,7 +32,7 @@ def register_text_alignment_features(features):
             {
                 "type": "text-left",
                 "description": "Aligner à gauche",
-                "element": "div",
+                "element": "p",
                 "icon": [
                     "M50 200 Q50 140, 110 140 L814 140 Q874 140, 874 200 "
                     "Q874 260, 814 260 L110 260 Q50 260, 50 200 Z "
@@ -50,9 +50,9 @@ def register_text_alignment_features(features):
         "contentstate",
         "text-left",
         {
-            "from_database_format": {'div[class="cmsfr-text-left"]': BlockElementHandler("text-left")},
+            "from_database_format": {'p[class="cmsfr-text-left"]': BlockElementHandler("text-left")},
             "to_database_format": {
-                "block_map": {"text-left": {"element": "div", "props": {"class": "cmsfr-text-left"}}}
+                "block_map": {"text-left": {"element": "p", "props": {"class": "cmsfr-text-left"}}}
             },
         },
     )
@@ -65,7 +65,7 @@ def register_text_alignment_features(features):
             {
                 "type": "text-center",
                 "description": "Centrer",
-                "element": "div",
+                "element": "p",
                 "icon": [
                     "M150 200 Q150 140, 210 140 L814 140 Q874 140, 874 200 "
                     "Q874 260, 814 260 L210 260 Q150 260, 150 200 Z "
@@ -83,9 +83,9 @@ def register_text_alignment_features(features):
         "contentstate",
         "text-center",
         {
-            "from_database_format": {'div[class="cmsfr-text-center"]': BlockElementHandler("text-center")},
+            "from_database_format": {'p[class="cmsfr-text-center"]': BlockElementHandler("text-center")},
             "to_database_format": {
-                "block_map": {"text-center": {"element": "div", "props": {"class": "cmsfr-text-center"}}}
+                "block_map": {"text-center": {"element": "p", "props": {"class": "cmsfr-text-center"}}}
             },
         },
     )
@@ -98,7 +98,7 @@ def register_text_alignment_features(features):
             {
                 "type": "text-right",
                 "description": "Aligner à droite",
-                "element": "div",
+                "element": "p",
                 "icon": [
                     "M150 200 Q150 140, 210 140 L914 140 Q974 140, 974 200 "
                     "Q974 260, 914 260 L210 260 Q150 260, 150 200 Z "
@@ -116,9 +116,9 @@ def register_text_alignment_features(features):
         "contentstate",
         "text-right",
         {
-            "from_database_format": {'div[class="cmsfr-text-right"]': BlockElementHandler("text-right")},
+            "from_database_format": {'p[class="cmsfr-text-right"]': BlockElementHandler("text-right")},
             "to_database_format": {
-                "block_map": {"text-right": {"element": "div", "props": {"class": "cmsfr-text-right"}}}
+                "block_map": {"text-right": {"element": "p", "props": {"class": "cmsfr-text-right"}}}
             },
         },
     )

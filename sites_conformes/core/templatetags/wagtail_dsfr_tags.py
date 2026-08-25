@@ -1,7 +1,10 @@
+from urllib.parse import urlencode
+
 from bs4 import BeautifulSoup
 from django import template
 from django.conf import settings
 from django.template.context import Context
+from django.utils.formats import date_format
 from django.utils.html import mark_safe
 from wagtail.models import Site
 from wagtail.rich_text import RichText
@@ -9,6 +12,16 @@ from wagtail.rich_text import RichText
 from sites_conformes.core.models import CmsDsfrConfig
 
 register = template.Library()
+
+FilterSpec = tuple[str, str]
+
+FILTERS: list[FilterSpec] = [
+    ("author", "id"),
+    ("category", "slug"),
+    ("source", "slug"),
+    ("tag", "slug"),
+    ("year", ""),
+]
 
 
 @register.simple_tag
@@ -141,21 +154,12 @@ def richtext_p_add_class(value, class_name: str):
     return mark_safe(str(soup))
 
 
-@register.simple_tag(takes_context=True)
-def toggle_url_filter(context, *_, **kwargs):
-    """
-    Sets a URL filter, or removes it if it is already in use.
-
-    The other filters can be passed through a dictionary or the GET parameters
-    """
-
+def build_toggle_url_query_string(context, filters: list[FilterSpec], **kwargs) -> str:
     filters_dict = kwargs.get("filters_dict", {})
     if filters_dict:
         url_params = filters_dict.copy()
     else:
         url_params = context["request"].GET.copy()
-
-    filters = [("author", "id"), ("category", "slug"), ("source", "slug"), ("tag", "slug"), ("year", "")]
 
     for f in filters:
         param = f[0]
@@ -171,12 +175,52 @@ def toggle_url_filter(context, *_, **kwargs):
         elif val and val == current_val:
             url_params.pop(param, None)
 
-    url_string = "&".join(["{}={}".format(x[0], x[1]) for x in url_params.items()])
-
+    url_string = urlencode(url_params, doseq=True)
     if url_string:
         return f"?{url_string}"
     else:
         return ""
+
+
+@register.simple_tag(takes_context=True)
+def toggle_url_filter(context, *_, **kwargs):
+    """
+    Sets a URL filter, or removes it if it is already in use.
+
+    The other filters can be passed through a dictionary or the GET parameters.
+    ``kwargs`` are filter values from the template (e.g. category=category).
+    Optional ``filters_dict`` overrides ``request.GET`` as the starting query params.
+    """
+    return build_toggle_url_query_string(context, FILTERS, **kwargs)
+
+
+@register.simple_tag
+def event_date_range(event_date_start, event_date_end):
+    """
+    Formatting the date range of an event by factoring out common parts (same day, same month, or same year).
+    """
+    if not event_date_start or not event_date_end:
+        return ""
+
+    start = event_date_start.date() if hasattr(event_date_start, "date") else event_date_start
+    end = event_date_end.date() if hasattr(event_date_end, "date") else event_date_end
+
+    if start == end:
+        return date_format(start)
+    if start.year == end.year and start.month == end.month:
+        return f"{start.day} – {date_format(end)}"
+    if start.year == end.year:
+        return f"{date_format(start, 'j F')} – {date_format(end, 'j F Y')}"
+    return f"{date_format(start)} – {date_format(end)}"
+
+
+@register.simple_tag
+def filters_query(filters_dict=None):
+    """Build a ``?key=val`` query string from blog index filter params."""
+    if not filters_dict:
+        return ""
+    url_string = urlencode(filters_dict, doseq=True)
+    return f"?{url_string}" if url_string else ""
 
 
 @register.filter

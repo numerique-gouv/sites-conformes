@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-24 09:46+0100\n"
-"PO-Revision-Date: 2025-10-28 13:47+0100\n"
+"POT-Creation-Date: 2026-07-01 12:02+0200\n"
+"PO-Revision-Date: 2026-03-26 13:59+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -128,6 +128,10 @@ msgstr "Ajouter à votre calendrier (iCal)"
 msgid "Year:"
 msgstr "Année :"
 
+#, python-format
+msgid "- Page %(current)s / %(total)s"
+msgstr "- Page %(current)s / %(total)s"
+
 msgid "Filters"
 msgstr "Filtres"
 
@@ -160,6 +164,12 @@ msgstr "Date de fin :"
 
 msgid "Filter by date"
 msgstr "Filtrer par date"
+
+msgid "selected"
+msgstr "étiquette sélectionnée"
+
+msgid "unselected"
+msgstr "étiquette non-sélectionnée"
 
 msgid "Export"
 msgstr "Export"

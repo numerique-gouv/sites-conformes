@@ -15,7 +15,7 @@ if [[ -z "$BACKUP_DIR" ]]; then
     exit 1
 fi
 
-MEDIA_BACKUP_DIR="${BACKUP_DIR}/sites-conformes-prod-medias/"
+MEDIA_BACKUP_DIR="${BACKUP_DIR}/${PROD_APP}-prod-medias/"
 
 echo "Moving media files from ${MEDIA_BACKUP_DIR} to ${MEDIA_ROOT:=medias}"
 

@@ -22,7 +22,7 @@ collectstatic:
 # Compile the translation files
 [group('Internationalization')]
 compilemessages:
-    {{docker_cmd}} {{uv_run}} django-admin compilemessages -l fr --ignore=.venv
+    {{docker_cmd}} {{uv_run}} python manage.py compilemessages -l fr --ignore=.venv
 
 alias csu := createsuperuser
 createsuperuser:
@@ -47,6 +47,26 @@ import_domain_whitelist:
 index:
     {{docker_cmd}} {{uv_run}} python manage.py update_index
 
+# Create .env from .env.example with a generated SECRET_KEY (never overwrites an existing .env)
+setup-env:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -f .env ]; then
+        echo ".env existe déjà, on n'écrase rien."
+        exit 0
+    fi
+    cp .env.example .env
+    python3 -c "import secrets,pathlib; c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#%^&*(-_=+)'; k=''.join(secrets.choice(c) for _ in range(50)); p=pathlib.Path('.env'); p.write_text('\n'.join('SECRET_KEY='+k if l.startswith('SECRET_KEY=') else l for l in p.read_text().splitlines())+'\n')"
+    echo "✅ .env créé et SECRET_KEY générée."
+
+# Create the PostgreSQL user and database defined in .env (DATABASE_USER / DATABASE_PASSWORD / DATABASE_NAME)
+setup-db:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    psql -U postgres -c "CREATE USER ${DATABASE_USER} WITH CREATEDB LOGIN PASSWORD '${DATABASE_PASSWORD}';"
+    psql -U postgres -c "CREATE DATABASE ${DATABASE_NAME} OWNER ${DATABASE_USER};"
+    echo "✅ Utilisateur et base PostgreSQL créés (${DATABASE_USER} / ${DATABASE_NAME})."
+
 init:
     {{docker_cmd}} uv sync --no-group dev
     just deploy
@@ -60,8 +80,8 @@ alias messages := makemessages
 # Update the translation files
 [group('Internationalization')]
 makemessages:
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles  --no-location
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --no-location
+    {{docker_cmd}} {{uv_run}} python manage.py makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles --ignore=docs --no-location
+    {{docker_cmd}} {{uv_run}} python manage.py makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --ignore=docs --ignore=node_modules --no-location
 
 alias mm:= makemigrations
 makemigrations app="":
@@ -90,6 +110,11 @@ run_gunicorn host_url=host_url host_port=host_port script_name=script_name:
 shell:
     {{docker_cmd}} {{uv_run}} python manage.py shell
 
+# Re-vendor the TarteAuCitron JS library from the installed npm package
+sync-tarteaucitron:
+    {{docker_cmd}} npm ci
+    cd scripts && bash sync_tarteaucitron.sh
+
 test app="":
     {{docker_cmd}} {{uv_run}} python manage.py test {{app}} --buffer --parallel --settings config.settings_test
 
@@ -104,6 +129,8 @@ upgrade:
     {{docker_cmd}} uv lock --upgrade
     {{docker_cmd}} {{uv_run}} pre-commit autoupdate
     {{docker_cmd}} npm update
+    just sync-tarteaucitron
+    {{docker_cmd}} uv lock --upgrade --project ./demo
 
 web-prompt:
     {{docker_cmd}} bash
@@ -215,3 +242,17 @@ restore-prod-db:
 [group('Dev DB and medias management')]
 restore-prod-medias:
     cd scripts && bash restore_prod_medias.sh
+
+#### Documentation-related recipes
+
+# Build the documentation and serve it locally with live reload (opens the browser)
+[group('Documentation')]
+docs:
+    uv run --no-project --with-requirements docs/requirements.txt --with sphinx-autobuild \
+        sphinx-autobuild docs docs/_build/html --open-browser
+
+# Build the documentation once (HTML written to docs/_build/html)
+[group('Documentation')]
+docs-build:
+    uv run --no-project --with-requirements docs/requirements.txt \
+        sphinx-build -b html -a docs docs/_build/html

@@ -1,0 +1,8 @@
+{
+    "line-length": {
+      "code_blocks": false,
+      "tables": false
+    },
+    "link-fragments": false,
+    "no-inline-html": false
+}

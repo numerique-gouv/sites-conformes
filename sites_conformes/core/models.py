@@ -27,6 +27,7 @@ from wagtail.snippets.models import register_snippet
 from sites_conformes.core.abstract import SitesFacilesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
+from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
@@ -134,89 +135,93 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 
         return context
 
+    def _default_filter_context(self, entries: models.QuerySet, selected_tag_slugs: list | None = None) -> dict:
+        """
+        Baseline context for the filter system (no filter applied),
+        overridden by the other _handle_* / _get_filtered_* methods.
+        """
+        return {
+            "entries": entries,
+            "extra_breadcrumbs": None,
+            "extra_title": "",
+            "current_tags": [],
+            "current_tag": None,
+            "selected_tag_slugs": selected_tag_slugs or [],
+        }
+
     def _get_filtered_entries_and_context(self, request: HttpRequest, entries: models.QuerySet) -> dict:
+        """
+        Reads the "tag" GET params and dispatches to the filter mode configured on the page.
+        """
         selected_tag_slugs = request.GET.getlist("tag")
         if not selected_tag_slugs:
-            return {
-                "entries": entries,
-                "extra_breadcrumbs": None,
-                "extra_title": "",
-                "current_tags": [],
-                "selected_tag_slugs": [],
-            }
+            return self._default_filter_context(entries)
 
         if self.filter_selection == self.SINGLE_FILTER:
             return self._handle_single_filter(selected_tag_slugs, entries)
         if self.filter_selection == self.MULTIPLE_FILTERS:
             return self._handle_multiple_filters(selected_tag_slugs, entries)
 
-        return {
-            "entries": entries,
-            "extra_breadcrumbs": None,
-            "extra_title": "",
-            "current_tags": [],
-            "selected_tag_slugs": selected_tag_slugs,
-        }
+        return self._default_filter_context(entries, selected_tag_slugs)
 
     def _handle_single_filter(self, selected_tag_slugs: list, entries: models.QuerySet) -> dict:
+        """
+        Filters entries by exactly one tag (SINGLE_FILTER mode)
+        """
+
         if len(selected_tag_slugs) != 1:
-            return {
-                "entries": entries,
-                "extra_breadcrumbs": None,
-                "extra_title": "",
-                "current_tags": [],
-                "selected_tag_slugs": selected_tag_slugs,
-            }
+            return self._default_filter_context(entries, selected_tag_slugs)
 
         tag_slug = selected_tag_slugs[0]
         tag = get_object_or_404(Tag, slug=tag_slug)
         filtered_entries = entries.filter(tags=tag)
-        current_tags = [tag]
-        extra_breadcrumbs = self._build_breadcrumbs(tag)
-        extra_title = _("Pages tagged with %(tag)s") % {"tag": tag}
 
         return {
-            "entries": filtered_entries,
-            "extra_breadcrumbs": extra_breadcrumbs,
-            "extra_title": extra_title,
-            "current_tags": current_tags,
-            "selected_tag_slugs": selected_tag_slugs,
+            **self._default_filter_context(filtered_entries, selected_tag_slugs),
+            "extra_breadcrumbs": self._build_breadcrumbs(tag),
+            "extra_title": _("Pages tagged with %(tag)s") % {"tag": tag},
+            "current_tags": [tag],
+            "current_tag": tag,
         }
 
     def _handle_multiple_filters(self, selected_tag_slugs: list, entries: models.QuerySet) -> dict:
+        """
+        Filters entries by one or more tags, combined with AND/OR (MULTIPLE_FILTERS mode)
+        """
+
         current_tags = list(Tag.objects.filter(slug__in=selected_tag_slugs))
 
         if not current_tags:
-            return {
-                "entries": entries,
-                "extra_breadcrumbs": None,
-                "extra_title": "",
-                "current_tags": [],
-                "selected_tag_slugs": selected_tag_slugs,
-            }
+            return self._default_filter_context(entries, selected_tag_slugs)
 
         if self.multiple_filter_operator == self.AND_OPERATOR:
             filtered_entries, extra_title = self._apply_and_operator(current_tags, entries)
         else:
             filtered_entries, extra_title = self._apply_or_operator(current_tags, entries)
 
-        extra_breadcrumbs = self._build_breadcrumbs()
-
         return {
-            "entries": filtered_entries,
-            "extra_breadcrumbs": extra_breadcrumbs,
+            **self._default_filter_context(filtered_entries, selected_tag_slugs),
+            "extra_breadcrumbs": self._build_breadcrumbs(),
             "extra_title": extra_title,
             "current_tags": current_tags,
-            "selected_tag_slugs": selected_tag_slugs,
+            "current_tag": current_tags[0] if len(current_tags) == 1 else None,
         }
 
     def _apply_and_operator(self, current_tags: list, entries: models.QuerySet) -> tuple:
+        """
+        Keeps only entries that have all of the given tags.
+        """
+
         for tag in current_tags:
             entries = entries.filter(tags=tag)
         extra_title = _("Pages tagged with all of: %(tags)s") % {"tags": ", ".join([str(t) for t in current_tags])}
         return entries, extra_title
 
     def _apply_or_operator(self, current_tags: list, entries: models.QuerySet) -> tuple:
+        """
+        Keeps entries that have at least one of the given tags.
+        """
+
         q_objects = Q()
         for tag in current_tags:
             q_objects |= Q(tags=tag)
@@ -225,6 +230,10 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return entries, extra_title
 
     def _build_breadcrumbs(self, tag: Union["Tag", None] = None) -> dict:
+        """
+        Build the breadcrumbs dictionary.
+        """
+
         breadcrumbs = {
             "links": [
                 {"url": self.get_url(), "title": self.title},
@@ -487,6 +496,18 @@ class CmsDsfrConfig(ClusterableModel, BaseSiteSetting):
     theme_modale_button = models.BooleanField(_("Display theme modale button"), default=False)  # type: ignore
     mourning = models.BooleanField(_("Mourning"), default=False)  # type: ignore
 
+    iframe_allow_origins = models.TextField(
+        _("Allowed iframe origins"),
+        default="",
+        blank=True,
+        validators=[validate_iframe_allow_origins],
+        help_text=_(
+            "One domain per line, without scheme or path (e.g. 'example.com'). "
+            "Pages can then be embedded in an iframe from these HTTPS origins. "
+            "The CMS admin can never be embedded from another origin."
+        ),
+    )
+
     newsletter_description = models.TextField(_("Newsletter description"), default="", blank=True)
 
     newsletter_url = models.URLField(
@@ -577,6 +598,7 @@ class CmsDsfrConfig(ClusterableModel, BaseSiteSetting):
                 FieldPanel("beta_tag"),
                 FieldPanel("theme_modale_button"),
                 FieldPanel("header_login_button"),
+                FieldPanel("iframe_allow_origins"),
             ],
             heading=_("Advanced settings"),
         ),

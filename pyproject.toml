@@ -1,9 +1,10 @@
 [project]
 name = "sites-conformes"
-# This is the packagified-release version, decoupled from upstream's tag.
-# Upstream `v3.2.0` is the source we fork from; we publish as `4.0.0` because
-# the packaging changes are large enough to warrant a major bump for consumers.
-version = "4.0.0rc1"
+# Version is driven by the GitHub Release tag at publish time. See
+# .github/workflows/publish.yml, which writes sites_conformes/_version.py
+# from github.event.release.tag_name (stripped of a leading "v").
+# The committed _version.py value is the local/dev fallback.
+dynamic = ["version"]
 description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l’État, accessible et responsive"
 authors = [
     { name = "Sites Conformes dev team", email = "contact@sites.beta.gouv.fr" }
@@ -15,7 +16,7 @@ readme = "README.md"
 requires-python = "<4.0,>=3.12"
 dependencies = [
     "django-dsfr>=2.4.0",
-    "django>=6.0",
+    "django<6.1,>=6.0",
     "wagtail>=7.2.0",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.1.0",
@@ -39,6 +40,7 @@ dependencies = [
     "wand>=0.6.13",
     "wagtail-honeypot>=1.2.1",
     "sentry-sdk[django]>=2.61.0",
+    "wagtail-2fa==1.8.0",
 ]
 
 [dependency-groups]
@@ -52,6 +54,7 @@ dev = [
     "pre-commit>=4.2.0",
     "ruff>=0.12.0",
     "tblib>=3.1.0",
+    "wagtail-factories>=4.5.0",
 ]
 
 # Packaging-only — upstream sites-conformes is a Django project and ships
@@ -59,6 +62,9 @@ dev = [
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = { attr = "sites_conformes._version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -77,6 +83,7 @@ sites_conformes = [
 
 [tool.black]
 line-length = 119
+target-version = ["py312", "py313", "py314"]
 
 # force-exclude (not extend-exclude) is required so that black skips migration
 # files even when pre-commit passes them explicitly on the command line.
@@ -160,3 +167,7 @@ ignore = ["E203", "E266"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
+
+# Blocks installation of known malware (typosquatting, deliberately malicious packages)
+[tool.uv.audit]
+malware-check = true

@@ -1,7 +1,7 @@
 {
   "name": "Sites conformes",
   "description": "Basic installation of the sites-conformes app",
-  "logo": "https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/static/artwork/logo-white-bg.svg",
+  "logo": "https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/sites_conformes/static/artwork/logo-white-bg.svg",
   "repository": "https://github.com/numerique-gouv/sites-conformes",
   "ref": "production",
   "website": "https://sites.beta.gouv.fr",
