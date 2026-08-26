@@ -83,7 +83,7 @@ makemessages:
     {{docker_cmd}} {{uv_run}} python manage.py makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles --ignore=docs --no-location
     {{docker_cmd}} {{uv_run}} python manage.py makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --ignore=docs --ignore=node_modules --no-location
 
-alias mm:= makemigrations
+alias mm := makemigrations
 makemigrations app="":
     {{docker_cmd}} {{uv_run}} python manage.py makemigrations {{app}}
 
@@ -147,6 +147,11 @@ scalingo-postdeploy:
     python manage.py update_index
 
 #### Audit-related recipes
+
+# Run the Django system check framework
+[group('Code audit')]
+check +apps="":
+    {{docker_cmd}} {{uv_run}} python manage.py check {{apps}}
 
 # Run a global pre-commit
 [group('Code audit')]
