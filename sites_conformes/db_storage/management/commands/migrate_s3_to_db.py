@@ -256,7 +256,7 @@ class Command(BaseCommand):
 
                 try:
                     qs = model.objects.filter(**lookup)
-                except Exception:
+                except Exception:  # nosec B112
                     continue
 
                 for obj in qs.iterator():
@@ -295,7 +295,7 @@ class Command(BaseCommand):
 
                 try:
                     qs = model.objects.filter(**lookup)
-                except Exception:
+                except Exception:  # nosec B112
                     continue
 
                 for obj in qs.iterator():

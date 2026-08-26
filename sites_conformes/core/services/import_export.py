@@ -4,7 +4,6 @@ import os
 import sys
 from io import BytesIO
 from pathlib import PosixPath
-from urllib.request import urlretrieve
 
 import requests
 from django.conf import settings
@@ -58,7 +57,7 @@ class ExportPage:
         return f"{self.source_site}api/v2/pages/{self.source_page_id}/"
 
     def get_content_from_source_page(self):
-        response = requests.get(self.source_page_api_url)
+        response = requests.get(self.source_page_api_url, timeout=5)
         return response.json()
 
     def get_source_images(self) -> None:
@@ -234,7 +233,7 @@ class ImportExportImages:
         return f"{self.source_site}api/v2/images/{image_id}/"
 
     def get_content_from_source_image(self, image_id: int) -> dict:
-        response = requests.get(self.source_image_api_url(image_id))
+        response = requests.get(self.source_image_api_url(image_id), timeout=5)
         return response.json()
 
     def download_images(self) -> None:
@@ -257,7 +256,11 @@ class ImportExportImages:
                 self.image_data[i]["is_pictogram"] = True
 
             else:
-                urlretrieve(image_url, self.image_folder / image_name)
+                with requests.get(image_url, timeout=5, stream=True) as image_response:
+                    image_response.raise_for_status()
+                    with open(self.image_folder / image_name, "wb") as image_file:
+                        for chunk in image_response.iter_content(chunk_size=8192):
+                            image_file.write(chunk)
                 self.image_data[i]["filename"] = image_name
                 self.image_data[i]["is_pictogram"] = False
 

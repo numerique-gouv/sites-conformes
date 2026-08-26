@@ -49,6 +49,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "bandit>=1.9.4",
     "black>=25.1.0",
     "coverage>=7.9.1",
     "deptry>=0.25.1",
@@ -207,3 +208,6 @@ DEP002 = [
 # Blocks installation of known malware (typosquatting, deliberately malicious packages)
 [tool.uv.audit]
 malware-check = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", "demo"]

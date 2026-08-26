@@ -47,11 +47,12 @@ class OIDCAuthenticationBackend(MozillaOIDCAuthenticationBackend):
         Returns:
         - dict: User details dictionary obtained from the OpenID Connect user endpoint.
         """
+        timeout = self.get_settings("OIDC_TIMEOUT", 5)
         user_response = requests.get(
             self.OIDC_OP_USER_ENDPOINT,
             headers={"Authorization": f"Bearer {access_token}"},
             verify=self.get_settings("OIDC_VERIFY_SSL", True),
-            timeout=self.get_settings("OIDC_TIMEOUT", None),
+            timeout=timeout,
             proxies=self.get_settings("OIDC_PROXY", None),
         )
         user_response.raise_for_status()

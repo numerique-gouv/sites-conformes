@@ -113,13 +113,16 @@ class Command(BaseCommand):
 
     def _plan_table_renames(self, cursor) -> list[tuple[str, str]]:
         like_clauses = " OR ".join([f"table_name LIKE '{app}_%'" for app in self.APPS_TO_MIGRATE])
-        cursor.execute(f"""
+        query_template = """
             SELECT table_name
             FROM information_schema.tables
             WHERE table_schema = 'public'
-              AND ({like_clauses})
+              AND ({})
             ORDER BY table_name;
-            """)
+            """
+        # Built from the hardcoded APPS_TO_MIGRATE constant, not user input;
+        # SQL identifiers/literals here can't be parameterized with %s.
+        cursor.execute(query_template.format(like_clauses))  # nosec B608
 
         renames = []
         for (table_name,) in cursor.fetchall():
@@ -137,24 +140,30 @@ class Command(BaseCommand):
 
     def _plan_migration_updates(self, cursor) -> list[tuple[str, str, int]]:
         apps_in_clause = ", ".join([f"'{app}'" for app in self.APPS_TO_MIGRATE])
-        cursor.execute(f"""
+        query_template = """
             SELECT app, COUNT(*) AS migration_count
             FROM django_migrations
-            WHERE app IN ({apps_in_clause})
+            WHERE app IN ({})
             GROUP BY app
             ORDER BY app;
-            """)
+            """
+        # Built from the hardcoded APPS_TO_MIGRATE constant, not user input;
+        # SQL identifiers/literals here can't be parameterized with %s.
+        cursor.execute(query_template.format(apps_in_clause))  # nosec B608
         return [(app, self._new_app_label(app), count) for app, count in cursor.fetchall()]
 
     def _plan_content_type_updates(self, cursor) -> list[tuple[str, str, int]]:
         apps_in_clause = ", ".join([f"'{app}'" for app in self.APPS_TO_MIGRATE])
-        cursor.execute(f"""
+        query_template = """
             SELECT app_label, COUNT(*) AS ct_count
             FROM django_content_type
-            WHERE app_label IN ({apps_in_clause})
+            WHERE app_label IN ({})
             GROUP BY app_label
             ORDER BY app_label;
-            """)
+            """
+        # Built from the hardcoded APPS_TO_MIGRATE constant, not user input;
+        # SQL identifiers/literals here can't be parameterized with %s.
+        cursor.execute(query_template.format(apps_in_clause))  # nosec B608
         return [(app, self._new_app_label(app), count) for app, count in cursor.fetchall()]
 
     # --- Reporting ----------------------------------------------------------

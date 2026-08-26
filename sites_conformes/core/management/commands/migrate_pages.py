@@ -40,7 +40,9 @@ class Command(BaseCommand):
             site = get_default_site()
             parent_page_slug = site.root_page.slug
 
-        image_folder = Path("/tmp/sf_img")
+        # Fixed path (not tempfile.mkdtemp()) so downloaded images and image_data.json
+        # persist and are reused/resumed across separate runs of this command.
+        image_folder = Path("/tmp/sf_img")  # nosec B108 -- developer-run-only CLI tool
         image_ids = []
 
         pages = {}

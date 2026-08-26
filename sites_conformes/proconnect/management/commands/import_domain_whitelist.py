@@ -18,7 +18,7 @@ class Command(BaseCommand):
             raise ValueError("The LASUITE_DOMAINE_API_KEY environment variable must be set.")
 
         headers = {"Authorization": f"Bearer {api_key}"}
-        result = requests.get(api_endpoint, headers=headers)
+        result = requests.get(api_endpoint, headers=headers, timeout=5)
 
         data = result.json()
         if data.get("status", "") != "success":
