@@ -115,11 +115,6 @@ class Command(BaseCommand):
         title = "Votre nouveau site avec Sites Conformes"
 
         image = Image.objects.filter(title="Pictogrammes DSFR — Digital — Coding").first()
-        # Mark the image as decorative for validations
-        if image:
-            image.is_decorative = True
-            image.save()
-
         text_raw = """<p>Bienvenue !</p>
 
         <p>Vous venez de créer un site utilisant le gestionnaire de contenus de l’État.</p>
@@ -131,7 +126,7 @@ class Command(BaseCommand):
         admin_url = reverse("wagtailadmin_home")
 
         image_and_text_block = {
-            "image": image,
+            "image": {"image": image, "alt_text": "", "decorative": True},
             "image_ratio": "3",
             "text": RichText(text_raw),
             "link": {"external_url": admin_url, "text": "Gérer le site"},
