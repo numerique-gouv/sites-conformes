@@ -1,5 +1,8 @@
 {
   "type": "module",
+  "engines": {
+    "npm": ">=11.10.0"
+  },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@types/node": "^22.10.0",

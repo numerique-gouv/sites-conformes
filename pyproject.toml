@@ -169,6 +169,16 @@ ignore = ["E203", "E266"]
 [tool.ruff.lint.isort]
 combine-as-imports = true
 
+# Dependency cooldown: ignore PyPI releases newer than this window so CVEs and
+# supply-chain advisories have time to surface before we adopt a version.
+# Re-run `uv lock` after changing this value.
+[tool.uv]
+exclude-newer = "7 days"
+
+# Per-package opt-out: set a package to false to bypass the cooldown for an
+# urgent security fix published inside the window. Example:
+# exclude-newer-package = { wagtail = false }
+
 # Blocks installation of known malware (typosquatting, deliberately malicious packages)
 [tool.uv.audit]
 malware-check = true
