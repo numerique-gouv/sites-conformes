@@ -132,6 +132,11 @@ p:empty {
     aspect-ratio: initial !important;
 }
 
+/* Add some vertical spacing between blocks stacked within an adjustable column */
+.cmsfr-block-multicolumns [class*="fr-col"] > div + div {
+    margin-top: 1.5rem;
+}
+
 .cmsfr-block-stepper dd {
     padding-left: 0;
 }
