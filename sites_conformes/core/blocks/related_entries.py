@@ -125,7 +125,7 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
         default=_("See all posts"),
     )
     is_see_all_link_filtered = BooleanBlock(
-        label=_('Apply filters in the "See all posts" page'),
+        label=_("Keep the filters when opening the page listing all posts"),
         default=False,
         required=False,
     )
@@ -192,7 +192,7 @@ class EventsRecentEntriesBlock(blocks.StructBlock):
         default=_("See all events"),
     )
     is_see_all_link_filtered = BooleanBlock(
-        label=_('Apply filters in the "See all events" page'),
+        label=_("Keep the filters when opening the page listing all events"),
         default=False,
         required=False,
     )
