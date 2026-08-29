@@ -147,7 +147,7 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
                 "show_filters",
                 BlockGroup(
                     children=["see_all_button_text", "is_see_all_link_filtered"],
-                    heading=_("“See all posts” button"),
+                    heading=_("Block button"),
                 ),
             ],
         )
@@ -214,7 +214,7 @@ class EventsRecentEntriesBlock(blocks.StructBlock):
                 "show_filters",
                 BlockGroup(
                     children=["see_all_button_text", "is_see_all_link_filtered"],
-                    heading=_("“See all events” button"),
+                    heading=_("Block button"),
                 ),
             ],
         )

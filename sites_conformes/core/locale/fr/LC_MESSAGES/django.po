@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-29 16:35+0200\n"
-"PO-Revision-Date: 2026-07-16 10:26+0200\n"
+"POT-Creation-Date: 2026-08-29 10:45+0200\n"
+"PO-Revision-Date: 2026-08-29 10:58+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -396,6 +396,9 @@ msgstr "Type de bouton"
 msgid "Icon side"
 msgstr "Côté de l’icône"
 
+msgid "Buttons alignment"
+msgstr "Alignement des boutons"
+
 msgid ""
 "Please use only one primary button.\n"
 "            If you use icons, use them on all buttons and align them on the "
@@ -404,9 +407,6 @@ msgstr ""
 "Merci de n’utiliser qu’un seul bouton primaire.\n"
 "Si vous utilisez des icônes, mettez-en sur tous les boutons et alignez-les "
 "du même côté."
-
-msgid "Position"
-msgstr "Position"
 
 msgid "Only used for internal links."
 msgstr "Uniquement pour les liens internes."
@@ -884,11 +884,11 @@ msgstr "Afficher les filtres"
 msgid "Button text"
 msgstr "Texte du bouton"
 
-msgid "Apply filters in the \"See all posts\" page"
-msgstr "Appliquer les filtres dans la page \"Voir tous les articles\""
+msgid "Keep the filters when opening the page listing all posts"
+msgstr "Conserver les filtres en ouvrant la page qui liste tous les articles"
 
-msgid "“See all posts” button"
-msgstr "Bouton « Voir tous les articles »"
+msgid "Block button"
+msgstr "Bouton du bloc"
 
 msgid "See all events"
 msgstr "Voir tous les événements"
@@ -896,11 +896,8 @@ msgstr "Voir tous les événements"
 msgid "Event calendar"
 msgstr "Agenda"
 
-msgid "Apply filters in the \"See all events\" page"
-msgstr "Appliquer les filtres dans la page \"Voir tous les événements\""
-
-msgid "“See all events” button"
-msgstr "Bouton « Voir tous les événements »"
+msgid "Keep the filters when opening the page listing all events"
+msgstr "Conserver les filtres en ouvrant la page qui liste tous les événements"
 
 msgid "Section title"
 msgstr "Titre de la section"
@@ -1580,6 +1577,8 @@ msgid ""
 "'%(domain)s' is not a valid domain. Enter one bare domain per line, without "
 "scheme, path or wildcard (e.g. 'example.com')."
 msgstr ""
+"« %(domain)s » n'est pas un domaine valide. Saisissez un seul domaine nu par "
+"ligne, sans schéma, chemin ni caractère générique (par ex. « example.com »)."
 
 msgid "List of all the tags."
 msgstr "Liste de toutes les étiquettes."
@@ -1591,6 +1590,21 @@ msgstr "Pages avec l’étiquette {tag}"
 #, python-brace-format
 msgid "List of pages tagged with {tag}"
 msgstr "Liste de pages avec l’étiquette {tag}"
+
+#~ msgid "“See all posts” button"
+#~ msgstr "Bouton « Voir tous les articles »"
+
+#~ msgid "“See all events” button"
+#~ msgstr "Bouton « Voir tous les événements »"
+
+#~ msgid "Position"
+#~ msgstr "Position"
+
+#~ msgid "Apply filters in the \"See all posts\" page"
+#~ msgstr "Appliquer les filtres dans la page \"Voir tous les articles\""
+
+#~ msgid "Apply filters in the \"See all events\" page"
+#~ msgstr "Appliquer les filtres dans la page \"Voir tous les événements\""
 
 #~ msgid "2. DSFR components"
 #~ msgstr "2. Composants du DSFR"
