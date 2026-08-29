@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from dsfr.forms import DsfrBoundField, DsfrDjangoTemplates
 from dsfr.utils import dsfr_input_class_attr
 from modelcluster.fields import ParentalKey
+from wagtail.admin.mail import send_mail
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, InlinePanel, MultiFieldPanel
 from wagtail.api import APIField
 from wagtail.contrib.forms.forms import BaseForm, FormBuilder
@@ -146,3 +147,30 @@ class FormPage(HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm
         Returns True if all fields in the form are mandatory.
         """
         return all(field.get("required", False) for field in self.form_fields.values())
+
+    def render_email(self, form):
+        notice = _(
+            "This message was generated automatically following the submission of a form on your website. "
+            "Please do not reply directly to this e-mail: your reply would not reach the sender. "
+            "To answer the person, use the e-mail address given in the form below."
+        )
+        return f"{notice}\n\n{super().render_email(form)}"
+
+    def send_mail(self, form):
+        """
+        Same as Wagtail's AbstractEmailForm.send_mail, but sets Reply-To to the e-mail
+        addresses submitted in the form's "email" fields. This way editors replying to
+        the notification answer the person who filled the form, not the site address.
+        """
+        addresses = [x.strip() for x in self.to_address.split(",")]
+
+        email_field_names = [field.clean_name for field in self.form_fields.all() if field.field_type == "email"]
+        reply_to = [form.cleaned_data[name] for name in email_field_names if form.cleaned_data.get(name)]
+
+        send_mail(
+            self.subject,
+            self.render_email(form),
+            addresses,
+            self.from_address,
+            reply_to=reply_to or None,
+        )
