@@ -21,6 +21,10 @@
             {% endif %}
         </div>
 
+        <p>
+            {% translate "Open your authenticator app (Aegis, Bitwarden, Google Authenticator, Microsoft Authenticator...) to get the code to enter below." %}
+        </p>
+
         {% block above_login %}{% endblock %}
 
         <form action="{% url 'wagtail_2fa_auth' %}" method="post" autocomplete="off" novalidate>
@@ -31,7 +35,9 @@
                 <input type="hidden" name="next" value="{{ next|default:home_url }}" />
 
                 {% block fields %}
-                    {% formattedfield field=form.otp_token %}
+                    {% translate "Security code" as label_otp %}
+                    {% translate "Please enter the 6-digit code displayed in your application." as help_otp %}
+                    {% formattedfield field=form.otp_token label_text=label_otp help_text=help_otp %}
                     {% block extra_fields %}
                         {% for field_name, field in form.extra_fields %}
                             {% formattedfield field=field %}

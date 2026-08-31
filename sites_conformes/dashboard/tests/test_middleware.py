@@ -1,9 +1,9 @@
-from unittest.mock import patch
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase, override_settings
-from wagtail_2fa.middleware import VerifyUserMiddleware
+from django.urls import reverse
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from sites_conformes.dashboard.middleware import VerifyUserStaticFilesMiddleware
 
@@ -19,6 +19,12 @@ class VerifyUserStaticFilesMiddlewareTest(TestCase):
     def _request(self, path, user=None):
         request = self.factory.get(path)
         request.user = user if user is not None else self.admin
+        return request
+
+    def _request_with_session(self, path, user=None):
+        request = self._request(path, user=user)
+        SessionMiddleware(get_response=lambda r: None).process_request(request)
+        request.session.save()
         return request
 
     # -- Static files
@@ -48,23 +54,46 @@ class VerifyUserStaticFilesMiddlewareTest(TestCase):
     # -- Other URLs
 
     @override_settings(WAGTAIL_2FA_REQUIRED=True)
-    def test_non_static_path_delegates_to_parent(self):
+    def test_non_static_path_with_staff_user_requires_verification(self):
         request = self._request("/cms-admin/")
-        with patch.object(VerifyUserMiddleware, "_require_verified_user", return_value=True) as mock_parent:
-            result = self.middleware._require_verified_user(request)
-        mock_parent.assert_called_once_with(request)
-        self.assertTrue(result)
+        self.assertTrue(self.middleware._require_verified_user(request))
 
     @override_settings(WAGTAIL_2FA_REQUIRED=True)
-    def test_static_path_does_not_call_parent(self):
+    def test_static_path_does_not_require_verification_even_if_otherwise_required(self):
         request = self._request("/static/file.js")
-        with patch.object(VerifyUserMiddleware, "_require_verified_user") as mock_parent:
-            self.middleware._require_verified_user(request)
-        mock_parent.assert_not_called()
+        self.assertFalse(self.middleware._require_verified_user(request))
 
     @override_settings(WAGTAIL_2FA_REQUIRED=False)
-    def test_2fa_not_required_globally(self):
+    def test_2fa_not_required_globally_for_user_without_device(self):
         request = self._request("/cms-admin/")
+        self.assertFalse(self.middleware._require_verified_user(request))
+
+    # -- Users who opted in to 2FA even though it isn't globally required
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=False)
+    def test_2fa_still_required_for_user_with_confirmed_device(self):
+        TOTPDevice.objects.create(user=self.admin, name="Device", confirmed=True)
+        request = self._request("/cms-admin/")
+        self.assertTrue(self.middleware._require_verified_user(request))
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=False)
+    def test_unverified_user_with_confirmed_device_is_redirected_to_otp_screen(self):
+        TOTPDevice.objects.create(user=self.admin, name="Device", confirmed=True)
+        request = self._request_with_session("/cms-admin/")
+        response = self.middleware.process_request(request)
+        self.assertIsNotNone(response)
+        self.assertIn(reverse("wagtail_2fa_auth"), response.url)
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=False)
+    def test_static_path_does_not_require_verification_for_user_with_confirmed_device(self):
+        TOTPDevice.objects.create(user=self.admin, name="Device", confirmed=True)
+        request = self._request("/static/file.js")
+        self.assertFalse(self.middleware._require_verified_user(request))
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=False)
+    def test_otp_auth_screen_does_not_require_verification_for_user_with_confirmed_device(self):
+        TOTPDevice.objects.create(user=self.admin, name="Device", confirmed=True)
+        request = self._request(reverse("wagtail_2fa_auth"))
         self.assertFalse(self.middleware._require_verified_user(request))
 
     @override_settings(WAGTAIL_2FA_REQUIRED=True)
@@ -80,10 +109,9 @@ class VerifyUserStaticFilesMiddlewareTest(TestCase):
 
     @override_settings(WAGTAIL_2FA_REQUIRED=True, MEDIA_URL="")
     def test_empty_media_url_does_not_crash(self):
-        request = self._request("/some/path/")
-        with patch.object(VerifyUserMiddleware, "_require_verified_user", return_value=False):
-            result = self.middleware._require_verified_user(request)
-        self.assertFalse(result)
+        request = self._request("/cms-admin/")
+        result = self.middleware._require_verified_user(request)
+        self.assertTrue(result)
 
     # -- ProConnect (OIDC) logout callback
 

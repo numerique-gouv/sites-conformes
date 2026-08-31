@@ -153,7 +153,7 @@ scalingo-postdeploy:
 check +apps="":
     {{docker_cmd}} {{uv_run}} python manage.py check {{apps}}
 
-# Run a global pre-commit
+# Run a global pre-commit check
 [group('Code audit')]
 quality:
     {{docker_cmd}} {{uv_run}} pre-commit run --all-files
