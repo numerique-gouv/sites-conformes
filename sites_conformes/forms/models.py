@@ -150,9 +150,9 @@ class FormPage(HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm
 
     def render_email(self, form):
         notice = _(
-            "This message was generated automatically following the submission of a form on your website. "
-            "Please do not reply directly to this e-mail: your reply would not reach the sender. "
-            "To answer the person, use the e-mail address given in the form below."
+            "This message was generated automatically following the submission of a form on your "
+            "Sites Conformes website. If you reply to this e-mail, your answer will be sent directly "
+            "to the person who submitted the form."
         )
         return f"{notice}\n\n{super().render_email(form)}"
 

@@ -12,9 +12,9 @@ from wagtail_localize.models import TranslationSource
 from sites_conformes.forms.models import FormField, FormPage, SitesFacilesFormBuilder
 
 AUTOMATIC_EMAIL_NOTICE = _(
-    "This message was generated automatically following the submission of a form on your website. "
-    "Please do not reply directly to this e-mail: your reply would not reach the sender. "
-    "To answer the person, use the e-mail address given in the form below."
+    "This message was generated automatically following the submission of a form on your "
+    "Sites Conformes website. If you reply to this e-mail, your answer will be sent directly "
+    "to the person who submitted the form."
 )
 
 
