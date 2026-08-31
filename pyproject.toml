@@ -17,7 +17,10 @@ requires-python = "<4.0,>=3.12"
 dependencies = [
     "django-dsfr>=2.4.0",
     "django<6.1,>=6.0",
-    "wagtail>=7.2.0",
+    # Upper bound: wagtail-2fa 1.8.0 still imports the deprecated
+    # wagtail.users.widgets.UserListingButton, which Wagtail 8 removed.
+    # Lift once wagtail-2fa adds Wagtail 8 support (see labd/wagtail-2fa#280).
+    "wagtail>=7.2.0,<8.0.0",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.1.0",
     "dj-database-url>=3.0.0",
