@@ -83,3 +83,27 @@ def patch_wagtail_2fa_device_create_view_success_message():
         return response
 
     DeviceCreateView.form_valid = form_valid
+
+
+def patch_wagtail_2fa_device_form_field_order():
+    """
+    Show "Current password" before "OTP token" in the add-device form.
+
+    ``DeviceForm`` (wagtail-2fa) declares its fields in the order
+    ``otp_token``, ``name``, ``password``, but ``Meta.fields = ["name",
+    "otp_token"]`` only pulls in real model fields (just ``name``) before
+    Django merges in the declared fields, so the field actually ends up
+    displayed as name -> otp_token -> password. Asking for the password
+    before the OTP token reads more naturally, so reorder them here rather
+    than forking the form.
+    """
+
+    from wagtail_2fa.forms import DeviceForm
+
+    original_init = DeviceForm.__init__
+
+    def __init__(self, request, **kwargs):
+        original_init(self, request, **kwargs)
+        self.order_fields(["name", "password", "otp_token"])
+
+    DeviceForm.__init__ = __init__

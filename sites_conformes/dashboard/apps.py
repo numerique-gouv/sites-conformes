@@ -13,8 +13,10 @@ class DashboardConfig(AppConfig):
     def ready(self):
         from sites_conformes.dashboard.monkey_patches import (
             patch_wagtail_2fa_device_create_view_success_message,
+            patch_wagtail_2fa_device_form_field_order,
             patch_wagtail_2fa_new_unconfirmed_device,
         )
 
         patch_wagtail_2fa_new_unconfirmed_device()
         patch_wagtail_2fa_device_create_view_success_message()
+        patch_wagtail_2fa_device_form_field_order()
