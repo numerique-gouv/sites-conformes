@@ -1,11 +1,21 @@
+import time
+
+from django.core import mail
 from django.core.management import call_command
 from django.test import SimpleTestCase
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from dsfr.forms import DsfrBoundField
 from wagtail.test.utils import WagtailPageTestCase
 from wagtail_localize.models import TranslationSource
 
 from sites_conformes.forms.models import FormField, FormPage, SitesFacilesFormBuilder
+
+AUTOMATIC_EMAIL_NOTICE = _(
+    "This message was generated automatically following the submission of a form on your "
+    "Sites Conformes website. If you reply to this e-mail, your answer will be sent directly "
+    "to the person who submitted the form."
+)
 
 
 class FormsTestCase(WagtailPageTestCase):
@@ -34,6 +44,69 @@ class FormsTestCase(WagtailPageTestCase):
             response,
             "<p>Merci pour votre message ! Nous reviendrons vers vous rapidement.</p>",
         )
+
+    def test_submission_email_starts_with_automatic_notice(self):
+        """
+        The notification e-mail sent to the site administrator must start with a notice
+        explaining the message is automatic and should not be replied to, so that editors
+        do not answer the site address instead of the person who submitted the form.
+        """
+        form_page = FormPage.objects.first()
+        form_page.to_address = "admin@example.org"
+        form_page.from_address = "no-reply@example.org"
+        form_page.subject = "Nouveau message"
+        form_page.save()
+
+        post_data = {
+            "votre_nom_complet": "Félix Faure",
+            "votre_adresse_electronique": "no7@elysee.fr",
+            "titre_de_votre_message": "Ma connaissance",
+            "votre_message": "S’est enfuie par l’escalier !",
+            # Honeypot fields (enabled by default): empty name + a submission time
+            # older than the required interval, so the submission is not treated as spam.
+            "whf_name": "",
+            "whf_time": str(int(time.time()) - 60),
+        }
+        response = self.client.post(form_page.url, post_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+
+        body = mail.outbox[0].body
+        # The notice comes first, before the form content.
+        self.assertTrue(body.startswith(AUTOMATIC_EMAIL_NOTICE))
+        # The submitted form content is still present.
+        self.assertIn("Votre nom complet: Félix Faure", body)
+        self.assertLess(body.index(AUTOMATIC_EMAIL_NOTICE), body.index("Votre nom complet"))
+
+    def test_submission_email_reply_to_is_submitter_address(self):
+        """
+        The notification e-mail must set Reply-To to the address entered in the form's
+        e-mail field, so replying answers the person who submitted the form rather than
+        the site's own address.
+        """
+        form_page = FormPage.objects.first()
+        form_page.to_address = "admin@example.org"
+        form_page.from_address = "no-reply@example.org"
+        form_page.subject = "Nouveau message"
+        form_page.save()
+
+        post_data = {
+            "votre_nom_complet": "Félix Faure",
+            "votre_adresse_electronique": "no7@elysee.fr",
+            "titre_de_votre_message": "Ma connaissance",
+            "votre_message": "S’est enfuie par l’escalier !",
+            "whf_name": "",
+            "whf_time": str(int(time.time()) - 60),
+        }
+        response = self.client.post(form_page.url, post_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+
+        message = mail.outbox[0]
+        self.assertEqual(message.reply_to, ["no7@elysee.fr"])
+        self.assertEqual(message.from_email, "no-reply@example.org")
 
     def test_incorrect_form_is_rejected(self):
         form_page = FormPage.objects.first()
