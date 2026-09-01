@@ -7,5 +7,4 @@ Cette section couvre certaines fonctionnalités apportées par Sites Conformes.
 maxdepth: 1
 ---
 2fa
-notifications
 ```
