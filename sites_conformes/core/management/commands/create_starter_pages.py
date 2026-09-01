@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.urls import reverse
-from wagtail.images.models import Image
+from wagtail.images import get_image_model
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 
@@ -9,6 +9,8 @@ from sites_conformes.core.models import ContentPage
 from sites_conformes.core.services.accessors import get_or_create_footer_bottom_menu, get_or_create_main_menu
 from sites_conformes.core.utils import get_default_site
 from sites_conformes.forms.models import FormField, FormPage
+
+Image = get_image_model()
 
 ALL_ALLOWED_SLUGS = ["home", "mentions-legales", "accessibilite", "contact"]
 
@@ -113,11 +115,6 @@ class Command(BaseCommand):
         title = "Votre nouveau site avec Sites Conformes"
 
         image = Image.objects.filter(title="Pictogrammes DSFR — Digital — Coding").first()
-        # Mark the image as decorative for validations
-        if image:
-            image.is_decorative = True
-            image.save()
-
         text_raw = """<p>Bienvenue !</p>
 
         <p>Vous venez de créer un site utilisant le gestionnaire de contenus de l’État.</p>
@@ -129,7 +126,7 @@ class Command(BaseCommand):
         admin_url = reverse("wagtailadmin_home")
 
         image_and_text_block = {
-            "image": image,
+            "image": {"image": image, "alt_text": "", "decorative": True},
             "image_ratio": "3",
             "text": RichText(text_raw),
             "link": {"external_url": admin_url, "text": "Gérer le site"},

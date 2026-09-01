@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
 from wagtail import blocks
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock
 from wagtailmarkdown.blocks import MarkdownBlock
 
 from sites_conformes.core.constants import (
@@ -214,7 +214,17 @@ class MultiColumnsBlock(CommonStreamBlock):
 
 
 class MultiColumnsWithTitleBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageBlock(
+        label=_("Background image"),
+        required=False,
+        help_text=_(
+            """Decorative background image behind columns. <br>
+                            This image spans the full width of the screen and will be resized depending on the user’s 
+                            screen width. <br>
+                            For optimal display, use an image at least 1920 px wide. <br>
+                            ⚠️ Make sure the image remains decorative: avoid including text or important information."""
+        ),
+    )
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
@@ -263,7 +273,7 @@ class FullWidthBlock(CommonStreamBlock):
 
 
 class FullWidthBackgroundBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageBlock(label=_("Background image"), required=False)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
@@ -312,7 +322,7 @@ class SideMenuBlock(blocks.StreamBlock):
 
 
 class FullWidthBackgroundWithSidemenuBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageBlock(label=_("Background image"), required=False)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
