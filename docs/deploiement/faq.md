@@ -145,6 +145,22 @@ Pensez à y mettre **tous** les domaines par lesquels le site est joignable
 À l’adresse de votre site suivie de **`/cms-admin/`** par défaut. Ce chemin est
 configurable via la variable `WAGTAILADMIN_PATH`.
 
+### À quoi sert le panneau de notifications de l’administration ?
+
+Le tableau de bord de l’administration peut afficher un **panneau d’information**
+contenant des messages : nouveautés, alertes ou maintenances à venir. Ces
+messages sont maintenus de façon centralisée par l’équipe du projet et sont donc
+communs à toutes les instances.
+
+Une notification peut également apparaître **automatiquement** pour signaler qu’une
+**nouvelle version est disponible**, lorsque la version installée n’est pas la
+dernière version publiée.
+
+Ces comportements sont configurables (source des messages, activation de l’alerte
+de version) via les variables `NOTIFICATIONS_FILE_URL`, `ADVERTISE_LATEST_VERSION`
+et associées, détaillées dans {doc}`variables-environnement`. C’est surtout utile
+pour les *forks* du projet, qui peuvent ainsi diffuser leurs propres messages.
+
 ### Comment servir le site depuis un sous-répertoire (ex. `/pages`) ?
 
 Renseignez la variable `FORCE_SCRIPT_NAME` (par exemple `/pages`). Le site est

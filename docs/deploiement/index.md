@@ -23,5 +23,4 @@ serveur-linux
 docker
 migrer-hebergement
 variables-environnement
-faq
 ```

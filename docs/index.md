@@ -47,6 +47,7 @@ donnees/index
 paquet/index
 contrib/index
 fonctionnalites/index
+deploiement/faq
 changelog
 ```
 
