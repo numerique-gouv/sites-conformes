@@ -12,6 +12,9 @@ on:
       - ".github/workflows/ci-check-tarteaucitron.yml"
       - "scripts/sync_tarteaucitron.sh"
 
+permissions:
+  contents: read
+
 jobs:
   build:
     if: github.event.pull_request.draft == false
