@@ -29,6 +29,21 @@ class SearchResultsTestCase(WagtailPageTestCase):
                 body=body,
                 slug="public-content-page",
                 owner=self.admin,
+                hero=[
+                    (
+                        "hero_text_image",
+                        {
+                            "text_content": {
+                                "hero_title": "XylophoneHeroique",
+                                "hero_subtitle": RichText("<p>Hero subtitle</p>"),
+                                "position": "left",
+                            },
+                            "buttons": [],
+                            "image": {},
+                            "layout": {"top_margin": 5, "bottom_margin": 5, "background_color": ""},
+                        },
+                    )
+                ],
             )
         )
         self.public_content_page.save_revision().publish()
@@ -55,6 +70,13 @@ class SearchResultsTestCase(WagtailPageTestCase):
     def test_search_public_content_page_is_found(self):
         search_url = reverse("cms_search")
         response = self.client.get(f"{search_url}?q=Lorem")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Page de contenu publique")
+
+    def test_search_hero_text_is_found(self):
+        search_url = reverse("cms_search")
+        response = self.client.get(f"{search_url}?q=XylophoneHeroique")
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Page de contenu publique")
