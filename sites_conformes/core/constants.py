@@ -138,6 +138,20 @@ MEDIA_WIDTH_CHOICES = [
     ("fr-content-media--lg", _("Large")),
 ]
 
+# Image display format. Values are DSFR CSS classes that constrain the image to a
+# ratio while cropping it cleanly (object-fit: cover). An empty value keeps the
+# image's original proportions (no cropping).
+IMAGE_FORMAT_CHOICES = [
+    ("", _("Original proportions")),
+    ("fr-responsive-img--1x1", _("Square (1:1)")),
+    ("fr-responsive-img--16x9", "16:9"),
+    ("fr-responsive-img--3x2", "3:2"),
+    ("fr-responsive-img--4x3", "4:3"),
+    ("fr-responsive-img--3x4", _("Portrait (3:4)")),
+    ("fr-responsive-img--2x3", "2:3"),
+    ("fr-responsive-img--32x9", _("Panoramic (32:9)")),
+]
+
 TEXT_SIZE_CHOICES = [
     ("fr-text--sm", _("Small")),
     ("", _("Medium")),
