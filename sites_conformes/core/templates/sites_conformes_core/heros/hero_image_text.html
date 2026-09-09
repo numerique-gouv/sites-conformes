@@ -8,10 +8,22 @@
         {% include "sites_conformes_core/heros/_hero_buttons.html" %}
       </div>
        <div class="fr-col-md-6">
-      {% image value.image fill-600x600 as header_image %}
-      <img class="fr-responsive-img"
-           src="{{ header_image.full_url }}"
-           alt="{{ header_image.alt }}" />
+      {% image value.image width-1200 as header_image %}
+      {% if value.image_format %}
+        {# Cropped to a ratio: DSFR content-media (size via --sm/--lg, cover crop via --Nx9) #}
+        <figure class="fr-content-media {{ value.image_size }}">
+          <div class="fr-content-media__img">
+            <img class="fr-responsive-img {{ value.image_format }}"
+                 src="{{ header_image.full_url }}"
+                 alt="{{ header_image.alt }}" />
+          </div>
+        </figure>
+      {% else %}
+        {# Original proportions: keep ratio, centered, height bounded by size #}
+        <img class="cmsfr-hero-img{% if value.image_size == 'fr-content-media--sm' %} cmsfr-hero-img--sm{% elif value.image_size == 'fr-content-media--lg' %} cmsfr-hero-img--lg{% endif %}"
+             src="{{ header_image.full_url }}"
+             alt="{{ header_image.alt }}" />
+      {% endif %}
     </div>
     </div>
    
