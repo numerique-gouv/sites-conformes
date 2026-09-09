@@ -138,6 +138,17 @@ class HeroImageBlockWithMask(HeroImageBlock):
         default="",
         help_text=_("Add a mask to lighten or darken the image"),
     )
+    background_format = blocks.ChoiceBlock(
+        label=_("Banner format"),
+        choices=[
+            ("", _("Standard (fixed height)")),
+            ("32x9", "32:9"),
+            ("16x9", "16:9"),
+        ],
+        required=False,
+        default="",
+        help_text=_("Aspect ratio of the banner. Standard keeps a fixed height."),
+    )
 
     class Meta:
         value_class = HeroImageStructValue
