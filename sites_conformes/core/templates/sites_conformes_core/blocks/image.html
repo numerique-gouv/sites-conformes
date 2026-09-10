@@ -8,11 +8,11 @@
   <div class="fr-content-media__img">
     {% if value.url %}
       <a href="{{ value.url }}">
-        {% image value.image original class=value.extra_classes alt=value.alt %}
+        {% image value.image original class=value.extra_classes %}
         <span class="fr-sr-only">{% translate "Go to page" %} {{ value.url }}</span>
       </a>
     {% else %}
-      {% image value.image original class=value.extra_classes alt=value.alt %}
+      {% image value.image original class=value.extra_classes %}
     {% endif %}
   </div>
   {% if value.caption %}<figcaption class="fr-content-media__caption">{{ value.caption }}</figcaption>{% endif %}
