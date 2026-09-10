@@ -132,6 +132,20 @@ p:empty {
     aspect-ratio: initial !important;
 }
 
+/* Add some vertical spacing between blocks stacked within an adjustable column */
+.cmsfr-block-multicolumns [class*="fr-col"] > div + div {
+    margin-top: 1.5rem;
+}
+
+/* A lone tile/card in an adjustable column should fill its column height so
+   cards line up at equal height, like in a standard multi-column row. The
+   Wagtail block wrapper (.block-tile / .block-card) otherwise breaks DSFR's
+   height:100% chain between the column and the .fr-tile/.fr-card. */
+.cmsfr-block-multicolumns [class*="fr-col"] > .block-tile:only-child,
+.cmsfr-block-multicolumns [class*="fr-col"] > .block-card:only-child {
+    height: 100%;
+}
+
 .cmsfr-block-stepper dd {
     padding-left: 0;
 }
