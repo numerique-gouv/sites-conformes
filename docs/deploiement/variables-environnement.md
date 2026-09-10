@@ -160,6 +160,20 @@ surcharger pour les forks du projet.
 | `LATEST_RELEASE_URL` | Endpoint de l’API GitHub utilisé pour détecter la dernière version publiée. | API GitHub releases du dépôt | ⚪ |
 | `RELEASES_URL` | Page de releases liée depuis la notification de nouvelle version. | Page releases GitHub du dépôt | ⚪ |
 
+## Serveur applicatif (Gunicorn)
+
+Ces réglages sont lus par `gunicorn.conf.py` à la racine du dépôt, chargé
+automatiquement par Gunicorn quel que soit le mode de lancement (Procfile,
+Docker, systemd, `just run_gunicorn`).
+
+| Variable | Rôle | Défaut | Niveau |
+| --- | --- | --- | --- |
+| `GUNICORN_WORKERS` | Nombre de processus. À défaut, `WEB_CONCURRENCY` (défini par Scalingo) est utilisé. | `2` | ⚪ |
+| `GUNICORN_THREADS` | Nombre de threads par processus. | `4` | ⚪ |
+| `GUNICORN_TIMEOUT` | Délai (en secondes) avant qu’un processus bloqué soit redémarré. | `120` | ⚪ |
+| `GUNICORN_MAX_REQUESTS` | Nombre de requêtes traitées avant redémarrage d’un processus (limite les fuites mémoire). | `10000` | ⚪ |
+| `GUNICORN_MAX_REQUESTS_JITTER` | Aléa ajouté à `GUNICORN_MAX_REQUESTS` pour étaler les redémarrages. | `2500` | ⚪ |
+
 ## Supervision des erreurs (Sentry)
 
 | Variable | Rôle | Défaut | Niveau |
