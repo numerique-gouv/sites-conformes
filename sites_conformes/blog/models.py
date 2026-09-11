@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import BooleanField, Count, QuerySet
@@ -16,12 +15,12 @@ from unidecode import unidecode
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, MultiFieldPanel, TitleFieldPanel
 from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
-from wagtail.contrib.routable_page.models import RoutablePageMixin, path
+from wagtail.contrib.routable_page.models import path
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 
 from sites_conformes.core.abstract import SitesFacilesBasePage
-from sites_conformes.core.models import Category, CategorySerializer, Tag
+from sites_conformes.core.models import AbstractIndexPage, Category, CategorySerializer
 
 User = get_user_model()
 
@@ -107,26 +106,84 @@ class TagEntryPage(TaggedItemBase):
     content_object = ParentalKey("BlogEntryPage", related_name="entry_tags")  # type: ignore
 
 
-class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
-    posts_per_page = models.PositiveSmallIntegerField(
-        default=10,
-        validators=[MaxValueValidator(100), MinValueValidator(1)],
-        verbose_name=_("Posts per page"),
+class AbstractAuthoredIndexPage(AbstractIndexPage):
+    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
+    filter_by_author = models.BooleanField(_("Filter by author"), default=False)
+    filter_by_source = models.BooleanField(
+        _("Filter by source"), help_text=_("The source is the organization of the post author"), default=False
     )
 
+    in_category_title = _("Pages in category %(category)s")
+    written_by_title = _("Pages written by")
+    categories_route = None
+
+    class Meta:
+        abstract = True
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        context.update(categories=self.get_categories(), authors=self.get_authors(), sources=self.get_sources())
+        return context
+
+    def apply_filters(self, request: HttpRequest, posts: QuerySet) -> tuple[QuerySet, dict]:
+        posts, context = super().apply_filters(request, posts)
+        context.update(current_category=None, current_source=None, current_author=None)
+
+        slug = request.GET.get("category")
+        if slug:
+            category = get_object_or_404(Category, slug=slug, locale=self.locale)
+            posts = posts.filter(categories=category)
+            context.update(
+                current_category=category,
+                extra_title=self.in_category_title % {"category": category.name},
+                extra_breadcrumbs=self.filter_breadcrumbs(category.name, self.categories_route, _("Categories")),
+            )
+
+        slug = request.GET.get("source")
+        if slug:
+            source = get_object_or_404(Organization, slug=slug)
+            posts = posts.filter(authors__organization=source)
+            title = f"{self.written_by_title} {source.name}"
+            context.update(current_source=source, extra_title=title, extra_breadcrumbs=self.filter_breadcrumbs(title))
+
+        author_id = request.GET.get("author")
+        if author_id:
+            author = get_object_or_404(Person, id=author_id)
+            posts = posts.filter(authors=author)
+            title = f"{self.written_by_title} {author.name}"
+            context.update(current_author=author, extra_title=title, extra_breadcrumbs=self.filter_breadcrumbs(title))
+
+        return posts, context
+
+    def get_authors(self) -> QuerySet:
+        ids = self.posts.specific().values_list("authors", flat=True)
+        return Person.objects.filter(id__in=ids).order_by("name")
+
+    def get_categories(self) -> QuerySet:
+        ids = self.posts.specific().values_list("categories", flat=True)
+        return Category.objects.filter(id__in=ids).order_by("name")
+
+    def get_sources(self) -> QuerySet:
+        ids = self.posts.specific().values_list("authors__organization", flat=True)
+        return Organization.objects.filter(id__in=ids).order_by("name")
+
+    @property
+    def show_filters(self) -> bool | BooleanField:
+        return self.filter_by_category or self.filter_by_tag or self.filter_by_author or self.filter_by_source
+
+
+class BlogIndexPage(AbstractAuthoredIndexPage):
     feed_posts_limit = models.PositiveSmallIntegerField(
         default=20,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
         verbose_name=_("Post limit in the RSS/Atom feeds"),
     )
 
-    # Filters
-    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
-    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
-    filter_by_author = models.BooleanField(_("Filter by author"), default=False)
-    filter_by_source = models.BooleanField(
-        _("Filter by source"), help_text=_("The source is the organization of the post author"), default=False
-    )
+    tagged_title = _("Posts tagged with %(tag)s")
+    in_category_title = _("Posts in category %(category)s")
+    written_by_title = _("Posts written by")
+    tags_route = "tags_list"
+    categories_route = "categories_list"
 
     settings_panels = SitesFacilesBasePage.settings_panels + [
         FieldPanel("posts_per_page"),
@@ -149,123 +206,17 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 
     @property
     def posts(self):
-        # Get list of blog pages that are descendants of this page
         posts = BlogEntryPage.objects.descendant_of(self).live()
-        posts = posts.order_by("-date").select_related("owner").prefetch_related("tags", "categories", "date__year")
-        return posts
+        return posts.order_by("-date").select_related("owner").prefetch_related("tags", "categories", "date__year")
 
-    def get_context(self, request, *args, **kwargs):
-        context = super(BlogIndexPage, self).get_context(request, *args, **kwargs)
-        posts = self.posts
-
-        extra_breadcrumbs = None
-        extra_title = ""
-
-        tag = request.GET.get("tag")
-        if tag:
-            tag = get_object_or_404(Tag, slug=tag)
-            posts = posts.filter(tags=tag)
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                    {
-                        "url": f"{self.get_url()}{self.reverse_subpage('tags_list')}",
-                        "title": _("Tags"),
-                    },
-                ],
-                "current": tag,
-            }
-            extra_title = _("Posts tagged with %(tag)s") % {"tag": tag}
-
-        category = request.GET.get("category")
-        if category:
-            category = get_object_or_404(Category, slug=category, locale=self.locale)
-            posts = posts.filter(categories=category)
-
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                    {
-                        "url": f"{self.get_url()}{self.reverse_subpage('categories_list')}",
-                        "title": _("Categories"),
-                    },
-                ],
-                "current": category.name,
-            }
-            extra_title = _("Posts in category %(category)s") % {"category": category.name}
-
-        source = request.GET.get("source")
-        if source:
-            source = get_object_or_404(Organization, slug=source)
-            posts = posts.filter(authors__organization=source)
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": _("Posts written by") + f" {source.name}",
-            }
-            extra_title = _("Posts written by") + f" {source.name}"
-
-        author = request.GET.get("author")
-        if author:
-            author = get_object_or_404(Person, id=author)
-
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": _("Posts written by") + f" {author.name}",
-            }
-            posts = posts.filter(authors=author)
-            extra_title = _("Posts written by") + f" {author.name}"
-
+    def apply_filters(self, request: HttpRequest, posts: QuerySet) -> tuple[QuerySet, dict]:
+        posts, context = super().apply_filters(request, posts)
         year = request.GET.get("year")
         if year:
             posts = posts.filter(date__year=year)
-            extra_title = _("Posts published in %(year)s") % {"year": year}
-
-        # Pagination
-        page_number = request.GET.get("page")
-        page_size = self.posts_per_page
-
-        paginator = Paginator(posts, page_size)  # Show <page_size> posts per page
-        posts = paginator.get_page(page_number)
-
-        context["posts"] = posts
-        context["current_category"] = category
-        context["current_tag"] = tag
-        context["current_source"] = source
-        context["current_author"] = author
+            context["extra_title"] = _("Posts published in %(year)s") % {"year": year}
         context["year"] = year
-        context["paginator"] = paginator
-        context["extra_title"] = extra_title
-
-        # Filters
-        context["categories"] = self.get_categories()
-        context["authors"] = self.get_authors()
-        context["sources"] = self.get_sources()
-        context["tags"] = self.get_tags()
-
-        if extra_breadcrumbs:
-            context["extra_breadcrumbs"] = extra_breadcrumbs
-
-        return context
-
-    def get_authors(self) -> QuerySet:
-        ids = self.posts.specific().values_list("authors", flat=True)
-        return Person.objects.filter(id__in=ids).order_by("name")
-
-    def get_categories(self) -> QuerySet:
-        ids = self.posts.specific().values_list("categories", flat=True)
-        return Category.objects.filter(id__in=ids).order_by("name")
-
-    def get_sources(self) -> QuerySet:
-        ids = self.posts.specific().values_list("authors__organization", flat=True)
-        return Organization.objects.filter(id__in=ids).order_by("name")
-
-    def get_tags(self) -> QuerySet:
-        ids = self.posts.specific().values_list("tags", flat=True)
-        return Tag.objects.filter(id__in=ids).order_by("name")
+        return posts, context
 
     def list_categories(self) -> list:
         posts = self.posts.specific()
@@ -287,10 +238,6 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             .filter(tag_count__gte=min_count)
             .order_by("-tag_count")
         )
-
-    @property
-    def show_filters(self) -> bool | BooleanField:
-        return self.filter_by_category or self.filter_by_tag or self.filter_by_author or self.filter_by_source
 
     def feed_posts(self, feed, request):
         """

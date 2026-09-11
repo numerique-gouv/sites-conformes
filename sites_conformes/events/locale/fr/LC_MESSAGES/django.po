@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 12:02+0200\n"
+"POT-Creation-Date: 2026-09-11 12:04+0200\n"
 "PO-Revision-Date: 2026-03-26 13:59+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,31 +25,6 @@ msgstr "Date de début"
 msgid "End date"
 msgstr "Date de fin"
 
-msgid "Events per page"
-msgstr "Événements par page"
-
-msgid "Filter by category"
-msgstr "Filtrer par catégorie"
-
-msgid "Filter by tag"
-msgstr "Filtrer par étiquette"
-
-msgid "Filter by author"
-msgstr "Filtrer par auteur"
-
-msgid "Filter by source"
-msgstr "Filtrer par source"
-
-msgid "The source is the organization of the event author"
-msgstr ""
-"La source est l’organisation à laquelle appartient l’auteur de l’événement"
-
-msgid "Show filters"
-msgstr "Afficher les filtres"
-
-msgid "Event calendar index"
-msgstr "Index de l’agenda"
-
 #, python-format
 msgid "Events tagged with %(tag)s"
 msgstr "Événements avec l’étiquette %(tag)s"
@@ -60,6 +35,12 @@ msgstr "Événements dans la catégorie %(category)s"
 
 msgid "Events created by"
 msgstr "Événements créés par"
+
+msgid "Show filters"
+msgstr "Afficher les filtres"
+
+msgid "Event calendar index"
+msgstr "Index de l’agenda"
 
 msgid "Past events"
 msgstr "Événements terminés"
@@ -165,11 +146,23 @@ msgstr "Date de fin :"
 msgid "Filter by date"
 msgstr "Filtrer par date"
 
+msgid "Filter by category"
+msgstr "Filtrer par catégorie"
+
 msgid "selected"
 msgstr "étiquette sélectionnée"
 
 msgid "unselected"
 msgstr "étiquette non-sélectionnée"
+
+msgid "Filter by tag"
+msgstr "Filtrer par étiquette"
+
+msgid "Filter by author"
+msgstr "Filtrer par auteur"
+
+msgid "Filter by source"
+msgstr "Filtrer par source"
 
 msgid "Export"
 msgstr "Export"
@@ -179,6 +172,13 @@ msgstr "Archives"
 
 msgid "See archives"
 msgstr "Voir les archives"
+
+#~ msgid "Events per page"
+#~ msgstr "Événements par page"
+
+#~ msgid "The source is the organization of the event author"
+#~ msgstr ""
+#~ "La source est l’organisation à laquelle appartient l’auteur de l’événement"
 
 #~ msgid "From…"
 #~ msgstr "Du…"

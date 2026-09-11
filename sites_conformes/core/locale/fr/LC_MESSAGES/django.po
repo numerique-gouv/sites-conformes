@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 11:49+0200\n"
+"POT-Creation-Date: 2026-09-11 14:11+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1043,6 +1043,10 @@ msgstr "Page de contenu"
 msgid "Entries per page"
 msgstr "Entrées par page"
 
+#, python-format
+msgid "Pages tagged with %(tag)s"
+msgstr "Pages avec l’étiquette %(tag)s"
+
 msgid "Single filter selection"
 msgstr "Autorise la sélection d’un seul filtre à la fois"
 
@@ -1066,10 +1070,6 @@ msgstr "Configuration des filtres"
 
 msgid "Catalog index page"
 msgstr "Index de catalogue"
-
-#, python-format
-msgid "Pages tagged with %(tag)s"
-msgstr "Pages avec l’étiquette %(tag)s"
 
 #, python-format
 msgid "Pages tagged with all of: %(tags)s"
