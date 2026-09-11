@@ -676,7 +676,7 @@ class BlogRecentEntriesBlockTestCase(RecentEntriesBlockTestMixin, WagtailPageTes
             instance=BlogEntryPage(
                 title="Article",
                 slug="article",
-                blog_categories=[self.category],
+                categories=[self.category],
             ),
         )
 
@@ -696,7 +696,7 @@ class EventsRecentEntriesBlockTestCase(RecentEntriesBlockTestMixin, WagtailPageT
             instance=EventEntryPage(
                 title="Formation",
                 slug="formation",
-                event_categories=[self.category],
+                categories=[self.category],
             ),
         )
 

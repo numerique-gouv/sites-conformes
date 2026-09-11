@@ -83,10 +83,10 @@
                <p class="fr-card__desc fr-icon-calendar-event-fill">
                 {% event_date_range post.event_date_start post.event_date_end %}
               </p>
-              {% if post.event_categories.all %}
+              {% if post.categories.all %}
                 <div class="fr-card__start">
                   <ul class="fr-tags-group">
-                    {% for cat in post.event_categories.all %}
+                    {% for cat in post.categories.all %}
                       <li>
                         <p class="fr-tag">{{ cat.name }}</p>
                       </li>

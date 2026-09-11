@@ -151,9 +151,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     def posts(self):
         # Get list of blog pages that are descendants of this page
         posts = BlogEntryPage.objects.descendant_of(self).live()
-        posts = (
-            posts.order_by("-date").select_related("owner").prefetch_related("tags", "blog_categories", "date__year")
-        )
+        posts = posts.order_by("-date").select_related("owner").prefetch_related("tags", "categories", "date__year")
         return posts
 
     def get_context(self, request, *args, **kwargs):
@@ -182,7 +180,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         category = request.GET.get("category")
         if category:
             category = get_object_or_404(Category, slug=category, locale=self.locale)
-            posts = posts.filter(blog_categories=category)
+            posts = posts.filter(categories=category)
 
             extra_breadcrumbs = {
                 "links": [
@@ -258,7 +256,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return Person.objects.filter(id__in=ids).order_by("name")
 
     def get_categories(self) -> QuerySet:
-        ids = self.posts.specific().values_list("blog_categories", flat=True)
+        ids = self.posts.specific().values_list("categories", flat=True)
         return Category.objects.filter(id__in=ids).order_by("name")
 
     def get_sources(self) -> QuerySet:
@@ -273,8 +271,8 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         posts = self.posts.specific()
         return (
             posts.values(
-                cat_slug=F("blog_categories__slug"),
-                cat_name=F("blog_categories__name"),
+                cat_slug=F("categories__slug"),
+                cat_name=F("categories__name"),
             )
             .annotate(cat_count=Count("cat_slug"))
             .filter(cat_count__gte=1)
@@ -303,7 +301,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         category = request.GET.get("category")
         if category:
             category = get_object_or_404(Category, slug=category, locale=self.locale)
-            posts = posts.filter(blog_categories=category)
+            posts = posts.filter(categories=category)
 
         limit = int(request.GET.get("limit", self.feed_posts_limit))
         posts = posts[:limit]
@@ -420,7 +418,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 
 class BlogEntryPage(SitesFacilesBasePage):
     tags = ClusterTaggableManager(through="TagEntryPage", blank=True)
-    blog_categories = ParentalManyToManyField(
+    categories = ParentalManyToManyField(
         "sites_conformes_core.Category",
         through="CategoryEntryPage",
         blank=True,
@@ -452,7 +450,7 @@ class BlogEntryPage(SitesFacilesBasePage):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("blog_categories"),
+                FieldPanel("categories"),
                 FieldPanel("tags"),
             ],
             heading=_("Tags and Categories"),
@@ -461,7 +459,7 @@ class BlogEntryPage(SitesFacilesBasePage):
 
     api_fields = SitesFacilesBasePage.api_fields + [
         APIField("tags"),
-        APIField("blog_categories", serializer=CategorySerializer(many=True)),
+        APIField("blog_categories", serializer=CategorySerializer(many=True, source="categories")),
         APIField("authors", serializer=PersonSerializer(many=True)),
         APIField("go_live_at"),
         APIField("expire_at"),
