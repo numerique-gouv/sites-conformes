@@ -43,7 +43,7 @@ FILTER_SETTINGS_DEFAULTS = {
 FILTER_CASES = [
     {
         "name": "category",
-        "relation": "blog_categories",
+        "relation": "categories",
     },
     {
         "name": "tag",
@@ -102,12 +102,12 @@ class BlogIndexPageFilterTestBase(WagtailPageTestCase):
         cls.post_with_category = cls.entry_page_factory(
             parent=cls.index,
             owner=cls.admin,
-            blog_categories=[cls.category],
+            categories=[cls.category],
         )
         cls.post_with_other_category = cls.entry_page_factory(
             parent=cls.index,
             owner=cls.admin,
-            blog_categories=[cls.other_category],
+            categories=[cls.other_category],
         )
 
     def _set_filter_settings(self, **settings):
@@ -308,7 +308,7 @@ class BlogIndexPagePostsTest(BlogIndexPageFilterTestBase):
         post = self.entry_page_factory(
             parent=self.index,
             owner=self.admin,
-            blog_categories=[self.category],
+            categories=[self.category],
         )
         response = self.client.get(self.index.url)  # no filters
         soup = BeautifulSoup(response.content, "html.parser")

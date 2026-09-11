@@ -14,21 +14,13 @@ class RecentEntriesStructValue(blocks.StructValue):
     """
 
     def posts(self):
-        index_page = self.get("index_page")
-        is_blog = False
-
-        if not index_page:
-            is_blog = True
-            index_page = self.get("blog")
+        index_page = self.get("index_page") or self.get("blog")
 
         posts = index_page.posts
 
         category_filter = self.get("category_filter")
         if category_filter:
-            if is_blog:
-                posts = posts.filter(blog_categories=category_filter)
-            else:
-                posts = posts.filter(event_categories=category_filter)
+            posts = posts.filter(categories=category_filter)
 
         tag_filter = self.get("tag_filter")
         if tag_filter:
