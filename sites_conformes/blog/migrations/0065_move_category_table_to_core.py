@@ -4,6 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ("sites_conformes_blog", "0064_recent_events_block__see_all_events_link"),
+        ("sites_conformes_events", "0036_recent_events_block__see_all_events_link"),
     ]
 
     operations = [
