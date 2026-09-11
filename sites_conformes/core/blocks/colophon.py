@@ -15,15 +15,12 @@ class ContactCardBlock(blocks.StructBlock):
 
     class Meta:
         icon = "user"
-        template = ("sites_conformes_blog/blocks/contact_card.html",)
+        template = ("sites_conformes_core/blocks/contact_card.html",)
 
 
 COLOPHON_BLOCKS = [
     ("paragraph", blocks.RichTextBlock(label=_("Rich text"))),
-    (
-        "imageandtext",
-        ImageAndTextBlock(label="Bloc image et texte"),
-    ),
+    ("imageandtext", ImageAndTextBlock(label="Bloc image et texte")),
     ("quote", QuoteBlock(label="Citation")),
     ("multicolumns", MultiColumnsWithTitleBlock(label="Multi-colonnes")),
     ("contact_card", ContactCardBlock(label=_("Contact card"))),
