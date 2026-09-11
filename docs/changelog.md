@@ -7,6 +7,27 @@ pour la liste complète des versions.
 Les notes de mise à jour qui requièrent une action de l’opérateur (migration de
 schéma, gel des contributions, etc.) sont reprises ci-dessous.
 
+## Version suivante
+
+Le modèle `Category` passe de l’app `sites_conformes_blog` à `sites_conformes_core`.
+La migration renomme la table en place et conserve les données, les traductions
+et les révisions. Lancez `python manage.py update_index` après `migrate` pour
+que la recherche de l’admin retrouve les catégories.
+
+Les chemins d’import changent en conséquence :
+
+- `Category` et `CategorySerializer` s’importent depuis
+  `sites_conformes.core.models` ;
+- `sites_conformes.blog.blocks` devient `sites_conformes.core.blocks.colophon`.
+  L’ancien module reste disponible avec un `DeprecationWarning` jusqu’à la
+  prochaine version majeure ;
+- les références en texte à `"sites_conformes_blog.Category"` dans vos modèles
+  doivent devenir `"sites_conformes_core.Category"` : aucun avertissement ne
+  peut les signaler ;
+- `CategoryManager` et sa méthode `with_uses`, inutilisée, sont supprimés ;
+- le template `sites_conformes_blog/blocks/contact_card.html` devient
+  `sites_conformes_core/blocks/contact_card.html` : déplacez vos surcharges.
+
 ## v4.0.0 - Packagification
 
 Cette version transforme `sites-conformes` en package Python distribué sur
