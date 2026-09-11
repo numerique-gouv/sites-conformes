@@ -65,7 +65,7 @@ class TagContentPage(TaggedItemBase):
 
 
 class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
-    entries_per_page = models.PositiveSmallIntegerField(
+    posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
         verbose_name=_("Entries per page"),
@@ -101,7 +101,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     )
 
     settings_panels = SitesFacilesBasePage.settings_panels + [
-        FieldPanel("entries_per_page"),
+        FieldPanel("posts_per_page"),
         MultiFieldPanel(
             [
                 FieldPanel("filter_by_tag"),
@@ -118,19 +118,19 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         verbose_name = _("Catalog index page")
 
     @property
-    def entries(self):
+    def posts(self):
         # Get a list of live content pages that are children of this page
         return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
 
-        filtered_data = self._get_filtered_entries_and_context(request, self.entries)
+        filtered_data = self._get_filtered_entries_and_context(request, self.posts)
         entries = filtered_data["entries"]
         extra_breadcrumbs = filtered_data["extra_breadcrumbs"]
 
         # Pagination
-        paginator = Paginator(entries, self.entries_per_page)
+        paginator = Paginator(entries, self.posts_per_page)
         page_number = request.GET.get("page")
         paginated_entries = paginator.get_page(page_number)
 
@@ -258,7 +258,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return breadcrumbs
 
     def get_tags(self) -> models.QuerySet:
-        ids = self.entries.values_list("tags", flat=True)
+        ids = self.posts.values_list("tags", flat=True)
         return Tag.objects.tags_with_usecount(1).filter(id__in=ids).order_by("name")
 
     @property
