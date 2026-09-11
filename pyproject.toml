@@ -49,6 +49,7 @@ dependencies = [
     "django-otp>=1.7.0",
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
+    "swapper>=1.4,<2",
 ]
 
 [dependency-groups]
@@ -80,6 +81,8 @@ version = { attr = "sites_conformes._version.__version__" }
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["sites_conformes*"]
+# Test-only app exercising SF_CONTENTPAGE_MODEL, not shipped to consumers
+exclude = ["sites_conformes.testapp*"]
 
 [tool.setuptools.package-data]
 sites_conformes = [
