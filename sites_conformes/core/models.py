@@ -8,7 +8,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from dsfr.constants import NOTICE_TYPE_CHOICES
-from modelcluster.fields import ParentalKey
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
 from taggit.models import TaggedItemBase
@@ -28,11 +28,7 @@ from wagtail.fields import RichTextField
 from wagtail.images import get_image_model_string
 from wagtail.models import Orderable
 
-from sites_conformes.core.abstract import (
-    AbstractIndexPage,
-    SitesFacilesBasePage,
-    Tag,
-)
+from sites_conformes.core.abstract import AbstractIndexPage, CategorySerializer, SitesFacilesBasePage, Tag
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
@@ -40,16 +36,19 @@ from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 class ContentPage(SitesFacilesBasePage):
     tags = ClusterTaggableManager(through="TagContentPage", blank=True)
+    categories = ParentalManyToManyField("sites_conformes_core.Category", blank=True, verbose_name=_("Categories"))
 
     class Meta:
         verbose_name = _("Content page")
 
     content_panels = SitesFacilesBasePage.content_panels + [
         FieldPanel("tags"),
+        FieldPanel("categories"),
     ]
 
     api_fields = SitesFacilesBasePage.api_fields + [
         APIField("tags"),
+        APIField("categories", serializer=CategorySerializer(many=True)),
     ]
 
 
@@ -88,6 +87,7 @@ class CatalogIndexPage(AbstractIndexPage):
         FieldPanel("posts_per_page"),
         MultiFieldPanel(
             [
+                FieldPanel("filter_by_category"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
@@ -111,10 +111,10 @@ class CatalogIndexPage(AbstractIndexPage):
         context["entries"] = context["posts"]
         return context
 
-    def apply_filters(self, request: HttpRequest, entries: models.QuerySet) -> tuple[models.QuerySet, dict]:
-        filtered_data = self._get_filtered_entries_and_context(request, entries)
-        filtered_data["filter_selection_mode"] = self.filter_selection
-        return filtered_data.pop("entries"), filtered_data
+    def apply_tag_filter(self, request: HttpRequest, entries: models.QuerySet, context: dict) -> models.QuerySet:
+        context.update(self._get_filtered_entries_and_context(request, entries))
+        context["filter_selection_mode"] = self.filter_selection
+        return context.pop("entries")
 
     def _default_filter_context(self, entries: models.QuerySet, selected_tag_slugs: list | None = None) -> dict:
         """
@@ -229,8 +229,8 @@ class CatalogIndexPage(AbstractIndexPage):
         return Tag.objects.tags_with_usecount(1).filter(id__in=ids).order_by("name")
 
     @property
-    def show_filters(self) -> bool | models.BooleanField:
-        return self.filter_by_tag and self.get_tags().count() > 0
+    def show_filters(self) -> bool:
+        return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and self.get_categories())
 
     @path("tags/", name="tags_list")
     def tags_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:

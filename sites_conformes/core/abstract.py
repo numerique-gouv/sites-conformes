@@ -324,9 +324,12 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         verbose_name=_("Entries per page"),
     )
     filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
+    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
 
     tagged_title = _("Pages tagged with %(tag)s")
+    in_category_title = _("Pages in category %(category)s")
     tags_route = None
+    categories_route = None
 
     class Meta:
         abstract = True
@@ -344,21 +347,39 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             posts=paginator.get_page(request.GET.get("page")),
             paginator=paginator,
             tags=self.get_tags(),
+            categories=self.get_categories(),
         )
         return context
 
     def apply_filters(self, request: HttpRequest, posts: models.QuerySet) -> tuple[models.QuerySet, dict]:
-        context = {"current_tag": None, "extra_title": "", "extra_breadcrumbs": None}
-        slug = request.GET.get("tag")
-        if slug:
-            tag = get_object_or_404(Tag, slug=slug)
-            posts = posts.filter(tags=tag)
-            context.update(
-                current_tag=tag,
-                extra_title=self.tagged_title % {"tag": tag},
-                extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
-            )
+        context = {"current_tag": None, "current_category": None, "extra_title": "", "extra_breadcrumbs": None}
+        posts = self.apply_tag_filter(request, posts, context)
+        posts = self.apply_category_filter(request, posts, context)
         return posts, context
+
+    def apply_tag_filter(self, request: HttpRequest, posts: models.QuerySet, context: dict) -> models.QuerySet:
+        slug = request.GET.get("tag")
+        if not slug:
+            return posts
+        tag = get_object_or_404(Tag, slug=slug)
+        context.update(
+            current_tag=tag,
+            extra_title=self.tagged_title % {"tag": tag},
+            extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
+        )
+        return posts.filter(tags=tag)
+
+    def apply_category_filter(self, request: HttpRequest, posts: models.QuerySet, context: dict) -> models.QuerySet:
+        slug = request.GET.get("category")
+        if not slug:
+            return posts
+        category = get_object_or_404(Category, slug=slug, locale=self.locale)
+        context.update(
+            current_category=category,
+            extra_title=self.in_category_title % {"category": category.name},
+            extra_breadcrumbs=self.filter_breadcrumbs(category.name, self.categories_route, _("Categories")),
+        )
+        return posts.filter(categories=category)
 
     def filter_breadcrumbs(self, current, route_name: str | None = None, route_title: str = "") -> dict:
         links = [{"url": self.get_url(), "title": self.title}]
@@ -369,3 +390,7 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     def get_tags(self) -> models.QuerySet:
         ids = self.posts.specific().values_list("tags", flat=True)
         return Tag.objects.filter(id__in=ids).order_by("name")
+
+    def get_categories(self) -> models.QuerySet:
+        ids = self.posts.specific().values_list("categories", flat=True)
+        return Category.objects.filter(id__in=ids).order_by("name")
