@@ -13,6 +13,7 @@ maxdepth: 1
 ---
 installation
 configuration
+modele-de-page-personnalise
 recherche
 exemple-annuaire
 ```

@@ -49,6 +49,9 @@ jobs:
       - name: 🤹‍ Run the unit tests
         run: |
           just unittest
+      - name: 🔀 Run the tests with a swapped content page model
+        run: |
+          just test-swapped
       - name: 🎨 Deploy starter content
         run: |
           just init

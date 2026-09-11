@@ -10,9 +10,12 @@ import wagtail.images.blocks
 import wagtailmarkdown.blocks
 from django.db import migrations, models
 
+from sites_conformes.core import get_contentpage_model_string
+
 
 class Migration(migrations.Migration):
     dependencies = [
+        migrations.swappable_dependency(get_contentpage_model_string()),
         ("sites_conformes_core", "0016_auto_20240305_1611"),
         ("taggit", "0006_rename_taggeditem_content_type_object_id_taggit_tagg_content_8fc721_idx"),
     ]
@@ -527,7 +530,7 @@ class Migration(migrations.Migration):
                     modelcluster.fields.ParentalKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="contentpage_tags",
-                        to="sites_conformes_core.contentpage",
+                        to=get_contentpage_model_string(),
                     ),
                 ),
                 (
