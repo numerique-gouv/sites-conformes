@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -7,7 +6,6 @@ from django.db.models import BooleanField, Count, QuerySet
 from django.db.models.expressions import F
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.template.defaultfilters import slugify
 from django.utils import feedgenerator, timezone
 from django.utils.translation import gettext_lazy as _
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
@@ -19,17 +17,11 @@ from wagtail.admin.panels import FieldPanel, FieldRowPanel, MultiFieldPanel, Tit
 from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import RoutablePageMixin, path
-from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Orderable
-from wagtail.models.i18n import TranslatableMixin
-from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.blog.blocks import COLOPHON_BLOCKS
-from sites_conformes.blog.managers import CategoryManager
 from sites_conformes.core.abstract import SitesFacilesBasePage
-from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
-from sites_conformes.core.models import Tag
+from sites_conformes.core.models import Category, CategorySerializer, Tag
 
 User = get_user_model()
 
@@ -99,85 +91,6 @@ class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = ("id", "name", "role", "organization", "contact_info", "image")
-        depth = 1
-
-
-@register_snippet
-class Category(TranslatableMixin, index.Indexed, Orderable):
-    name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
-    slug = models.SlugField(unique=True, max_length=80)
-    parent = models.ForeignKey(
-        "self",
-        blank=True,
-        null=True,
-        related_name="children",
-        verbose_name=_("Parent category"),
-        on_delete=models.SET_NULL,
-    )
-    description = RichTextField(
-        max_length=500,
-        features=LIMITED_RICHTEXTFIELD_FEATURES,
-        blank=True,
-        verbose_name=_("Description"),
-        help_text=_("Displayed on the top of the category page"),
-    )  # type: ignore
-    colophon = StreamField(
-        COLOPHON_BLOCKS,
-        blank=True,
-        use_json_field=True,
-        help_text=_("Text displayed at the end of every page in the category"),
-    )
-    objects = CategoryManager()
-
-    panels = [
-        TitleFieldPanel("name"),
-        FieldPanel("slug", widget=SlugInput),
-        FieldPanel("description"),
-        FieldPanel("colophon"),
-        FieldPanel("parent"),
-    ]
-
-    api_fields = [
-        APIField("name"),
-        APIField("slug"),
-        APIField("description"),
-        APIField("colophon"),
-        APIField("parent"),
-    ]
-
-    def __str__(self):
-        return self.name
-
-    def clean(self):
-        if self.parent:
-            parent = self.parent
-            if self.parent == self:
-                raise ValidationError(_("Parent category cannot be self."))
-            if parent.parent and parent.parent == self:
-                raise ValidationError(_("Cannot have circular Parents."))
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        return super(Category, self).save(*args, **kwargs)
-
-    class Meta:
-        ordering = ["name"]
-        verbose_name = _("Category")
-        verbose_name_plural = _("Categories")
-        unique_together = [
-            ("translation_key", "locale"),
-            ("name", "locale"),
-            ("slug", "locale"),
-        ]
-
-    search_fields = [index.SearchField("name")]
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ("id", "name", "slug", "description", "colophon", "parent")
         depth = 1
 
 
@@ -508,7 +421,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 class BlogEntryPage(SitesFacilesBasePage):
     tags = ClusterTaggableManager(through="TagEntryPage", blank=True)
     blog_categories = ParentalManyToManyField(
-        "Category",
+        "sites_conformes_core.Category",
         through="CategoryEntryPage",
         blank=True,
         verbose_name=_("Categories"),

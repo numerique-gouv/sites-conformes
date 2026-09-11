@@ -5,8 +5,8 @@ import factory
 import wagtail_factories
 from django.utils.text import slugify
 
-from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category, Organization, Person
-from sites_conformes.core.models import Tag
+from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Organization, Person
+from sites_conformes.core.models import Category, Tag
 
 PARIS_TZ = zoneinfo.ZoneInfo("Europe/Paris")
 DEFAULT_POST_DATE = datetime(2024, 1, 1, 12, 0, 0, tzinfo=PARIS_TZ)
