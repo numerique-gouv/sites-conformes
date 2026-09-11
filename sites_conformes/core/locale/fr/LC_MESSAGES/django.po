@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 12:07+0200\n"
+"POT-Creation-Date: 2026-09-11 12:12+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1070,6 +1070,16 @@ msgstr "Page de contenu"
 msgid "Entries per page"
 msgstr "Entrées par page"
 
+msgid "Category groups"
+msgstr "Groupes de catégories"
+
+msgid ""
+"Parent categories to use as filter groups. Leave empty to list every "
+"category in use."
+msgstr ""
+"Catégories parentes à utiliser comme groupes de filtres. Laissez vide pour "
+"lister toutes les catégories utilisées."
+
 #, python-format
 msgid "Pages tagged with %(tag)s"
 msgstr "Pages avec l’étiquette %(tag)s"
@@ -1479,6 +1489,12 @@ msgstr "Dans cette rubrique"
 msgid "Go to page"
 msgstr "Aller à la page"
 
+msgid "selected"
+msgstr "étiquette sélectionnée"
+
+msgid "unselected"
+msgstr "étiquette non-sélectionnée"
+
 msgid "Page visibility restricted to logged in users only"
 msgstr "Visibilité de la page restreinte aux utilisateurs connectés"
 
@@ -1522,12 +1538,6 @@ msgstr "- Page %(current)s / %(total)s"
 
 msgid "Filters"
 msgstr "Filtres"
-
-msgid "selected"
-msgstr "étiquette sélectionnée"
-
-msgid "unselected"
-msgstr "étiquette non-sélectionnée"
 
 msgid "Pages"
 msgstr "Pages"

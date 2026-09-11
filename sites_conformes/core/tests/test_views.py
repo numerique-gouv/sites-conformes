@@ -412,6 +412,50 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         self.assertEqual(response.context["current_category"], category)
         self.assertContains(response, gettext("Filter by category"))
 
+    @staticmethod
+    def list_groups(response):
+        return [(heading, list(group)) for heading, group in response.context["category_groups"]]
+
+    def test_category_groups_default_to_a_single_block(self):
+        category = Category.objects.create(name="Guides", slug="guides", locale=self.catalog_index_page.locale)
+        self.entry1.categories.add(category)
+        self.entry1.save()
+
+        response = self.client.get(self.catalog_index_page.url)
+
+        self.assertEqual(self.list_groups(response), [(gettext("Filter by category"), [category])])
+        self.assertContains(response, gettext("Filter by category"))
+
+    def test_category_groups_follow_the_selected_parents(self):
+        locale = self.catalog_index_page.locale
+        theme = Category.objects.create(name="Thème", slug="theme", locale=locale)
+        region = Category.objects.create(name="Région", slug="region", locale=locale)
+        guides = Category.objects.create(name="Guides", slug="guides", parent=theme, locale=locale)
+        unused = Category.objects.create(name="Inutilisée", slug="inutilisee", parent=theme, locale=locale)
+        bretagne = Category.objects.create(name="Bretagne", slug="bretagne", parent=region, locale=locale)
+        self.entry1.categories.add(guides, bretagne)
+        self.entry1.save()
+        self.catalog_index_page.filter_categories.add(theme)
+        self.catalog_index_page.save()
+
+        response = self.client.get(self.catalog_index_page.url)
+
+        self.assertEqual(self.list_groups(response), [("Thème", [guides])])
+        self.assertContains(response, '<h3 class="fr-h6">Thème</h3>', html=True)
+        self.assertNotContains(response, unused.name)
+        self.assertNotContains(response, bretagne.name)
+        self.assertNotContains(response, gettext("Filter by category"))
+
+    def test_only_parent_categories_can_be_filter_groups(self):
+        locale = self.catalog_index_page.locale
+        theme = Category.objects.create(name="Thème", slug="theme", locale=locale)
+        Category.objects.create(name="Guides", slug="guides", parent=theme, locale=locale)
+
+        form_class = CatalogIndexPage.get_edit_handler().get_form_class()
+        form = form_class(instance=self.catalog_index_page, for_user=self.admin)
+
+        self.assertEqual(list(form.fields["filter_categories"].queryset), [theme])
+
     def test_multiple_filter_and(self):
         self.catalog_index_page.filter_selection = CatalogIndexPage.MULTIPLE_FILTERS
         self.catalog_index_page.multiple_filter_operator = CatalogIndexPage.AND_OPERATOR

@@ -31,6 +31,7 @@ class EventsIndexPage(AbstractAuthoredIndexPage):
         MultiFieldPanel(
             [
                 FieldPanel("filter_by_category"),
+                FieldPanel("filter_categories"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_by_author"),
                 FieldPanel("filter_by_source"),
