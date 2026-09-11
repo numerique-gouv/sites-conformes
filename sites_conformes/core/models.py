@@ -64,16 +64,61 @@ class TagContentPage(TaggedItemBase):
     content_object = ParentalKey("ContentPage", related_name="contentpage_tags")  # type: ignore
 
 
-class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
         verbose_name=_("Entries per page"),
     )
-
-    # Filters
     filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
 
+    tagged_title = _("Pages tagged with %(tag)s")
+    tags_route = None
+
+    class Meta:
+        abstract = True
+
+    @property
+    def posts(self) -> models.QuerySet:
+        raise NotImplementedError
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        posts, filters = self.apply_filters(request, self.posts)
+        paginator = Paginator(posts, self.posts_per_page)
+        context.update(filters)
+        context.update(
+            posts=paginator.get_page(request.GET.get("page")),
+            paginator=paginator,
+            tags=self.get_tags(),
+        )
+        return context
+
+    def apply_filters(self, request: HttpRequest, posts: models.QuerySet) -> tuple[models.QuerySet, dict]:
+        context = {"current_tag": None, "extra_title": "", "extra_breadcrumbs": None}
+        slug = request.GET.get("tag")
+        if slug:
+            tag = get_object_or_404(Tag, slug=slug)
+            posts = posts.filter(tags=tag)
+            context.update(
+                current_tag=tag,
+                extra_title=self.tagged_title % {"tag": tag},
+                extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
+            )
+        return posts, context
+
+    def filter_breadcrumbs(self, current, route_name: str | None = None, route_title: str = "") -> dict:
+        links = [{"url": self.get_url(), "title": self.title}]
+        if route_name:
+            links.append({"url": f"{self.get_url()}{self.reverse_subpage(route_name)}", "title": route_title})
+        return {"links": links, "current": current}
+
+    def get_tags(self) -> models.QuerySet:
+        ids = self.posts.specific().values_list("tags", flat=True)
+        return Tag.objects.filter(id__in=ids).order_by("name")
+
+
+class CatalogIndexPage(AbstractIndexPage):
     SINGLE_FILTER = "single"
     MULTIPLE_FILTERS = "multiple"
     FILTER_SELECTION_CHOICES = [
@@ -124,30 +169,13 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-
-        filtered_data = self._get_filtered_entries_and_context(request, self.posts)
-        entries = filtered_data["entries"]
-        extra_breadcrumbs = filtered_data["extra_breadcrumbs"]
-
-        # Pagination
-        paginator = Paginator(entries, self.posts_per_page)
-        page_number = request.GET.get("page")
-        paginated_entries = paginator.get_page(page_number)
-
-        context.update(
-            {
-                "entries": paginated_entries,
-                "paginator": paginator,
-                "tags": self.get_tags(),
-                "filter_selection_mode": self.filter_selection,
-                **filtered_data,
-            }
-        )
-
-        if extra_breadcrumbs:
-            context["extra_breadcrumbs"] = extra_breadcrumbs
-
+        context["entries"] = context["posts"]
         return context
+
+    def apply_filters(self, request: HttpRequest, entries: models.QuerySet) -> tuple[models.QuerySet, dict]:
+        filtered_data = self._get_filtered_entries_and_context(request, entries)
+        filtered_data["filter_selection_mode"] = self.filter_selection
+        return filtered_data.pop("entries"), filtered_data
 
     def _default_filter_context(self, entries: models.QuerySet, selected_tag_slugs: list | None = None) -> dict:
         """

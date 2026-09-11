@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 11:49+0200\n"
+"POT-Creation-Date: 2026-09-11 12:04+0200\n"
 "PO-Revision-Date: 2026-03-23 16:34+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -36,17 +36,8 @@ msgstr "Personne"
 msgid "Category"
 msgstr "Catégorie"
 
-msgid "Posts per page"
-msgstr "Articles par page"
-
-msgid "Post limit in the RSS/Atom feeds"
-msgstr "Nombre d’articles dans les flux RSS/Atom"
-
 msgid "Filter by category"
 msgstr "Filtrer par catégorie"
-
-msgid "Filter by tag"
-msgstr "Filtrer par étiquette"
 
 msgid "Filter by author"
 msgstr "Filtrer par auteur"
@@ -58,21 +49,22 @@ msgid "The source is the organization of the post author"
 msgstr ""
 "La source est l’organisation à laquelle appartient l’auteur de l’article"
 
-msgid "Show filters"
-msgstr "Afficher les filtres"
+#, python-format
+msgid "Pages in category %(category)s"
+msgstr "Pages dans la catégorie %(category)s"
 
-msgid "Blog index"
-msgstr "Index de blog"
+msgid "Pages written by"
+msgstr "Pages écrites par"
 
-msgid "Tags"
-msgstr "Étiquettes"
+msgid "Categories"
+msgstr "Catégories"
+
+msgid "Post limit in the RSS/Atom feeds"
+msgstr "Nombre d’articles dans les flux RSS/Atom"
 
 #, python-format
 msgid "Posts tagged with %(tag)s"
 msgstr "Articles avec l’étiquette %(tag)s"
-
-msgid "Categories"
-msgstr "Catégories"
 
 #, python-format
 msgid "Posts in category %(category)s"
@@ -81,9 +73,18 @@ msgstr "Articles dans la catégorie %(category)s"
 msgid "Posts written by"
 msgstr "Articles écrits par"
 
+msgid "Show filters"
+msgstr "Afficher les filtres"
+
+msgid "Blog index"
+msgstr "Index de blog"
+
 #, python-format
 msgid "Posts published in %(year)s"
 msgstr "Articles publiés en %(year)s"
+
+msgid "Tags"
+msgstr "Étiquettes"
 
 msgid "Post date"
 msgstr "Date de publication"
@@ -146,8 +147,14 @@ msgstr "étiquette sélectionnée"
 msgid "unselected"
 msgstr "étiquette non-sélectionnée"
 
+msgid "Filter by tag"
+msgstr "Filtrer par étiquette"
+
 msgid "Posts"
 msgstr "Articles"
+
+#~ msgid "Posts per page"
+#~ msgstr "Articles par page"
 
 #~ msgid "Rich text"
 #~ msgstr "Texte riche"
