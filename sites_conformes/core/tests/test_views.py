@@ -1,11 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.core.models import (
     CatalogIndexPage,
+    Category,
     CmsDsfrConfig,
     ContentPage,
     Tag,
@@ -397,6 +399,18 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         # (toggle_url_filter relies on "current_tag" to detect this), instead
         # of re-adding it and leaving the filter/results unchanged.
         self.assertNotContains(response, 'href="?tag=tag-1#posts-list"')
+
+    def test_category_filter(self):
+        category = Category.objects.create(name="Guides", slug="guides", locale=self.catalog_index_page.locale)
+        self.entry1.categories.add(category)
+        self.entry1.save()
+
+        response = self.client.get(self.catalog_index_page.url + "?category=guides")
+
+        self.assertContains(response, "Entrée 1")
+        self.assertNotContains(response, "Entrée 2")
+        self.assertEqual(response.context["current_category"], category)
+        self.assertContains(response, gettext("Filter by category"))
 
     def test_multiple_filter_and(self):
         self.catalog_index_page.filter_selection = CatalogIndexPage.MULTIPLE_FILTERS

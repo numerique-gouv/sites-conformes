@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from dsfr.constants import NOTICE_TYPE_CHOICES
-from modelcluster.fields import ParentalKey
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
 from rest_framework import serializers
@@ -45,18 +45,99 @@ from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
+@register_snippet
+class Category(TranslatableMixin, index.Indexed, Orderable):
+    name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
+    slug = models.SlugField(unique=True, max_length=80)
+    parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        related_name="children",
+        verbose_name=_("Parent category"),
+        on_delete=models.SET_NULL,
+    )
+    description = RichTextField(
+        max_length=500,
+        features=LIMITED_RICHTEXTFIELD_FEATURES,
+        blank=True,
+        verbose_name=_("Description"),
+        help_text=_("Displayed on the top of the category page"),
+    )  # type: ignore
+    colophon = StreamField(
+        COLOPHON_BLOCKS,
+        blank=True,
+        use_json_field=True,
+        help_text=_("Text displayed at the end of every page in the category"),
+    )
+
+    panels = [
+        TitleFieldPanel("name"),
+        FieldPanel("slug", widget=SlugInput),
+        FieldPanel("description"),
+        FieldPanel("colophon"),
+        FieldPanel("parent"),
+    ]
+
+    api_fields = [
+        APIField("name"),
+        APIField("slug"),
+        APIField("description"),
+        APIField("colophon"),
+        APIField("parent"),
+    ]
+
+    search_fields = [index.SearchField("name")]
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
+        unique_together = [
+            ("translation_key", "locale"),
+            ("name", "locale"),
+            ("slug", "locale"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if self.parent:
+            parent = self.parent
+            if self.parent == self:
+                raise ValidationError(_("Parent category cannot be self."))
+            if parent.parent and parent.parent == self:
+                raise ValidationError(_("Cannot have circular Parents."))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id", "name", "slug", "description", "colophon", "parent")
+        depth = 1
+
+
 class ContentPage(SitesFacilesBasePage):
     tags = ClusterTaggableManager(through="TagContentPage", blank=True)
+    categories = ParentalManyToManyField("sites_conformes_core.Category", blank=True, verbose_name=_("Categories"))
 
     class Meta:
         verbose_name = _("Content page")
 
     content_panels = SitesFacilesBasePage.content_panels + [
         FieldPanel("tags"),
+        FieldPanel("categories"),
     ]
 
     api_fields = SitesFacilesBasePage.api_fields + [
         APIField("tags"),
+        APIField("categories", serializer=CategorySerializer(many=True)),
     ]
 
 
@@ -71,9 +152,12 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         verbose_name=_("Entries per page"),
     )
     filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
+    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
 
     tagged_title = _("Pages tagged with %(tag)s")
+    in_category_title = _("Pages in category %(category)s")
     tags_route = None
+    categories_route = None
 
     class Meta:
         abstract = True
@@ -91,21 +175,39 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             posts=paginator.get_page(request.GET.get("page")),
             paginator=paginator,
             tags=self.get_tags(),
+            categories=self.get_categories(),
         )
         return context
 
     def apply_filters(self, request: HttpRequest, posts: models.QuerySet) -> tuple[models.QuerySet, dict]:
-        context = {"current_tag": None, "extra_title": "", "extra_breadcrumbs": None}
-        slug = request.GET.get("tag")
-        if slug:
-            tag = get_object_or_404(Tag, slug=slug)
-            posts = posts.filter(tags=tag)
-            context.update(
-                current_tag=tag,
-                extra_title=self.tagged_title % {"tag": tag},
-                extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
-            )
+        context = {"current_tag": None, "current_category": None, "extra_title": "", "extra_breadcrumbs": None}
+        posts = self.apply_tag_filter(request, posts, context)
+        posts = self.apply_category_filter(request, posts, context)
         return posts, context
+
+    def apply_tag_filter(self, request: HttpRequest, posts: models.QuerySet, context: dict) -> models.QuerySet:
+        slug = request.GET.get("tag")
+        if not slug:
+            return posts
+        tag = get_object_or_404(Tag, slug=slug)
+        context.update(
+            current_tag=tag,
+            extra_title=self.tagged_title % {"tag": tag},
+            extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
+        )
+        return posts.filter(tags=tag)
+
+    def apply_category_filter(self, request: HttpRequest, posts: models.QuerySet, context: dict) -> models.QuerySet:
+        slug = request.GET.get("category")
+        if not slug:
+            return posts
+        category = get_object_or_404(Category, slug=slug, locale=self.locale)
+        context.update(
+            current_category=category,
+            extra_title=self.in_category_title % {"category": category.name},
+            extra_breadcrumbs=self.filter_breadcrumbs(category.name, self.categories_route, _("Categories")),
+        )
+        return posts.filter(categories=category)
 
     def filter_breadcrumbs(self, current, route_name: str | None = None, route_title: str = "") -> dict:
         links = [{"url": self.get_url(), "title": self.title}]
@@ -116,6 +218,10 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     def get_tags(self) -> models.QuerySet:
         ids = self.posts.specific().values_list("tags", flat=True)
         return Tag.objects.filter(id__in=ids).order_by("name")
+
+    def get_categories(self) -> models.QuerySet:
+        ids = self.posts.specific().values_list("categories", flat=True)
+        return Category.objects.filter(id__in=ids).order_by("name")
 
 
 class CatalogIndexPage(AbstractIndexPage):
@@ -149,6 +255,7 @@ class CatalogIndexPage(AbstractIndexPage):
         FieldPanel("posts_per_page"),
         MultiFieldPanel(
             [
+                FieldPanel("filter_by_category"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
@@ -172,10 +279,10 @@ class CatalogIndexPage(AbstractIndexPage):
         context["entries"] = context["posts"]
         return context
 
-    def apply_filters(self, request: HttpRequest, entries: models.QuerySet) -> tuple[models.QuerySet, dict]:
-        filtered_data = self._get_filtered_entries_and_context(request, entries)
-        filtered_data["filter_selection_mode"] = self.filter_selection
-        return filtered_data.pop("entries"), filtered_data
+    def apply_tag_filter(self, request: HttpRequest, entries: models.QuerySet, context: dict) -> models.QuerySet:
+        context.update(self._get_filtered_entries_and_context(request, entries))
+        context["filter_selection_mode"] = self.filter_selection
+        return context.pop("entries")
 
     def _default_filter_context(self, entries: models.QuerySet, selected_tag_slugs: list | None = None) -> dict:
         """
@@ -290,8 +397,8 @@ class CatalogIndexPage(AbstractIndexPage):
         return Tag.objects.tags_with_usecount(1).filter(id__in=ids).order_by("name")
 
     @property
-    def show_filters(self) -> bool | models.BooleanField:
-        return self.filter_by_tag and self.get_tags().count() > 0
+    def show_filters(self) -> bool:
+        return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and self.get_categories())
 
     @path("tags/", name="tags_list")
     def tags_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -323,84 +430,6 @@ class CatalogIndexPage(AbstractIndexPage):
             },
             template="sites_conformes_core/tags_list_page.html",
         )
-
-
-@register_snippet
-class Category(TranslatableMixin, index.Indexed, Orderable):
-    name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
-    slug = models.SlugField(unique=True, max_length=80)
-    parent = models.ForeignKey(
-        "self",
-        blank=True,
-        null=True,
-        related_name="children",
-        verbose_name=_("Parent category"),
-        on_delete=models.SET_NULL,
-    )
-    description = RichTextField(
-        max_length=500,
-        features=LIMITED_RICHTEXTFIELD_FEATURES,
-        blank=True,
-        verbose_name=_("Description"),
-        help_text=_("Displayed on the top of the category page"),
-    )  # type: ignore
-    colophon = StreamField(
-        COLOPHON_BLOCKS,
-        blank=True,
-        use_json_field=True,
-        help_text=_("Text displayed at the end of every page in the category"),
-    )
-
-    panels = [
-        TitleFieldPanel("name"),
-        FieldPanel("slug", widget=SlugInput),
-        FieldPanel("description"),
-        FieldPanel("colophon"),
-        FieldPanel("parent"),
-    ]
-
-    api_fields = [
-        APIField("name"),
-        APIField("slug"),
-        APIField("description"),
-        APIField("colophon"),
-        APIField("parent"),
-    ]
-
-    search_fields = [index.SearchField("name")]
-
-    class Meta:
-        ordering = ["name"]
-        verbose_name = _("Category")
-        verbose_name_plural = _("Categories")
-        unique_together = [
-            ("translation_key", "locale"),
-            ("name", "locale"),
-            ("slug", "locale"),
-        ]
-
-    def __str__(self):
-        return self.name
-
-    def clean(self):
-        if self.parent:
-            parent = self.parent
-            if self.parent == self:
-                raise ValidationError(_("Parent category cannot be self."))
-            if parent.parent and parent.parent == self:
-                raise ValidationError(_("Cannot have circular Parents."))
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ("id", "name", "slug", "description", "colophon", "parent")
-        depth = 1
 
 
 @register_snippet

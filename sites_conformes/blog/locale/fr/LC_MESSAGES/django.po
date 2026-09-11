@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 12:04+0200\n"
+"POT-Creation-Date: 2026-09-11 12:07+0200\n"
 "PO-Revision-Date: 2026-03-23 16:34+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -36,9 +36,6 @@ msgstr "Personne"
 msgid "Category"
 msgstr "Catégorie"
 
-msgid "Filter by category"
-msgstr "Filtrer par catégorie"
-
 msgid "Filter by author"
 msgstr "Filtrer par auteur"
 
@@ -49,15 +46,8 @@ msgid "The source is the organization of the post author"
 msgstr ""
 "La source est l’organisation à laquelle appartient l’auteur de l’article"
 
-#, python-format
-msgid "Pages in category %(category)s"
-msgstr "Pages dans la catégorie %(category)s"
-
 msgid "Pages written by"
 msgstr "Pages écrites par"
-
-msgid "Categories"
-msgstr "Catégories"
 
 msgid "Post limit in the RSS/Atom feeds"
 msgstr "Nombre d’articles dans les flux RSS/Atom"
@@ -82,6 +72,9 @@ msgstr "Index de blog"
 #, python-format
 msgid "Posts published in %(year)s"
 msgstr "Articles publiés en %(year)s"
+
+msgid "Categories"
+msgstr "Catégories"
 
 msgid "Tags"
 msgstr "Étiquettes"
@@ -141,6 +134,9 @@ msgstr "- Page %(current)s / %(total)s"
 msgid "Filters"
 msgstr "Filtres"
 
+msgid "Filter by category"
+msgstr "Filtrer par catégorie"
+
 msgid "selected"
 msgstr "étiquette sélectionnée"
 
@@ -152,6 +148,10 @@ msgstr "Filtrer par étiquette"
 
 msgid "Posts"
 msgstr "Articles"
+
+#, python-format
+#~ msgid "Pages in category %(category)s"
+#~ msgstr "Pages dans la catégorie %(category)s"
 
 #~ msgid "Posts per page"
 #~ msgstr "Articles par page"

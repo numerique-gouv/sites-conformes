@@ -40,6 +40,7 @@ class ExportPage:
         self.content = copy.deepcopy(self.source_content)
         self.content["body"] = remove_block_ids(self.source_body)
         self.content.pop("tags", None)
+        self.content.pop("categories", None)
         self.content.pop("header_image_render", None)
         self.content.pop("header_image_thumbnail", None)
         self.clear_meta_keys()
