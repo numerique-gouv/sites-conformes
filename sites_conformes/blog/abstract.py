@@ -9,39 +9,24 @@ from sites_conformes.core.abstract import AbstractIndexPage
 
 
 class AbstractAuthoredIndexPage(AbstractIndexPage):
-    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
     filter_by_author = models.BooleanField(_("Filter by author"), default=False)
     filter_by_source = models.BooleanField(
         _("Filter by source"), help_text=_("The source is the organization of the post author"), default=False
     )
 
-    in_category_title = _("Pages in category %(category)s")
     written_by_title = _("Pages written by")
-    categories_route = None
 
     class Meta:
         abstract = True
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        context.update(categories=self.get_categories(), authors=self.get_authors(), sources=self.get_sources())
+        context.update(authors=self.get_authors(), sources=self.get_sources())
         return context
 
     def apply_filters(self, request: HttpRequest, posts: QuerySet) -> tuple[QuerySet, dict]:
         posts, context = super().apply_filters(request, posts)
-        context.update(current_category=None, current_source=None, current_author=None)
-
-        slug = request.GET.get("category")
-        if slug:
-            category = get_object_or_404(
-                apps.get_model("sites_conformes_core", "Category"), slug=slug, locale=self.locale
-            )
-            posts = posts.filter(categories=category)
-            context.update(
-                current_category=category,
-                extra_title=self.in_category_title % {"category": category.name},
-                extra_breadcrumbs=self.filter_breadcrumbs(category.name, self.categories_route, _("Categories")),
-            )
+        context.update(current_source=None, current_author=None)
 
         slug = request.GET.get("source")
         if slug:
@@ -62,10 +47,6 @@ class AbstractAuthoredIndexPage(AbstractIndexPage):
     def get_authors(self) -> QuerySet:
         ids = self.posts.specific().values_list("authors", flat=True)
         return apps.get_model("sites_conformes_blog", "Person").objects.filter(id__in=ids).order_by("name")
-
-    def get_categories(self) -> QuerySet:
-        ids = self.posts.specific().values_list("categories", flat=True)
-        return apps.get_model("sites_conformes_core", "Category").objects.filter(id__in=ids).order_by("name")
 
     def get_sources(self) -> QuerySet:
         ids = self.posts.specific().values_list("authors__organization", flat=True)
