@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-29 16:35+0200\n"
-"PO-Revision-Date: 2026-07-16 10:26+0200\n"
+"POT-Creation-Date: 2026-09-14 16:53+0200\n"
+"PO-Revision-Date: 2026-09-14 16:57+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -251,11 +251,30 @@ msgstr "Le lien est affiché en bas du bloc de texte, avec une flèche"
 msgid "Alternative text (textual description of the image)"
 msgstr "Alternative textuelle (description textuelle de l’image)"
 
-msgid "Witdh"
+msgid "Width"
 msgstr "Largeur"
+
+msgid ""
+"Display width of the image within the column. \"Actual size\" shows the "
+"image at its exact pixel size (without enlarging it) — use it together with "
+"the \"Original proportions\" ratio."
+msgstr ""
+"Largeur d'affichage de l'image dans la colonne. « Taille réelle » affiche "
+"l'image à sa taille en pixels exacte (sans l'agrandir), à utiliser avec le "
+"ratio « Proportions d'origine »."
 
 msgid "Image ratio"
 msgstr "Ratio de l’image"
+
+msgid "Original proportions"
+msgstr "Proportions d’origine"
+
+msgid ""
+"Choose \"Original proportions\" to keep the image's own ratio (never "
+"cropped); choose a ratio to crop the image to that shape."
+msgstr ""
+"Choisissez « Proportions d'origine » pour conserver le ratio de l'image "
+"(jamais rognée) ou choisissez un ratio pour recadrer l'image à cette forme."
 
 msgid "Caption"
 msgstr "Légende"
@@ -684,11 +703,36 @@ msgid "Add a mask to lighten or darken the image"
 msgstr ""
 "Ajouter un masque sombre ou plus clair pour améliorer la lisibilité du texte"
 
+msgid "Banner format"
+msgstr "Format de l’entête"
+
+msgid "Standard (fixed height)"
+msgstr "Standard (hauteur fixe)"
+
+msgid "Aspect ratio of the banner. Standard keeps a fixed height."
+msgstr "Ratio du bandeau. « Standard » conserve une hauteur fixe."
+
 msgid "Text content"
 msgstr "Contenu textuel"
 
 msgid "Hero image"
 msgstr "Image d’en-tête"
+
+msgid "Image format"
+msgstr "Format de l’image"
+
+msgid ""
+"Shape in which the image is displayed. \"Original proportions\" keeps the "
+"whole image; the other formats crop it to that ratio."
+msgstr ""
+"Forme sous laquelle l'image est affichée. « Proportions d'origine » conserve "
+"l'image entière, les autres formats la recadrent à ce ratio."
+
+msgid "Image size"
+msgstr "Taille de l’image"
+
+msgid "Size of the image within its column."
+msgstr "Taille de l’image dans le colonnade"
 
 msgid "Layout"
 msgstr "Mise en page"
@@ -849,6 +893,9 @@ msgstr ""
 "bannière de consentement si possible (par exemple : https://www.youtube-"
 "nocookie.com/embed/gLzXOViPX-0) Pour Youtube, cliquez sur « Intégrer la "
 "vidéo » puis cochez « Activer le mode de confidentialité avancé »."
+
+msgid "Witdh"
+msgstr "Largeur"
 
 msgid "Video ratio"
 msgstr "Ratio de la vidéo"
@@ -1027,6 +1074,18 @@ msgstr "Icône du côté droit"
 
 msgid "Icon on the left side"
 msgstr "Icône du côté gauche"
+
+msgid "Actual size"
+msgstr ""
+
+msgid "Square (1:1)"
+msgstr ""
+
+msgid "Portrait (3:4)"
+msgstr ""
+
+msgid "Panoramic (32:9)"
+msgstr ""
 
 msgid "Small (80px)"
 msgstr "Petit (80px)"
@@ -1242,13 +1301,17 @@ msgid "Mourning"
 msgstr "Mise en berne"
 
 msgid "Allowed iframe origins"
-msgstr ""
+msgstr "Origines d’iframe autorisées"
 
 msgid ""
 "One domain per line, without scheme or path (e.g. 'example.com'). Pages can "
 "then be embedded in an iframe from these HTTPS origins. The CMS admin can "
 "never be embedded from another origin."
 msgstr ""
+"Un domaine par ligne, sans schéma ni chemin (par ex. « example.com »). Les "
+"pages peuvent alors être intégrées dans une iframe depuis ces origines "
+"HTTPS. L'administration du CMS ne peut jamais être intégrée depuis une autre "
+"origine."
 
 msgid "Newsletter description"
 msgstr "Description de la lettre d’information"
@@ -1580,6 +1643,8 @@ msgid ""
 "'%(domain)s' is not a valid domain. Enter one bare domain per line, without "
 "scheme, path or wildcard (e.g. 'example.com')."
 msgstr ""
+"« %(domain)s » n'est pas un domaine valide. Saisissez un seul domaine nu par "
+"ligne, sans schéma, chemin ni caractère générique (par ex. « example.com »)."
 
 msgid "List of all the tags."
 msgstr "Liste de toutes les étiquettes."

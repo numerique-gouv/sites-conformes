@@ -11,6 +11,7 @@ from wagtail.blocks.struct_block import StructBlockAdapter, StructBlockValidatio
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
     ALIGN_VERTICAL_CHOICES,
+    IMAGE_FORMAT_CHOICES,
     MEDIA_WIDTH_CHOICES,
     TEMPLATE_EXAMPLE_BUTTON_LIST,
 )
@@ -99,6 +100,17 @@ class HeroImageBlockWithMask(HeroImageBlock):
         default="",
         help_text=_("Add a mask to lighten or darken the image"),
     )
+    background_format = blocks.ChoiceBlock(
+        label=_("Banner format"),
+        choices=[
+            ("", _("Standard (fixed height)")),
+            ("32x9", "32:9"),
+            ("16x9", "16:9"),
+        ],
+        required=False,
+        default="",
+        help_text=_("Aspect ratio of the banner. Standard keeps a fixed height."),
+    )
 
     class Meta:
         value_class = HeroImageStructValue
@@ -114,11 +126,42 @@ class HeroImageAndTextBlock(blocks.StructBlock):
             If you use icons, use them on all buttons and align them on the same side."""),
     )
     image = ImageBlockWithDefault(label=_("Hero image"), default_image_title="Illustration Sites Faciles Homme Nuages")
+    image_format = blocks.ChoiceBlock(
+        label=_("Image format"),
+        choices=IMAGE_FORMAT_CHOICES,
+        required=False,
+        default="fr-responsive-img--1x1",
+        help_text=_(
+            "Shape in which the image is displayed. "
+            '"Original proportions" keeps the whole image; the other formats crop it to that ratio.'
+        ),
+    )
+    image_size = blocks.ChoiceBlock(
+        label=_("Image size"),
+        choices=MEDIA_WIDTH_CHOICES,
+        required=False,
+        default="",
+        help_text=_("Size of the image within its column."),
+    )
     layout = LayoutBlock(label=_("Layout"))
 
     class Meta:
         icon = "minus"
         template = "sites_conformes_core/heros/hero_image_text.html"
+        form_classname = "struct-block hero-image-text-block"
+
+
+class HeroImageAndTextBlockAdapter(StructBlockAdapter):
+    """Lay out the image format/size fields side by side in the admin form."""
+
+    @cached_property
+    def media(self):
+        return forms.Media(
+            css={"all": ("css/admin-block/hero-image-text-block-admin.css",)},
+        )
+
+
+register(HeroImageAndTextBlockAdapter(), HeroImageAndTextBlock)
 
 
 class HeroWideImageAndTextBlock(blocks.StructBlock):
@@ -159,6 +202,7 @@ class HeroBackgroundImageBlock(blocks.StructBlock):
     image = HeroImageBlockWithMask(
         label=_("Hero image"),
     )
+
     background_color = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
