@@ -138,6 +138,11 @@ MEDIA_WIDTH_CHOICES = [
     ("fr-content-media--lg", _("Large")),
 ]
 
+# Width choices for the centered image block: the standard sizes plus a neutral
+# "Actual size" option that displays the image at its exact pixel size (used with
+# the "Original proportions" format).
+CENTERED_IMAGE_WIDTH_CHOICES = MEDIA_WIDTH_CHOICES + [("natural", _("Actual size"))]
+
 # Image display format. Values are DSFR CSS classes that constrain the image to a
 # ratio while cropping it cleanly (object-fit: cover). An empty value keeps the
 # image's original proportions (no cropping).

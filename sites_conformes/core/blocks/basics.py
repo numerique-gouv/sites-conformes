@@ -1,7 +1,11 @@
+from django import forms
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES_ILLUSTRATION, IMAGE_RATIOS
 from wagtail import blocks
+from wagtail.admin.telepath import register
 from wagtail.blocks import StructValue
+from wagtail.blocks.struct_block import StructBlockAdapter
 from wagtail.images import get_image_model
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
@@ -20,10 +24,10 @@ from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES,
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
     ALIGN_VERTICAL_CHOICES,
+    CENTERED_IMAGE_WIDTH_CHOICES,
     HEADING_CHOICES,
     LEVEL_CHOICES,
     LIMITED_RICHTEXTFIELD_FEATURES,
-    MEDIA_WIDTH_CHOICES,
     TEXT_SIZE_CHOICES,
 )
 
@@ -209,10 +213,19 @@ class CenteredImageStructValue(StructValue):
         """
         image_ratio = self.get("image_ratio")
 
+        if image_ratio == "original":
+            if self.get("width") == "natural":
+                # Original proportions at the image's exact pixel size (width not
+                # scaled), centered and capped to the column.
+                return "cmsfr-image-natural"
+            # Keep fr-responsive-img so the image fills the chosen width and is
+            # resized by Small/Medium/Large (like the ratio modes); cmsfr-image-original
+            # cancels the 16/9 aspect-ratio DSFR forces, so the image keeps its own
+            # proportions (never cropped).
+            return "fr-responsive-img cmsfr-image-original"
         if image_ratio:
             return f"fr-responsive-img {image_ratio}"
-        else:
-            return "fr-responsive-img"
+        return "fr-responsive-img"
 
 
 class CenteredImageBlock(blocks.StructBlock):
@@ -233,29 +246,32 @@ class CenteredImageBlock(blocks.StructBlock):
                 "900 px (small), 1200 px (medium) or the full width of the screen "
                 "(large, 1920 px on a large screen).<br>"
                 "Its height depends on the “Image ratio” field: the image is cropped to this format, "
-                "around its center.<br>"
+                "around its center, unless “Original proportions” is chosen.<br>"
                 "<strong>On mobile</strong>, the image takes up the full width of the screen, with the same ratio."
             ),
         ),
     )
     width = blocks.ChoiceBlock(
-        label=_("Witdh"),
-        choices=MEDIA_WIDTH_CHOICES,
+        label=_("Width"),
+        choices=CENTERED_IMAGE_WIDTH_CHOICES,
         required=False,
         default="",
         help_text=_(
             "Allows you to adjust the width of the image on the page. "
-            "In ‘large’ mode, the image occupies the entire available width."
+            "In ‘large’ mode, the image occupies the entire available width. "
+            "“Actual size” shows the image at its exact pixel size, without enlarging it: "
+            "use it together with the “Original proportions” ratio."
         ),
     )
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
-        choices=IMAGE_RATIOS,
+        choices=[("original", _("Original proportions"))] + list(IMAGE_RATIOS),
         required=False,
         default="h3",
         help_text=_(
             "Image ratio is the ratio between width and height of the image. "
-            "By changing it, you can adjust the image display (square, horizontal or vertical)"
+            "Choose “Original proportions” to keep the image's own ratio (never cropped), "
+            "or a ratio to crop the image to that shape (square, horizontal or vertical)."
         ),
     )
     caption = blocks.CharBlock(label=_("Caption"), required=False)
@@ -265,6 +281,20 @@ class CenteredImageBlock(blocks.StructBlock):
         icon = "image"
         template = "sites_conformes_core/blocks/image.html"
         value_class = CenteredImageStructValue
+        form_classname = "struct-block centered-image-block"
+
+
+class CenteredImageBlockAdapter(StructBlockAdapter):
+    """Lay out the width / image ratio fields side by side in the admin form."""
+
+    @cached_property
+    def media(self):
+        return forms.Media(
+            css={"all": ("css/admin-block/centered-image-block-admin.css",)},
+        )
+
+
+register(CenteredImageBlockAdapter(), CenteredImageBlock)
 
 
 class QuoteBlock(blocks.StructBlock):
