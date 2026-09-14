@@ -1,0 +1,34 @@
+div.struct-block.hero-image-text-block {
+    display: grid;
+    column-gap: 2rem;
+    grid-template-areas:
+        "text_content text_content"
+        "buttons      buttons"
+        "image        image"
+        "format       size"
+        "layout       layout";
+
+    >div[data-contentpath="text_content"] {
+        grid-area: text_content;
+    }
+
+    >div[data-contentpath="buttons"] {
+        grid-area: buttons;
+    }
+
+    >div[data-contentpath="image"] {
+        grid-area: image;
+    }
+
+    >div[data-contentpath="image_format"] {
+        grid-area: format;
+    }
+
+    >div[data-contentpath="image_size"] {
+        grid-area: size;
+    }
+
+    >div[data-contentpath="layout"] {
+        grid-area: layout;
+    }
+}

@@ -10,7 +10,6 @@
        <div class="fr-col-md-6">
       {% image value.image width-1200 as header_image %}
       {% if value.image_format %}
-        {# Cropped to a ratio: DSFR content-media (size via --sm/--lg, cover crop via --Nx9) #}
         <figure class="fr-content-media {{ value.image_size }}">
           <div class="fr-content-media__img">
             <img class="fr-responsive-img {{ value.image_format }}"
