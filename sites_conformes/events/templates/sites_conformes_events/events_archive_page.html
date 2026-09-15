@@ -48,9 +48,9 @@
 
   <div class="fr-container fr-pt-4w">
     {% include "sites_conformes_core/blocks/breadcrumbs.html" %}
-    {% if page.show_title %}
+    {% if page.show_title is not None %}
       <h1>
-        {{ page.title }}
+        {{ page.show_title }}
         {% if extra_title %}: {{ extra_title }}{% endif %}
       </h1>
     {% endif %}
