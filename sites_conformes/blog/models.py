@@ -518,6 +518,10 @@ class BlogEntryPage(SitesFacilesBasePage):
         "sites_conformes_blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
     )
 
+    search_fields = SitesFacilesBasePage.search_fields + [
+        index.FilterField("date"),
+    ]
+
     parent_page_types = ["sites_conformes_blog.BlogIndexPage"]
     subpage_types = []
 
