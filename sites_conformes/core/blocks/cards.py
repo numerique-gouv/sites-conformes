@@ -2,7 +2,6 @@ from django.utils.translation import gettext_lazy as _
 from dsfr.constants import IMAGE_RATIOS
 from wagtail import blocks
 from wagtail.blocks import StructValue
-from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 
 from sites_conformes.core.blocks.badges_tags import BadgesListBlock, TagListBlock
 from sites_conformes.core.constants import (
@@ -13,6 +12,7 @@ from sites_conformes.core.constants import (
 )
 
 from .buttons_links import ButtonsHorizontalListBlock, IconPickerBlock, LinksVerticalListBlock, LinkWithoutLabelBlock
+from .medias import CustomImageBlock
 
 
 class CardstructValue(StructValue):
@@ -70,7 +70,7 @@ class CardBlock(blocks.StructBlock):
         help_text=_("Adapt to the page layout. Defaults to heading 3."),
     )
     description = blocks.RichTextBlock(label=_("Content"), features=LIMITED_RICHTEXTFIELD_FEATURES, required=False)
-    image = ImageBlock(label=_("Image"), required=False)
+    image = CustomImageBlock(label=_("Image"), required=False)
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
         choices=IMAGE_RATIOS,
@@ -137,11 +137,20 @@ class CardBlock(blocks.StructBlock):
 
 
 class HorizontalCardBlock(CardBlock):
+    image = CustomImageBlock(
+        label=_("Image"),
+        required=False,
+        help_text=_("""Recommended width according to the chosen ratio: <br>
+                    - 50/50: 599 × 336 px <br>
+                    - 1/3: 399 × 224 px <br>
+                    Adjust the width if necessary depending on the display format.
+        """),
+    )
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
         choices=HORIZONTAL_CARD_IMAGE_RATIOS,
         required=False,
-        default="h3",
+        default="fr-card--horizontal-half",
     )
     bottom_detail_text = blocks.CharBlock(
         label=_("Bottom detail: text"),
@@ -159,6 +168,16 @@ class HorizontalCardBlock(CardBlock):
 
 
 class VerticalCardBlock(CardBlock):
+    image = CustomImageBlock(
+        label=_("Image"),
+        required=False,
+        help_text=_(
+            "Recommended width: minimum 1200 px. "
+            "This width corresponds to a single-column layout (the widest)."
+            "The ideal width decreases if you use multiple columns."
+        ),
+    )
+
     class Meta:
         icon = "tablet-alt"
         template = "sites_conformes_core/blocks/card_vertical.html"
@@ -176,7 +195,7 @@ class TileBlock(blocks.StructBlock):
     description = blocks.RichTextBlock(
         label=_("Content"), features=LIMITED_RICHTEXTFIELD_FEATURES_WITHOUT_LINKS, required=False
     )
-    image = ImageChooserBlock(label=_("Image"), help_text=_("Prefer SVG files."), required=False)
+    image = CustomImageBlock(label=_("Image"), help_text=_("Prefer SVG files."), required=False)
     link = LinkWithoutLabelBlock(
         label=_("Link"),
         required=False,
