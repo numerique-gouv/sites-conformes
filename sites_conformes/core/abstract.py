@@ -163,7 +163,7 @@ class SitesFacilesBasePage(Page):
         return self.preview_image or self.header_image
 
     @property
-    def show_title(self):
+    def display_title(self):
         for block in self.hero:
             if block.block_type == "old_hero" and block.value.get("header_with_title") is False:
                 if block.value.get("header_title"):
