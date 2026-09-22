@@ -1,0 +1,6 @@
+{% extends "wagtailadmin/tables/title_cell.html" %}
+
+{% block title %}
+  {% if instance.is_child %}<span class="sf-category-tree__branch" aria-hidden="true">└</span>{% endif %}
+  {{ block.super }}
+{% endblock title %}
