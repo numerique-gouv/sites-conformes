@@ -6,6 +6,7 @@ from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
+from modelcluster.fields import ParentalManyToManyField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import RoutablePageMixin
@@ -229,6 +230,13 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     )
     filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
     filter_by_category = models.BooleanField(_("Filter by category"), default=True)
+    filter_categories = ParentalManyToManyField(
+        "sites_conformes_core.Category",
+        blank=True,
+        limit_choices_to={"children__isnull": False},
+        verbose_name=_("Category groups"),
+        help_text=_("Parent categories to use as filter groups. Leave empty to list every category in use."),
+    )
 
     tagged_title = _("Pages tagged with %(tag)s")
     in_category_title = _("Pages in category %(category)s")
@@ -252,6 +260,7 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             paginator=paginator,
             tags=self.get_tags(),
             categories=self.get_categories(),
+            category_groups=self.get_category_groups(),
         )
         return context
 
@@ -298,3 +307,10 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     def get_categories(self) -> models.QuerySet:
         ids = self.posts.specific().values_list("categories", flat=True)
         return apps.get_model("sites_conformes_core", "Category").objects.filter(id__in=ids).order_by("name")
+
+    def get_category_groups(self) -> list[tuple[str, models.QuerySet]]:
+        categories = self.get_categories()
+        parents = self.filter_categories.all()
+        if not parents:
+            return [(_("Filter by category"), categories)]
+        return [(parent.name, categories.filter(parent=parent)) for parent in parents]

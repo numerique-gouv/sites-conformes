@@ -175,6 +175,7 @@ class CatalogIndexPage(AbstractIndexPage):
         MultiFieldPanel(
             [
                 FieldPanel("filter_by_category"),
+                FieldPanel("filter_categories"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
