@@ -1,8 +1,6 @@
 from typing import Union
 
 from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.forms.widgets import Textarea, mark_safe
@@ -28,7 +26,7 @@ from wagtail.admin.panels import (
 )
 from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
-from wagtail.contrib.routable_page.models import RoutablePageMixin, path
+from wagtail.contrib.routable_page.models import path
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
@@ -37,7 +35,7 @@ from wagtail.models.i18n import TranslatableMixin
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import AbstractIndexPage, SitesFacilesBasePage
 from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
@@ -62,60 +60,6 @@ class ContentPage(SitesFacilesBasePage):
 
 class TagContentPage(TaggedItemBase):
     content_object = ParentalKey("ContentPage", related_name="contentpage_tags")  # type: ignore
-
-
-class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
-    posts_per_page = models.PositiveSmallIntegerField(
-        default=10,
-        validators=[MaxValueValidator(100), MinValueValidator(1)],
-        verbose_name=_("Entries per page"),
-    )
-    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
-
-    tagged_title = _("Pages tagged with %(tag)s")
-    tags_route = None
-
-    class Meta:
-        abstract = True
-
-    @property
-    def posts(self) -> models.QuerySet:
-        raise NotImplementedError
-
-    def get_context(self, request, *args, **kwargs):
-        context = super().get_context(request, *args, **kwargs)
-        posts, filters = self.apply_filters(request, self.posts)
-        paginator = Paginator(posts, self.posts_per_page)
-        context.update(filters)
-        context.update(
-            posts=paginator.get_page(request.GET.get("page")),
-            paginator=paginator,
-            tags=self.get_tags(),
-        )
-        return context
-
-    def apply_filters(self, request: HttpRequest, posts: models.QuerySet) -> tuple[models.QuerySet, dict]:
-        context = {"current_tag": None, "extra_title": "", "extra_breadcrumbs": None}
-        slug = request.GET.get("tag")
-        if slug:
-            tag = get_object_or_404(Tag, slug=slug)
-            posts = posts.filter(tags=tag)
-            context.update(
-                current_tag=tag,
-                extra_title=self.tagged_title % {"tag": tag},
-                extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
-            )
-        return posts, context
-
-    def filter_breadcrumbs(self, current, route_name: str | None = None, route_title: str = "") -> dict:
-        links = [{"url": self.get_url(), "title": self.title}]
-        if route_name:
-            links.append({"url": f"{self.get_url()}{self.reverse_subpage(route_name)}", "title": route_title})
-        return {"links": links, "current": current}
-
-    def get_tags(self) -> models.QuerySet:
-        ids = self.posts.specific().values_list("tags", flat=True)
-        return Tag.objects.filter(id__in=ids).order_by("name")
 
 
 class CatalogIndexPage(AbstractIndexPage):

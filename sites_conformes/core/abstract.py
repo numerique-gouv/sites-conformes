@@ -1,8 +1,14 @@
+from django.apps import apps
+from django.core.paginator import Paginator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.api import APIField
+from wagtail.contrib.routable_page.models import RoutablePageMixin
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
 from wagtail.images.api.fields import ImageRenditionField
@@ -213,3 +219,57 @@ class SitesFacilesBasePage(Page):
         abstract = True
         verbose_name = _("Base page")
         verbose_name_plural = _("Base pages")
+
+
+class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+    posts_per_page = models.PositiveSmallIntegerField(
+        default=10,
+        validators=[MaxValueValidator(100), MinValueValidator(1)],
+        verbose_name=_("Entries per page"),
+    )
+    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
+
+    tagged_title = _("Pages tagged with %(tag)s")
+    tags_route = None
+
+    class Meta:
+        abstract = True
+
+    @property
+    def posts(self) -> models.QuerySet:
+        raise NotImplementedError
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        posts, filters = self.apply_filters(request, self.posts)
+        paginator = Paginator(posts, self.posts_per_page)
+        context.update(filters)
+        context.update(
+            posts=paginator.get_page(request.GET.get("page")),
+            paginator=paginator,
+            tags=self.get_tags(),
+        )
+        return context
+
+    def apply_filters(self, request: HttpRequest, posts: models.QuerySet) -> tuple[models.QuerySet, dict]:
+        context = {"current_tag": None, "extra_title": "", "extra_breadcrumbs": None}
+        slug = request.GET.get("tag")
+        if slug:
+            tag = get_object_or_404(apps.get_model("sites_conformes_core", "Tag"), slug=slug)
+            posts = posts.filter(tags=tag)
+            context.update(
+                current_tag=tag,
+                extra_title=self.tagged_title % {"tag": tag},
+                extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
+            )
+        return posts, context
+
+    def filter_breadcrumbs(self, current, route_name: str | None = None, route_title: str = "") -> dict:
+        links = [{"url": self.get_url(), "title": self.title}]
+        if route_name:
+            links.append({"url": f"{self.get_url()}{self.reverse_subpage(route_name)}", "title": route_title})
+        return {"links": links, "current": current}
+
+    def get_tags(self) -> models.QuerySet:
+        ids = self.posts.specific().values_list("tags", flat=True)
+        return apps.get_model("sites_conformes_core", "Tag").objects.filter(id__in=ids).order_by("name")
