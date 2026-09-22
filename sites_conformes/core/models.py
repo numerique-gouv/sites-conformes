@@ -1,8 +1,6 @@
 from typing import Union
 
 from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.forms.widgets import Textarea, mark_safe
@@ -28,7 +26,7 @@ from wagtail.admin.panels import (
 )
 from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
-from wagtail.contrib.routable_page.models import RoutablePageMixin, path
+from wagtail.contrib.routable_page.models import path
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
@@ -37,7 +35,7 @@ from wagtail.models.i18n import TranslatableMixin
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import AbstractIndexPage, SitesFacilesBasePage
 from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
@@ -64,16 +62,7 @@ class TagContentPage(TaggedItemBase):
     content_object = ParentalKey("ContentPage", related_name="contentpage_tags")  # type: ignore
 
 
-class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
-    posts_per_page = models.PositiveSmallIntegerField(
-        default=10,
-        validators=[MaxValueValidator(100), MinValueValidator(1)],
-        verbose_name=_("Entries per page"),
-    )
-
-    # Filters
-    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
-
+class CatalogIndexPage(AbstractIndexPage):
     SINGLE_FILTER = "single"
     MULTIPLE_FILTERS = "multiple"
     FILTER_SELECTION_CHOICES = [
@@ -124,30 +113,13 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-
-        filtered_data = self._get_filtered_entries_and_context(request, self.posts)
-        entries = filtered_data["entries"]
-        extra_breadcrumbs = filtered_data["extra_breadcrumbs"]
-
-        # Pagination
-        paginator = Paginator(entries, self.posts_per_page)
-        page_number = request.GET.get("page")
-        paginated_entries = paginator.get_page(page_number)
-
-        context.update(
-            {
-                "entries": paginated_entries,
-                "paginator": paginator,
-                "tags": self.get_tags(),
-                "filter_selection_mode": self.filter_selection,
-                **filtered_data,
-            }
-        )
-
-        if extra_breadcrumbs:
-            context["extra_breadcrumbs"] = extra_breadcrumbs
-
+        context["entries"] = context["posts"]
         return context
+
+    def apply_filters(self, request: HttpRequest, entries: models.QuerySet) -> tuple[models.QuerySet, dict]:
+        filtered_data = self._get_filtered_entries_and_context(request, entries)
+        filtered_data["filter_selection_mode"] = self.filter_selection
+        return filtered_data.pop("entries"), filtered_data
 
     def _default_filter_context(self, entries: models.QuerySet, selected_tag_slugs: list | None = None) -> dict:
         """
