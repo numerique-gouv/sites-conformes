@@ -3,7 +3,7 @@ from django.urls import reverse
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.core.models import Category
+from sites_conformes.core.abstract import Category
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
 
 User = get_user_model()

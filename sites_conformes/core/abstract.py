@@ -1,16 +1,31 @@
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from rest_framework import serializers
+from taggit.models import Tag as TaggitTag
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, TitleFieldPanel
+from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
+from wagtail.contrib.routable_page.models import RoutablePageMixin
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
 from wagtail.images.api.fields import ImageRenditionField
-from wagtail.models import Page
+from wagtail.models import Orderable, Page
+from wagtail.models.i18n import TranslatableMixin
 from wagtail.search import index
+from wagtail.snippets.models import register_snippet
 
 from sites_conformes.core.blocks.buttons_links import ButtonsHorizontalListBlock
+from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
 from sites_conformes.core.blocks.core import HERO_STREAMFIELD_BLOCKS, STREAMFIELD_COMMON_BLOCKS
+from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
+from sites_conformes.core.managers import TagManager
 from sites_conformes.core.utils import get_streamfield_raw_text
 
 
@@ -213,3 +228,144 @@ class SitesFacilesBasePage(Page):
         abstract = True
         verbose_name = _("Base page")
         verbose_name_plural = _("Base pages")
+
+
+@register_snippet
+class Category(TranslatableMixin, index.Indexed, Orderable):
+    name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
+    slug = models.SlugField(unique=True, max_length=80)
+    parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        related_name="children",
+        verbose_name=_("Parent category"),
+        on_delete=models.SET_NULL,
+    )
+    description = RichTextField(
+        max_length=500,
+        features=LIMITED_RICHTEXTFIELD_FEATURES,
+        blank=True,
+        verbose_name=_("Description"),
+        help_text=_("Displayed on the top of the category page"),
+    )  # type: ignore
+    colophon = StreamField(
+        COLOPHON_BLOCKS,
+        blank=True,
+        use_json_field=True,
+        help_text=_("Text displayed at the end of every page in the category"),
+    )
+
+    panels = [
+        TitleFieldPanel("name"),
+        FieldPanel("slug", widget=SlugInput),
+        FieldPanel("description"),
+        FieldPanel("colophon"),
+        FieldPanel("parent"),
+    ]
+
+    api_fields = [
+        APIField("name"),
+        APIField("slug"),
+        APIField("description"),
+        APIField("colophon"),
+        APIField("parent"),
+    ]
+
+    search_fields = [index.SearchField("name")]
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
+        unique_together = [
+            ("translation_key", "locale"),
+            ("name", "locale"),
+            ("slug", "locale"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if self.parent:
+            parent = self.parent
+            if self.parent == self:
+                raise ValidationError(_("Parent category cannot be self."))
+            if parent.parent and parent.parent == self:
+                raise ValidationError(_("Cannot have circular Parents."))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id", "name", "slug", "description", "colophon", "parent")
+        depth = 1
+
+
+@register_snippet
+class Tag(TaggitTag):
+    objects = TagManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = _("Tag")
+
+
+class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+    posts_per_page = models.PositiveSmallIntegerField(
+        default=10,
+        validators=[MaxValueValidator(100), MinValueValidator(1)],
+        verbose_name=_("Entries per page"),
+    )
+    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
+
+    tagged_title = _("Pages tagged with %(tag)s")
+    tags_route = None
+
+    class Meta:
+        abstract = True
+
+    @property
+    def posts(self) -> models.QuerySet:
+        raise NotImplementedError
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        posts, filters = self.apply_filters(request, self.posts)
+        paginator = Paginator(posts, self.posts_per_page)
+        context.update(filters)
+        context.update(
+            posts=paginator.get_page(request.GET.get("page")),
+            paginator=paginator,
+            tags=self.get_tags(),
+        )
+        return context
+
+    def apply_filters(self, request: HttpRequest, posts: models.QuerySet) -> tuple[models.QuerySet, dict]:
+        context = {"current_tag": None, "extra_title": "", "extra_breadcrumbs": None}
+        slug = request.GET.get("tag")
+        if slug:
+            tag = get_object_or_404(Tag, slug=slug)
+            posts = posts.filter(tags=tag)
+            context.update(
+                current_tag=tag,
+                extra_title=self.tagged_title % {"tag": tag},
+                extra_breadcrumbs=self.filter_breadcrumbs(tag, self.tags_route, _("Tags")),
+            )
+        return posts, context
+
+    def filter_breadcrumbs(self, current, route_name: str | None = None, route_title: str = "") -> dict:
+        links = [{"url": self.get_url(), "title": self.title}]
+        if route_name:
+            links.append({"url": f"{self.get_url()}{self.reverse_subpage(route_name)}", "title": route_title})
+        return {"links": links, "current": current}
+
+    def get_tags(self) -> models.QuerySet:
+        ids = self.posts.specific().values_list("tags", flat=True)
+        return Tag.objects.filter(id__in=ids).order_by("name")

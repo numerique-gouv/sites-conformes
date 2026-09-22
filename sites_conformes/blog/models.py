@@ -19,8 +19,7 @@ from wagtail.contrib.routable_page.models import path
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core.abstract import SitesFacilesBasePage
-from sites_conformes.core.models import AbstractIndexPage, Category, CategorySerializer
+from sites_conformes.core.abstract import AbstractIndexPage, Category, CategorySerializer, SitesFacilesBasePage
 
 User = get_user_model()
 

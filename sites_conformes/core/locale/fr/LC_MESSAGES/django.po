@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 14:11+0200\n"
+"POT-Creation-Date: 2026-09-22 08:45+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -98,6 +98,49 @@ msgstr "Page de base"
 
 msgid "Base pages"
 msgstr "Pages de base"
+
+msgid "Category name"
+msgstr "Nom de la catégorie"
+
+msgid "Parent category"
+msgstr "Catégorie parente"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Displayed on the top of the category page"
+msgstr "Affiché en haut de la page de la catégorie"
+
+msgid "Text displayed at the end of every page in the category"
+msgstr "Texte affiché à la fin de chaque page de la catégorie"
+
+msgid "Category"
+msgstr "Catégorie"
+
+msgid "Categories"
+msgstr "Catégories"
+
+msgid "Parent category cannot be self."
+msgstr "La catégorie ne peut être sa propre parente."
+
+msgid "Cannot have circular Parents."
+msgstr "Il est impossible d’avoir des parents circulaires."
+
+msgid "Tag"
+msgstr "Étiquette"
+
+msgid "Entries per page"
+msgstr "Entrées par page"
+
+msgid "Filter by tag"
+msgstr "Filtrer par étiquette"
+
+#, python-format
+msgid "Pages tagged with %(tag)s"
+msgstr "Pages avec l’étiquette %(tag)s"
+
+msgid "Tags"
+msgstr "Étiquettes"
 
 msgid "New"
 msgstr "Nouveau"
@@ -315,9 +358,6 @@ msgstr "Organisation"
 
 msgid "Contact info"
 msgstr "Informations de contact"
-
-msgid "Tags"
-msgstr "Étiquettes"
 
 msgid "Anchor ID"
 msgstr "Identifiant de l’ancre"
@@ -865,9 +905,6 @@ msgstr "Nombre d’articles"
 msgid "Filter by category"
 msgstr "Filtrer par catégorie"
 
-msgid "Filter by tag"
-msgstr "Filtrer par étiquette"
-
 msgid "Filter by author"
 msgstr "Filtrer par auteur"
 
@@ -1040,13 +1077,6 @@ msgstr "Grand (200px)"
 msgid "Content page"
 msgstr "Page de contenu"
 
-msgid "Entries per page"
-msgstr "Entrées par page"
-
-#, python-format
-msgid "Pages tagged with %(tag)s"
-msgstr "Pages avec l’étiquette %(tag)s"
-
 msgid "Single filter selection"
 msgstr "Autorise la sélection d’un seul filtre à la fois"
 
@@ -1081,36 +1111,6 @@ msgstr "Pages avec l’une des étiquettes : %(tags)s"
 
 msgid "Selected tags"
 msgstr "Étiquettes selectionnées"
-
-msgid "Category name"
-msgstr "Nom de la catégorie"
-
-msgid "Parent category"
-msgstr "Catégorie parente"
-
-msgid "Description"
-msgstr "Description"
-
-msgid "Displayed on the top of the category page"
-msgstr "Affiché en haut de la page de la catégorie"
-
-msgid "Text displayed at the end of every page in the category"
-msgstr "Texte affiché à la fin de chaque page de la catégorie"
-
-msgid "Category"
-msgstr "Catégorie"
-
-msgid "Categories"
-msgstr "Catégories"
-
-msgid "Parent category cannot be self."
-msgstr "La catégorie ne peut être sa propre parente."
-
-msgid "Cannot have circular Parents."
-msgstr "Il est impossible d’avoir des parents circulaires."
-
-msgid "Tag"
-msgstr "Étiquette"
 
 msgid "Custom scripts"
 msgstr "Scripts personnalisés"

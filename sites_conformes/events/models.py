@@ -16,8 +16,8 @@ from wagtail.contrib.routable_page.models import RoutablePageMixin, path
 from wagtail.search import index
 
 from sites_conformes.blog.models import AbstractAuthoredIndexPage, PersonSerializer
-from sites_conformes.core.abstract import SitesFacilesBasePage
-from sites_conformes.core.models import Category, CategorySerializer, CmsDsfrConfig
+from sites_conformes.core.abstract import Category, CategorySerializer, SitesFacilesBasePage
+from sites_conformes.core.models import CmsDsfrConfig
 from sites_conformes.events.forms import EventSearchForm
 
 
