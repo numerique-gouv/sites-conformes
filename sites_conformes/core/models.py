@@ -24,7 +24,7 @@ from wagtail.images import get_image_model_string
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core import get_contentpage_model, get_contentpage_model_string
+from sites_conformes.core import get_contentpage_model, get_contentpage_model_string, is_contentpage_swapped
 from sites_conformes.core.abstract import SitesFacilesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
@@ -53,23 +53,28 @@ class AbstractContentPage(SitesFacilesBasePage):
 
 
 class ContentPage(AbstractContentPage):
-    tags = ClusterTaggableManager(through="TagContentPage", blank=True)
-
     class Meta:
         verbose_name = _("Content page")
         swappable = "SF_CONTENTPAGE_MODEL"
 
-    content_panels = AbstractContentPage.content_panels + [
-        FieldPanel("tags"),
-    ]
+    if not is_contentpage_swapped():
+        # A swapped project declares its own tags and through model (see AbstractContentPage);
+        # declaring ours against the swapped-in model would register a phantom child relation on it.
+        tags = ClusterTaggableManager(through="TagContentPage", blank=True)
 
-    api_fields = AbstractContentPage.api_fields + [
-        APIField("tags"),
-    ]
+        content_panels = AbstractContentPage.content_panels + [
+            FieldPanel("tags"),
+        ]
+
+        api_fields = AbstractContentPage.api_fields + [
+            APIField("tags"),
+        ]
 
 
-class TagContentPage(TaggedItemBase):
-    content_object = ParentalKey(get_contentpage_model_string(), related_name="contentpage_tags")  # type: ignore
+if not is_contentpage_swapped():
+
+    class TagContentPage(TaggedItemBase):
+        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
 
 
 class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):

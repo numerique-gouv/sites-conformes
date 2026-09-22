@@ -10,7 +10,7 @@ import wagtail.blocks.migrations.operations
 import wagtail.fields
 from django.db import migrations, models
 
-from sites_conformes.core import get_contentpage_model_string
+from sites_conformes.core import get_contentpage_model_string, is_contentpage_swapped
 
 
 class Migration(migrations.Migration):
@@ -627,6 +627,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "abstract": False,
+                "swappable": "SF_CONTENTPAGE_MODEL",
                 "verbose_name": "Content page",
             },
             bases=("wagtailcore.page",),
@@ -664,22 +665,29 @@ class Migration(migrations.Migration):
                 "verbose_name": "Scripts de suivi",
             },
         ),
-        wagtail.blocks.migrations.migrate_operation.MigrateStreamData(
-            app_name="sites_conformes_core",
-            model_name="ContentPage",
-            field_name="body",
-            operations_and_block_paths=[
-                (wagtail.blocks.migrations.operations.RemoveStreamChildrenOperation(name="hero"), "body"),
-                (wagtail.blocks.migrations.operations.RemoveStreamChildrenOperation(name="title"), "body"),
-                (
-                    wagtail.blocks.migrations.operations.RenameStreamChildrenOperation(
-                        new_name="paragraph", old_name="paragraphlarge"
-                    ),
-                    "",
+        # The shipped model never held rows in a swapped project, and its managers are unavailable.
+        *(
+            []
+            if is_contentpage_swapped()
+            else [
+                wagtail.blocks.migrations.migrate_operation.MigrateStreamData(
+                    app_name="sites_conformes_core",
+                    model_name="ContentPage",
+                    field_name="body",
+                    operations_and_block_paths=[
+                        (wagtail.blocks.migrations.operations.RemoveStreamChildrenOperation(name="hero"), "body"),
+                        (wagtail.blocks.migrations.operations.RemoveStreamChildrenOperation(name="title"), "body"),
+                        (
+                            wagtail.blocks.migrations.operations.RenameStreamChildrenOperation(
+                                new_name="paragraph", old_name="paragraphlarge"
+                            ),
+                            "",
+                        ),
+                    ],
+                    revisions_from=None,
+                    chunk_size=1024,
                 ),
-            ],
-            revisions_from=None,
-            chunk_size=1024,
+            ]
         ),
         migrations.AddField(
             model_name="contentpage",
@@ -2228,30 +2236,42 @@ class Migration(migrations.Migration):
             name="header_darken",
             field=models.BooleanField(default=False, verbose_name="Darken background image"),
         ),
-        migrations.CreateModel(
-            name="TagContentPage",
-            fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                (
-                    "content_object",
-                    modelcluster.fields.ParentalKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="contentpage_tags",
-                        to=get_contentpage_model_string(),
-                    ),
+        # Only the shipped content page carries this through model: a swapped project declares its own.
+        *(
+            []
+            if is_contentpage_swapped()
+            else [
+                migrations.CreateModel(
+                    name="TagContentPage",
+                    fields=[
+                        (
+                            "id",
+                            models.BigAutoField(
+                                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                            ),
+                        ),
+                        (
+                            "content_object",
+                            modelcluster.fields.ParentalKey(
+                                on_delete=django.db.models.deletion.CASCADE,
+                                related_name="contentpage_tags",
+                                to=get_contentpage_model_string(),
+                            ),
+                        ),
+                        (
+                            "tag",
+                            models.ForeignKey(
+                                on_delete=django.db.models.deletion.CASCADE,
+                                related_name="%(app_label)s_%(class)s_items",
+                                to="taggit.tag",
+                            ),
+                        ),
+                    ],
+                    options={
+                        "abstract": False,
+                    },
                 ),
-                (
-                    "tag",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="%(app_label)s_%(class)s_items",
-                        to="taggit.tag",
-                    ),
-                ),
-            ],
-            options={
-                "abstract": False,
-            },
+            ]
         ),
         migrations.CreateModel(
             name="MegaMenu",
@@ -2787,16 +2807,23 @@ class Migration(migrations.Migration):
                 verbose_name="Logo display",
             ),
         ),
-        migrations.AddField(
-            model_name="contentpage",
-            name="tags",
-            field=modelcluster.contrib.taggit.ClusterTaggableManager(
-                blank=True,
-                help_text="A comma-separated list of tags.",
-                through="sites_conformes_core.TagContentPage",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+        # Only the shipped content page carries this through model: a swapped project declares its own.
+        *(
+            []
+            if is_contentpage_swapped()
+            else [
+                migrations.AddField(
+                    model_name="contentpage",
+                    name="tags",
+                    field=modelcluster.contrib.taggit.ClusterTaggableManager(
+                        blank=True,
+                        help_text="A comma-separated list of tags.",
+                        through="sites_conformes_core.TagContentPage",
+                        to="taggit.Tag",
+                        verbose_name="Tags",
+                    ),
+                ),
+            ]
         ),
         migrations.CreateModel(
             name="CatalogIndexPage",
