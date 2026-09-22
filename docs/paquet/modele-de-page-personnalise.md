@@ -24,7 +24,9 @@ faudra effectuer une migration de données pas forcément évidente.
 
 2. Déclarez votre modèle hérité de `AbstractContentPage`. Le champ `tags`
    et son modèle intermédiaire doivent être déclarés sur votre modèle, car
-   celle-ci est requise par Sites Conformes pour bien fonctionner
+   celle-ci est requise par Sites Conformes pour bien fonctionner. Le modèle
+   intermédiaire du paquet (`TagContentPage`) et sa table ne sont pas créés
+   lorsque le modèle est remplacé.
 
    ```python
    from django.db import models

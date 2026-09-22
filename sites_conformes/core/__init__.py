@@ -21,6 +21,14 @@ def get_contentpage_model_string() -> str:
     return getattr(settings, "SF_CONTENTPAGE_MODEL", DEFAULT_CONTENTPAGE_MODEL)
 
 
+def is_contentpage_swapped() -> bool:
+    """
+    Return whether ``SF_CONTENTPAGE_MODEL`` points at another model than the shipped one
+    (the same comparison as ``ContentPage._meta.swapped``, usable before models are loaded).
+    """
+    return get_contentpage_model_string().lower() != DEFAULT_CONTENTPAGE_MODEL.lower()
+
+
 def get_contentpage_model():
     """
     Return the content page model class. Only valid once the app registry is ready.

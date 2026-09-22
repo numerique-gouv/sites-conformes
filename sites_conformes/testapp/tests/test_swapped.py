@@ -2,11 +2,12 @@ from unittest import skipUnless
 
 from django.apps import apps
 from django.core.management import call_command
+from django.db import connection
 from wagtail.models import Site, get_page_models
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.core import get_contentpage_model
-from sites_conformes.core.models import CatalogIndexPage, ContentPage
+from sites_conformes.core import get_contentpage_model, models as core_models
+from sites_conformes.core.models import CatalogIndexPage, ContentPage, Tag
 from sites_conformes.core.services.accessors import get_or_create_content_page
 
 
@@ -36,6 +37,20 @@ class SwappedContentPageTestCase(WagtailPageTestCase):
 
         self.assertEqual(list(self.CustomContentPage.objects.filter(tags__name="dsfr")), [page])
         self.assertPageIsRenderable(page)
+
+    def test_shipped_tag_through_model_is_not_declared(self):
+        self.assertFalse(hasattr(core_models, "TagContentPage"))
+        self.assertFalse(hasattr(ContentPage, "tags"))
+        tables = connection.introspection.table_names()
+        self.assertNotIn("sites_conformes_core_contentpage", tables)
+        self.assertNotIn("sites_conformes_core_tagcontentpage", tables)
+
+    def test_tags_with_usecount_follows_the_swapped_through_model(self):
+        page = self.home.add_child(instance=self.CustomContentPage(title="Tagged", slug="tagged", live=True))
+        page.tags.add("dsfr")
+        page.save()
+
+        self.assertEqual([tag.name for tag in Tag.objects.tags_with_usecount(1)], ["dsfr"])
 
     def test_catalog_lists_custom_pages(self):
         catalog = self.home.add_child(instance=CatalogIndexPage(title="Catalogue", slug="catalogue"))
