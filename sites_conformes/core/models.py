@@ -43,7 +43,6 @@ from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-@register_snippet
 class Category(TranslatableMixin, index.Indexed, Orderable):
     name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
     slug = models.SlugField(unique=True, max_length=80)
@@ -96,6 +95,40 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
             ("name", "locale"),
             ("slug", "locale"),
         ]
+
+    @classmethod
+    def in_tree_order(cls, queryset: models.QuerySet | None = None) -> list["Category"]:
+        """Return the categories as a flat list, each child right after its parent."""
+        categories = cls.objects.all() if queryset is None else queryset
+        by_parent: dict[int | None, list[Category]] = {}
+        for category in categories.select_related("parent"):
+            by_parent.setdefault(category.parent_id, []).append(category)
+
+        ordered: list[Category] = []
+        seen: set[int] = set()
+
+        def append_with_children(category: Category, depth: int) -> None:
+            if category.pk in seen:
+                return
+            seen.add(category.pk)
+            category.tree_depth = depth
+            ordered.append(category)
+            for child in by_parent.get(category.pk, []):
+                append_with_children(child, depth + 1)
+
+        for root in by_parent.get(None, []):
+            append_with_children(root, 0)
+
+        # A category whose parent is filtered out of the queryset is shown at the root.
+        for orphans in by_parent.values():
+            for category in orphans:
+                append_with_children(category, 0)
+
+        return ordered
+
+    @property
+    def is_child(self) -> bool:
+        return self.parent_id is not None
 
     def __str__(self):
         return self.name

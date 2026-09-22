@@ -271,6 +271,7 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return posts, context
 
     def apply_tag_filter(self, request: HttpRequest, posts: models.QuerySet, context: dict) -> models.QuerySet:
+
         slug = request.GET.get("tag")
         if not slug:
             return posts
@@ -283,6 +284,7 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return posts.filter(tags=tag)
 
     def apply_category_filter(self, request: HttpRequest, posts: models.QuerySet, context: dict) -> models.QuerySet:
+
         slug = request.GET.get("category")
         if not slug:
             return posts
@@ -301,10 +303,12 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return {"links": links, "current": current}
 
     def get_tags(self) -> models.QuerySet:
+
         ids = self.posts.specific().values_list("tags", flat=True)
         return apps.get_model("sites_conformes_core", "Tag").objects.filter(id__in=ids).order_by("name")
 
     def get_categories(self) -> models.QuerySet:
+
         ids = self.posts.specific().values_list("categories", flat=True)
         return apps.get_model("sites_conformes_core", "Category").objects.filter(id__in=ids).order_by("name")
 
