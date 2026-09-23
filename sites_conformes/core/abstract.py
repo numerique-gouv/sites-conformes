@@ -2,6 +2,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
+from modelcluster.fields import ParentalManyToManyField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import RoutablePageMixin
@@ -226,6 +227,13 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         verbose_name=_("Entries per page"),
     )
     filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
+    filter_categories = ParentalManyToManyField(
+        "sites_conformes_core.Category",
+        blank=True,
+        limit_choices_to={"children__isnull": False},
+        verbose_name=_("Category groups"),
+        help_text=_("Parent categories to use as filter groups. Leave empty to list every category in use."),
+    )
 
     class Meta:
         abstract = True
@@ -233,3 +241,14 @@ class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     @property
     def posts(self) -> models.QuerySet:
         raise NotImplementedError
+
+    def get_categories(self) -> models.QuerySet:
+        raise NotImplementedError
+
+    def get_category_groups(self) -> list[tuple[str, models.QuerySet]]:
+        """One block of filters per chosen parent category, or a single block when none is chosen."""
+        categories = self.get_categories()
+        parents = self.filter_categories.all()
+        if not parents:
+            return [(_("Filter by category"), categories)]
+        return [(parent.name, categories.filter(parent=parent)) for parent in parents]

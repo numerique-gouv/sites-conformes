@@ -190,6 +190,7 @@ class CatalogIndexPage(AbstractIndexPage):
         MultiFieldPanel(
             [
                 FieldPanel("filter_by_category"),
+                FieldPanel("filter_categories"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
@@ -226,6 +227,7 @@ class CatalogIndexPage(AbstractIndexPage):
                 "paginator": paginator,
                 "tags": self.get_tags(),
                 "categories": self.get_categories(),
+                "category_groups": self.get_category_groups(),
                 "filter_selection_mode": self.filter_selection,
                 **filtered_data,
             }
