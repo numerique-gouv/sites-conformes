@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 11:24+0200\n"
+"POT-Creation-Date: 2026-09-23 11:50+0200\n"
 "PO-Revision-Date: 2026-03-26 13:59+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -156,17 +156,14 @@ msgstr "Date de fin :"
 msgid "Filter by date"
 msgstr "Filtrer par date"
 
-msgid "Filter by category"
-msgstr "Filtrer par catégorie"
+msgid "Filter by tag"
+msgstr "Filtrer par étiquette"
 
 msgid "selected"
 msgstr "étiquette sélectionnée"
 
 msgid "unselected"
 msgstr "étiquette non-sélectionnée"
-
-msgid "Filter by tag"
-msgstr "Filtrer par étiquette"
 
 msgid "Filter by author"
 msgstr "Filtrer par auteur"
@@ -179,6 +176,9 @@ msgstr "Archives"
 
 msgid "See archives"
 msgstr "Voir les archives"
+
+#~ msgid "Filter by category"
+#~ msgstr "Filtrer par catégorie"
 
 #~ msgid "From…"
 #~ msgstr "Du…"

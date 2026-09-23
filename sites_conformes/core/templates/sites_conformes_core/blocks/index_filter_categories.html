@@ -1,0 +1,23 @@
+{% load i18n wagtailcore_tags wagtail_dsfr_tags %}
+{% if page.filter_by_category %}
+  {% for heading, group in category_groups %}
+    {% if group %}
+      <div class="fr-my-3w">
+        <h3 class="fr-h6">{{ heading }}</h3>
+        <ul class="fr-tags-group">
+          {% for category in group %}
+            <li>
+              <a type="button"
+                 class="fr-tag"
+                 href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
+                 title="{% if category.slug == current_category.slug %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
+                 {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                {{ category.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}

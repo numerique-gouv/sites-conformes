@@ -89,6 +89,7 @@ class AbstractAuthoredIndexPage(AbstractIndexPage):
         context["extra_title"] = extra_title
 
         context["categories"] = self.get_categories()
+        context["category_groups"] = self.get_category_groups()
         context["authors"] = self.get_authors()
         context["sources"] = self.get_sources()
         context["tags"] = self.get_tags()

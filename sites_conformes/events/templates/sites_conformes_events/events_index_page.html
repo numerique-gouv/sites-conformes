@@ -94,24 +94,7 @@
 
               {{ form }}
 
-              {% if categories and page.filter_by_category %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for category in categories %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
-                           title="{% if category.slug == current_category.slug %}{% translate 'selected' %} {% else %}{% translate 'unselected' %} {% endif %}"
-                           {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
-                          {{ category.name }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+              {% include "sites_conformes_core/blocks/index_filter_categories.html" %}
 
               {% if tags and page.filter_by_tag %}
                 <div class="fr-my-3w">
