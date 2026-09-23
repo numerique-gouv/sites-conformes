@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from dsfr.constants import NOTICE_TYPE_CHOICES
-from modelcluster.fields import ParentalKey
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
 from rest_framework import serializers
@@ -135,6 +135,16 @@ class AbstractContentPage(SitesFacilesBasePage):
     depend on yours while yours depend on it.
     """
 
+    categories = ParentalManyToManyField("sites_conformes_core.Category", blank=True, verbose_name=_("Categories"))
+
+    content_panels = SitesFacilesBasePage.content_panels + [
+        FieldPanel("categories"),
+    ]
+
+    api_fields = SitesFacilesBasePage.api_fields + [
+        APIField("categories", serializer=CategorySerializer(many=True)),
+    ]
+
     class Meta:
         abstract = True
 
@@ -177,6 +187,8 @@ class CatalogIndexPage(AbstractIndexPage):
     )
 
     # Filters
+    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
+
     SINGLE_FILTER = "single"
     MULTIPLE_FILTERS = "multiple"
     FILTER_SELECTION_CHOICES = [
@@ -207,6 +219,7 @@ class CatalogIndexPage(AbstractIndexPage):
         FieldPanel("posts_per_page"),
         MultiFieldPanel(
             [
+                FieldPanel("filter_by_category"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
@@ -243,6 +256,7 @@ class CatalogIndexPage(AbstractIndexPage):
                 "entries": paginated_entries,
                 "paginator": paginator,
                 "tags": self.get_tags(),
+                "categories": self.get_categories(),
                 "filter_selection_mode": self.filter_selection,
                 **filtered_data,
             }
@@ -264,6 +278,7 @@ class CatalogIndexPage(AbstractIndexPage):
             "extra_title": "",
             "current_tags": [],
             "current_tag": None,
+            "current_category": None,
             "selected_tag_slugs": selected_tag_slugs or [],
         }
 
@@ -271,16 +286,32 @@ class CatalogIndexPage(AbstractIndexPage):
         """
         Reads the "tag" GET params and dispatches to the filter mode configured on the page.
         """
+        entries, category = self._filter_by_category(request, entries)
+
         selected_tag_slugs = request.GET.getlist("tag")
         if not selected_tag_slugs:
-            return self._default_filter_context(entries)
+            filtered = self._default_filter_context(entries)
+        elif self.filter_selection == self.SINGLE_FILTER:
+            filtered = self._handle_single_filter(selected_tag_slugs, entries)
+        elif self.filter_selection == self.MULTIPLE_FILTERS:
+            filtered = self._handle_multiple_filters(selected_tag_slugs, entries)
+        else:
+            filtered = self._default_filter_context(entries, selected_tag_slugs)
 
-        if self.filter_selection == self.SINGLE_FILTER:
-            return self._handle_single_filter(selected_tag_slugs, entries)
-        if self.filter_selection == self.MULTIPLE_FILTERS:
-            return self._handle_multiple_filters(selected_tag_slugs, entries)
+        if category:
+            filtered["current_category"] = category
+            filtered["extra_title"] = _("Pages in category %(category)s") % {"category": category.name}
+        return filtered
 
-        return self._default_filter_context(entries, selected_tag_slugs)
+    def _filter_by_category(
+        self, request: HttpRequest, entries: models.QuerySet
+    ) -> tuple[models.QuerySet, "Category | None"]:
+        """Narrows the entries to one category, read from the "category" GET param."""
+        slug = request.GET.get("category")
+        if not slug:
+            return entries, None
+        category = get_object_or_404(Category, slug=slug, locale=self.locale)
+        return entries.filter(categories=category), category
 
     def _handle_single_filter(self, selected_tag_slugs: list, entries: models.QuerySet) -> dict:
         """
@@ -365,9 +396,13 @@ class CatalogIndexPage(AbstractIndexPage):
         ids = self.posts.values_list("tags", flat=True)
         return Tag.objects.tags_with_usecount(1).filter(id__in=ids).order_by("name")
 
+    def get_categories(self) -> models.QuerySet:
+        ids = self.posts.values_list("categories", flat=True)
+        return Category.objects.filter(id__in=ids).order_by("name")
+
     @property
-    def show_filters(self) -> bool | models.BooleanField:
-        return self.filter_by_tag and self.get_tags().count() > 0
+    def show_filters(self) -> bool:
+        return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and self.get_categories())
 
     @path("tags/", name="tags_list")
     def tags_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
