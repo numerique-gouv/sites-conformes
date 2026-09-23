@@ -28,7 +28,7 @@ from wagtail.admin.panels import (
 )
 from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
-from wagtail.contrib.routable_page.models import RoutablePageMixin, path
+from wagtail.contrib.routable_page.models import path
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
@@ -37,7 +37,7 @@ from wagtail.models.i18n import TranslatableMixin
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import AbstractIndexPage, SitesFacilesBasePage
 from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
@@ -64,7 +64,7 @@ class TagContentPage(TaggedItemBase):
     content_object = ParentalKey("ContentPage", related_name="contentpage_tags")  # type: ignore
 
 
-class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class CatalogIndexPage(AbstractIndexPage):
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
@@ -72,8 +72,6 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     )
 
     # Filters
-    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
-
     SINGLE_FILTER = "single"
     MULTIPLE_FILTERS = "multiple"
     FILTER_SELECTION_CHOICES = [

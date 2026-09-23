@@ -4,7 +4,6 @@ from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import get_language, gettext_lazy as _
@@ -18,26 +17,28 @@ from wagtail.contrib.routable_page.models import RoutablePageMixin, path
 from wagtail.models.i18n import Locale
 from wagtail.search import index
 
-from sites_conformes.blog.models import Organization, Person, PersonSerializer
+from sites_conformes.blog.abstract import AbstractAuthoredIndexPage
+from sites_conformes.blog.models import PersonSerializer
 from sites_conformes.core.abstract import SitesFacilesBasePage
-from sites_conformes.core.models import Category, CategorySerializer, CmsDsfrConfig, Tag
+from sites_conformes.core.models import Category, CategorySerializer, CmsDsfrConfig
 from sites_conformes.events.forms import EventSearchForm
 
 
-class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class EventsIndexPage(AbstractAuthoredIndexPage):
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
         verbose_name=_("Events per page"),
     )
 
-    # Filters
-    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
-    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
-    filter_by_author = models.BooleanField(_("Filter by author"), default=False)
     filter_by_source = models.BooleanField(
         _("Filter by source"), help_text=_("The source is the organization of the event author"), default=False
     )
+
+    tagged_title = _("Events tagged with %(tag)s")
+    in_category_title = _("Events in category %(category)s")
+    authored_by_title = _("Events created by")
+    breadcrumb_shows_taxonomy = False
 
     settings_panels = SitesFacilesBasePage.settings_panels + [
         FieldPanel("posts_per_page"),
@@ -56,6 +57,10 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 
     class Meta:
         verbose_name = _("Event calendar index")
+
+    @property
+    def filter_locale(self):
+        return Locale.objects.get(language_code=get_language())
 
     @property
     def posts(self):
@@ -84,62 +89,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         )
         return entries
 
-    def get_context(self, request, *args, **kwargs):
-        context = super(EventsIndexPage, self).get_context(request, *args, **kwargs)
-        posts = self.posts
-        locale = Locale.objects.get(language_code=get_language())
-
-        extra_breadcrumbs = None
-        extra_title = ""
-
-        tag = request.GET.get("tag")
-        if tag:
-            tag = get_object_or_404(Tag, slug=tag)
-            posts = posts.filter(tags=tag)
-            extra_title = _("Events tagged with %(tag)s") % {"tag": tag}
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": extra_title,
-            }
-
-        category = request.GET.get("category")
-        if category:
-            category = get_object_or_404(Category, slug=category, locale=locale)
-            posts = posts.filter(categories=category)
-            extra_title = _("Events in category %(category)s") % {"category": category.name}
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": extra_title,
-            }
-
-        source = request.GET.get("source")
-        if source:
-            source = get_object_or_404(Organization, slug=source)
-            posts = posts.filter(authors__organization=source)
-            extra_title = _("Events created by") + f" {source.name}"
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": extra_title,
-            }
-
-        author = request.GET.get("author")
-        if author:
-            author = get_object_or_404(Person, id=author)
-            extra_title = _("Events created by") + f" {author.name}"
-            extra_breadcrumbs = {
-                "links": [
-                    {"url": self.get_url(), "title": self.title},
-                ],
-                "current": extra_title,
-            }
-            posts = posts.filter(authors=author)
-
+    def apply_extra_filters(self, request, posts, context, extra_title):
         date_from = request.GET.get("date_from", "")
         if date_from:
             posts = posts.filter(event_date_end__date__gte=date_from)
@@ -150,50 +100,8 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             posts = posts.filter(event_date_start__date__lte=date_to)
             context["current_date_to"] = datetime.datetime.strptime(date_to, "%Y-%m-%d").date()
 
-        form = EventSearchForm(initial={"date_from": date_from, "date_to": date_to})
-
-        # Pagination
-        page_number = request.GET.get("page")
-        page_size = self.posts_per_page
-
-        paginator = Paginator(posts, page_size)  # Show <page_size> posts per page
-        posts = paginator.get_page(page_number)
-
-        context["posts"] = posts
-        context["current_category"] = category
-        context["current_tag"] = tag
-        context["current_source"] = source
-        context["current_author"] = author
-        context["paginator"] = paginator
-        context["extra_title"] = extra_title
-
-        # Filters
-        context["form"] = form
-        context["categories"] = self.get_categories()
-        context["authors"] = self.get_authors()
-        context["sources"] = self.get_sources()
-        context["tags"] = self.get_tags()
-
-        if extra_breadcrumbs:
-            context["extra_breadcrumbs"] = extra_breadcrumbs
-
-        return context
-
-    def get_authors(self) -> models.QuerySet:
-        ids = self.posts.specific().values_list("authors", flat=True)
-        return Person.objects.filter(id__in=ids).order_by("name")
-
-    def get_categories(self) -> models.QuerySet:
-        ids = self.posts.specific().values_list("categories", flat=True)
-        return Category.objects.filter(id__in=ids).order_by("name")
-
-    def get_sources(self) -> models.QuerySet:
-        ids = self.posts.specific().values_list("authors__organization", flat=True)
-        return Organization.objects.filter(id__in=ids).order_by("name")
-
-    def get_tags(self) -> models.QuerySet:
-        ids = self.posts.specific().values_list("tags", flat=True)
-        return Tag.objects.filter(id__in=ids).order_by("name")
+        context["form"] = EventSearchForm(initial={"date_from": date_from, "date_to": date_to})
+        return posts, extra_title
 
     @path("ical/")
     def ical_view(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
