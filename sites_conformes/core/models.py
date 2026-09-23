@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from dsfr.constants import NOTICE_TYPE_CHOICES
-from modelcluster.fields import ParentalKey
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
 from rest_framework import serializers
@@ -46,6 +46,84 @@ from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
+@register_snippet
+class Category(TranslatableMixin, index.Indexed, Orderable):
+    name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
+    slug = models.SlugField(unique=True, max_length=80)
+    parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        related_name="children",
+        verbose_name=_("Parent category"),
+        on_delete=models.SET_NULL,
+    )
+    description = RichTextField(
+        max_length=500,
+        features=LIMITED_RICHTEXTFIELD_FEATURES,
+        blank=True,
+        verbose_name=_("Description"),
+        help_text=_("Displayed on the top of the category page"),
+    )  # type: ignore
+    colophon = StreamField(
+        COLOPHON_BLOCKS,
+        blank=True,
+        use_json_field=True,
+        help_text=_("Text displayed at the end of every page in the category"),
+    )
+
+    panels = [
+        TitleFieldPanel("name"),
+        FieldPanel("slug", widget=SlugInput),
+        FieldPanel("description"),
+        FieldPanel("colophon"),
+        FieldPanel("parent"),
+    ]
+
+    api_fields = [
+        APIField("name"),
+        APIField("slug"),
+        APIField("description"),
+        APIField("colophon"),
+        APIField("parent"),
+    ]
+
+    search_fields = [index.SearchField("name")]
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
+        unique_together = [
+            ("translation_key", "locale"),
+            ("name", "locale"),
+            ("slug", "locale"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if self.parent:
+            parent = self.parent
+            if self.parent == self:
+                raise ValidationError(_("Parent category cannot be self."))
+            if parent.parent and parent.parent == self:
+                raise ValidationError(_("Cannot have circular Parents."))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id", "name", "slug", "description", "colophon", "parent")
+        depth = 1
+
+
 class AbstractContentPage(SitesFacilesBasePage):
     """
     Base class for the swappable content page model.
@@ -56,6 +134,16 @@ class AbstractContentPage(SitesFacilesBasePage):
     would make your app's migrations depend on this one, which itself depends on
     the swapped model (same rule as ``AbstractUser.groups`` in Django).
     """
+
+    categories = ParentalManyToManyField("sites_conformes_core.Category", blank=True, verbose_name=_("Categories"))
+
+    content_panels = SitesFacilesBasePage.content_panels + [
+        FieldPanel("categories"),
+    ]
+
+    api_fields = SitesFacilesBasePage.api_fields + [
+        APIField("categories", serializer=CategorySerializer(many=True)),
+    ]
 
     class Meta:
         abstract = True
@@ -99,6 +187,8 @@ class CatalogIndexPage(AbstractIndexPage):
     )
 
     # Filters
+    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
+
     SINGLE_FILTER = "single"
     MULTIPLE_FILTERS = "multiple"
     FILTER_SELECTION_CHOICES = [
@@ -129,6 +219,7 @@ class CatalogIndexPage(AbstractIndexPage):
         FieldPanel("posts_per_page"),
         MultiFieldPanel(
             [
+                FieldPanel("filter_by_category"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
@@ -164,6 +255,7 @@ class CatalogIndexPage(AbstractIndexPage):
                 "entries": paginated_entries,
                 "paginator": paginator,
                 "tags": self.get_tags(),
+                "categories": self.get_categories(),
                 "filter_selection_mode": self.filter_selection,
                 **filtered_data,
             }
@@ -185,6 +277,7 @@ class CatalogIndexPage(AbstractIndexPage):
             "extra_title": "",
             "current_tags": [],
             "current_tag": None,
+            "current_category": None,
             "selected_tag_slugs": selected_tag_slugs or [],
         }
 
@@ -192,16 +285,32 @@ class CatalogIndexPage(AbstractIndexPage):
         """
         Reads the "tag" GET params and dispatches to the filter mode configured on the page.
         """
+        entries, category = self._filter_by_category(request, entries)
+
         selected_tag_slugs = request.GET.getlist("tag")
         if not selected_tag_slugs:
-            return self._default_filter_context(entries)
+            filtered = self._default_filter_context(entries)
+        elif self.filter_selection == self.SINGLE_FILTER:
+            filtered = self._handle_single_filter(selected_tag_slugs, entries)
+        elif self.filter_selection == self.MULTIPLE_FILTERS:
+            filtered = self._handle_multiple_filters(selected_tag_slugs, entries)
+        else:
+            filtered = self._default_filter_context(entries, selected_tag_slugs)
 
-        if self.filter_selection == self.SINGLE_FILTER:
-            return self._handle_single_filter(selected_tag_slugs, entries)
-        if self.filter_selection == self.MULTIPLE_FILTERS:
-            return self._handle_multiple_filters(selected_tag_slugs, entries)
+        if category:
+            filtered["current_category"] = category
+            filtered["extra_title"] = _("Pages in category %(category)s") % {"category": category.name}
+        return filtered
 
-        return self._default_filter_context(entries, selected_tag_slugs)
+    def _filter_by_category(
+        self, request: HttpRequest, entries: models.QuerySet
+    ) -> tuple[models.QuerySet, "Category | None"]:
+        """Narrows the entries to one category, read from the "category" GET param."""
+        slug = request.GET.get("category")
+        if not slug:
+            return entries, None
+        category = get_object_or_404(Category, slug=slug, locale=self.locale)
+        return entries.filter(categories=category), category
 
     def _handle_single_filter(self, selected_tag_slugs: list, entries: models.QuerySet) -> dict:
         """
@@ -286,9 +395,13 @@ class CatalogIndexPage(AbstractIndexPage):
         ids = self.posts.values_list("tags", flat=True)
         return Tag.objects.tags_with_usecount(1).filter(id__in=ids).order_by("name")
 
+    def get_categories(self) -> models.QuerySet:
+        ids = self.posts.values_list("categories", flat=True)
+        return Category.objects.filter(id__in=ids).order_by("name")
+
     @property
-    def show_filters(self) -> bool | models.BooleanField:
-        return self.filter_by_tag and self.get_tags().count() > 0
+    def show_filters(self) -> bool:
+        return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and self.get_categories())
 
     @path("tags/", name="tags_list")
     def tags_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -320,84 +433,6 @@ class CatalogIndexPage(AbstractIndexPage):
             },
             template="sites_conformes_core/tags_list_page.html",
         )
-
-
-@register_snippet
-class Category(TranslatableMixin, index.Indexed, Orderable):
-    name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
-    slug = models.SlugField(unique=True, max_length=80)
-    parent = models.ForeignKey(
-        "self",
-        blank=True,
-        null=True,
-        related_name="children",
-        verbose_name=_("Parent category"),
-        on_delete=models.SET_NULL,
-    )
-    description = RichTextField(
-        max_length=500,
-        features=LIMITED_RICHTEXTFIELD_FEATURES,
-        blank=True,
-        verbose_name=_("Description"),
-        help_text=_("Displayed on the top of the category page"),
-    )  # type: ignore
-    colophon = StreamField(
-        COLOPHON_BLOCKS,
-        blank=True,
-        use_json_field=True,
-        help_text=_("Text displayed at the end of every page in the category"),
-    )
-
-    panels = [
-        TitleFieldPanel("name"),
-        FieldPanel("slug", widget=SlugInput),
-        FieldPanel("description"),
-        FieldPanel("colophon"),
-        FieldPanel("parent"),
-    ]
-
-    api_fields = [
-        APIField("name"),
-        APIField("slug"),
-        APIField("description"),
-        APIField("colophon"),
-        APIField("parent"),
-    ]
-
-    search_fields = [index.SearchField("name")]
-
-    class Meta:
-        ordering = ["name"]
-        verbose_name = _("Category")
-        verbose_name_plural = _("Categories")
-        unique_together = [
-            ("translation_key", "locale"),
-            ("name", "locale"),
-            ("slug", "locale"),
-        ]
-
-    def __str__(self):
-        return self.name
-
-    def clean(self):
-        if self.parent:
-            parent = self.parent
-            if self.parent == self:
-                raise ValidationError(_("Parent category cannot be self."))
-            if parent.parent and parent.parent == self:
-                raise ValidationError(_("Cannot have circular Parents."))
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ("id", "name", "slug", "description", "colophon", "parent")
-        depth = 1
 
 
 @register_snippet
