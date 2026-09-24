@@ -37,11 +37,11 @@ class BlogEntryPageFactory(PublishedPageFactory):
         model = BlogEntryPage
 
     @factory.post_generation
-    def blog_categories(obj, create, extracted, **kwargs):
+    def categories(obj, create, extracted, **kwargs):
         if not create or not extracted:
             return
         for category in extracted:
-            obj.blog_categories.add(category)
+            obj.categories.add(category)
 
     @factory.post_generation
     def tags(obj, create, extracted, **kwargs):
