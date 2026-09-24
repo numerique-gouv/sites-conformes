@@ -1,8 +1,10 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.api import APIField
+from wagtail.contrib.routable_page.models import RoutablePageMixin
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
 from wagtail.images.api.fields import ImageRenditionField
@@ -214,3 +216,21 @@ class SitesFacilesBasePage(Page):
         abstract = True
         verbose_name = _("Base page")
         verbose_name_plural = _("Base pages")
+
+
+class AbstractIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+    """Fields and behaviour common to every index page (blog, events, catalog)."""
+
+    posts_per_page = models.PositiveSmallIntegerField(
+        default=10,
+        validators=[MaxValueValidator(100), MinValueValidator(1)],
+        verbose_name=_("Entries per page"),
+    )
+    filter_by_tag = models.BooleanField(_("Filter by tag"), default=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def posts(self) -> models.QuerySet:
+        raise NotImplementedError

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 11:49+0200\n"
+"POT-Creation-Date: 2026-09-23 11:24+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -98,6 +98,12 @@ msgstr "Page de base"
 
 msgid "Base pages"
 msgstr "Pages de base"
+
+msgid "Entries per page"
+msgstr "Entrées par page"
+
+msgid "Filter by tag"
+msgstr "Filtrer par étiquette"
 
 msgid "New"
 msgstr "Nouveau"
@@ -865,9 +871,6 @@ msgstr "Nombre d’articles"
 msgid "Filter by category"
 msgstr "Filtrer par catégorie"
 
-msgid "Filter by tag"
-msgstr "Filtrer par étiquette"
-
 msgid "Filter by author"
 msgstr "Filtrer par auteur"
 
@@ -1039,9 +1042,6 @@ msgstr "Grand (200px)"
 
 msgid "Content page"
 msgstr "Page de contenu"
-
-msgid "Entries per page"
-msgstr "Entrées par page"
 
 msgid "Single filter selection"
 msgstr "Autorise la sélection d’un seul filtre à la fois"
