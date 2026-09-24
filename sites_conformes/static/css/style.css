@@ -183,6 +183,46 @@ p:empty {
     object-position: bottom;
 }
 
+/* Hero image (image + text block) shown at its original proportions: keep the
+   ratio, center it, and bound its height by the chosen size. DSFR's content-media
+   always imposes a ratio, so this is the one custom rule needed for the
+   "original proportions" option. */
+.cmsfr-hero-img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    max-height: 320px; /* Medium (default) */
+}
+
+.cmsfr-hero-img--sm {
+    max-height: 200px;
+}
+
+.cmsfr-hero-img--lg {
+    max-height: 460px;
+}
+
+/* Centered image at its original proportions: cancel the 16/9 aspect-ratio that
+   DSFR forces on responsive images inside .fr-content-media, so the image keeps
+   its own proportions (never cropped) while still being sized by the width option
+   (Small/Medium/Large, like the ratio modes). !important is required to beat the
+   DSFR rule (specificity 0,2,0, no !important). */
+img.cmsfr-image-original {
+    aspect-ratio: auto !important;
+}
+
+/* Centered image at its exact pixel size ("Actual size" width + original
+   proportions): natural size, centered, capped to the column, ratio preserved. */
+img.cmsfr-image-natural {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
 /* Custom styling for multi-select filter tags */
 /* Override DSFR default behavior: pressed tags should appear active (colored) */
 label.fr-tag[aria-pressed="true"] {
