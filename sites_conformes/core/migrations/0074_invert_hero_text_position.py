@@ -6,6 +6,8 @@ from itertools import chain
 
 def invert_text_position(apps, schema_editor):
     ContentPage = apps.get_model("sites_conformes_core", "ContentPage")
+    if ContentPage._meta.swapped:  # nothing was ever stored in the shipped model
+        return
     CatalogIndexPage = apps.get_model("sites_conformes_core", "CatalogIndexPage")
 
     pages = chain(ContentPage.objects.all(), CatalogIndexPage.objects.all())

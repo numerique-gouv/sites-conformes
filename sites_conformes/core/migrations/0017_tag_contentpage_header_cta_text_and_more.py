@@ -10,9 +10,12 @@ import wagtail.images.blocks
 import wagtailmarkdown.blocks
 from django.db import migrations, models
 
+from sites_conformes.core import get_contentpage_model_string, is_contentpage_swapped
+
 
 class Migration(migrations.Migration):
     dependencies = [
+        migrations.swappable_dependency(get_contentpage_model_string()),
         ("sites_conformes_core", "0016_auto_20240305_1611"),
         ("taggit", "0006_rename_taggeditem_content_type_object_id_taggit_tagg_content_8fc721_idx"),
     ]
@@ -518,40 +521,52 @@ class Migration(migrations.Migration):
             name="header_darken",
             field=models.BooleanField(default=False, verbose_name="Darken background image"),
         ),
-        migrations.CreateModel(
-            name="TagContentPage",
-            fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                (
-                    "content_object",
-                    modelcluster.fields.ParentalKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="contentpage_tags",
-                        to="sites_conformes_core.contentpage",
+        # Only the shipped content page carries this through model: a swapped project declares its own.
+        *(
+            []
+            if is_contentpage_swapped()
+            else [
+                migrations.CreateModel(
+                    name="TagContentPage",
+                    fields=[
+                        (
+                            "id",
+                            models.BigAutoField(
+                                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                            ),
+                        ),
+                        (
+                            "content_object",
+                            modelcluster.fields.ParentalKey(
+                                on_delete=django.db.models.deletion.CASCADE,
+                                related_name="contentpage_tags",
+                                to=get_contentpage_model_string(),
+                            ),
+                        ),
+                        (
+                            "tag",
+                            models.ForeignKey(
+                                on_delete=django.db.models.deletion.CASCADE,
+                                related_name="%(app_label)s_%(class)s_items",
+                                to="taggit.tag",
+                            ),
+                        ),
+                    ],
+                    options={
+                        "abstract": False,
+                    },
+                ),
+                migrations.AddField(
+                    model_name="contentpage",
+                    name="tags",
+                    field=modelcluster.contrib.taggit.ClusterTaggableManager(
+                        blank=True,
+                        help_text="A comma-separated list of tags.",
+                        through="sites_conformes_core.TagContentPage",
+                        to="taggit.Tag",
+                        verbose_name="Tags",
                     ),
                 ),
-                (
-                    "tag",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="%(app_label)s_%(class)s_items",
-                        to="taggit.tag",
-                    ),
-                ),
-            ],
-            options={
-                "abstract": False,
-            },
-        ),
-        migrations.AddField(
-            model_name="contentpage",
-            name="tags",
-            field=modelcluster.contrib.taggit.ClusterTaggableManager(
-                blank=True,
-                help_text="A comma-separated list of tags.",
-                through="sites_conformes_core.TagContentPage",
-                to="taggit.Tag",
-                verbose_name="Tags",
-            ),
+            ]
         ),
     ]

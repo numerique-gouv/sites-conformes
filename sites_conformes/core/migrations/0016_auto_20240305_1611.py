@@ -12,6 +12,8 @@ def update_header_fields(apps, schema_editor):
     """
 
     ContentPage = apps.get_model("sites_conformes_core", "ContentPage")
+    if ContentPage._meta.swapped:  # nothing was ever stored in the shipped model
+        return
     for page in ContentPage.objects.all():
         for block in page.body.raw_data:
             if block["type"] == "hero":
