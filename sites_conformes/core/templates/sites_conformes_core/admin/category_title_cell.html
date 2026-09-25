@@ -1,0 +1,8 @@
+{% extends "wagtailadmin/tables/title_cell.html" %}
+
+{% block title %}
+  {% if instance.tree_depth %}
+    <span class="sf-category-tree__branch" style="--sf-tree-depth: {{ instance.tree_depth }}" aria-hidden="true">└</span>
+  {% endif %}
+  {{ block.super }}
+{% endblock title %}

@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     "wagtail_localize",
     "wagtail_localize.locales",
     "taggit",
+    "treebeard",
     "wagtail.api.v2",
     "rest_framework",
     "django.contrib.auth",

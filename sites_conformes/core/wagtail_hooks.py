@@ -1,7 +1,5 @@
 """
-Text alignment features for Draftail editor.
-
-Implementation using BlockFeature with custom CSS that preserves content styling.
+Admin customisations: Draftail text alignment features and the category tree listing.
 """
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
@@ -11,6 +9,9 @@ from wagtail import hooks
 from wagtail.admin.rich_text.converters.html_to_contentstate import (
     BlockElementHandler,
 )
+from wagtail.snippets.models import register_snippet
+
+from sites_conformes.core.views_admin import CategoryViewSet
 
 
 @hooks.register("register_rich_text_features")
@@ -134,3 +135,6 @@ def editor_js():
         '<script src="{}"></script>',
         static("content_manager/js/text-alignment.js"),
     )
+
+
+register_snippet(CategoryViewSet)
