@@ -145,6 +145,10 @@ class AbstractContentPage(SitesFacilesBasePage):
         APIField("categories", serializer=CategorySerializer(many=True)),
     ]
 
+    search_fields = SitesFacilesBasePage.search_fields + [
+        index.RelatedFields("categories", [index.SearchField("name")]),
+    ]
+
     class Meta:
         abstract = True
 
