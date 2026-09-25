@@ -1,0 +1,21 @@
+{% extends "wagtailsnippets/snippets/index_results.html" %}
+{% load i18n %}
+
+{% block results %}
+  {% if tree_roots is not None %}
+    <div class="nice-padding sf-category-tree"
+         data-category-tree
+         data-move-url="{{ move_url }}"
+         data-csrf="{{ csrf_token }}">
+      <p class="help-block help-info">{% translate "Drag a category onto another one to nest it under it, or onto the zone below to bring it back to the root." %}</p>
+      <ul class="sf-category-tree__list">
+        {% for node in tree_roots %}
+          {% include "sites_conformes_core/admin/category_tree_node.html" %}
+        {% endfor %}
+      </ul>
+      <div class="sf-category-tree__root-zone" data-root-zone>{% translate "Root categories" %}</div>
+    </div>
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock results %}

@@ -136,9 +136,46 @@
     display: block;
 }
 
-.sf-category-tree__branch {
-    display: inline-block;
-    margin-inline-start: calc(var(--sf-tree-depth, 1) * 1.5rem);
-    margin-inline-end: 0.25rem;
+.sf-category-tree__list {
+    list-style: none;
+    margin: 0;
+    padding-inline-start: 1.5rem;
+}
+
+.sf-category-tree > .sf-category-tree__list {
+    padding-inline-start: 0;
+}
+
+.sf-category-tree__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    cursor: grab;
+}
+
+.sf-category-tree__handle .icon {
+    width: 1rem;
+    height: 1rem;
     opacity: 0.5;
+}
+
+.sf-category-tree__root-zone {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border: 2px dashed var(--w-color-border-furniture);
+    border-radius: 0.25rem;
+    color: var(--w-color-text-meta);
+    text-align: center;
+}
+
+.is-dragging > .sf-category-tree__row {
+    opacity: 0.4;
+}
+
+.is-drop-target > .sf-category-tree__row,
+.sf-category-tree__root-zone.is-drop-target {
+    outline: 2px solid var(--w-color-border-interactive);
+    background: var(--w-color-surface-button-outline-hover, transparent);
 }
