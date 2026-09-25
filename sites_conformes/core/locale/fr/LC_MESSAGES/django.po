@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 15:32+0200\n"
+"POT-Creation-Date: 2026-09-25 15:48+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1051,7 +1051,9 @@ msgid "Large (200px)"
 msgstr "Grand (200px)"
 
 msgid "A category cannot be moved under itself or one of its sub-categories."
-msgstr "Une catégorie ne peut pas être déplacée sous elle-même ou sous l’une de ses sous-catégories."
+msgstr ""
+"Une catégorie ne peut pas être déplacée sous elle-même ou sous l’une de ses "
+"sous-catégories."
 
 msgid "Category name"
 msgstr "Nom de la catégorie"
@@ -1463,6 +1465,16 @@ msgstr "Méga menu"
 msgid "Home page"
 msgstr "Accueil"
 
+msgid ""
+"Drag a category onto another one to nest it under it, or onto the zone below "
+"to bring it back to the root."
+msgstr ""
+"Glissez une catégorie sur une autre pour l’y imbriquer, ou sur la zone "
+"ci-dessous pour la ramener à la racine."
+
+msgid "Root categories"
+msgstr "Catégories racines"
+
 msgid "Published on"
 msgstr "Publié le"
 
@@ -1627,6 +1639,14 @@ msgstr "Pages avec l’étiquette {tag}"
 #, python-brace-format
 msgid "List of pages tagged with {tag}"
 msgstr "Liste de pages avec l’étiquette {tag}"
+
+#, python-format
+msgid "Category “%(node)s” moved under “%(target)s”."
+msgstr "Catégorie « %(node)s » déplacée sous « %(target)s »."
+
+#, python-format
+msgid "Category “%(node)s” moved to the root."
+msgstr "Catégorie « %(node)s » déplacée à la racine."
 
 #~ msgid "Parent category cannot be self."
 #~ msgstr "La catégorie ne peut être sa propre parente."
