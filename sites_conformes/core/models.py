@@ -16,6 +16,7 @@ from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
 from rest_framework import serializers
 from taggit.models import Tag as TaggitTag, TaggedItemBase
+from treebeard.al_tree import AL_Node, AL_NodeManager
 from unidecode import unidecode
 from wagtail.admin.panels import (
     FieldPanel,
@@ -40,13 +41,25 @@ from wagtail.snippets.models import register_snippet
 from sites_conformes.core.abstract import AbstractIndexPage, SitesFacilesBasePage
 from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
+from sites_conformes.core.forms import CategoryForm
 from sites_conformes.core.managers import TagManager
 from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-@register_snippet
-class Category(TranslatableMixin, index.Indexed, Orderable):
+class CategoryManager(AL_NodeManager):
+    def get_queryset(self):
+        # treebeard sorts by parent first, which puts the root categories last; keep the plain name order.
+        return models.Manager.get_queryset(self)
+
+
+class Category(AL_Node, TranslatableMixin, index.Indexed, Orderable):
+    """A category tree (django-treebeard adjacency list): ``parent`` is the only tree column."""
+
+    node_order_by = ["name"]
+    base_form_class = CategoryForm
+    objects = CategoryManager()
+
     name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
     slug = models.SlugField(unique=True, max_length=80)
     parent = models.ForeignKey(
@@ -55,7 +68,7 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
         null=True,
         related_name="children",
         verbose_name=_("Parent category"),
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
     )
     description = RichTextField(
         max_length=500,
@@ -76,7 +89,10 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
         FieldPanel("slug", widget=SlugInput),
         FieldPanel("description"),
         FieldPanel("colophon"),
-        FieldPanel("parent"),
+        MultiFieldPanel(
+            [FieldPanel("treebeard_ref_node"), FieldPanel("treebeard_position")],
+            heading=_("Place in the category tree"),
+        ),
     ]
 
     api_fields = [
@@ -101,14 +117,6 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
 
     def __str__(self):
         return self.name
-
-    def clean(self):
-        if self.parent:
-            parent = self.parent
-            if self.parent == self:
-                raise ValidationError(_("Parent category cannot be self."))
-            if parent.parent and parent.parent == self:
-                raise ValidationError(_("Cannot have circular Parents."))
 
     def save(self, *args, **kwargs):
         if not self.slug:

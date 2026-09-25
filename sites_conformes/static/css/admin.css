@@ -135,3 +135,10 @@
 .sf-notice .fr-notice__title {
     display: block;
 }
+
+.sf-category-tree__branch {
+    display: inline-block;
+    margin-inline-start: calc(var(--sf-tree-depth, 1) * 1.5rem);
+    margin-inline-end: 0.25rem;
+    opacity: 0.5;
+}

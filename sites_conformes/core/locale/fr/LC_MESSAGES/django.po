@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 15:03+0200\n"
+"POT-Creation-Date: 2026-09-25 15:32+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1050,6 +1050,9 @@ msgstr "Medium (140px)"
 msgid "Large (200px)"
 msgstr "Grand (200px)"
 
+msgid "A category cannot be moved under itself or one of its sub-categories."
+msgstr "Une catégorie ne peut pas être déplacée sous elle-même ou sous l’une de ses sous-catégories."
+
 msgid "Category name"
 msgstr "Nom de la catégorie"
 
@@ -1065,17 +1068,14 @@ msgstr "Affiché en haut de la page de la catégorie"
 msgid "Text displayed at the end of every page in the category"
 msgstr "Texte affiché à la fin de chaque page de la catégorie"
 
+msgid "Place in the category tree"
+msgstr "Place dans l’arborescence des catégories"
+
 msgid "Category"
 msgstr "Catégorie"
 
 msgid "Categories"
 msgstr "Catégories"
-
-msgid "Parent category cannot be self."
-msgstr "La catégorie ne peut être sa propre parente."
-
-msgid "Cannot have circular Parents."
-msgstr "Il est impossible d’avoir des parents circulaires."
 
 msgid "Content page"
 msgstr "Page de contenu"
@@ -1627,6 +1627,12 @@ msgstr "Pages avec l’étiquette {tag}"
 #, python-brace-format
 msgid "List of pages tagged with {tag}"
 msgstr "Liste de pages avec l’étiquette {tag}"
+
+#~ msgid "Parent category cannot be self."
+#~ msgstr "La catégorie ne peut être sa propre parente."
+
+#~ msgid "Cannot have circular Parents."
+#~ msgstr "Il est impossible d’avoir des parents circulaires."
 
 #~ msgid "2. DSFR components"
 #~ msgstr "2. Composants du DSFR"
