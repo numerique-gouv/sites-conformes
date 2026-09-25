@@ -17,6 +17,7 @@ from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import path
 from wagtail.models import Orderable
+from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
 from sites_conformes.blog.abstract import AbstractAuthoredIndexPage
@@ -325,6 +326,10 @@ class BlogEntryPage(SitesFacilesBasePage):
     authors = ParentalManyToManyField(
         "sites_conformes_blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
     )
+
+    search_fields = SitesFacilesBasePage.search_fields + [
+        index.SearchField("categories"),
+    ]
 
     parent_page_types = ["sites_conformes_blog.BlogIndexPage"]
     subpage_types = []
