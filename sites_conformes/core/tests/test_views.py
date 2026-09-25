@@ -465,6 +465,22 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         self.assertNotContains(response, "?category=bretagne")
         self.assertNotContains(response, gettext("Filter by category"))
 
+    def test_sidebar_is_hidden_when_the_chosen_groups_have_nothing_to_show(self):
+        locale = self.catalog_index_page.locale
+        theme = Category.objects.create(name="Thème", slug="theme", locale=locale)
+        Category.objects.create(name="Guides", slug="guides", parent=theme, locale=locale)
+        region = Category.objects.create(name="Région", slug="region", locale=locale)
+        self.entry1.categories.add(region)  # in use, but not under the chosen group
+        self.entry1.save()
+        self.catalog_index_page.filter_categories.add(theme)
+        self.catalog_index_page.filter_by_tag = False  # the fixture entries carry tags
+        self.catalog_index_page.save()
+
+        response = self.client.get(self.catalog_index_page.url)
+
+        self.assertFalse(self.catalog_index_page.show_filters)
+        self.assertNotContains(response, 'class="fr-sidemenu')
+
     def test_only_parent_categories_can_be_filter_groups(self):
         locale = self.catalog_index_page.locale
         theme = Category.objects.create(name="Thème", slug="theme", locale=locale)
