@@ -405,6 +405,30 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         self.assertNotContains(response, "Entrée 2")
         self.assertEqual(response.context["current_category"], category)
         self.assertContains(response, gettext("Filter by category"))
+        self.assertEqual(response.context["extra_breadcrumbs"]["current"], "Guides")
+        self.assertEqual(
+            response.context["extra_title"], gettext("Pages in category %(category)s") % {"category": "Guides"}
+        )
+        # The category is shown as a chip on the card, not only in the filter sidebar.
+        self.assertContains(response, '<p class="fr-tag">Guides</p>', html=True)
+
+    def test_category_and_tag_filters_combine(self):
+        category = Category.objects.create(name="Guides", slug="guides", locale=self.catalog_index_page.locale)
+        self.entry1.categories.add(category)  # tag-1
+        self.entry1.save()
+        self.entry3.categories.add(category)  # tag-1 and tag-2
+        self.entry3.save()
+
+        response = self.client.get(self.catalog_index_page.url + "?category=guides&tag=tag-2")
+
+        self.assertNotContains(response, "Entrée 1")
+        self.assertContains(response, "Entrée 3")
+        self.assertEqual(response.context["extra_breadcrumbs"]["current"], self.tag2)
+        self.assertEqual(
+            response.context["extra_title"],
+            gettext("%(title)s, in category %(category)s")
+            % {"title": gettext("Pages tagged with %(tag)s") % {"tag": "Tag 2"}, "category": "Guides"},
+        )
 
     def test_multiple_filter_and(self):
         self.catalog_index_page.filter_selection = CatalogIndexPage.MULTIPLE_FILTERS

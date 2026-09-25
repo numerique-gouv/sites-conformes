@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 11:48+0200\n"
+"POT-Creation-Date: 2026-09-25 14:52+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1093,6 +1093,10 @@ msgstr "Configuration des filtres"
 
 msgid "Catalog index page"
 msgstr "Index de catalogue"
+
+#, python-format
+msgid "%(title)s, in category %(category)s"
+msgstr "%(title)s, dans la catégorie %(category)s"
 
 #, python-format
 msgid "Pages in category %(category)s"
