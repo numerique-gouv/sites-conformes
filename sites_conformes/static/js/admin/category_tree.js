@@ -13,6 +13,8 @@ class CategoryTreeController extends window.StimulusModule.Controller {
     this.dragged = row.closest("[data-node]");
     this.dragged.classList.add("is-dragging");
     event.dataTransfer.effectAllowed = "move";
+    // Firefox and Safari only start a drag when some data is set.
+    event.dataTransfer.setData("text/plain", this.dragged.dataset.node);
   }
 
   end() {
