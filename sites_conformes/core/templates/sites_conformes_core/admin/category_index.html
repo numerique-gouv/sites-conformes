@@ -1,0 +1,7 @@
+{% extends "wagtailsnippets/snippets/index.html" %}
+{% load static %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script defer src="{% static 'js/admin/category_tree.js' %}"></script>
+{% endblock extra_js %}

@@ -1,5 +1,6 @@
 from importlib import import_module
 
+from bs4 import BeautifulSoup
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -57,12 +58,48 @@ class CategoryAdminTest(WagtailPageTestCase):
         self.housing = Category.objects.create(name="Logement", slug="logement", parent=self.theme)
         self.public = Category.objects.create(name="Public", slug="public")
 
-    def test_listing_shows_children_after_their_parent(self):
+    def test_listing_nests_children_inside_their_parent(self):
         response = self.client.get(reverse("wagtailsnippets_sites_conformes_core_category:list"))
 
         self.assertEqual(response.status_code, 200)
-        content = response.content.decode()
-        self.assertLess(content.index("Thème"), content.index("Logement"))
+        soup = BeautifulSoup(response.content, "html.parser")
+        self.assertIsNotNone(soup.select_one(f'[data-node="{self.theme.pk}"] [data-node="{self.housing.pk}"]'))
+        self.assertIsNotNone(soup.select_one("[data-root-zone]"))
+
+    def test_search_falls_back_to_the_flat_table(self):
+        response = self.client.get(reverse("wagtailsnippets_sites_conformes_core_category:list") + "?q=Logement")
+
+        self.assertContains(response, "Logement")
+        self.assertNotContains(response, "data-category-tree")
+
+    def test_drop_on_a_category_nests_under_it(self):
+        response = self.client.post(
+            reverse("wagtailsnippets_sites_conformes_core_category:move"),
+            {"node": self.housing.pk, "target": self.public.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.housing.refresh_from_db()
+        self.assertEqual(self.housing.parent, self.public)
+
+    def test_drop_on_the_root_zone_makes_a_root(self):
+        response = self.client.post(
+            reverse("wagtailsnippets_sites_conformes_core_category:move"), {"node": self.housing.pk}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.housing.refresh_from_db()
+        self.assertIsNone(self.housing.parent)
+
+    def test_drop_on_a_descendant_is_refused(self):
+        response = self.client.post(
+            reverse("wagtailsnippets_sites_conformes_core_category:move"),
+            {"node": self.theme.pk, "target": self.housing.pk},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.theme.refresh_from_db()
+        self.assertIsNone(self.theme.parent)
 
     def test_create_view_places_the_category_under_the_chosen_parent(self):
         response = self.client.post(

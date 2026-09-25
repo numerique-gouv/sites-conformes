@@ -1,0 +1,16 @@
+{% load wagtailadmin_tags %}
+<li data-node="{{ node.pk }}">
+  <div class="sf-category-tree__row" draggable="true">
+    <span class="sf-category-tree__handle" aria-hidden="true">{% icon name="grip" %}</span>
+    <a href="{% url view.edit_url_name node.pk %}">{{ node.name }}</a>
+  </div>
+  {% with children=node.get_children %}
+    {% if children %}
+      <ul class="sf-category-tree__list">
+        {% for node in children %}
+          {% include "sites_conformes_core/admin/category_tree_node.html" %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+</li>
