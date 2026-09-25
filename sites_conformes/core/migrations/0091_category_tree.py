@@ -19,6 +19,20 @@ def break_cycles(apps, schema_editor):
             parents[node] = None
 
 
+def number_siblings(apps, schema_editor):
+    """Numbers each group of siblings from 1, in the name order they were sorted by until now.
+
+    django-treebeard's adjacency list counts sibling orders from 1: with 0, moving a node
+    before another one silently leaves both at the same place.
+    """
+    Category = apps.get_model("sites_conformes_core", "Category")
+    parent_ids = Category.objects.values_list("parent_id", flat=True).distinct()
+    for parent_id in parent_ids:
+        siblings = Category.objects.filter(parent_id=parent_id).order_by("name", "pk")
+        for sib_order, category in enumerate(siblings, start=1):
+            Category.objects.filter(pk=category.pk).update(sib_order=sib_order)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -26,10 +40,26 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(break_cycles, migrations.RunPython.noop),
         migrations.AlterField(
             model_name='category',
             name='parent',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='sites_conformes_core.category', verbose_name='Parent category'),
         ),
+        migrations.AlterModelOptions(
+            name='category',
+            options={'ordering': ['sib_order'], 'verbose_name': 'Category', 'verbose_name_plural': 'Categories'},
+        ),
+        migrations.AddField(
+            model_name='category',
+            name='sib_order',
+            field=models.PositiveIntegerField(default=0, editable=False),
+        ),
+        migrations.RemoveField(
+            model_name='category',
+            name='sort_order',
+        ),
+        # Data last: an update before an ALTER TABLE on the same table fails with
+        # "pending trigger events" on PostgreSQL, in this single transaction.
+        migrations.RunPython(break_cycles, migrations.RunPython.noop),
+        migrations.RunPython(number_siblings, migrations.RunPython.noop),
     ]
