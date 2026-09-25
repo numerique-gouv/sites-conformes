@@ -41,6 +41,9 @@ et l’API garde ses clés `blog_categories` et `event_categories` :
   à ces champs dans vos migrations de données ;
 - `CatalogIndexPage.entries_per_page` devient `posts_per_page`, sans alias.
 
+Les catégories forment désormais un arbre django-treebeard. Supprimer une catégorie
+parente supprime aussi ses sous-catégories (elles remontaient à la racine auparavant).
+
 ## v4.0.0 - Packagification
 
 Cette version transforme `sites-conformes` en package Python distribué sur

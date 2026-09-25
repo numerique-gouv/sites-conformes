@@ -2,9 +2,7 @@ import zoneinfo
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils.translation import gettext
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
@@ -69,21 +67,6 @@ class CategoryTestCase(TestCase):
         category = CategoryFactory(name="Vie pratique", slug="")
 
         self.assertEqual(category.slug, "vie-pratique")
-
-    def test_category_cannot_be_its_own_parent(self):
-        category = CategoryFactory()
-        category.parent = category
-
-        with self.assertRaisesMessage(ValidationError, gettext("Parent category cannot be self.")):
-            category.clean()
-
-    def test_categories_cannot_be_circular(self):
-        parent = CategoryFactory()
-        child = CategoryFactory(parent=parent)
-        parent.parent = child
-
-        with self.assertRaisesMessage(ValidationError, gettext("Cannot have circular Parents.")):
-            parent.clean()
 
     def test_valid_parent(self):
         parent = CategoryFactory()
