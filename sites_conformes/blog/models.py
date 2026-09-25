@@ -330,6 +330,7 @@ class BlogEntryPage(SitesFacilesBasePage):
 
     search_fields = SitesFacilesBasePage.search_fields + [
         index.FilterField("date"),
+        index.SearchField("categories"),
     ]
 
     parent_page_types = ["sites_conformes_blog.BlogIndexPage"]
