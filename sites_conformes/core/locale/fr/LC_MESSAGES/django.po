@@ -1094,10 +1094,9 @@ msgstr "Configuration des filtres"
 msgid "Catalog index page"
 msgstr "Index de catalogue"
 
-#, fuzzy, python-format
-#| msgid "Parent category cannot be self."
+#, python-format
 msgid "Pages in category %(category)s"
-msgstr "La catégorie ne peut être sa propre parente."
+msgstr "Pages dans la catégorie %(category)s"
 
 #, python-format
 msgid "Pages tagged with %(tag)s"
