@@ -202,7 +202,7 @@ class CatalogIndexPage(AbstractIndexPage):
     @property
     def posts(self):
         # Get a list of live content pages that are children of this page
-        return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
+        return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags", "categories")
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
@@ -265,8 +265,18 @@ class CatalogIndexPage(AbstractIndexPage):
 
         if category:
             filtered["current_category"] = category
-            filtered["extra_title"] = _("Pages in category %(category)s") % {"category": category.name}
+            filtered["extra_title"] = self._category_title(category, filtered["extra_title"])
+            # A tag filter already put its own trail in place; otherwise show "Catalog > Category".
+            filtered["extra_breadcrumbs"] = filtered["extra_breadcrumbs"] or {
+                "links": [{"url": self.get_url(), "title": self.title}],
+                "current": category.name,
+            }
         return filtered
+
+    def _category_title(self, category: "Category", tag_title: str) -> str:
+        if tag_title:
+            return _("%(title)s, in category %(category)s") % {"title": tag_title, "category": category.name}
+        return _("Pages in category %(category)s") % {"category": category.name}
 
     def _filter_by_category(
         self, request: HttpRequest, entries: models.QuerySet

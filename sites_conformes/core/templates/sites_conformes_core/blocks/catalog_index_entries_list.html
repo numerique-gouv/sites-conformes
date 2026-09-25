@@ -8,9 +8,14 @@
             <a href="{{ entry.url }}">{{ entry.title }}</a>
           </h3>
           <p class="fr-card__desc">{{ entry.search_description |truncatewords:20 }}</p>
-          {% if entry.tags.all %}
+          {% if entry.categories.all or entry.tags.all %}
             <div class="fr-card__start">
               <ul class="fr-tags-group">
+                {% for cat in entry.categories.all %}
+                  <li>
+                    <p class="fr-tag">{{ cat.name }}</p>
+                  </li>
+                {% endfor %}
                 {% for tag in entry.tags.all %}
                   <li>
                     <p class="fr-tag">{{ tag.name }}</p>
