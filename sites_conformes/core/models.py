@@ -130,6 +130,10 @@ class ContentPage(SitesFacilesBasePage):
     class Meta:
         verbose_name = _("Content page")
 
+    search_fields = SitesFacilesBasePage.search_fields + [
+        index.SearchField("categories"),
+    ]
+
     content_panels = SitesFacilesBasePage.content_panels + [
         FieldPanel("tags"),
         FieldPanel("categories"),
