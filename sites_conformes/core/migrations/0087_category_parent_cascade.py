@@ -4,6 +4,21 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def break_cycles(apps, schema_editor):
+    """Detach any category whose parent chain loops back on itself: treebeard walks ancestors without a guard."""
+    Category = apps.get_model("sites_conformes_core", "Category")
+    parents = dict(Category.objects.values_list("pk", "parent_id"))
+    for pk in parents:
+        seen = set()
+        node = pk
+        while node is not None and node not in seen:
+            seen.add(node)
+            node = parents.get(node)
+        if node is not None:  # the walk came back to a node already seen: a cycle
+            Category.objects.filter(pk=node).update(parent=None)
+            parents[node] = None
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -11,6 +26,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(break_cycles, migrations.RunPython.noop),
         migrations.AlterField(
             model_name='category',
             name='parent',

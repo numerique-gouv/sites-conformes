@@ -1,3 +1,6 @@
+from importlib import import_module
+
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import gettext
@@ -32,6 +35,17 @@ class CategoryTreeTest(WagtailPageTestCase):
         self.theme.delete()
 
         self.assertEqual(set(Category.objects.values_list("name", flat=True)), {"Public", "Entreprises"})
+
+    def test_migration_breaks_parent_cycles_left_by_the_old_validation(self):
+        Category.objects.filter(pk=self.theme.pk).update(parent=self.housing)  # Thème -> Logement -> Thème
+        break_cycles = import_module("sites_conformes.core.migrations.0087_category_parent_cascade").break_cycles
+
+        break_cycles(apps, None)
+
+        roots = set(Category.objects.filter(parent=None).values_list("name", flat=True))
+        self.assertIn("Public", roots)
+        self.assertTrue({"Thème", "Logement"} & roots, "one node of the cycle is back at the root")
+        self.assertEqual([c.name for c in Category.get_tree()][:1] and len(Category.get_tree()), 5)
 
 
 class CategoryAdminTest(WagtailPageTestCase):
