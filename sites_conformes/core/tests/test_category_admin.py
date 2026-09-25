@@ -70,7 +70,7 @@ class CategoryAdminTest(WagtailPageTestCase):
         response = self.client.get(reverse("wagtailsnippets_sites_conformes_core_category:list") + "?q=Logement")
 
         self.assertContains(response, "Logement")
-        self.assertNotContains(response, "data-category-tree")
+        self.assertNotContains(response, 'data-controller="sf-category-tree"')
 
     def test_drop_on_a_category_nests_under_it(self):
         response = self.client.post(
