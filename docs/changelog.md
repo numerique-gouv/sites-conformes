@@ -14,6 +14,9 @@ La migration renomme la table en place et conserve les données, les traductions
 et les révisions. Lancez `python manage.py update_index` après `migrate` pour
 que la recherche de l’admin retrouve les catégories.
 
+Les catégories forment désormais un arbre django-treebeard. Supprimer une catégorie
+parente supprime aussi ses sous-catégories (elles remontaient à la racine auparavant).
+
 ## v4.0.0 - Packagification
 
 Cette version transforme `sites-conformes` en package Python distribué sur
