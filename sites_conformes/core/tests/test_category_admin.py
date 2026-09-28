@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from django.utils.translation import gettext
 from wagtail.test.utils import WagtailPageTestCase
+from wagtail_admin_treebeard.forms import INVALID_MOVE_MESSAGE
 
 from sites_conformes.core.models import Category
 
@@ -70,36 +70,7 @@ class CategoryAdminTest(WagtailPageTestCase):
         response = self.client.get(reverse("wagtailsnippets_sites_conformes_core_category:list") + "?q=Logement")
 
         self.assertContains(response, "Logement")
-        self.assertNotContains(response, 'data-controller="sf-category-tree"')
-
-    def test_drop_on_a_category_nests_under_it(self):
-        response = self.client.post(
-            reverse("wagtailsnippets_sites_conformes_core_category:move"),
-            {"node": self.housing.pk, "target": self.public.pk},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.housing.refresh_from_db()
-        self.assertEqual(self.housing.parent, self.public)
-
-    def test_drop_on_the_root_zone_makes_a_root(self):
-        response = self.client.post(
-            reverse("wagtailsnippets_sites_conformes_core_category:move"), {"node": self.housing.pk}
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.housing.refresh_from_db()
-        self.assertIsNone(self.housing.parent)
-
-    def test_drop_on_a_descendant_is_refused(self):
-        response = self.client.post(
-            reverse("wagtailsnippets_sites_conformes_core_category:move"),
-            {"node": self.theme.pk, "target": self.housing.pk},
-        )
-
-        self.assertEqual(response.status_code, 400)
-        self.theme.refresh_from_db()
-        self.assertIsNone(self.theme.parent)
+        self.assertNotContains(response, 'data-controller="tb-tree"')
 
     def test_create_view_places_the_category_under_the_chosen_parent(self):
         response = self.client.post(
@@ -127,6 +98,6 @@ class CategoryAdminTest(WagtailPageTestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, gettext("A category cannot be moved under itself or one of its sub-categories."))
+        self.assertContains(response, INVALID_MOVE_MESSAGE)
         self.theme.refresh_from_db()
         self.assertIsNone(self.theme.parent)

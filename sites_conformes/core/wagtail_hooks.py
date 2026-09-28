@@ -10,8 +10,9 @@ from wagtail.admin.rich_text.converters.html_to_contentstate import (
     BlockElementHandler,
 )
 from wagtail.snippets.models import register_snippet
+from wagtail_admin_treebeard.views import TreeSnippetViewSet
 
-from sites_conformes.core.views_admin import CategoryViewSet
+from sites_conformes.core.models import Category
 
 
 @hooks.register("register_rich_text_features")
@@ -135,6 +136,13 @@ def editor_js():
         '<script src="{}"></script>',
         static("content_manager/js/text-alignment.js"),
     )
+
+
+class CategoryViewSet(TreeSnippetViewSet):
+    model = Category
+    icon = "tag"  # type: ignore
+    list_display = ["name", "parent"]
+    search_fields = ["name"]
 
 
 register_snippet(CategoryViewSet)

@@ -37,12 +37,12 @@ from wagtail.models import Orderable
 from wagtail.models.i18n import TranslatableMixin
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
+from wagtail_admin_treebeard.forms import TreeNodeForm, tree_panel
 
 from sites_conformes.core import get_contentpage_model, get_contentpage_model_string, is_contentpage_swapped
 from sites_conformes.core.abstract import AbstractIndexPage, SitesFacilesBasePage
 from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
-from sites_conformes.core.forms import CategoryForm
 from sites_conformes.core.managers import TagManager
 from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
@@ -58,7 +58,7 @@ class Category(AL_Node, TranslatableMixin, index.Indexed, Orderable):
     """A category tree (django-treebeard adjacency list): ``parent`` is the only tree column."""
 
     node_order_by = ["name"]
-    base_form_class = CategoryForm
+    base_form_class = TreeNodeForm
     objects = CategoryManager()
 
     name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
@@ -90,10 +90,7 @@ class Category(AL_Node, TranslatableMixin, index.Indexed, Orderable):
         FieldPanel("slug", widget=SlugInput),
         FieldPanel("description"),
         FieldPanel("colophon"),
-        MultiFieldPanel(
-            [FieldPanel("treebeard_ref_node"), FieldPanel("treebeard_position")],
-            heading=_("Place in the category tree"),
-        ),
+        tree_panel(heading=_("Place in the category tree")),
     ]
 
     api_fields = [

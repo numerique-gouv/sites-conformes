@@ -1983,6 +1983,7 @@ dependencies = [
     { name = "unidecode" },
     { name = "wagtail" },
     { name = "wagtail-2fa" },
+    { name = "wagtail-admin-treebeard" },
     { name = "wagtail-honeypot" },
     { name = "wagtail-localize" },
     { name = "wagtail-markdown" },
@@ -2035,6 +2036,7 @@ requires-dist = [
     { name = "unidecode", specifier = ">=1.4.0" },
     { name = "wagtail", specifier = ">=7.2.0,<8.0.0" },
     { name = "wagtail-2fa", specifier = "==1.8.0" },
+    { name = "wagtail-admin-treebeard", url = "https://github.com/incubateur-ademe/plusfraisautravail/archive/593a25895082b3b190dfbf7ba9c6964de9936677.tar.gz", subdirectory = "packages/wagtail-admin-treebeard" },
     { name = "wagtail-honeypot", specifier = ">=1.2.1" },
     { name = "wagtail-localize", specifier = ">=1.12.1" },
     { name = "wagtail-markdown", specifier = ">=0.12.1" },
@@ -2283,6 +2285,29 @@ sdist = { url = "https://files.pythonhosted.org/packages/12/9a/b7166a0f7cee7121f
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/bb/6f14801cacee011c696b4f12de5ff28e11556ae996ab46d06dbc3f72d915/wagtail_2fa-1.8.0-py3-none-any.whl", hash = "sha256:cfd3d2678c53f16f3af4b0f7587c1fd0508488cbf70bc0176151bcf2369a093f", size = 41064, upload-time = "2026-03-02T15:38:10.039Z" },
 ]
+
+[[package]]
+name = "wagtail-admin-treebeard"
+version = "0.1.0"
+source = { url = "https://github.com/incubateur-ademe/plusfraisautravail/archive/593a25895082b3b190dfbf7ba9c6964de9936677.tar.gz", subdirectory = "packages/wagtail-admin-treebeard" }
+dependencies = [
+    { name = "django" },
+    { name = "django-treebeard" },
+    { name = "wagtail" },
+]
+sdist = { hash = "sha256:53b0d82add602e630f588cc9f589dff833dd5753a051731d18c02ea015cdc3e2" }
+
+[package.metadata]
+requires-dist = [
+    { name = "beautifulsoup4", marker = "extra == 'dev'", specifier = ">=4.12" },
+    { name = "django", specifier = ">=5.0" },
+    { name = "django-treebeard", specifier = ">=5.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3" },
+    { name = "pytest-django", marker = "extra == 'dev'", specifier = ">=4.9" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.7" },
+    { name = "wagtail", specifier = ">=7.0" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "wagtail-factories"
