@@ -48,6 +48,7 @@ dependencies = [
     "django-otp>=1.7.0",
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
+    "django-treebeard>=5.3.1",
 ]
 
 [dependency-groups]
