@@ -50,6 +50,7 @@ dependencies = [
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
     "swapper>=1.4,<2",
+    "django-treebeard>=5.3.1",
 ]
 
 [dependency-groups]
