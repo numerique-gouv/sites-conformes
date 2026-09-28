@@ -51,6 +51,8 @@ dependencies = [
     "djangorestframework>=3.18.0",
     "swapper>=1.4,<2",
     "django-treebeard>=5.3.1",
+    # Not on PyPI yet: pinned to the commit that merged it in the plusfraisautravail monorepo.
+    "wagtail-admin-treebeard @ https://github.com/incubateur-ademe/plusfraisautravail/archive/593a25895082b3b190dfbf7ba9c6964de9936677.tar.gz#subdirectory=packages/wagtail-admin-treebeard",
 ]
 
 [dependency-groups]
