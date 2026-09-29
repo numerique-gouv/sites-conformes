@@ -154,12 +154,13 @@ class ImageAndTextBlock(blocks.StructBlock):
     image = CustomImageBlock(
         label=_("Image"),
         help_text=_(
-            "Recommended image size depends on the width of the image selected below:<br>"
-            "- 3/12: 238 × 158 px<br>"
-            "- 4/12: 336 × 224 px<br>"
-            "- 5/12: 434 × 289 px<br>"
-            "- 6/12: 532 × 354 px<br>"
-            "💡 Tip: choose a slightly larger image to avoid blurring when resizing."
+            "<strong>On desktop</strong>, the image is displayed next to the text. "
+            "Its width depends on the “Image width” field below: "
+            "about 250 px (3/12), 350 px (4/12), 450 px (5/12) or 560 px (6/12).<br>"
+            "<strong>On mobile</strong>, the image moves above or below the text, depending on the "
+            "“Image position” field, and takes up the full width of the screen (up to about 510 px).<br>"
+            "The image is never cropped: it is scaled down to fit the available space, keeping its proportions.<br>"
+            "<strong>Tip:</strong> choose an image at least 600 px wide, whatever the width chosen."
         ),
     )
     image_side = blocks.ChoiceBlock(
@@ -181,7 +182,10 @@ class ImageAndTextBlock(blocks.StructBlock):
             ("6", "6/12"),
         ],
         default="3",
-        help_text=_("Defines the width of the image relative to the text, based on a 12-column grid."),
+        help_text=_(
+            "Share of the block width taken up by the image on desktop, based on a 12-column grid: "
+            "3/12 is a quarter, 6/12 is half. On mobile, the image always takes up the full width."
+        ),
     )
     text = blocks.RichTextBlock(label=_("Rich text"))
     link = SingleLinkBlock(
