@@ -1,12 +1,20 @@
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES_ILLUSTRATION, IMAGE_RATIOS
 from wagtail import blocks
-from wagtail.blocks import StructBlockValidationError, StructValue
+from wagtail.blocks import StructValue
 from wagtail.images import get_image_model
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.blocks.badges_tags import TagListBlock
+from sites_conformes.core.blocks.buttons_links import (
+    ButtonBlock,
+    ButtonsHorizontalListBlock,
+    IconPickerBlock,
+    LinkWithoutLabelBlock,
+    SingleLinkBlock,
+)
+from sites_conformes.core.blocks.medias import CustomImageBlock
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES,
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
@@ -17,15 +25,6 @@ from sites_conformes.core.constants import (
     MEDIA_WIDTH_CHOICES,
     TEXT_SIZE_CHOICES,
 )
-
-from .buttons_links import (
-    ButtonBlock,
-    ButtonsHorizontalListBlock,
-    IconPickerBlock,
-    LinkWithoutLabelBlock,
-    SingleLinkBlock,
-)
-from .medias import CustomImageBlock
 
 Image = get_image_model()
 
@@ -154,12 +153,14 @@ class HighlightBlock(blocks.StructBlock):
 class ImageAndTextBlock(blocks.StructBlock):
     image = CustomImageBlock(
         label=_("Image"),
-        help_text=_("""Recommended image size depends on the width of the image selected below:<br>
-- 3/12: 238 × 158 px<br>
-- 4/12: 336 × 224 px<br>
-- 5/12: 434 × 289 px<br>
-- 6/12: 532 × 354 px<br>
-💡 Tip: choose a slightly larger image to avoid blurring when resizing."""),
+        help_text=_(
+            "Recommended image size depends on the width of the image selected below:<br>"
+            "- 3/12: 238 × 158 px<br>"
+            "- 4/12: 336 × 224 px<br>"
+            "- 5/12: 434 × 289 px<br>"
+            "- 6/12: 532 × 354 px<br>"
+            "💡 Tip: choose a slightly larger image to avoid blurring when resizing."
+        ),
     )
     image_side = blocks.ChoiceBlock(
         label=_("Image position"),
@@ -218,18 +219,12 @@ class CenteredImageBlock(blocks.StructBlock):
     )
     image = CustomImageBlock(
         label=_("Image"),
-        help_text=_("""Recommended width: minimum 900 px.<br>
-            Then adjust the image width according to the option selected below: 
-            900 px (small), 1200 px (medium) or 1500 px (large), 
-            and depending on the image ratio."""),
-    )
-    alt = blocks.CharBlock(
-        label=_("Alternative text (textual description of the image)"),
         help_text=_(
-            "This field is obsolete and will be removed in the near future. "
-            "Please use the alt field of the image itself."
+            "Recommended width: minimum 900 px.<br>"
+            "Then adjust the image width according to the option selected below: "
+            "900 px (small), 1200 px (medium) or 1500 px (large), "
+            "and depending on the image ratio."
         ),
-        required=False,
     )
     width = blocks.ChoiceBlock(
         label=_("Witdh"),
@@ -254,23 +249,6 @@ class CenteredImageBlock(blocks.StructBlock):
     caption = blocks.CharBlock(label=_("Caption"), required=False)
     url = blocks.URLBlock(label=_("Link"), required=False)
 
-    def clean(self, value):
-        value = super().clean(value)
-
-        if value.get("alt"):
-            raise StructBlockValidationError(
-                block_errors={
-                    "alt": ValidationError(
-                        _(
-                            "This field is obsolete and will be removed in the near future. "
-                            "Please use the alt field of the image itself."
-                        )
-                    )
-                }
-            )
-
-        return value
-
     class Meta:
         icon = "image"
         template = "sites_conformes_core/blocks/image.html"
@@ -278,7 +256,7 @@ class CenteredImageBlock(blocks.StructBlock):
 
 
 class QuoteBlock(blocks.StructBlock):
-    image = CustomImageBlock(
+    image = ImageChooserBlock(
         label=_("Image"),
         required=False,
         help_text=_("Optional image of the author. The image will be adjusted to a square format (1:1) of 184px."),
@@ -428,7 +406,7 @@ class VerticalContactCardBlock(blocks.StructBlock):
     role = blocks.CharBlock(label=_("Role"), max_length=255, required=False)
     organization = blocks.CharBlock(label=_("Organization"), max_length=255, required=False)
     contact_info = blocks.CharBlock(label=_("Contact info"), max_length=500, required=False)
-    image = CustomImageBlock(label="Image", required=False)
+    image = ImageChooserBlock(label="Image", required=False)
     tags = TagListBlock(label=_("Tags"), required=False)
 
     class Meta:

@@ -354,7 +354,7 @@ class Command(BaseCommand):
         text = "".join(f"<p>{p}</p>" for p in fake.paragraphs(nb=3))
         body.append(("paragraph", RichText(text)))
 
-        # image (CenteredImageBlock - ImageChooserBlock)
+        # image (CenteredImageBlock)
         body.append(
             (
                 "image",
@@ -667,7 +667,7 @@ class Command(BaseCommand):
             (
                 "quote",
                 {
-                    "image": {"image": img_placeholder, "alt_text": "", "decorative": True},
+                    "image": img_placeholder,
                     "quote": fake.sentence(nb_words=10),
                     "author_name": fake.name(),
                     "author_title": fake.job(),

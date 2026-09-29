@@ -4,15 +4,19 @@ from wagtail import blocks
 from wagtail.blocks import StructValue
 
 from sites_conformes.core.blocks.badges_tags import BadgesListBlock, TagListBlock
+from sites_conformes.core.blocks.buttons_links import (
+    ButtonsHorizontalListBlock,
+    IconPickerBlock,
+    LinksVerticalListBlock,
+    LinkWithoutLabelBlock,
+)
+from sites_conformes.core.blocks.medias import CustomImageBlock
 from sites_conformes.core.constants import (
     HEADING_CHOICES,
     HORIZONTAL_CARD_IMAGE_RATIOS,
     LIMITED_RICHTEXTFIELD_FEATURES,
     LIMITED_RICHTEXTFIELD_FEATURES_WITHOUT_LINKS,
 )
-
-from .buttons_links import ButtonsHorizontalListBlock, IconPickerBlock, LinksVerticalListBlock, LinkWithoutLabelBlock
-from .medias import CustomImageBlock
 
 
 class CardstructValue(StructValue):
@@ -140,11 +144,12 @@ class HorizontalCardBlock(CardBlock):
     image = CustomImageBlock(
         label=_("Image"),
         required=False,
-        help_text=_("""Recommended width according to the chosen ratio: <br>
-                    - 50/50: 599 × 336 px <br>
-                    - 1/3: 399 × 224 px <br>
-                    Adjust the width if necessary depending on the display format.
-        """),
+        help_text=_(
+            "Recommended width according to the chosen ratio:<br>"
+            "- 50/50: 599 × 336 px<br>"
+            "- 1/3: 399 × 224 px<br>"
+            "Adjust the width if necessary depending on the display format."
+        ),
     )
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
@@ -173,7 +178,7 @@ class VerticalCardBlock(CardBlock):
         required=False,
         help_text=_(
             "Recommended width: minimum 1200 px. "
-            "This width corresponds to a single-column layout (the widest)."
+            "This width corresponds to a single-column layout (the widest). "
             "The ideal width decreases if you use multiple columns."
         ),
     )
@@ -195,7 +200,14 @@ class TileBlock(blocks.StructBlock):
     description = blocks.RichTextBlock(
         label=_("Content"), features=LIMITED_RICHTEXTFIELD_FEATURES_WITHOUT_LINKS, required=False
     )
-    image = CustomImageBlock(label=_("Image"), help_text=_("Prefer SVG files."), required=False)
+    image = CustomImageBlock(
+        label=_("Image"),
+        help_text=_(
+            "Prefer SVG files. If the image contains information (figure, text), fill in the alt text; "
+            "otherwise, mark it as decorative."
+        ),
+        required=False,
+    )
     link = LinkWithoutLabelBlock(
         label=_("Link"),
         required=False,

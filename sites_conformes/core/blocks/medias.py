@@ -20,11 +20,12 @@ class CustomImageBlock(ImageBlock):
 
         if "decorative" in self.child_blocks:
             self.child_blocks["decorative"].field.help_text = _(
-                "Check if the image is purely decorative. " "In this case, the alt attribute (alt text) will be empty."
+                "Check if the image conveys no information, or only information already given by the surrounding "
+                "text. In this case, the alt attribute will be empty."
             )
         if "alt_text" in self.child_blocks:
             self.child_blocks["alt_text"].field.help_text = _(
-                "Used by screen readers if the image is not marked as decorative."
+                "Used by screen readers if the image is not marked as decorative. "
                 "Describe the content or purpose of the image in a short, clear sentence."
             )
 
