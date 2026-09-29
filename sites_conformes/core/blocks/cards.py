@@ -145,10 +145,12 @@ class HorizontalCardBlock(CardBlock):
         label=_("Image"),
         required=False,
         help_text=_(
-            "Recommended width according to the chosen ratio:<br>"
-            "- 50/50: 599 × 336 px<br>"
-            "- 1/3: 399 × 224 px<br>"
-            "Adjust the width if necessary depending on the display format."
+            "<strong>On desktop:</strong> the image takes up half of the card in 50/50 (up to 600 px wide) "
+            "or a third in 1/3 (up to 400 px). Its height follows that of the text.<br>"
+            "<strong>On mobile:</strong> the image moves above the text, across the full width (up to 740 px), "
+            "in 16:9 format.<br>"
+            "<strong>Tip:</strong> an image of at least 800 × 600 px, with the important element in the center, "
+            "displays well in both cases."
         ),
     )
     image_ratio = blocks.ChoiceBlock(
