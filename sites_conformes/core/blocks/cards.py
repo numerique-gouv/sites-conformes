@@ -145,12 +145,15 @@ class HorizontalCardBlock(CardBlock):
         label=_("Image"),
         required=False,
         help_text=_(
-            "<strong>On desktop:</strong> the image takes up half of the card in 50/50 (up to 600 px wide) "
-            "or a third in 1/3 (up to 400 px). Its height follows that of the text.<br>"
-            "<strong>On mobile:</strong> the image moves above the text, across the full width (up to 740 px), "
-            "in 16:9 format.<br>"
-            "<strong>Tip:</strong> an image of at least 800 × 600 px, with the important element in the center, "
-            "displays well in both cases."
+            "<strong>On desktop</strong>, the image is displayed to the left of the text. "
+            "Its width depends on the “Image ratio” field below: "
+            "half of the card with 50/50 (up to 600 px), a third with 1/3 (up to 400 px).<br>"
+            "Its height is that of the card, which grows with the length of the text. The image is cut at the edges "
+            "to fill exactly this height: the longer the text, the more its sides are trimmed.<br>"
+            "<strong>On mobile</strong>, the image moves above the text, across the full width of the screen, "
+            "in landscape format (16:9).<br>"
+            "<strong>Tip:</strong> choose an image of at least 800 × 600 px and place the important element "
+            "in the center, as this is the part that remains visible in all cases."
         ),
     )
     image_ratio = blocks.ChoiceBlock(
@@ -158,6 +161,10 @@ class HorizontalCardBlock(CardBlock):
         choices=HORIZONTAL_CARD_IMAGE_RATIOS,
         required=False,
         default="fr-card--horizontal-half",
+        help_text=_(
+            "Share of the card width taken up by the image on desktop. "
+            "On mobile, the image always takes up the full width."
+        ),
     )
     bottom_detail_text = blocks.CharBlock(
         label=_("Bottom detail: text"),
