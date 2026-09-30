@@ -4,8 +4,9 @@
 {% settings_value "SF_SCHEME_DEPENDENT_SVGS" as scheme_dependent_svgs %}
 
 {% if scheme_dependent_svgs and artwork.file.name|slice:"-4:" == ".svg" %}
+  {% firstof alt artwork.alt as svg_label %}
   <div class="fr-responsive-img">
-    <svg aria-hidden="true" class="fr-artwork" viewBox="0 0 80 80">
+    <svg {% if svg_label %}role="img" aria-label="{{ svg_label }}"{% else %}aria-hidden="true"{% endif %} class="fr-artwork" viewBox="0 0 80 80">
       <use class="fr-artwork-decorative" href="{{ artwork.full_url }}#artwork-decorative"></use>
       <use class="fr-artwork-minor" href="{{ artwork.full_url }}#artwork-minor"></use>
       <use class="fr-artwork-major" href="{{ artwork.full_url }}#artwork-major"></use>

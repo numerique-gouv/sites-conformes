@@ -231,3 +231,34 @@ class HelpTextWithDetailsTestCase(TestCase):
             help_text = str(help_text_with_details("Résumé", "Détails"))
 
         self.assertIn("<summary>Comment l'image s'affiche-t-elle ?</summary>", help_text)
+
+
+@override_settings(SF_SCHEME_DEPENDENT_SVGS=True)
+class ImageAndTextSvgAltTestCase(WagtailPageTestCase):
+    def setUp(self):
+        self.home = Page.objects.get(slug="home")
+        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "fichier_2023.svg")
+
+    def get_svg(self, alt_text, decorative):
+        value = {
+            "image": {"image": self.image, "alt_text": alt_text, "decorative": decorative},
+            "text": RichText("<p>Sample</p>"),
+        }
+        page = self.home.add_child(
+            instance=ContentPage(title="Image and text", slug="image-and-text", body=[("imageandtext", value)])
+        )
+        soup = BeautifulSoup(self.client.get(page.url).content, "html.parser")
+        return soup.select_one(".cmsfr-block-image-and-text svg.fr-artwork")
+
+    def test_svg_artwork_has_accessible_name(self):
+        svg = self.get_svg("87 % de satisfaction", False)
+
+        self.assertEqual(svg["role"], "img")
+        self.assertEqual(svg["aria-label"], "87 % de satisfaction")
+        self.assertFalse(svg.has_attr("aria-hidden"))
+
+    def test_decorative_svg_artwork_is_hidden(self):
+        svg = self.get_svg("", True)
+
+        self.assertEqual(svg["aria-hidden"], "true")
+        self.assertFalse(svg.has_attr("role"))
