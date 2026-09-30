@@ -19,6 +19,7 @@ from .basics import TextContentAllAlignments, TextContentLeftRight, TextContentV
 from .buttons_links import ButtonBlock, ButtonsHorizontalListBlock
 from .layout import BackgroundColorChoiceBlock, LayoutBlock
 from .medias import CustomImageBlock, ImageBlockWithDefault
+from .utils import help_text_with_details
 
 
 class HeroImageStructValue(StructValue):
@@ -53,6 +54,24 @@ class HeroImageBlock(blocks.StructBlock):
 
 
 class HeroImageBlockWithRatioWidth(HeroImageBlock):
+    image = ImageBlockWithDefault(
+        label=_("Image"),
+        default_image_title="Banner Sites Faciles Dimitri Iakymuk Unsplash",
+        required=False,
+        help_text=help_text_with_details(
+            _("Recommended size: at least 1920 px wide with the “Large” width (default)."),
+            _(
+                "<strong>On desktop</strong>, the width of the image depends on the “Image width” field: "
+                "900 px (small), 1200 px (medium) or the full width of the screen "
+                "(large, 1920 px on a large screen).<br>"
+                "Its height depends on the “Image ratio” field (32:9 by default, a very elongated banner): "
+                "the image is cropped to this format. "
+                "The “Image positioning” field indicates the part to keep visible.<br>"
+                "<strong>On mobile</strong>, the image takes up the full width of the screen with the same ratio: "
+                "in 32:9, the banner is only about a hundred pixels high. Avoid putting text in it."
+            ),
+        ),
+    )
     image_width = blocks.ChoiceBlock(
         label=_("Image width"),
         choices=MEDIA_WIDTH_CHOICES,
@@ -76,6 +95,25 @@ class HeroImageBlockWithRatioWidth(HeroImageBlock):
 
 
 class HeroImageBlockWithMask(HeroImageBlock):
+    image = ImageBlockWithDefault(
+        label=_("Image"),
+        default_image_title="Banner Sites Faciles Dimitri Iakymuk Unsplash",
+        required=False,
+        help_text=help_text_with_details(
+            _("Recommended size: at least 1900 × 650 px, with the important element in the center."),
+            _(
+                "The image is placed in the background, behind the text, across the full width of the screen "
+                "and at least 650 px high (more if the text is long). It is first cropped into a 1900 × 650 px "
+                "banner: if it is taller, its focal point (to be set in the media library) indicates the band "
+                "to keep, otherwise the center is kept.<br>"
+                "<strong>On desktop</strong>, the banner is visible almost in full.<br>"
+                "<strong>On mobile</strong>, only a band about 400 px wide, in the center of the image, "
+                "remains visible, whatever the focal point.<br>"
+                "The text is displayed on top of it: choose an uncluttered image, "
+                "or use the “Image mask” field to darken or lighten it."
+            ),
+        ),
+    )
     # Overriding image_positioning to offer fewer options than in HeroImageBlock
     image_positioning = blocks.ChoiceBlock(
         choices=[
@@ -113,7 +151,20 @@ class HeroImageAndTextBlock(blocks.StructBlock):
         help_text=_("""Please use only one primary button.
             If you use icons, use them on all buttons and align them on the same side."""),
     )
-    image = ImageBlockWithDefault(label=_("Hero image"), default_image_title="Illustration Sites Faciles Homme Nuages")
+    image = ImageBlockWithDefault(
+        label=_("Hero image"),
+        default_image_title="Illustration Sites Faciles Homme Nuages",
+        help_text=help_text_with_details(
+            _("Recommended size: at least 600 × 600 px. The image is displayed as a square."),
+            _(
+                "The image is cropped into a square keeping its focal point (to be set in the media library) "
+                "in the frame, or around its center if there is none.<br>"
+                "<strong>On desktop</strong>, it is displayed next to the text, in a square of up to 600 px.<br>"
+                "<strong>On mobile</strong>, it moves below the text and takes up the full width of the screen, "
+                "still as a square."
+            ),
+        ),
+    )
     layout = LayoutBlock(label=_("Layout"))
 
     class Meta:
@@ -234,7 +285,21 @@ class OldHero(blocks.StructBlock):
         label=_("Show title in header image?"),
         required=False,
     )
-    header_image = CustomImageBlock(label=_("Header image"), required=False)
+    header_image = CustomImageBlock(
+        label=_("Header image"),
+        required=False,
+        help_text=help_text_with_details(
+            _("Background image of 1200 × 350 px, with the important element in the center."),
+            _(
+                "The image is placed in the background, across the full width of the screen and 350 px high. "
+                "It is first cropped into a 1200 × 350 px banner: if it is taller, its focal point "
+                "(to be set in the media library) indicates the band to keep, otherwise the center is kept.<br>"
+                "<strong>On desktop</strong>, beyond 1200 px wide, it is enlarged and may lose sharpness.<br>"
+                "<strong>On mobile</strong>, only a band about 400 px wide, in the center of the image, "
+                "remains visible, whatever the focal point."
+            ),
+        ),
+    )
     header_color_class = blocks.ChoiceBlock(
         label=_("Background color"),
         choices=COLOR_CHOICES,
