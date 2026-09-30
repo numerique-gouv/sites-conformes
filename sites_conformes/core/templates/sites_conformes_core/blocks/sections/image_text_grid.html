@@ -6,7 +6,7 @@
       {% for item in rendered_items %}
         <div class="fr-col-12 fr-col-md-{{ value.items_per_row }} fr-pb-2v fr-pr-4v">
           <div>
-            <img src="{{ item.rendition.full_url }}" alt={{ item.rendition.alt }} />
+            <img src="{{ item.rendition.full_url }}" alt="{{ item.rendition.alt }}" />
           </div>
           <h3 class="fr-h5 fr-pt-5v">{{ item.title }}</h3>
           <p class="">{{ item.text|richtext }}</p>

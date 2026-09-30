@@ -181,3 +181,36 @@ class TileImageAltTestCase(WagtailPageTestCase):
 
         self.assertEqual(svg["aria-hidden"], "true")
         self.assertFalse(svg.has_attr("role"))
+
+
+class SectionAndHeroImagesTestCase(WagtailPageTestCase):
+    def setUp(self):
+        self.home = Page.objects.get(slug="home")
+        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "fichier_2023.svg")
+        self.image_value = {"image": self.image, "alt_text": "Un homme dans les nuages", "decorative": False}
+
+    def get_soup(self, page):
+        return BeautifulSoup(self.client.get(page.url).content, "html.parser")
+
+    def test_grid_section_keeps_multi_word_alt(self):
+        grid_block = ContentPage._meta.get_field("body").stream_block.child_blocks["image_text_grid_section"]
+        value = dict(grid_block.get_default())
+        value["items"] = [{**dict(item), "image": self.image_value} for item in value["items"]]
+        page = self.home.add_child(
+            instance=ContentPage(title="Grid", slug="grid", body=[("image_text_grid_section", value)])
+        )
+
+        imgs = self.get_soup(page).select(".cmsfr-text-content--left img")
+
+        self.assertTrue(imgs)
+        for img in imgs:
+            self.assertEqual(img["alt"], "Un homme dans les nuages")
+
+    def test_old_hero_background_is_centered(self):
+        hero_block = ContentPage._meta.get_field("hero").stream_block.child_blocks["old_hero"]
+        value = {**dict(hero_block.get_default()), "header_image": self.image_value}
+        page = self.home.add_child(instance=ContentPage(title="Hero", slug="hero", hero=[("old_hero", value)]))
+
+        hero = self.get_soup(page).select_one(".cmsfr-hero")
+
+        self.assertIn("cmsfr-hero-position--center", hero["class"])
