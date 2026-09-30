@@ -224,7 +224,7 @@ class TileBlock(blocks.StructBlock):
     image = CustomImageBlock(
         label=_("Image"),
         help_text=help_text_with_details(
-            _("Small image, up to 80 px wide: prefer a pictogram in SVG format."),
+            _("Recommended size: at least 80 px wide, or preferably a pictogram in SVG format."),
             _(
                 "The image is displayed at the top of the tile (on the left for a horizontal tile), "
                 "up to 80 px wide on desktop as on mobile, slightly less for a small tile. "
