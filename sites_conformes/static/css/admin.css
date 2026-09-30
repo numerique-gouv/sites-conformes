@@ -135,3 +135,23 @@
 .sf-notice .fr-notice__title {
     display: block;
 }
+/* Collapsible help texts (see help_text_with_details) */
+.sf-help-details {
+    margin-top: 0.25rem;
+}
+
+.sf-help-details > summary {
+    display: list-item;
+    width: fit-content;
+    cursor: pointer;
+    color: var(--w-color-text-link-default);
+    text-decoration: underline;
+}
+
+.sf-help-details > summary:hover {
+    color: var(--w-color-text-link-hover);
+}
+
+.sf-help-details[open] > summary {
+    margin-bottom: 0.25rem;
+}

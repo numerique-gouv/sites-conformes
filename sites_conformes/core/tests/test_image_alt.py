@@ -5,10 +5,12 @@ from bs4 import BeautifulSoup
 from django.apps import apps
 from django.db import connection
 from django.test import TestCase, override_settings
+from django.utils import translation
 from wagtail.models import Page, Revision
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
+from sites_conformes.core.blocks.utils import help_text_with_details
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 
@@ -214,3 +216,18 @@ class SectionAndHeroImagesTestCase(WagtailPageTestCase):
         hero = self.get_soup(page).select_one(".cmsfr-hero")
 
         self.assertIn("cmsfr-hero-position--center", hero["class"])
+
+
+class HelpTextWithDetailsTestCase(TestCase):
+    def test_summary_stays_visible_and_details_are_collapsible(self):
+        help_text = str(help_text_with_details("Summary", "Details", details_label="Label"))
+
+        self.assertEqual(
+            help_text, 'Summary<details class="sf-help-details"><summary>Label</summary>Details</details>'
+        )
+
+    def test_default_label_is_translated(self):
+        with translation.override("fr"):
+            help_text = str(help_text_with_details("Résumé", "Détails"))
+
+        self.assertIn("<summary>Comment l'image s'affiche-t-elle ?</summary>", help_text)

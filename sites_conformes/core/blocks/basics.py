@@ -15,6 +15,7 @@ from sites_conformes.core.blocks.buttons_links import (
     SingleLinkBlock,
 )
 from sites_conformes.core.blocks.medias import CustomImageBlock
+from sites_conformes.core.blocks.utils import help_text_with_details
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES,
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
@@ -153,14 +154,16 @@ class HighlightBlock(blocks.StructBlock):
 class ImageAndTextBlock(blocks.StructBlock):
     image = CustomImageBlock(
         label=_("Image"),
-        help_text=_(
-            "<strong>On desktop</strong>, the image is displayed next to the text. "
-            "Its width depends on the “Image width” field below: "
-            "about 250 px (3/12), 350 px (4/12), 450 px (5/12) or 560 px (6/12).<br>"
-            "<strong>On mobile</strong>, the image moves above or below the text, depending on the "
-            "“Image position” field, and takes up the full width of the screen (up to about 510 px).<br>"
-            "The image is never cropped: it is scaled down to fit the available space, keeping its proportions.<br>"
-            "<strong>Tip:</strong> choose an image at least 600 px wide, whatever the width chosen."
+        help_text=help_text_with_details(
+            _("Recommended size: at least 600 px wide, whatever the width chosen."),
+            _(
+                "<strong>On desktop</strong>, the image is displayed next to the text. "
+                "Its width depends on the “Image width” field below: "
+                "about 250 px (3/12), 350 px (4/12), 450 px (5/12) or 560 px (6/12).<br>"
+                "<strong>On mobile</strong>, the image moves above or below the text, depending on the "
+                "“Image position” field, and takes up the full width of the screen (up to about 510 px).<br>"
+                "The image is never cropped: it is scaled down to fit the available space, keeping its proportions."
+            ),
         ),
     )
     image_side = blocks.ChoiceBlock(
@@ -223,11 +226,16 @@ class CenteredImageBlock(blocks.StructBlock):
     )
     image = CustomImageBlock(
         label=_("Image"),
-        help_text=_(
-            "Recommended width: minimum 900 px.<br>"
-            "Then adjust the image width according to the option selected below: "
-            "900 px (small), 1200 px (medium) or 1500 px (large), "
-            "and depending on the image ratio."
+        help_text=help_text_with_details(
+            _("Recommended size: at least 1200 px wide, 1920 px for the “Large” width."),
+            _(
+                "<strong>On desktop</strong>, the width of the image depends on the “Width” field below: "
+                "900 px (small), 1200 px (medium) or the full width of the screen "
+                "(large, 1920 px on a large screen).<br>"
+                "Its height depends on the “Image ratio” field: the image is cropped to this format, "
+                "around its center.<br>"
+                "<strong>On mobile</strong>, the image takes up the full width of the screen, with the same ratio."
+            ),
         ),
     )
     width = blocks.ChoiceBlock(

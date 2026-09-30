@@ -11,6 +11,7 @@ from sites_conformes.core.blocks.buttons_links import (
     LinkWithoutLabelBlock,
 )
 from sites_conformes.core.blocks.medias import CustomImageBlock
+from sites_conformes.core.blocks.utils import help_text_with_details
 from sites_conformes.core.constants import (
     HEADING_CHOICES,
     HORIZONTAL_CARD_IMAGE_RATIOS,
@@ -144,16 +145,18 @@ class HorizontalCardBlock(CardBlock):
     image = CustomImageBlock(
         label=_("Image"),
         required=False,
-        help_text=_(
-            "<strong>On desktop</strong>, the image is displayed to the left of the text. "
-            "Its width depends on the “Image ratio” field below: "
-            "half of the card with 50/50 (up to 600 px), a third with 1/3 (up to 400 px).<br>"
-            "Its height is that of the card, which grows with the length of the text. The image is cut at the edges "
-            "to fill exactly this height: the longer the text, the more its sides are trimmed.<br>"
-            "<strong>On mobile</strong>, the image moves above the text, across the full width of the screen, "
-            "in landscape format (16:9).<br>"
-            "<strong>Tip:</strong> choose an image of at least 800 × 600 px and place the important element "
-            "in the center, as this is the part that remains visible in all cases."
+        help_text=help_text_with_details(
+            _("Recommended size: at least 800 × 600 px, with the important element in the center."),
+            _(
+                "<strong>On desktop</strong>, the image is displayed to the left of the text. "
+                "Its width depends on the “Image ratio” field below: "
+                "half of the card with 50/50 (up to 600 px), a third with 1/3 (up to 400 px).<br>"
+                "Its height is that of the card, which grows with the length of the text. "
+                "The image is cut at the edges to fill exactly this height: "
+                "the longer the text, the more its sides are trimmed.<br>"
+                "<strong>On mobile</strong>, the image moves above the text, across the full width of the screen, "
+                "in landscape format (16:9)."
+            ),
         ),
     )
     image_ratio = blocks.ChoiceBlock(
@@ -185,10 +188,19 @@ class VerticalCardBlock(CardBlock):
     image = CustomImageBlock(
         label=_("Image"),
         required=False,
-        help_text=_(
-            "Recommended width: minimum 1200 px. "
-            "This width corresponds to a single-column layout (the widest). "
-            "The ideal width decreases if you use multiple columns."
+        help_text=help_text_with_details(
+            _(
+                "Recommended size: at least 800 px wide (1200 px if the card is alone on its row), "
+                "with the important element in the center."
+            ),
+            _(
+                "<strong>On desktop</strong>, the image takes up the full width of the card, which depends on "
+                "the number of cards per row: about 1200 px for a single card, 590 px for two, 370 px for three.<br>"
+                "Its height depends on the “Image ratio” field (16:9 by default): the image is cropped to this "
+                "format, around its center.<br>"
+                "<strong>On mobile</strong>, the cards are stacked and the image takes up the full width "
+                "of the screen, with the same ratio."
+            ),
         ),
     )
 
@@ -211,9 +223,15 @@ class TileBlock(blocks.StructBlock):
     )
     image = CustomImageBlock(
         label=_("Image"),
-        help_text=_(
-            "Prefer SVG files. If the image contains information (figure, text), fill in the alt text; "
-            "otherwise, mark it as decorative."
+        help_text=help_text_with_details(
+            _("Small image, up to 80 px wide: prefer a pictogram in SVG format."),
+            _(
+                "The image is displayed at the top of the tile (on the left for a horizontal tile), "
+                "up to 80 px wide on desktop as on mobile, slightly less for a small tile. "
+                "It is never cropped: it is scaled down, keeping its proportions.<br>"
+                "If it contains information (figure, text), fill in the alt text; "
+                "otherwise, mark it as decorative."
+            ),
         ),
         required=False,
     )
