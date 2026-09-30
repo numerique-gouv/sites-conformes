@@ -10,7 +10,7 @@ from wagtail.models import Page, Revision
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.core.blocks.utils import help_text_with_details
+from sites_conformes.core.blocks.utils import HELP_ICON, help_text_with_details
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 
@@ -223,14 +223,14 @@ class HelpTextWithDetailsTestCase(TestCase):
         help_text = str(help_text_with_details("Summary", "Details", details_label="Label"))
 
         self.assertEqual(
-            help_text, 'Summary<details class="sf-help-details"><summary>Label</summary>Details</details>'
+            help_text, f'Summary<details class="sf-help-details"><summary>{HELP_ICON}Label</summary>Details</details>'
         )
 
     def test_default_label_is_translated(self):
         with translation.override("fr"):
             help_text = str(help_text_with_details("Résumé", "Détails"))
 
-        self.assertIn("<summary>Comment l'image s'affiche-t-elle ?</summary>", help_text)
+        self.assertIn(f"<summary>{HELP_ICON}Comment l'image s'affiche-t-elle ?</summary>", help_text)
 
 
 @override_settings(SF_SCHEME_DEPENDENT_SVGS=True)

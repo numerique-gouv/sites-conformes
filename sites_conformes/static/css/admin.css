@@ -141,11 +141,23 @@
 }
 
 .sf-help-details > summary {
-    display: list-item;
-    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
     cursor: pointer;
     color: var(--w-color-text-link-default);
-    text-decoration: underline;
+}
+
+/* The help icon replaces the native disclosure triangle */
+.sf-help-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.sf-help-details__icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
 }
 
 .sf-help-details > summary:hover {
