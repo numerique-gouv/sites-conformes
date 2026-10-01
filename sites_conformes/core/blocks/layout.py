@@ -31,6 +31,13 @@ from .medias import IframeBlock, TranscriptionBlock, VideoBlock
 from .related_entries import BlogRecentEntriesBlock, EventsRecentEntriesBlock
 from .tables import AdvancedTypedTableBlock
 
+BG_IMAGE_HELP_TEXT = _(
+    "Decorative background image.<br>"
+    "This image spans the full width of the screen and will be resized depending on the user’s screen width.<br>"
+    "For optimal display, use an image at least 1920 px wide.<br>"
+    "⚠️ Make sure the image remains decorative: avoid including text or important information."
+)
+
 
 class BackgroundColorChoiceBlock(blocks.ChoiceBlock):
     choices = COLOR_CHOICES
@@ -214,7 +221,7 @@ class MultiColumnsBlock(CommonStreamBlock):
 
 
 class MultiColumnsWithTitleBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageChooserBlock(label=_("Background image"), required=False, help_text=BG_IMAGE_HELP_TEXT)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
@@ -263,7 +270,7 @@ class FullWidthBlock(CommonStreamBlock):
 
 
 class FullWidthBackgroundBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageChooserBlock(label=_("Background image"), required=False, help_text=BG_IMAGE_HELP_TEXT)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,
@@ -312,7 +319,7 @@ class SideMenuBlock(blocks.StreamBlock):
 
 
 class FullWidthBackgroundWithSidemenuBlock(blocks.StructBlock):
-    bg_image = ImageChooserBlock(label=_("Background image"), required=False)
+    bg_image = ImageChooserBlock(label=_("Background image"), required=False, help_text=BG_IMAGE_HELP_TEXT)
     bg_color_class = BackgroundColorChoiceBlock(
         label=_("Background color"),
         required=False,

@@ -23,6 +23,7 @@ from .buttons_links import ButtonBlock, LinkBlock
 from .cards import VerticalCardBlock
 from .layout import LayoutBlock
 from .medias import ImageBlockWithDefault
+from .utils import help_text_with_details
 
 Image = get_image_model()
 
@@ -119,6 +120,17 @@ class ImageTextCTASection(blocks.StructBlock):
         label=_("Image"),
         default_image_title="Illustration Sites Faciles Femme Ordinateur",
         default_image_decorative=True,
+        help_text=help_text_with_details(
+            _("Recommended size: at least 600 × 600 px. The image is displayed as a square."),
+            _(
+                "The image is cropped into a square keeping its focal point (to be set in the media library) "
+                "in the frame, or around its center if there is none.<br>"
+                "<strong>On desktop</strong>, it is displayed next to the text, on the opposite side to the position "
+                "chosen for the text, in a square of up to 600 px.<br>"
+                "<strong>On mobile</strong>, it moves below the text and takes up the full width of the screen, "
+                "still as a square."
+            ),
+        ),
     )
     layout = LayoutBlock(label=_("Layout"), collapsed=True)
 
@@ -127,7 +139,18 @@ class ImageTextCTASection(blocks.StructBlock):
 
 
 class ImageAndTextItems(blocks.StructBlock):
-    image = ImageBlockWithDefault(label=_("Image"))
+    image = ImageBlockWithDefault(
+        label=_("Image"),
+        help_text=help_text_with_details(
+            _("Recommended size: at least 200 × 200 px. The image is displayed as a small square."),
+            _(
+                "The image is displayed as a square, at the size chosen in the “Image size of items” field "
+                "of the section: 80, 140 or 200 px, on desktop as on mobile.<br>"
+                "It is cropped into a square keeping its focal point (to be set in the media library) "
+                "in the frame, or around its center if there is none."
+            ),
+        ),
+    )
     title = blocks.CharBlock(label=_("Title"), required=True)
     text = blocks.RichTextBlock(
         default="Add a short description to help your visitors better understand what you offer.",

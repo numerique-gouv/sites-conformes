@@ -1,3 +1,5 @@
+from django.utils.text import format_lazy
+from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
 from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 from wagtail.rich_text import RichText
@@ -123,3 +125,23 @@ def block_to_sample_dict(block):
 def stream_entry(block_name: str, block_instance) -> tuple:
     # Convenience wrapper: returns (block_name, block_to_sample_dict(block_instance)).
     return (block_name, block_to_sample_dict(block_instance))
+
+
+# Same markup as {% icon name="help" %}: the icon sprite is loaded on every Wagtail admin page
+HELP_ICON = '<svg class="icon icon-help sf-help-details__icon" aria-hidden="true"><use href="#icon-help"></use></svg>'
+
+
+def help_text_with_details(summary, details, details_label=None):
+    """
+    Returns a help text made of a short summary, always visible,
+    and a collapsible section (<details>) holding the full explanation.
+    """
+    if details_label is None:
+        details_label = _("How is the image displayed?")
+    return format_lazy(
+        '{}<details class="sf-help-details"><summary>{}{}</summary>{}</details>',
+        summary,
+        HELP_ICON,
+        details_label,
+        details,
+    )

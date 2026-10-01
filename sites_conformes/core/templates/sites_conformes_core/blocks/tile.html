@@ -41,7 +41,7 @@
 
       {% if scheme_dependent_svgs and pictogram.file.name|slice:"-4:" == ".svg" %}
         <div class="fr-tile__pictogram">
-          <svg aria-hidden="true"
+          <svg {% if pictogram.alt %}role="img" aria-label="{{ pictogram.alt }}"{% else %}aria-hidden="true"{% endif %}
                class="fr-artwork"
                viewBox="0 0 80 80"
                width="80px"
@@ -52,7 +52,7 @@
           </svg>
         </div>
       {% else %}
-        <div class="fr-tile__img">{% image value.image width-80 alt="" %}</div>
+        <div class="fr-tile__img">{% image value.image width-80 %}</div>
       {% endif %}
     </div>
   {% endif %}

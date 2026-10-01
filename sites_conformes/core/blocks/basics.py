@@ -3,10 +3,19 @@ from dsfr.constants import COLOR_CHOICES_ILLUSTRATION, IMAGE_RATIOS
 from wagtail import blocks
 from wagtail.blocks import StructValue
 from wagtail.images import get_image_model
-from wagtail.images.blocks import ImageBlock, ImageChooserBlock
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from sites_conformes.core.blocks.badges_tags import TagListBlock
+from sites_conformes.core.blocks.buttons_links import (
+    ButtonBlock,
+    ButtonsHorizontalListBlock,
+    IconPickerBlock,
+    LinkWithoutLabelBlock,
+    SingleLinkBlock,
+)
+from sites_conformes.core.blocks.medias import CustomImageBlock
+from sites_conformes.core.blocks.utils import help_text_with_details
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES,
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
@@ -16,14 +25,6 @@ from sites_conformes.core.constants import (
     LIMITED_RICHTEXTFIELD_FEATURES,
     MEDIA_WIDTH_CHOICES,
     TEXT_SIZE_CHOICES,
-)
-
-from .buttons_links import (
-    ButtonBlock,
-    ButtonsHorizontalListBlock,
-    IconPickerBlock,
-    LinkWithoutLabelBlock,
-    SingleLinkBlock,
 )
 
 Image = get_image_model()
@@ -151,7 +152,20 @@ class HighlightBlock(blocks.StructBlock):
 
 
 class ImageAndTextBlock(blocks.StructBlock):
-    image = ImageBlock(label=_("Image"))
+    image = CustomImageBlock(
+        label=_("Image"),
+        help_text=help_text_with_details(
+            _("Recommended size: at least 600 px wide, whatever the width chosen."),
+            _(
+                "<strong>On desktop</strong>, the image is displayed next to the text. "
+                "Its width depends on the “Image width” field below: "
+                "about 250 px (3/12), 350 px (4/12), 450 px (5/12) or 560 px (6/12).<br>"
+                "<strong>On mobile</strong>, the image moves above or below the text, depending on the "
+                "“Image position” field, and takes up the full width of the screen (up to about 510 px).<br>"
+                "The image is never cropped: it is scaled down to fit the available space, keeping its proportions."
+            ),
+        ),
+    )
     image_side = blocks.ChoiceBlock(
         label=_("Image position"),
         choices=[
@@ -171,6 +185,10 @@ class ImageAndTextBlock(blocks.StructBlock):
             ("6", "6/12"),
         ],
         default="3",
+        help_text=_(
+            "Share of the block width taken up by the image on desktop, based on a 12-column grid: "
+            "3/12 is a quarter, 6/12 is half. On mobile, the image always takes up the full width."
+        ),
     )
     text = blocks.RichTextBlock(label=_("Rich text"))
     link = SingleLinkBlock(
@@ -206,22 +224,39 @@ class CenteredImageBlock(blocks.StructBlock):
         default="h3",
         help_text=_("Adapt to the page layout. Defaults to heading 3."),
     )
-    image = ImageChooserBlock(label=_("Image"))
-    alt = blocks.CharBlock(
-        label=_("Alternative text (textual description of the image)"),
-        required=False,
+    image = CustomImageBlock(
+        label=_("Image"),
+        help_text=help_text_with_details(
+            _("Recommended size: at least 1200 px wide, 1920 px for the “Large” width."),
+            _(
+                "<strong>On desktop</strong>, the width of the image depends on the “Width” field below: "
+                "900 px (small), 1200 px (medium) or the full width of the screen "
+                "(large, 1920 px on a large screen).<br>"
+                "Its height depends on the “Image ratio” field: the image is cropped to this format, "
+                "around its center.<br>"
+                "<strong>On mobile</strong>, the image takes up the full width of the screen, with the same ratio."
+            ),
+        ),
     )
     width = blocks.ChoiceBlock(
         label=_("Witdh"),
         choices=MEDIA_WIDTH_CHOICES,
         required=False,
         default="",
+        help_text=_(
+            "Allows you to adjust the width of the image on the page. "
+            "In ‘large’ mode, the image occupies the entire available width."
+        ),
     )
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
         choices=IMAGE_RATIOS,
         required=False,
         default="h3",
+        help_text=_(
+            "Image ratio is the ratio between width and height of the image. "
+            "By changing it, you can adjust the image display (square, horizontal or vertical)"
+        ),
     )
     caption = blocks.CharBlock(label=_("Caption"), required=False)
     url = blocks.URLBlock(label=_("Link"), required=False)
@@ -233,7 +268,11 @@ class CenteredImageBlock(blocks.StructBlock):
 
 
 class QuoteBlock(blocks.StructBlock):
-    image = ImageChooserBlock(label=_("Image"), required=False)
+    image = ImageChooserBlock(
+        label=_("Image"),
+        required=False,
+        help_text=_("Optional image of the author. The image will be adjusted to a square format (1:1) of 184px."),
+    )
     quote = blocks.CharBlock(label=_("Quote"))
     author_name = blocks.CharBlock(label=_("Author name"), required=False)
     author_title = blocks.CharBlock(label=_("Author title"), required=False)

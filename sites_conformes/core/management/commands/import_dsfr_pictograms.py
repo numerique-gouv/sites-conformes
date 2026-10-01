@@ -1,10 +1,12 @@
 import os
 
 from django.core.management.base import BaseCommand
-from wagtail.images.models import Image
+from wagtail.images import get_image_model
 
 from sites_conformes.core.services.accessors import get_or_create_collection
 from sites_conformes.core.utils import import_image, overwrite_image
+
+Image = get_image_model()
 
 
 class Command(BaseCommand):

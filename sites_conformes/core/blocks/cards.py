@@ -2,17 +2,22 @@ from django.utils.translation import gettext_lazy as _
 from dsfr.constants import IMAGE_RATIOS
 from wagtail import blocks
 from wagtail.blocks import StructValue
-from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 
 from sites_conformes.core.blocks.badges_tags import BadgesListBlock, TagListBlock
+from sites_conformes.core.blocks.buttons_links import (
+    ButtonsHorizontalListBlock,
+    IconPickerBlock,
+    LinksVerticalListBlock,
+    LinkWithoutLabelBlock,
+)
+from sites_conformes.core.blocks.medias import CustomImageBlock
+from sites_conformes.core.blocks.utils import help_text_with_details
 from sites_conformes.core.constants import (
     HEADING_CHOICES,
     HORIZONTAL_CARD_IMAGE_RATIOS,
     LIMITED_RICHTEXTFIELD_FEATURES,
     LIMITED_RICHTEXTFIELD_FEATURES_WITHOUT_LINKS,
 )
-
-from .buttons_links import ButtonsHorizontalListBlock, IconPickerBlock, LinksVerticalListBlock, LinkWithoutLabelBlock
 
 
 class CardstructValue(StructValue):
@@ -70,7 +75,7 @@ class CardBlock(blocks.StructBlock):
         help_text=_("Adapt to the page layout. Defaults to heading 3."),
     )
     description = blocks.RichTextBlock(label=_("Content"), features=LIMITED_RICHTEXTFIELD_FEATURES, required=False)
-    image = ImageBlock(label=_("Image"), required=False)
+    image = CustomImageBlock(label=_("Image"), required=False)
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
         choices=IMAGE_RATIOS,
@@ -137,11 +142,32 @@ class CardBlock(blocks.StructBlock):
 
 
 class HorizontalCardBlock(CardBlock):
+    image = CustomImageBlock(
+        label=_("Image"),
+        required=False,
+        help_text=help_text_with_details(
+            _("Recommended size: at least 800 × 600 px, with the important element in the center."),
+            _(
+                "<strong>On desktop</strong>, the image is displayed to the left of the text. "
+                "Its width depends on the “Image ratio” field below: "
+                "half of the card with 50/50 (up to 600 px), a third with 1/3 (up to 400 px).<br>"
+                "Its height is that of the card, which grows with the length of the text. "
+                "The image is cut at the edges to fill exactly this height: "
+                "the longer the text, the more its sides are trimmed.<br>"
+                "<strong>On mobile</strong>, the image moves above the text, across the full width of the screen, "
+                "in landscape format (16:9)."
+            ),
+        ),
+    )
     image_ratio = blocks.ChoiceBlock(
         label=_("Image ratio"),
         choices=HORIZONTAL_CARD_IMAGE_RATIOS,
         required=False,
-        default="h3",
+        default="fr-card--horizontal-half",
+        help_text=_(
+            "Share of the card width taken up by the image on desktop. "
+            "On mobile, the image always takes up the full width."
+        ),
     )
     bottom_detail_text = blocks.CharBlock(
         label=_("Bottom detail: text"),
@@ -159,6 +185,25 @@ class HorizontalCardBlock(CardBlock):
 
 
 class VerticalCardBlock(CardBlock):
+    image = CustomImageBlock(
+        label=_("Image"),
+        required=False,
+        help_text=help_text_with_details(
+            _(
+                "Recommended size: at least 800 px wide (1200 px if the card is alone on its row), "
+                "with the important element in the center."
+            ),
+            _(
+                "<strong>On desktop</strong>, the image takes up the full width of the card, which depends on "
+                "the number of cards per row: about 1200 px for a single card, 590 px for two, 370 px for three.<br>"
+                "Its height depends on the “Image ratio” field (16:9 by default): the image is cropped to this "
+                "format, around its center.<br>"
+                "<strong>On mobile</strong>, the cards are stacked and the image takes up the full width "
+                "of the screen, with the same ratio."
+            ),
+        ),
+    )
+
     class Meta:
         icon = "tablet-alt"
         template = "sites_conformes_core/blocks/card_vertical.html"
@@ -176,7 +221,20 @@ class TileBlock(blocks.StructBlock):
     description = blocks.RichTextBlock(
         label=_("Content"), features=LIMITED_RICHTEXTFIELD_FEATURES_WITHOUT_LINKS, required=False
     )
-    image = ImageChooserBlock(label=_("Image"), help_text=_("Prefer SVG files."), required=False)
+    image = CustomImageBlock(
+        label=_("Image"),
+        help_text=help_text_with_details(
+            _("Recommended size: at least 80 px wide, or preferably a pictogram in SVG format."),
+            _(
+                "The image is displayed at the top of the tile (on the left for a horizontal tile), "
+                "up to 80 px wide on desktop as on mobile, slightly less for a small tile. "
+                "It is never cropped: it is scaled down, keeping its proportions.<br>"
+                "If it contains information (figure, text), fill in the alt text; "
+                "otherwise, mark it as decorative."
+            ),
+        ),
+        required=False,
+    )
     link = LinkWithoutLabelBlock(
         label=_("Link"),
         required=False,

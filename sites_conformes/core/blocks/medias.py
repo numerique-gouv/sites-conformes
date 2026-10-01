@@ -12,7 +12,25 @@ Image = get_image_model()
 
 
 ## Image
-class ImageBlockWithDefault(ImageBlock):
+
+
+class CustomImageBlock(ImageBlock):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if "decorative" in self.child_blocks:
+            self.child_blocks["decorative"].field.help_text = _(
+                "Check if the image conveys no information, or only information already given by the surrounding "
+                "text. In this case, the alt attribute will be empty."
+            )
+        if "alt_text" in self.child_blocks:
+            self.child_blocks["alt_text"].field.help_text = _(
+                "Used by screen readers if the image is not marked as decorative. "
+                "Describe the content or purpose of the image in a short, clear sentence."
+            )
+
+
+class ImageBlockWithDefault(CustomImageBlock):
     def __init__(
         self, *args, default_image_title=None, default_image_decorative=True, default_image_alt_text="", **kwargs
     ):
@@ -20,16 +38,6 @@ class ImageBlockWithDefault(ImageBlock):
         self._default_image_alt_text = default_image_alt_text
         self._default_image_decorative = default_image_decorative
         super().__init__(*args, **kwargs)
-
-        if "decorative" in self.child_blocks:
-            self.child_blocks["decorative"].field.help_text = _(
-                "Check if the image is purely decorative. " "In this case, the alt attribute (alt text) will be empty."
-            )
-        if "alt_text" in self.child_blocks:
-            self.child_blocks["alt_text"].field.help_text = _(
-                "Used by screen readers if the image is not marked as decorative."
-                "Describe the content or purpose of the image in a short, clear sentence."
-            )
 
     def get_default(self):
         if self._default_image_title:
