@@ -551,6 +551,11 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # sites_conformes.core.middleware.IframeMiddleware.
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
+# Swappable content page model (see docs/paquet/modele-de-page-personnalise.md).
+# Point it to a concrete subclass of sites_conformes.core.models.AbstractContentPage,
+# before any page is created.
+SF_CONTENTPAGE_MODEL = "sites_conformes_core.ContentPage"
+
 # Sentry
 if sentry_dsn := os.getenv("SENTRY_DSN"):
     import sentry_sdk  # noqa: E402

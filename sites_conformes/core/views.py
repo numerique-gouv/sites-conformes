@@ -6,7 +6,10 @@ from django.views.generic import ListView, TemplateView
 from unidecode import unidecode
 from wagtail.models import Page, Site
 
-from sites_conformes.core.models import ContentPage, Tag
+from sites_conformes.core import get_contentpage_model
+from sites_conformes.core.models import Tag
+
+ContentPage = get_contentpage_model()
 
 
 class SearchResultsView(ListView):
