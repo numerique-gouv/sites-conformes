@@ -67,7 +67,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             .filter(event_date_end__date__gte=today)
             .order_by("event_date_start")
             .select_related("owner")
-            .prefetch_related("tags", "event_categories", "date__year")
+            .prefetch_related("tags", "categories", "date__year")
         )
         return entries
 
@@ -80,7 +80,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             .filter(event_date_end__date__lte=today)
             .order_by("-event_date_start")
             .select_related("owner")
-            .prefetch_related("tags", "event_categories", "date__year")
+            .prefetch_related("tags", "categories", "date__year")
         )
         return entries
 
@@ -107,7 +107,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         category = request.GET.get("category")
         if category:
             category = get_object_or_404(Category, slug=category, locale=locale)
-            posts = posts.filter(event_categories=category)
+            posts = posts.filter(categories=category)
             extra_title = _("Events in category %(category)s") % {"category": category.name}
             extra_breadcrumbs = {
                 "links": [
@@ -184,7 +184,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return Person.objects.filter(id__in=ids).order_by("name")
 
     def get_categories(self) -> models.QuerySet:
-        ids = self.posts.specific().values_list("event_categories", flat=True)
+        ids = self.posts.specific().values_list("categories", flat=True)
         return Category.objects.filter(id__in=ids).order_by("name")
 
     def get_sources(self) -> models.QuerySet:
@@ -268,7 +268,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
 class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
     tags = ClusterTaggableManager(through="TagEventEntryPage", blank=True)
 
-    event_categories = ParentalManyToManyField(
+    categories = ParentalManyToManyField(
         "sites_conformes_core.Category",
         through="CategoryEventEntryPage",
         blank=True,
@@ -296,7 +296,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
     subpage_types = []
 
     search_fields = SitesFacilesBasePage.search_fields + [
-        index.SearchField("event_categories"),
+        index.SearchField("categories"),
         index.SearchField("event_date_start"),
         index.SearchField("event_date_end"),
         index.SearchField("location"),
@@ -335,7 +335,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("event_categories"),
+                FieldPanel("categories"),
                 FieldPanel("tags"),
             ],
             heading=_("Tags and Categories"),
@@ -344,7 +344,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
 
     api_fields = SitesFacilesBasePage.api_fields + [
         APIField("tags"),
-        APIField("event_categories", serializer=CategorySerializer(many=True)),
+        APIField("event_categories", serializer=CategorySerializer(many=True, source="categories")),
         APIField("authors", serializer=PersonSerializer(many=True)),
         APIField("event_date_start"),
         APIField("event_date_end"),
