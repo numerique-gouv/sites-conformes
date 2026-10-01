@@ -7,6 +7,13 @@ pour la liste complète des versions.
 Les notes de mise à jour qui requièrent une action de l’opérateur (migration de
 schéma, gel des contributions, etc.) sont reprises ci-dessous.
 
+## Version suivante
+
+Le modèle `Category` passe de l’app `sites_conformes_blog` à `sites_conformes_core`.
+La migration renomme la table en place et conserve les données, les traductions
+et les révisions. Lancez `python manage.py update_index` après `migrate` pour
+que la recherche de l’admin retrouve les catégories.
+
 ## v4.0.0 - Packagification
 
 Cette version transforme `sites-conformes` en package Python distribué sur

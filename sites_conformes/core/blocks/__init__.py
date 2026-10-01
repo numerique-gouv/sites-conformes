@@ -3,6 +3,7 @@ from .badges_tags import *  # NOQA: F403
 from .basics import *  # NOQA: F403
 from .buttons_links import *  # NOQA: F403
 from .cards import *  # NOQA: F403
+from .colophon import *  # NOQA: F403
 from .core import *  # NOQA: F403
 from .heros import *  # NOQA: F403
 from .layout import *  # NOQA: F403

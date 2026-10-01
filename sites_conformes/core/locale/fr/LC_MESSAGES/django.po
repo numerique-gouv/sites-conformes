@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-29 16:35+0200\n"
+"POT-Creation-Date: 2026-09-11 11:49+0200\n"
 "PO-Revision-Date: 2026-07-16 10:26+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -503,6 +503,9 @@ msgstr "Tuile avec une ombre"
 msgid "Horizontal tile"
 msgstr "Tuile horizontale"
 
+msgid "Contact card"
+msgstr "Carte contact"
+
 msgid "Centered image"
 msgstr "Image centrée"
 
@@ -739,9 +742,6 @@ msgid ""
 msgstr ""
 "Cette partie vous permet de choisir la mise en page de votre bloc (arrière-"
 "plan, marge...) "
-
-msgid "Contact card"
-msgstr "Carte contact"
 
 msgid "Extra components"
 msgstr "Composants supplémentaires"
@@ -1082,6 +1082,33 @@ msgstr "Pages avec l’une des étiquettes : %(tags)s"
 msgid "Selected tags"
 msgstr "Étiquettes selectionnées"
 
+msgid "Category name"
+msgstr "Nom de la catégorie"
+
+msgid "Parent category"
+msgstr "Catégorie parente"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Displayed on the top of the category page"
+msgstr "Affiché en haut de la page de la catégorie"
+
+msgid "Text displayed at the end of every page in the category"
+msgstr "Texte affiché à la fin de chaque page de la catégorie"
+
+msgid "Category"
+msgstr "Catégorie"
+
+msgid "Categories"
+msgstr "Catégories"
+
+msgid "Parent category cannot be self."
+msgstr "La catégorie ne peut être sa propre parente."
+
+msgid "Cannot have circular Parents."
+msgstr "Il est impossible d’avoir des parents circulaires."
+
 msgid "Tag"
 msgstr "Étiquette"
 
@@ -1200,9 +1227,6 @@ msgstr "Afficher la mention BETA à côté du titre"
 
 msgid "Show a login button in the header"
 msgstr "Afficher un bouton de connexion dans l’en-tête"
-
-msgid "Description"
-msgstr "Description"
 
 msgid "Site logo"
 msgstr "Logo du site"
@@ -1403,9 +1427,6 @@ msgstr "Classe d’icône"
 msgid "Social media item"
 msgstr "Lien de réseau social"
 
-msgid "Category"
-msgstr "Catégorie"
-
 msgid "Mega menu category"
 msgstr "Catégorie de méga menu"
 
@@ -1414,9 +1435,6 @@ msgstr "Catégories de méga menu"
 
 msgid "Main link"
 msgstr "Lien principal"
-
-msgid "Categories"
-msgstr "Catégories"
 
 msgid "Maximum 4 categories, each with maximum 8 links."
 msgstr "Maximum 4 catégories, chacune contenant maximum 8 liens."

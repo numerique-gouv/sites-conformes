@@ -8,46 +8,87 @@ from django.db.models import Q
 from django.forms.widgets import Textarea, mark_safe
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from dsfr.constants import NOTICE_TYPE_CHOICES
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
+from rest_framework import serializers
 from taggit.models import Tag as TaggitTag, TaggedItemBase
 from unidecode import unidecode
-from wagtail.admin.panels import FieldPanel, HelpPanel, InlinePanel, MultiFieldPanel, ObjectList, TabbedInterface
+from wagtail.admin.panels import (
+    FieldPanel,
+    HelpPanel,
+    InlinePanel,
+    MultiFieldPanel,
+    ObjectList,
+    TabbedInterface,
+    TitleFieldPanel,
+)
+from wagtail.admin.widgets.slug import SlugInput
 from wagtail.api import APIField
 from wagtail.contrib.routable_page.models import RoutablePageMixin, path
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
-from wagtail.fields import RichTextField
+from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model_string
 from wagtail.models import Orderable
+from wagtail.models.i18n import TranslatableMixin
+from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
+from sites_conformes.core import get_contentpage_model, get_contentpage_model_string, is_contentpage_swapped
 from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
 from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-class ContentPage(SitesFacilesBasePage):
-    tags = ClusterTaggableManager(through="TagContentPage", blank=True)
+class AbstractContentPage(SitesFacilesBasePage):
+    """
+    Base class for the swappable content page model.
+
+    To use your own model, subclass this and point ``SF_CONTENTPAGE_MODEL`` at it,
+    the way Wagtail 8 handles ``WAGTAIL_PAGE_MODEL``. Declare ``tags`` and its
+    through model on the concrete subclass: a through model shared from this app
+    would make your app's migrations depend on this one, which itself depends on
+    the swapped model (same rule as ``AbstractUser.groups`` in Django).
+    """
 
     class Meta:
+        abstract = True
+
+    def get_template(self, request, *args, **kwargs):
+        # Wagtail derives ``template`` from the concrete model's app label;
+        # fall back to the shipped template when the subclass app has none.
+        return [self.template, "sites_conformes_core/content_page.html"]
+
+
+class ContentPage(AbstractContentPage):
+    class Meta:
         verbose_name = _("Content page")
+        swappable = "SF_CONTENTPAGE_MODEL"
 
-    content_panels = SitesFacilesBasePage.content_panels + [
-        FieldPanel("tags"),
-    ]
+    if not is_contentpage_swapped():
+        # A swapped project declares its own tags and through model (see AbstractContentPage);
+        # declaring ours against the swapped-in model would register a phantom child relation on it.
+        tags = ClusterTaggableManager(through="TagContentPage", blank=True)
 
-    api_fields = SitesFacilesBasePage.api_fields + [
-        APIField("tags"),
-    ]
+        content_panels = AbstractContentPage.content_panels + [
+            FieldPanel("tags"),
+        ]
+
+        api_fields = AbstractContentPage.api_fields + [
+            APIField("tags"),
+        ]
 
 
-class TagContentPage(TaggedItemBase):
-    content_object = ParentalKey("ContentPage", related_name="contentpage_tags")  # type: ignore
+if not is_contentpage_swapped():
+
+    class TagContentPage(TaggedItemBase):
+        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
 
 
 class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
@@ -98,7 +139,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = ["sites_conformes_core.ContentPage"]
+    subpage_types = [get_contentpage_model_string()]
 
     class Meta:
         verbose_name = _("Catalog index page")
@@ -106,7 +147,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     @property
     def entries(self):
         # Get a list of live content pages that are children of this page
-        return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
+        return get_contentpage_model().objects.child_of(self).live().specific().prefetch_related("tags")
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
@@ -281,6 +322,84 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             },
             template="sites_conformes_core/tags_list_page.html",
         )
+
+
+@register_snippet
+class Category(TranslatableMixin, index.Indexed, Orderable):
+    name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
+    slug = models.SlugField(unique=True, max_length=80)
+    parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        related_name="children",
+        verbose_name=_("Parent category"),
+        on_delete=models.SET_NULL,
+    )
+    description = RichTextField(
+        max_length=500,
+        features=LIMITED_RICHTEXTFIELD_FEATURES,
+        blank=True,
+        verbose_name=_("Description"),
+        help_text=_("Displayed on the top of the category page"),
+    )  # type: ignore
+    colophon = StreamField(
+        COLOPHON_BLOCKS,
+        blank=True,
+        use_json_field=True,
+        help_text=_("Text displayed at the end of every page in the category"),
+    )
+
+    panels = [
+        TitleFieldPanel("name"),
+        FieldPanel("slug", widget=SlugInput),
+        FieldPanel("description"),
+        FieldPanel("colophon"),
+        FieldPanel("parent"),
+    ]
+
+    api_fields = [
+        APIField("name"),
+        APIField("slug"),
+        APIField("description"),
+        APIField("colophon"),
+        APIField("parent"),
+    ]
+
+    search_fields = [index.SearchField("name")]
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
+        unique_together = [
+            ("translation_key", "locale"),
+            ("name", "locale"),
+            ("slug", "locale"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if self.parent:
+            parent = self.parent
+            if self.parent == self:
+                raise ValidationError(_("Parent category cannot be self."))
+            if parent.parent and parent.parent == self:
+                raise ValidationError(_("Cannot have circular Parents."))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id", "name", "slug", "description", "colophon", "parent")
+        depth = 1
 
 
 @register_snippet

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 12:02+0200\n"
+"POT-Creation-Date: 2026-09-11 11:49+0200\n"
 "PO-Revision-Date: 2026-03-23 16:34+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -21,50 +21,20 @@ msgstr ""
 msgid "Name"
 msgstr "Nom"
 
-msgid "Role"
-msgstr "Fonction"
-
 msgid "Organization"
 msgstr "Organisation"
+
+msgid "Role"
+msgstr "Fonction"
 
 msgid "Contact info"
 msgstr "Informations de contact"
 
-msgid "Rich text"
-msgstr "Texte riche"
-
-msgid "Contact card"
-msgstr "Carte contact"
-
 msgid "Person"
 msgstr "Personne"
 
-msgid "Category name"
-msgstr "Nom de la catégorie"
-
-msgid "Parent category"
-msgstr "Catégorie parente"
-
-msgid "Description"
-msgstr "Description"
-
-msgid "Displayed on the top of the category page"
-msgstr "Affiché en haut de la page de la catégorie"
-
-msgid "Text displayed at the end of every page in the category"
-msgstr "Texte affiché à la fin de chaque page de la catégorie"
-
-msgid "Parent category cannot be self."
-msgstr "La catégorie ne peut être sa propre parente."
-
-msgid "Cannot have circular Parents."
-msgstr "Il est impossible d’avoir des parents circulaires."
-
 msgid "Category"
 msgstr "Catégorie"
-
-msgid "Categories"
-msgstr "Catégories"
 
 msgid "Posts per page"
 msgstr "Articles par page"
@@ -100,6 +70,9 @@ msgstr "Étiquettes"
 #, python-format
 msgid "Posts tagged with %(tag)s"
 msgstr "Articles avec l’étiquette %(tag)s"
+
+msgid "Categories"
+msgstr "Catégories"
 
 #, python-format
 msgid "Posts in category %(category)s"
@@ -175,6 +148,33 @@ msgstr "étiquette non-sélectionnée"
 
 msgid "Posts"
 msgstr "Articles"
+
+#~ msgid "Rich text"
+#~ msgstr "Texte riche"
+
+#~ msgid "Contact card"
+#~ msgstr "Carte contact"
+
+#~ msgid "Category name"
+#~ msgstr "Nom de la catégorie"
+
+#~ msgid "Parent category"
+#~ msgstr "Catégorie parente"
+
+#~ msgid "Description"
+#~ msgstr "Description"
+
+#~ msgid "Displayed on the top of the category page"
+#~ msgstr "Affiché en haut de la page de la catégorie"
+
+#~ msgid "Text displayed at the end of every page in the category"
+#~ msgstr "Texte affiché à la fin de chaque page de la catégorie"
+
+#~ msgid "Parent category cannot be self."
+#~ msgstr "La catégorie ne peut être sa propre parente."
+
+#~ msgid "Cannot have circular Parents."
+#~ msgstr "Il est impossible d’avoir des parents circulaires."
 
 #, python-format
 #~ msgid "Posts written by %(first_name)s %(last_name)s"

@@ -18,9 +18,9 @@ from wagtail.contrib.routable_page.models import RoutablePageMixin, path
 from wagtail.models.i18n import Locale
 from wagtail.search import index
 
-from sites_conformes.blog.models import Category, CategorySerializer, Organization, Person, PersonSerializer
+from sites_conformes.blog.models import Organization, Person, PersonSerializer
 from sites_conformes.core.abstract import SitesFacilesBasePage
-from sites_conformes.core.models import CmsDsfrConfig, Tag
+from sites_conformes.core.models import Category, CategorySerializer, CmsDsfrConfig, Tag
 from sites_conformes.events.forms import EventSearchForm
 
 
@@ -269,7 +269,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
     tags = ClusterTaggableManager(through="TagEventEntryPage", blank=True)
 
     event_categories = ParentalManyToManyField(
-        "sites_conformes_blog.Category",
+        "sites_conformes_core.Category",
         through="CategoryEventEntryPage",
         blank=True,
         verbose_name=_("Categories"),
