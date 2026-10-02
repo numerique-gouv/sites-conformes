@@ -42,9 +42,9 @@
       <div class="fr-grid-row fr-grid-row--gutters">
         <div class="fr-col-12">
           {% include "sites_conformes_core/blocks/breadcrumbs.html" %}
-          {% if page.show_title %}
+          {% if page.display_title is not None %}
             <h1>
-              {{ page.title }}
+              {{ page.display_title }}
               {% include "sites_conformes_core/blocks/page_visibility.html" %}
             </h1>
           {% endif %}

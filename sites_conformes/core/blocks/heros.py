@@ -230,6 +230,9 @@ register(HeroBackgroundBlockAdapter(), HeroBackgroundImageBlock)
 
 
 class OldHero(blocks.StructBlock):
+    header_title = blocks.CharBlock(
+        label=_("Header title"), required=False, help_text=_("If left empty, the page title will be used.")
+    )
     header_with_title = blocks.BooleanBlock(
         label=_("Show title in header image?"),
         required=False,

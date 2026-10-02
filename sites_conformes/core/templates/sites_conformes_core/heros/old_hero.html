@@ -11,7 +11,9 @@
           <div class="fr-col  {% if not value.header_large %}fr-col-md-6{% else %} fr-col-12 cmsfr-hero-column {% endif %}">
             {% if value.header_with_title %}
               <h1 {% if block.value.large %}class="fr-display--sm"{% endif %}>
+                {% if value.header_title %}{{ value.header_title }}{% else %}
                 {{ page.title }}
+                {% endif %}
                 {% if extra_title %}: {{ extra_title }}{% endif %}
                 {% include "sites_conformes_core/blocks/page_visibility.html" %}
               </h1>

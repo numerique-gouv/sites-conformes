@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-29 16:35+0200\n"
-"PO-Revision-Date: 2026-07-16 10:26+0200\n"
+"POT-Creation-Date: 2026-09-21 16:26+0200\n"
+"PO-Revision-Date: 2026-09-21 16:37+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -712,6 +712,12 @@ msgstr "Veuillez sélectionner une couleur pour l’arrière-plan."
 
 msgid "Please select an image for the background."
 msgstr "Veuillez sélectionner une image pour l’arrière-plan."
+
+msgid "Header title"
+msgstr "Titre de l’entête"
+
+msgid "If left empty, the page title will be used."
+msgstr "Si ce champ est laissé vide, le titre de la page sera utilisé."
 
 msgid ""
 "Uses the French Design System colors. Apply only if there is no header image."
