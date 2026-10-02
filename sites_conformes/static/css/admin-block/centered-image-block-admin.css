@@ -1,0 +1,44 @@
+div.struct-block.centered-image-block {
+    display: grid;
+    column-gap: 2rem;
+    grid-template-areas:
+        "title        title"
+        "heading_tag  heading_tag"
+        "image        image"
+        "alt          alt"
+        "width        ratio"
+        "caption      caption"
+        "url          url";
+
+    >div[data-contentpath="title"] {
+        grid-area: title;
+    }
+
+    >div[data-contentpath="heading_tag"] {
+        grid-area: heading_tag;
+    }
+
+    >div[data-contentpath="image"] {
+        grid-area: image;
+    }
+
+    >div[data-contentpath="alt"] {
+        grid-area: alt;
+    }
+
+    >div[data-contentpath="width"] {
+        grid-area: width;
+    }
+
+    >div[data-contentpath="image_ratio"] {
+        grid-area: ratio;
+    }
+
+    >div[data-contentpath="caption"] {
+        grid-area: caption;
+    }
+
+    >div[data-contentpath="url"] {
+        grid-area: url;
+    }
+}
