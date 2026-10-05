@@ -7,7 +7,7 @@ from modelcluster.fields import ParentalKey
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, InlinePanel, MultiFieldPanel
 from wagtail.api import APIField
 from wagtail.contrib.forms.forms import BaseForm, FormBuilder
-from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
+from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField as WagtailAbstractFormField
 from wagtail.contrib.forms.panels import FormSubmissionsPanel
 from wagtail.contrib.forms.utils import get_field_clean_name
 from wagtail.fields import RichTextField
@@ -15,10 +15,17 @@ from wagtail.models import TranslatableMixin
 from wagtail_honeypot.models import HoneypotFormMixin, HoneypotFormSubmissionMixin
 from wagtail_localize.fields import SynchronizedField
 
+from sites_conformes.core import is_model_swapped
+from sites_conformes.core.abstract import DefaultTemplateMixin
 from sites_conformes.forms.widgets import CustomEmailInputWidget
 
 
-class FormField(TranslatableMixin, AbstractFormField):
+class AbstractFormField(TranslatableMixin, WagtailAbstractFormField):
+    """
+    Base class for the fields of a form page. A swapped ``SF_FORMPAGE_MODEL`` declares its own
+    concrete subclass, with a ``page`` parental key named ``form_fields`` towards it, as ``FormField`` does below.
+    """
+
     CHOICES = (
         ("singleline", _("Text field")),
         ("multiline", _("Text area")),
@@ -33,8 +40,6 @@ class FormField(TranslatableMixin, AbstractFormField):
         # ("datetime", _("Date/time")),
         ("hidden", _("Hidden field")),
     )
-
-    page = ParentalKey("FormPage", on_delete=models.CASCADE, related_name="form_fields")
 
     field_type = models.CharField(verbose_name=_("Field type"), max_length=16, choices=CHOICES)
 
@@ -51,7 +56,8 @@ class FormField(TranslatableMixin, AbstractFormField):
             self.clean_name = get_field_clean_name(self.label)
         super().save(*args, **kwargs)
 
-    class Meta(TranslatableMixin.Meta, AbstractFormField.Meta):
+    class Meta(TranslatableMixin.Meta, WagtailAbstractFormField.Meta):
+        abstract = True
         verbose_name = _("Form field")
         verbose_name_plural = _("Form fields")
 
@@ -96,7 +102,15 @@ class SitesFacilesFormBuilder(FormBuilder):
         return type("WagtailForm", (SitesFacilesCustomForm,), self.formfields)
 
 
-class FormPage(HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm):
+class AbstractFormPage(DefaultTemplateMixin, HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm):
+    """
+    Base class for the swappable form page model (setting ``SF_FORMPAGE_MODEL``).
+
+    Declare the form fields model on the side of the concrete subclass (see ``AbstractFormField``).
+    """
+
+    default_template = "sites_conformes_forms/form_page.html"
+
     intro = RichTextField(blank=True)
     thank_you_text = RichTextField(blank=True)
 
@@ -136,13 +150,29 @@ class FormPage(HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm
     ]
 
     class Meta:
-        verbose_name = _("Form page")
-        verbose_name_plural = _("Form pages")
+        abstract = True
 
     form_builder = SitesFacilesFormBuilder
+
+    def get_landing_page_template(self, request, *args, **kwargs):
+        # Same fallback as get_template, for the landing page
+        return [self.landing_page_template, "sites_conformes_forms/form_page_landing.html"]
 
     def all_fields_required(self):
         """
         Returns True if all fields in the form are mandatory.
         """
         return all(field.get("required", False) for field in self.form_fields.values())
+
+
+class FormPage(AbstractFormPage):
+    class Meta:
+        verbose_name = _("Form page")
+        verbose_name_plural = _("Form pages")
+        swappable = "SF_FORMPAGE_MODEL"
+
+
+if not is_model_swapped("SF_FORMPAGE_MODEL"):
+
+    class FormField(AbstractFormField):
+        page = ParentalKey("FormPage", on_delete=models.CASCADE, related_name="form_fields")

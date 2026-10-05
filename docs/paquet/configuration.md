@@ -117,6 +117,10 @@ pour s'épargner une migration de contenu un petit peu pénible.
 SF_CONTENTPAGE_MODEL = "sites_conformes_core.ContentPage"
 ```
 
+Les autres modèles de page se remplacent de la même manière, avec les réglages
+`SF_CATALOGINDEXPAGE_MODEL`, `SF_BLOGINDEXPAGE_MODEL`, `SF_BLOGENTRYPAGE_MODEL`,
+`SF_EVENTSINDEXPAGE_MODEL`, `SF_EVENTENTRYPAGE_MODEL` et `SF_FORMPAGE_MODEL`.
+
 ## SF_DISABLE_LOCAL_LOGIN
 
 Désactive la connexion par mot de passe au profit d’un SSO (ProConnect, etc.).

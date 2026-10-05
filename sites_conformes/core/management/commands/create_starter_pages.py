@@ -5,12 +5,13 @@ from wagtail.images.models import Image
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 
-from sites_conformes.core import get_contentpage_model
+from sites_conformes.core import get_contentpage_model, get_model
 from sites_conformes.core.services.accessors import get_or_create_footer_bottom_menu, get_or_create_main_menu
 from sites_conformes.core.utils import get_default_site
-from sites_conformes.forms.models import FormField, FormPage
 
 ContentPage = get_contentpage_model()
+FormPage = get_model("SF_FORMPAGE_MODEL")
+FormField = FormPage._meta.get_field("form_fields").related_model
 
 ALL_ALLOWED_SLUGS = ["home", "mentions-legales", "accessibilite", "contact"]
 

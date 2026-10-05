@@ -14,7 +14,20 @@ from sites_conformes.core.blocks.core import HERO_STREAMFIELD_BLOCKS, STREAMFIEL
 from sites_conformes.core.utils import get_streamfield_raw_text
 
 
-class SitesFacilesBasePage(Page):
+class DefaultTemplateMixin:
+    """
+    Wagtail derives ``template`` from the app label of the concrete model: fall back to the shipped
+    ``default_template`` when a subclass living in another app (see the ``SF_*_MODEL`` settings) has none.
+    """
+
+    default_template = None
+
+    def get_template(self, request, *args, **kwargs):
+        template = super().get_template(request, *args, **kwargs)
+        return [template, self.default_template] if self.default_template else template
+
+
+class SitesFacilesBasePage(DefaultTemplateMixin, Page):
     """
     This class defines a base page model that will be used
     by all pages in the site.

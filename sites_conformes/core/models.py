@@ -46,10 +46,7 @@ class AbstractContentPage(SitesFacilesBasePage):
     class Meta:
         abstract = True
 
-    def get_template(self, request, *args, **kwargs):
-        # Wagtail derives ``template`` from the concrete model's app label;
-        # fall back to the shipped template when the subclass app has none.
-        return [self.template, "sites_conformes_core/content_page.html"]
+    default_template = "sites_conformes_core/content_page.html"
 
 
 class ContentPage(AbstractContentPage):
@@ -77,7 +74,13 @@ if not is_contentpage_swapped():
         content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
 
 
-class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class AbstractCatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+    """
+    Base class for the swappable catalog index model (setting ``SF_CATALOGINDEXPAGE_MODEL``).
+    """
+
+    default_template = "sites_conformes_core/catalog_index_page.html"
+
     entries_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
@@ -128,7 +131,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     subpage_types = [get_contentpage_model_string()]
 
     class Meta:
-        verbose_name = _("Catalog index page")
+        abstract = True
 
     @property
     def entries(self):
@@ -308,6 +311,12 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             },
             template="sites_conformes_core/tags_list_page.html",
         )
+
+
+class CatalogIndexPage(AbstractCatalogIndexPage):
+    class Meta:
+        verbose_name = _("Catalog index page")
+        swappable = "SF_CATALOGINDEXPAGE_MODEL"
 
 
 @register_snippet

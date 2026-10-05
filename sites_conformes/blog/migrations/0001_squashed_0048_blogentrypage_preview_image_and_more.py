@@ -10,6 +10,8 @@ import wagtail.fields
 import wagtail.search.index
 from django.db import migrations, models
 
+from sites_conformes.core import without_swapped_relations
+
 
 class Migration(migrations.Migration):
 
@@ -416,6 +418,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
+                "swappable": "SF_BLOGENTRYPAGE_MODEL",
                 "verbose_name": "Blog page",
             },
             bases=("wagtailcore.page",),
@@ -5288,6 +5291,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
+                "swappable": "SF_BLOGINDEXPAGE_MODEL",
                 "verbose_name": "Blog index",
             },
             bases=("wagtailcore.page",),
@@ -5462,3 +5466,7 @@ class Migration(migrations.Migration):
             ),
         ),
     ]
+    # A swapped project declares its own tags, categories and through models (see AbstractBlogEntryPage)
+    operations = without_swapped_relations(
+        operations, "SF_BLOGENTRYPAGE_MODEL", ("categoryentrypage", "tagentrypage"), ("tags", "blog_categories")
+    )

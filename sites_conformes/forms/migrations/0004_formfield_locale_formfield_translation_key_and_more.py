@@ -2,6 +2,7 @@ import uuid
 
 import django.db.models.deletion
 from django.db import migrations, models
+from sites_conformes.core import is_model_swapped
 
 
 def set_unique_translation_keys(apps, _schema_editor):
@@ -85,3 +86,6 @@ class Migration(migrations.Migration):
             unique_together={("translation_key", "locale")},
         ),
     ]
+    # A swapped project declares its own form fields model (see AbstractFormPage)
+    if is_model_swapped("SF_FORMPAGE_MODEL"):
+        operations = []

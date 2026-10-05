@@ -19,12 +19,19 @@ from wagtail.models.i18n import Locale
 from wagtail.search import index
 
 from sites_conformes.blog.models import Category, CategorySerializer, Organization, Person, PersonSerializer
+from sites_conformes.core import get_model, get_model_string, is_model_swapped
 from sites_conformes.core.abstract import SitesFacilesBasePage
 from sites_conformes.core.models import CmsDsfrConfig, Tag
 from sites_conformes.events.forms import EventSearchForm
 
 
-class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class AbstractEventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+    """
+    Base class for the swappable events index model (setting ``SF_EVENTSINDEXPAGE_MODEL``).
+    """
+
+    default_template = "sites_conformes_events/events_index_page.html"
+
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
@@ -52,17 +59,18 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = ["sites_conformes_events.EventEntryPage"]
+    subpage_types = [get_model_string("SF_EVENTENTRYPAGE_MODEL")]
 
     class Meta:
-        verbose_name = _("Event calendar index")
+        abstract = True
 
     @property
     def posts(self):
         # Get list of event pages that are descendants of this page
         today = timezone.now().date()
         entries = (
-            EventEntryPage.objects.descendant_of(self)
+            get_model("SF_EVENTENTRYPAGE_MODEL")
+            .objects.descendant_of(self)
             .live()
             .filter(event_date_end__date__gte=today)
             .order_by("event_date_start")
@@ -75,7 +83,8 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     def past_events(self):
         today = timezone.now().date()
         entries = (
-            EventEntryPage.objects.descendant_of(self)
+            get_model("SF_EVENTENTRYPAGE_MODEL")
+            .objects.descendant_of(self)
             .live()
             .filter(event_date_end__date__lte=today)
             .order_by("-event_date_start")
@@ -85,7 +94,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         return entries
 
     def get_context(self, request, *args, **kwargs):
-        context = super(EventsIndexPage, self).get_context(request, *args, **kwargs)
+        context = super().get_context(request, *args, **kwargs)
         posts = self.posts
         locale = Locale.objects.get(language_code=get_language())
 
@@ -265,15 +274,21 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         )
 
 
-class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
-    tags = ClusterTaggableManager(through="TagEventEntryPage", blank=True)
+class EventsIndexPage(AbstractEventsIndexPage):
+    class Meta:
+        verbose_name = _("Event calendar index")
+        swappable = "SF_EVENTSINDEXPAGE_MODEL"
 
-    event_categories = ParentalManyToManyField(
-        "sites_conformes_blog.Category",
-        through="CategoryEventEntryPage",
-        blank=True,
-        verbose_name=_("Categories"),
-    )
+
+class AbstractEventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
+    """
+    Base class for the swappable event entry model (setting ``SF_EVENTENTRYPAGE_MODEL``).
+
+    Declare ``tags``, ``event_categories`` and their through models on the concrete subclass,
+    as ``EventEntryPage`` does below (same rule as ``AbstractContentPage.tags``).
+    """
+
+    default_template = "sites_conformes_events/event_entry_page.html"
 
     date = models.DateTimeField(verbose_name=_("Post date"), default=timezone.now)
     event_date_start = models.DateTimeField(verbose_name=_("Event start date"), default=timezone.now)
@@ -292,7 +307,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
         "sites_conformes_blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
     )
 
-    parent_page_types = ["sites_conformes_events.EventsIndexPage"]
+    parent_page_types = [get_model_string("SF_EVENTSINDEXPAGE_MODEL")]
     subpage_types = []
 
     search_fields = SitesFacilesBasePage.search_fields + [
@@ -406,17 +421,33 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
         return response
 
     class Meta:
+        abstract = True
+
+
+class EventEntryPage(AbstractEventEntryPage):
+    class Meta:
         verbose_name = _("Event page")
+        swappable = "SF_EVENTENTRYPAGE_MODEL"
+
+    if not is_model_swapped("SF_EVENTENTRYPAGE_MODEL"):
+        tags = ClusterTaggableManager(through="TagEventEntryPage", blank=True)
+        event_categories = ParentalManyToManyField(
+            "sites_conformes_blog.Category",
+            through="CategoryEventEntryPage",
+            blank=True,
+            verbose_name=_("Categories"),
+        )
 
 
-class TagEventEntryPage(TaggedItemBase):
-    content_object = ParentalKey("EventEntryPage", related_name="event_entry_tags")
+if not is_model_swapped("SF_EVENTENTRYPAGE_MODEL"):
 
+    class TagEventEntryPage(TaggedItemBase):
+        content_object = ParentalKey("EventEntryPage", related_name="event_entry_tags")
 
-class CategoryEventEntryPage(models.Model):
-    category = models.ForeignKey(Category, related_name="+", verbose_name=_("Category"), on_delete=models.CASCADE)
-    page = ParentalKey("EventEntryPage", related_name="event_entry_categories")
-    panels = [FieldPanel("category")]
+    class CategoryEventEntryPage(models.Model):
+        category = models.ForeignKey(Category, related_name="+", verbose_name=_("Category"), on_delete=models.CASCADE)
+        page = ParentalKey("EventEntryPage", related_name="event_entry_categories")
+        panels = [FieldPanel("category")]
 
-    def __str__(self):
-        return self.category
+        def __str__(self):
+            return self.category

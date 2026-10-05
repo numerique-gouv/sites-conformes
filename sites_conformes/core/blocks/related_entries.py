@@ -1,3 +1,5 @@
+from django.apps import apps
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
 from wagtail.blocks import BlockGroup, BooleanBlock
@@ -6,6 +8,23 @@ from wagtail.snippets.blocks import SnippetChooserBlock
 from sites_conformes.core.constants import (
     HEADING_CHOICES_2_5,
 )
+
+
+class SwappablePageChooserBlock(blocks.PageChooserBlock):
+    """
+    A page chooser following the ``SF_*_MODEL`` settings: ``page_type`` names the shipped models,
+    the models swapped in their place are the ones offered.
+    """
+
+    @cached_property
+    def target_models(self):
+        models = super().target_models
+        return [apps.get_model(model._meta.swapped) if model._meta.swapped else model for model in models]
+
+    def deconstruct(self):
+        # Frozen as a plain chooser of the shipped models, so that the migrations do not depend on the settings
+        _, args, kwargs = blocks.Block.deconstruct(self)
+        return "wagtail.blocks.PageChooserBlock", args, {**kwargs, "page_type": self.page_type}
 
 
 class RecentEntriesStructValue(blocks.StructValue):
@@ -103,7 +122,7 @@ class BlogRecentEntriesBlock(blocks.StructBlock):
         default="h2",
         help_text=_("Adapt to the page layout. Defaults to heading 2."),
     )
-    blog = blocks.PageChooserBlock(label=_("Blog"), page_type="sites_conformes_blog.BlogIndexPage")
+    blog = SwappablePageChooserBlock(label=_("Blog"), page_type="sites_conformes_blog.BlogIndexPage")
     entries_count = blocks.IntegerBlock(
         label=_("Number of entries"), required=False, min_value=1, max_value=8, default=3
     )
@@ -170,7 +189,9 @@ class EventsRecentEntriesBlock(blocks.StructBlock):
         default="h2",
         help_text=_("Adapt to the page layout. Defaults to heading 2."),
     )
-    index_page = blocks.PageChooserBlock(label=_("Event calendar"), page_type="sites_conformes_events.EventsIndexPage")
+    index_page = SwappablePageChooserBlock(
+        label=_("Event calendar"), page_type="sites_conformes_events.EventsIndexPage"
+    )
     entries_count = blocks.IntegerBlock(
         label=_("Number of entries"), required=False, min_value=1, max_value=8, default=3
     )

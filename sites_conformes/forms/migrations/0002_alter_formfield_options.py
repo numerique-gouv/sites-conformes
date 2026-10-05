@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from sites_conformes.core import without_swapped_relations
+
 
 class Migration(migrations.Migration):
 
@@ -15,3 +17,5 @@ class Migration(migrations.Migration):
             options={"ordering": ["sort_order"], "verbose_name": "Form field", "verbose_name_plural": "Form fields"},
         ),
     ]
+    # A swapped project declares its own form fields model (see AbstractFormPage)
+    operations = without_swapped_relations(operations, "SF_FORMPAGE_MODEL", ("formfield",))

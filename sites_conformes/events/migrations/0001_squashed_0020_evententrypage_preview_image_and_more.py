@@ -8,6 +8,8 @@ import modelcluster.fields
 import wagtail.fields
 from django.db import migrations, models
 
+from sites_conformes.core import without_swapped_relations
+
 
 class Migration(migrations.Migration):
 
@@ -1488,6 +1490,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
+                "swappable": "SF_EVENTENTRYPAGE_MODEL",
                 "verbose_name": "Event page",
             },
             bases=("wagtailcore.page",),
@@ -5011,8 +5014,16 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
+                "swappable": "SF_EVENTSINDEXPAGE_MODEL",
                 "verbose_name": "Event calendar index",
             },
             bases=("wagtailcore.page",),
         ),
     ]
+    # A swapped project declares its own tags, categories and through models (see AbstractEventEntryPage)
+    operations = without_swapped_relations(
+        operations,
+        "SF_EVENTENTRYPAGE_MODEL",
+        ("categoryevententrypage", "tagevententrypage"),
+        ("tags", "event_categories"),
+    )

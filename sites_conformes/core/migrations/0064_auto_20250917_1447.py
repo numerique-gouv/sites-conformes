@@ -6,11 +6,11 @@ from itertools import chain
 
 def migrate_old_hero_in_new_streamfield_hero(apps, schema_editor):
     ContentPage = apps.get_model("sites_conformes_core", "ContentPage")
-    if ContentPage._meta.swapped:  # nothing was ever stored in the shipped model
-        return
     CatalogIndexPage = apps.get_model("sites_conformes_core", "CatalogIndexPage")
 
-    pages = chain(ContentPage.objects.all(), CatalogIndexPage.objects.all())
+    # Nothing was ever stored in a swapped out model, and its managers are unavailable
+    models = [model for model in (ContentPage, CatalogIndexPage) if not model._meta.swapped]
+    pages = chain.from_iterable(model.objects.all() for model in models)
 
     hero_fields = [
         "header_with_title",

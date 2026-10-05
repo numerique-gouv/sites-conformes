@@ -14,7 +14,7 @@ class ContentManagerConfig(AppConfig):
 
         patch_wagtail_localize_handle_image_block()
 
-        # Wagtail (< 8.1) registers every concrete page class, including one swapped out
+        # Wagtail (< 8.1) registers every concrete page class, including those swapped out
         # via Meta.swappable, which would keep it creatable in the admin.
         from wagtail.models import PAGE_MODEL_CLASSES
 

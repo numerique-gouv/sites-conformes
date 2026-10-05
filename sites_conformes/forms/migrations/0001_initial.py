@@ -6,6 +6,8 @@ import wagtail.contrib.forms.models
 import wagtail.fields
 from django.db import migrations, models
 
+from sites_conformes.core import without_swapped_relations
+
 
 class Migration(migrations.Migration):
     initial = True
@@ -45,6 +47,7 @@ class Migration(migrations.Migration):
                 ("thank_you_text", wagtail.fields.RichTextField(blank=True)),
             ],
             options={
+                "swappable": "SF_FORMPAGE_MODEL",
                 "verbose_name": "Form page",
                 "verbose_name_plural": "Form pages",
             },
@@ -120,3 +123,5 @@ class Migration(migrations.Migration):
             },
         ),
     ]
+    # A swapped project declares its own form fields model (see AbstractFormPage)
+    operations = without_swapped_relations(operations, "SF_FORMPAGE_MODEL", ("formfield",))

@@ -3,6 +3,8 @@
 import modelcluster.fields
 from django.db import migrations, models
 
+from sites_conformes.core import without_swapped_relations
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -61,3 +63,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name="Darken background image"),
         ),
     ]
+    # A swapped project declares its own tags, categories and through models (see AbstractBlogEntryPage)
+    operations = without_swapped_relations(
+        operations, "SF_BLOGENTRYPAGE_MODEL", ("categoryentrypage", "tagentrypage"), ("tags", "blog_categories")
+    )

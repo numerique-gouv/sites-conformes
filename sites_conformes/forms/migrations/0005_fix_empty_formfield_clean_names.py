@@ -1,6 +1,7 @@
 from django.db import migrations
 
 from wagtail.contrib.forms.utils import get_field_clean_name
+from sites_conformes.core import is_model_swapped
 
 
 def fix_empty_clean_names(apps, schema_editor):
@@ -19,3 +20,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(fix_empty_clean_names, reverse_code=migrations.RunPython.noop),
     ]
+    # A swapped project declares its own form fields model (see AbstractFormPage)
+    if is_model_swapped("SF_FORMPAGE_MODEL"):
+        operations = []

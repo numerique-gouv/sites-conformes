@@ -8,7 +8,9 @@ def invert_text_position(apps, schema_editor):
     BlogEntryPage = apps.get_model("sites_conformes_blog", "BlogEntryPage")
     BlogIndexPage = apps.get_model("sites_conformes_blog", "BlogIndexPage")
 
-    pages = chain(BlogEntryPage.objects.all(), BlogIndexPage.objects.all())
+    # Nothing was ever stored in a swapped out model, and its managers are unavailable
+    models = [model for model in (BlogEntryPage, BlogIndexPage) if not model._meta.swapped]
+    pages = chain.from_iterable(model.objects.all() for model in models)
 
     for page in pages:
         if not hasattr(page, "hero"):

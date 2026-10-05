@@ -7,17 +7,18 @@ from taggit.models import slugify
 from wagtail.images import get_image_model
 from wagtail.rich_text import RichText
 
-from sites_conformes.blog.models import BlogIndexPage
-from sites_conformes.core import get_contentpage_model
+from sites_conformes.core import get_contentpage_model, get_model
 from sites_conformes.core.services.accessors import (
     get_or_create_catalog_index_page,
     get_or_create_content_page,
     get_or_create_main_menu,
 )
 from sites_conformes.core.utils import get_default_site, import_image
-from sites_conformes.forms.models import FormField, FormPage
 
 ContentPage = get_contentpage_model()
+BlogIndexPage = get_model("SF_BLOGINDEXPAGE_MODEL")
+FormPage = get_model("SF_FORMPAGE_MODEL")
+FormField = FormPage._meta.get_field("form_fields").related_model
 
 ALL_ALLOWED_SLUGS = ["blog_index", "publications", "menu_page", "form", "common_blocks", "hero_blocks"]
 

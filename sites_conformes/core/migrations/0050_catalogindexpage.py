@@ -1661,6 +1661,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
+                "swappable": "SF_CATALOGINDEXPAGE_MODEL",
                 "verbose_name": "Catalog index page",
             },
             bases=("wagtailcore.page",),

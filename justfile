@@ -121,7 +121,7 @@ test app="":
 unittest app="":
     {{docker_cmd}} {{uv_run}} python manage.py test {{app}} --settings config.settings_test
 
-# Run the test suite of the swapped content page model (SF_CONTENTPAGE_MODEL)
+# Run the test suite of the swapped page models (SF_*_MODEL)
 test-swapped:
     {{docker_cmd}} {{uv_run}} python manage.py test sites_conformes.testapp --settings config.settings_swapped
 

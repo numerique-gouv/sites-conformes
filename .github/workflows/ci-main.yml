@@ -49,7 +49,7 @@ jobs:
       - name: 🤹‍ Run the unit tests
         run: |
           just unittest
-      - name: 🔀 Run the tests with a swapped content page model
+      - name: 🔀 Run the tests with swapped page models
         run: |
           just test-swapped
       - name: 🎨 Deploy starter content

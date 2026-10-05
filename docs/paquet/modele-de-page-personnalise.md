@@ -1,4 +1,4 @@
-# Modèle de page de contenu personnalisé
+# Modèles de page personnalisés
 
 Les projets utilisant Sites conformes sous forme de paquet peuvent remplacer le
 modèle `ContentPage` par leur propre modèle, pour y ajouter des champs, des
@@ -78,7 +78,8 @@ faudra effectuer une migration de données pas forcément évidente.
 
 Wagtail dérive le nom du template du modèle concret, ici
 `my_app/custom_content_page.html`. S’il n’existe pas, le template du paquet
-`sites_conformes_core/content_page.html` est utilisé. Pour le personnaliser,
+`sites_conformes_core/content_page.html` est utilisé (il en va de même pour
+les autres modèles de page). Pour le personnaliser,
 créez le template de votre modèle en étendant celui du paquet :
 
 ```django
@@ -89,21 +90,104 @@ créez le template de votre modèle en étendant celui du paquet :
 hériter de celui proposé par Sites Conformes. Cependant cela donnera lieux
 sur le long terme à davantage de maintenance.
 
-## Accéder au modèle depuis votre code
+## Les autres modèles de page
 
-N’importez pas `ContentPage` directement : une fois le modèle remplacé, il n’est
-plus utilisable.
+Les autres modèles de page du paquet se remplacent de la même manière, chacun
+avec son réglage et sa classe abstraite :
+
+| Réglage | Modèle fourni | Classe abstraite |
+| --- | --- | --- |
+| `SF_CONTENTPAGE_MODEL` | `sites_conformes_core.ContentPage` | `sites_conformes.core.models.AbstractContentPage` |
+| `SF_CATALOGINDEXPAGE_MODEL` | `sites_conformes_core.CatalogIndexPage` | `sites_conformes.core.models.AbstractCatalogIndexPage` |
+| `SF_BLOGINDEXPAGE_MODEL` | `sites_conformes_blog.BlogIndexPage` | `sites_conformes.blog.models.AbstractBlogIndexPage` |
+| `SF_BLOGENTRYPAGE_MODEL` | `sites_conformes_blog.BlogEntryPage` | `sites_conformes.blog.models.AbstractBlogEntryPage` |
+| `SF_EVENTSINDEXPAGE_MODEL` | `sites_conformes_events.EventsIndexPage` | `sites_conformes.events.models.AbstractEventsIndexPage` |
+| `SF_EVENTENTRYPAGE_MODEL` | `sites_conformes_events.EventEntryPage` | `sites_conformes.events.models.AbstractEventEntryPage` |
+| `SF_FORMPAGE_MODEL` | `sites_conformes_forms.FormPage` | `sites_conformes.forms.models.AbstractFormPage` |
+
+Chaque modèle se remplace indépendamment des autres : les pages d’index
+acceptent comme sous-pages le modèle désigné par le réglage correspondant, et
+les blocs « articles récents » et « événements récents » proposent les pages
+d’index remplacées.
+
+Les pages d’index (`AbstractCatalogIndexPage`, `AbstractBlogIndexPage`,
+`AbstractEventsIndexPage`) n’ont rien d’autre à déclarer que vos propres champs.
+
+### Articles de blog et événements
+
+Comme pour `tags` sur les pages de contenu, les étiquettes, les catégories et
+leurs modèles intermédiaires sont à déclarer sur votre modèle. Les noms des
+champs (`tags` et `blog_categories`, ou `event_categories` pour les événements)
+sont requis par Sites Conformes ; les panneaux d’administration correspondants
+sont déjà fournis par la classe abstraite.
 
 ```python
-from sites_conformes.core import get_contentpage_model, get_contentpage_model_string
+from django.db import models
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from modelcluster.tags import ClusterTaggableManager
+from taggit.models import TaggedItemBase
 
-ContentPage = get_contentpage_model()  # la classe, une fois les apps chargées
-ContentPage = get_contentpage_model_string()  # "my_app.CustomContentPage", pour les clés étrangères, subpage_types et migrations
+from sites_conformes.blog.models import AbstractBlogEntryPage
+
+
+class CustomBlogEntryPage(AbstractBlogEntryPage):
+    tags = ClusterTaggableManager(through="TagCustomBlogEntryPage", blank=True)
+    blog_categories = ParentalManyToManyField(
+        "sites_conformes_blog.Category",
+        through="CategoryCustomBlogEntryPage",
+        blank=True,
+        verbose_name="Catégories",
+    )
+
+
+class TagCustomBlogEntryPage(TaggedItemBase):
+    content_object = ParentalKey("CustomBlogEntryPage", related_name="tagged_items")
+
+
+class CategoryCustomBlogEntryPage(models.Model):
+    category = models.ForeignKey("sites_conformes_blog.Category", related_name="+", on_delete=models.CASCADE)
+    page = ParentalKey("CustomBlogEntryPage", related_name="entry_categories")
 ```
+
+### Pages de formulaire
+
+Le modèle des champs de formulaire est à déclarer avec votre modèle de page, à
+partir de `AbstractFormField`. Le nom `form_fields` est requis.
+
+```python
+from django.db import models
+from modelcluster.fields import ParentalKey
+
+from sites_conformes.forms.models import AbstractFormField, AbstractFormPage
+
+
+class CustomFormPage(AbstractFormPage):
+    pass
+
+
+class CustomFormField(AbstractFormField):
+    page = ParentalKey("CustomFormPage", on_delete=models.CASCADE, related_name="form_fields")
+```
+
+## Accéder aux modèles depuis votre code
+
+N’importez pas directement un modèle fourni par le paquet : une fois remplacé,
+il n’est plus utilisable.
+
+```python
+from sites_conformes.core import get_model, get_model_string
+
+BlogEntryPage = get_model("SF_BLOGENTRYPAGE_MODEL")  # la classe, une fois les apps chargées
+get_model_string("SF_BLOGENTRYPAGE_MODEL")  # "my_app.CustomBlogEntryPage", pour les clés étrangères, subpage_types et migrations
+```
+
+Pour les pages de contenu, `get_contentpage_model()` et
+`get_contentpage_model_string()` restent disponibles.
 
 ## Exemple
 
 L’app `sites_conformes.testapp` du dépôt contient un modèle de référence
-complet et sa suite de tests, exécutée en CI avec `just test-swapped`.
+pour chaque modèle remplaçable et leur suite de tests, exécutée en CI avec
+`just test-swapped`.
 Elle peut être utilisée comme source d'inspiration pour voir une mise en oeuvre
 complète de cette fonctionnalité.

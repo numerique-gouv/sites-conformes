@@ -27,6 +27,7 @@ from wagtail.snippets.models import register_snippet
 
 from sites_conformes.blog.blocks import COLOPHON_BLOCKS
 from sites_conformes.blog.managers import CategoryManager
+from sites_conformes.core import get_model, get_model_string, is_model_swapped
 from sites_conformes.core.abstract import SitesFacilesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.models import Tag
@@ -181,20 +182,13 @@ class CategorySerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class CategoryEntryPage(models.Model):
-    category = models.ForeignKey(Category, related_name="+", verbose_name=_("Category"), on_delete=models.CASCADE)
-    page = ParentalKey("BlogEntryPage", related_name="entry_categories")  # type: ignore
-    panels = [FieldPanel("category")]
+class AbstractBlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+    """
+    Base class for the swappable blog index model (setting ``SF_BLOGINDEXPAGE_MODEL``).
+    """
 
-    def __str__(self):
-        return self.category
+    default_template = "sites_conformes_blog/blog_index_page.html"
 
-
-class TagEntryPage(TaggedItemBase):
-    content_object = ParentalKey("BlogEntryPage", related_name="entry_tags")  # type: ignore
-
-
-class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
@@ -229,22 +223,22 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = ["sites_conformes_blog.BlogEntryPage"]
+    subpage_types = [get_model_string("SF_BLOGENTRYPAGE_MODEL")]
 
     class Meta:
-        verbose_name = _("Blog index")
+        abstract = True
 
     @property
     def posts(self):
         # Get list of blog pages that are descendants of this page
-        posts = BlogEntryPage.objects.descendant_of(self).live()
+        posts = get_model("SF_BLOGENTRYPAGE_MODEL").objects.descendant_of(self).live()
         posts = (
             posts.order_by("-date").select_related("owner").prefetch_related("tags", "blog_categories", "date__year")
         )
         return posts
 
     def get_context(self, request, *args, **kwargs):
-        context = super(BlogIndexPage, self).get_context(request, *args, **kwargs)
+        context = super().get_context(request, *args, **kwargs)
         posts = self.posts
 
         extra_breadcrumbs = None
@@ -505,20 +499,28 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         )
 
 
-class BlogEntryPage(SitesFacilesBasePage):
-    tags = ClusterTaggableManager(through="TagEntryPage", blank=True)
-    blog_categories = ParentalManyToManyField(
-        "Category",
-        through="CategoryEntryPage",
-        blank=True,
-        verbose_name=_("Categories"),
-    )
+class BlogIndexPage(AbstractBlogIndexPage):
+    class Meta:
+        verbose_name = _("Blog index")
+        swappable = "SF_BLOGINDEXPAGE_MODEL"
+
+
+class AbstractBlogEntryPage(SitesFacilesBasePage):
+    """
+    Base class for the swappable blog entry model (setting ``SF_BLOGENTRYPAGE_MODEL``).
+
+    Declare ``tags``, ``blog_categories`` and their through models on the concrete subclass,
+    as ``BlogEntryPage`` does below (same rule as ``AbstractContentPage.tags``).
+    """
+
+    default_template = "sites_conformes_blog/blog_entry_page.html"
+
     date = models.DateTimeField(verbose_name=_("Post date"), default=timezone.now)
     authors = ParentalManyToManyField(
         "sites_conformes_blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
     )
 
-    parent_page_types = ["sites_conformes_blog.BlogIndexPage"]
+    parent_page_types = [get_model_string("SF_BLOGINDEXPAGE_MODEL")]
     subpage_types = []
 
     settings_panels = SitesFacilesBasePage.settings_panels + [
@@ -558,4 +560,33 @@ class BlogEntryPage(SitesFacilesBasePage):
         return self.url
 
     class Meta:
+        abstract = True
+
+
+class BlogEntryPage(AbstractBlogEntryPage):
+    class Meta:
         verbose_name = _("Blog page")
+        swappable = "SF_BLOGENTRYPAGE_MODEL"
+
+    if not is_model_swapped("SF_BLOGENTRYPAGE_MODEL"):
+        tags = ClusterTaggableManager(through="TagEntryPage", blank=True)
+        blog_categories = ParentalManyToManyField(
+            "Category",
+            through="CategoryEntryPage",
+            blank=True,
+            verbose_name=_("Categories"),
+        )
+
+
+if not is_model_swapped("SF_BLOGENTRYPAGE_MODEL"):
+
+    class CategoryEntryPage(models.Model):
+        category = models.ForeignKey(Category, related_name="+", verbose_name=_("Category"), on_delete=models.CASCADE)
+        page = ParentalKey("BlogEntryPage", related_name="entry_categories")  # type: ignore
+        panels = [FieldPanel("category")]
+
+        def __str__(self):
+            return self.category
+
+    class TagEntryPage(TaggedItemBase):
+        content_object = ParentalKey("BlogEntryPage", related_name="entry_tags")  # type: ignore
