@@ -7,10 +7,11 @@
 # in pyproject.toml.
 #
 # The version lives in sites_conformes/_version.py (single source of truth for
-# both the PyPI build and the runtime) and is bumped by hand. On release we build
-# & publish the wheel with that version; source-based deployments (Scalingo, an
-# internal server, the Docker image built from the repo) pick up the number
-# straight from the committed _version.py.
+# both the PyPI build and the runtime) and is bumped by hand, to match the tag
+# of the upcoming release. On release we rewrite it from the tag, then build &
+# publish the wheel; source-based deployments (Scalingo, an internal server, the
+# Docker image built from the repo) pick up the number straight from the
+# committed _version.py.
 name: Publish to PyPI
 
 on:

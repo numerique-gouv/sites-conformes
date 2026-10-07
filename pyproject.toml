@@ -1,9 +1,10 @@
 [project]
 name = "sites-conformes"
-# Version is driven by the GitHub Release tag at publish time. See
-# .github/workflows/publish.yml, which writes sites_conformes/_version.py
-# from github.event.release.tag_name (stripped of a leading "v").
-# The committed _version.py value is the local/dev fallback.
+# Version is read from sites_conformes/_version.py, which is bumped by hand and
+# committed before cutting the matching GitHub Release: source-based deployments
+# (Scalingo, internal server, Docker) read it from there. At publish time,
+# .github/workflows/publish.yml rewrites it from the release tag (stripped of a
+# leading "v") before building the wheel, so the tag and _version.py must match.
 dynamic = ["version"]
 description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l’État, accessible et responsive"
 authors = [
