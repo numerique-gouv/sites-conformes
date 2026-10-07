@@ -1,12 +1,13 @@
 from unittest import skipUnless
 
+import swapper
 from django.apps import apps
 from django.core.management import call_command
 from django.db import connection
 from wagtail.models import Site, get_page_models
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.core import get_contentpage_model, models as core_models
+from sites_conformes.core import models as core_models
 from sites_conformes.core.models import CatalogIndexPage, ContentPage, Tag
 from sites_conformes.core.services.accessors import get_or_create_content_page
 
@@ -15,7 +16,7 @@ from sites_conformes.core.services.accessors import get_or_create_content_page
 class SwappedContentPageTestCase(WagtailPageTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.CustomContentPage = get_contentpage_model()
+        cls.CustomContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
         cls.home = Site.objects.get(is_default_site=True).root_page
 
     def test_setting_swaps_the_model(self):

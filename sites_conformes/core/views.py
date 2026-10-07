@@ -1,3 +1,4 @@
+import swapper
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -6,10 +7,9 @@ from django.views.generic import ListView, TemplateView
 from unidecode import unidecode
 from wagtail.models import Page, Site
 
-from sites_conformes.core import get_contentpage_model
 from sites_conformes.core.models import Tag
 
-ContentPage = get_contentpage_model()
+ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
 
 
 class SearchResultsView(ListView):

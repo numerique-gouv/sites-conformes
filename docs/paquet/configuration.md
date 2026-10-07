@@ -110,8 +110,10 @@ ou User de Django.
 
 Voir {doc}`modele-de-page-personnalise`.
 
-Il est recommandé de définir cette valeur avant la création des premières pages
-pour s'épargner une migration de contenu un petit peu pénible.
+Ce réglage doit être défini avant la première migration du projet : les sites
+existants ne peuvent pas changer de modèle sans une migration de contenu.
+
+Valeur par défaut :
 
 ```python
 SF_CONTENTPAGE_MODEL = "sites_conformes_core.ContentPage"

@@ -455,7 +455,6 @@ class Migration(migrations.Migration):
             ],
             options={
                 "abstract": False,
-                "swappable": "SF_CONTENTPAGE_MODEL",
             },
             bases=("wagtailcore.page",),
         ),
