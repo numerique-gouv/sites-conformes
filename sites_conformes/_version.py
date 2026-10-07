@@ -1,7 +1,6 @@
 # Single source of truth for the version, read both at build time (setuptools
 # dynamic version, cf. pyproject.toml) and at runtime (sites_conformes/__init__.py).
-# On release, .github/workflows/publish.yml resolves the number from the GitHub
-# Release tag, writes it here, and commits this file back to main so every
-# source-based deployment (Scalingo, internal server, Docker) picks it up.
-# The value committed below is the local/dev fallback between releases.
+# Bump this by hand and commit it before cutting the matching GitHub Release;
+# source-based deployments (Scalingo, internal server, Docker) read it straight
+# from here.
 __version__ = "4.2.0"
