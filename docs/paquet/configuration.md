@@ -100,6 +100,25 @@ dédié. Désactivé par défaut.
 SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 ```
 
+## SF_CONTENTPAGE_MODEL
+
+Modèle Django utilisé pour les pages de contenu, au format `app_label.ModelName`.
+Permet de remplacer le modèle initial `ContentPage` par un modèle de votre choix.
+Celui-ci doit hériter de
+`AbstractContentPage`, sur le principe des modèles de Page personnalisé de Wagtail
+ou User de Django.
+
+Voir {doc}`modele-de-page-personnalise`.
+
+Ce réglage doit être défini avant la première migration du projet : les sites
+existants ne peuvent pas changer de modèle sans une migration de contenu.
+
+Valeur par défaut :
+
+```python
+SF_CONTENTPAGE_MODEL = "sites_conformes_core.ContentPage"
+```
+
 ## SF_DISABLE_LOCAL_LOGIN
 
 Désactive la connexion par mot de passe au profit d’un SSO (ProConnect, etc.).

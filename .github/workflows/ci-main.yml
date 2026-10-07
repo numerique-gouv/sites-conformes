@@ -52,6 +52,13 @@ jobs:
       - name: 🤹‍ Run the unit tests
         run: |
           just unittest
+      - name: 🔀 Run the demo project tests (swapped content page model)
+        working-directory: demo
+        env:
+          DJANGO_SETTINGS_MODULE: demo.settings.dev
+        run: |
+          uv sync
+          uv run python manage.py test
       - name: 🎨 Deploy starter content
         run: |
           just init

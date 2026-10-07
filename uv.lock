@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12, <4.0"
 
 [options]
@@ -1983,6 +1983,7 @@ dependencies = [
     { name = "requests" },
     { name = "rust-just" },
     { name = "sentry-sdk", extra = ["django"] },
+    { name = "swapper" },
     { name = "unidecode" },
     { name = "wagtail" },
     { name = "wagtail-2fa" },
@@ -2034,6 +2035,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rust-just", specifier = ">=1.40.0" },
     { name = "sentry-sdk", extras = ["django"], specifier = ">=2.61.0" },
+    { name = "swapper", specifier = ">=1.4,<2" },
     { name = "unidecode", specifier = ">=1.4.0" },
     { name = "wagtail", specifier = ">=7.2.0,<8.0.0" },
     { name = "wagtail-2fa", specifier = "==1.8.0" },
@@ -2116,6 +2118,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/db/a1/3b8ed9c1fc3aa6eebb57732d924ddaa0500ecc3b638d0454816320994383/stevedore-5.9.1.tar.gz", hash = "sha256:e97a2667923efda926e8713fde6a73616df68210a3cbc6f02b48967b676fd8bf", size = 518111, upload-time = "2026-08-20T15:25:14.754Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c5/97/bba6e7ec2f5498b9dcb7b1b6400086b80ae5a8ebaff4b25e8c8add75f439/stevedore-5.9.1-py3-none-any.whl", hash = "sha256:5c8ff3a9f336cc1a06ac0f597bc79d11a2f950bfd32e290ca56b5a301fafafbf", size = 54931, upload-time = "2026-08-20T15:25:13.602Z" },
+]
+
+[[package]]
+name = "swapper"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/3e/a28d29aa28570b09257dad52cc5e5ebda9fe8802eeca0d9e254ccf8e5788/swapper-1.5.0.tar.gz", hash = "sha256:405f934265aa0c8d8b8e6b1be584875d1a3b7de6b1cd6f47367a4dbdc028609a", size = 24119, upload-time = "2026-09-01T21:51:07.192Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/5f/eab0a39f9c16c5d32c00f1f9b7ee9e8823686d1fd40a7fd1f0fc3247a59c/swapper-1.5.0-py2.py3-none-any.whl", hash = "sha256:67ae5a01bc12159dede567b98212a83baa53aa466a8eb5cf44af226b8219d21c", size = 7273, upload-time = "2026-09-01T21:51:05.953Z" },
 ]
 
 [[package]]
