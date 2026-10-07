@@ -104,7 +104,9 @@ swapper.is_swapped("sites_conformes_core", "ContentPage")
 
 ## Exemple
 
-L’app `sites_conformes.testapp` du dépôt contient un modèle de référence
-complet et sa suite de tests, exécutée en CI avec `just test-swapped`.
-Elle peut être utilisée comme source d'inspiration pour voir une mise en oeuvre
+Le projet de démonstration du dépôt (`demo/`) remplace le modèle par
+`home.CustomContentPage` : voir `demo/home/models.py`, le réglage dans
+`demo/demo/settings/base.py` et les tests dans `demo/home/tests.py`, exécutés
+en CI.
+Il peut être utilisé comme source d'inspiration pour voir une mise en œuvre
 complète de cette fonctionnalité.

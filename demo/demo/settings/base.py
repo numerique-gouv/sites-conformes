@@ -221,6 +221,10 @@ INSTALLED_APPS.extend(
         "sites_conformes.proconnect",
     ]
 )
+# Custom content page model, set before the first migration
+# (see docs/paquet/modele-de-page-personnalise.md).
+SF_CONTENTPAGE_MODEL = "home.CustomContentPage"
+
 WAGTAILADMIN_PATH = "admin/"
 TESTING = False
 HOST_URL = "localhost"

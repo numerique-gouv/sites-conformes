@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12, <4.0"
 
 [[package]]
@@ -1092,6 +1092,7 @@ dependencies = [
     { name = "requests" },
     { name = "rust-just" },
     { name = "sentry-sdk", extra = ["django"] },
+    { name = "swapper" },
     { name = "unidecode" },
     { name = "wagtail" },
     { name = "wagtail-2fa" },
@@ -1126,6 +1127,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rust-just", specifier = ">=1.40.0" },
     { name = "sentry-sdk", extras = ["django"], specifier = ">=2.61.0" },
+    { name = "swapper", specifier = ">=1.4,<2" },
     { name = "unidecode", specifier = ">=1.4.0" },
     { name = "wagtail", specifier = ">=7.2.0,<8.0.0" },
     { name = "wagtail-2fa", specifier = "==1.8.0" },
@@ -1186,6 +1188,15 @@ name = "static3"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/87/b0/9cf15108b73c4f2ffffe11d237c938f57785f55d3693d822d565432cb680/static3-0.7.0.tar.gz", hash = "sha256:674641c64bc75507af2eb20bef7e7e3593dca993dec6674be108fa15b42f47c8", size = 24607, upload-time = "2016-05-10T11:43:45.17Z" }
+
+[[package]]
+name = "swapper"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/3e/a28d29aa28570b09257dad52cc5e5ebda9fe8802eeca0d9e254ccf8e5788/swapper-1.5.0.tar.gz", hash = "sha256:405f934265aa0c8d8b8e6b1be584875d1a3b7de6b1cd6f47367a4dbdc028609a", size = 24119, upload-time = "2026-09-01T21:51:07.192Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/5f/eab0a39f9c16c5d32c00f1f9b7ee9e8823686d1fd40a7fd1f0fc3247a59c/swapper-1.5.0-py2.py3-none-any.whl", hash = "sha256:67ae5a01bc12159dede567b98212a83baa53aa466a8eb5cf44af226b8219d21c", size = 7273, upload-time = "2026-09-01T21:51:05.953Z" },
+]
 
 [[package]]
 name = "telepath"
