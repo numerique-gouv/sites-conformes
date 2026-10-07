@@ -1,5 +1,6 @@
 from typing import Union
 
+import swapper
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -24,7 +25,6 @@ from wagtail.images import get_image_model_string
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core import get_contentpage_model, get_contentpage_model_string, is_contentpage_swapped
 from sites_conformes.core.abstract import SitesFacilesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
@@ -37,10 +37,10 @@ class AbstractContentPage(SitesFacilesBasePage):
     Base class for the swappable content page model.
 
     To use your own model, subclass this and point ``SF_CONTENTPAGE_MODEL`` at it,
-    the way Wagtail 8 handles ``WAGTAIL_PAGE_MODEL``. Declare ``tags`` and its
-    through model on the concrete subclass: a through model shared from this app
-    would make your app's migrations depend on this one, which itself depends on
-    the swapped model (same rule as ``AbstractUser.groups`` in Django).
+    the way Wagtail 8 handles ``WAGTAIL_PAGE_MODEL`` (both rely on ``swapper``).
+    Declare ``tags`` and its through model on the concrete subclass: a through model
+    shipped by this app would point at your model, so this app's migrations would
+    depend on yours while yours depend on it.
     """
 
     class Meta:
@@ -55,9 +55,9 @@ class AbstractContentPage(SitesFacilesBasePage):
 class ContentPage(AbstractContentPage):
     class Meta:
         verbose_name = _("Content page")
-        swappable = "SF_CONTENTPAGE_MODEL"
+        swappable = swapper.swappable_setting("sites_conformes_core", "ContentPage")
 
-    if not is_contentpage_swapped():
+    if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
         # A swapped project declares its own tags and through model (see AbstractContentPage);
         # declaring ours against the swapped-in model would register a phantom child relation on it.
         tags = ClusterTaggableManager(through="TagContentPage", blank=True)
@@ -71,7 +71,7 @@ class ContentPage(AbstractContentPage):
         ]
 
 
-if not is_contentpage_swapped():
+if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
 
     class TagContentPage(TaggedItemBase):
         content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
@@ -125,7 +125,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = [get_contentpage_model_string()]
+    subpage_types = [swapper.get_model_name("sites_conformes_core", "ContentPage")]
 
     class Meta:
         verbose_name = _("Catalog index page")
@@ -133,7 +133,8 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     @property
     def entries(self):
         # Get a list of live content pages that are children of this page
-        return get_contentpage_model().objects.child_of(self).live().specific().prefetch_related("tags")
+        ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
+        return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)

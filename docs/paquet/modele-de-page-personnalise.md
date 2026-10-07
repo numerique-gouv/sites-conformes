@@ -5,7 +5,9 @@ modèle `ContentPage` par leur propre modèle, pour y ajouter des champs, des
 panneaux d’administration ou un template spécifique.
 C'est la seule solution qui évite de forker le projet.
   
-Le mécanisme est celui de `AUTH_USER_MODEL` de Django :
+Le mécanisme est celui des [modèles de page de base personnalisés de Wagtail 8](https://docs.wagtail.org/en/latest/advanced_topics/customization/custom_base_page_models.html)
+(`WAGTAIL_PAGE_MODEL`), lui-même basé sur `AUTH_USER_MODEL` de Django et la
+bibliothèque [`swapper`](https://github.com/openwisp/django-swappable-models) :
 
 - le paquet fournit une classe abstraite `AbstractContentPage`
 - le réglage `SF_CONTENTPAGE_MODEL` désigne le modèle à utiliser.
@@ -52,18 +54,10 @@ faudra effectuer une migration de données pas forcément évidente.
        content_object = ParentalKey("CustomContentPage", related_name="tagged_items")
    ```
 
-3. Définissez le réglage, au format `app_label.ModelName`, et ajoutez l’app à
-   `INSTALLED_APPS` **avant** `sites_conformes.core` afin que ses migrations
-   soient appliquées en premier :
+3. Ajoutez l’app à `INSTALLED_APPS` et définissez le réglage, au format
+   `app_label.ModelName` :
 
    ```python
-   INSTALLED_APPS = [
-       "my_app",
-       # ...
-       "sites_conformes.core",
-       # ...
-   ]
-
    SF_CONTENTPAGE_MODEL = "my_app.CustomContentPage"
    ```
 
@@ -92,13 +86,20 @@ sur le long terme à davantage de maintenance.
 ## Accéder au modèle depuis votre code
 
 N’importez pas `ContentPage` directement : une fois le modèle remplacé, il n’est
-plus utilisable.
+plus utilisable. Comme pour la `Page` de Wagtail 8, passez par `swapper` :
 
 ```python
-from sites_conformes.core import get_contentpage_model, get_contentpage_model_string
+import swapper
 
-ContentPage = get_contentpage_model()  # la classe, une fois les apps chargées
-ContentPage = get_contentpage_model_string()  # "my_app.CustomContentPage", pour les clés étrangères, subpage_types et migrations
+# La classe, une fois les apps chargées (dans une fonction ou une méthode)
+ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
+
+# "my_app.CustomContentPage", utilisable dans les définitions de modèles
+# (clés étrangères, subpage_types) et les migrations
+swapper.get_model_name("sites_conformes_core", "ContentPage")
+
+# Le modèle choisi, ou False si c’est celui du paquet
+swapper.is_swapped("sites_conformes_core", "ContentPage")
 ```
 
 ## Exemple

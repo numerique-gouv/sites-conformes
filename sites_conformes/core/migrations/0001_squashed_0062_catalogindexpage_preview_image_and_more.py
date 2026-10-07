@@ -8,9 +8,8 @@ import modelcluster.fields
 import wagtail.blocks.migrations.migrate_operation
 import wagtail.blocks.migrations.operations
 import wagtail.fields
+import swapper
 from django.db import migrations, models
-
-from sites_conformes.core import get_contentpage_model_string, is_contentpage_swapped
 
 
 class Migration(migrations.Migration):
@@ -83,7 +82,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        migrations.swappable_dependency(get_contentpage_model_string()),
         ("taggit", "0006_rename_taggeditem_content_type_object_id_taggit_tagg_content_8fc721_idx"),
         ("wagtailcore", "0078_referenceindex"),
         ("wagtailcore", "0089_log_entry_data_json_null_to_object"),
@@ -627,7 +625,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "abstract": False,
-                "swappable": "SF_CONTENTPAGE_MODEL",
+                "swappable": swapper.swappable_setting("sites_conformes_core", "ContentPage"),
                 "verbose_name": "Content page",
             },
             bases=("wagtailcore.page",),
@@ -668,7 +666,7 @@ class Migration(migrations.Migration):
         # The shipped model never held rows in a swapped project, and its managers are unavailable.
         *(
             []
-            if is_contentpage_swapped()
+            if swapper.is_swapped("sites_conformes_core", "ContentPage")
             else [
                 wagtail.blocks.migrations.migrate_operation.MigrateStreamData(
                     app_name="sites_conformes_core",
@@ -2239,7 +2237,7 @@ class Migration(migrations.Migration):
         # Only the shipped content page carries this through model: a swapped project declares its own.
         *(
             []
-            if is_contentpage_swapped()
+            if swapper.is_swapped("sites_conformes_core", "ContentPage")
             else [
                 migrations.CreateModel(
                     name="TagContentPage",
@@ -2255,7 +2253,7 @@ class Migration(migrations.Migration):
                             modelcluster.fields.ParentalKey(
                                 on_delete=django.db.models.deletion.CASCADE,
                                 related_name="contentpage_tags",
-                                to=get_contentpage_model_string(),
+                                to="sites_conformes_core.contentpage",
                             ),
                         ),
                         (
@@ -2810,7 +2808,7 @@ class Migration(migrations.Migration):
         # Only the shipped content page carries this through model: a swapped project declares its own.
         *(
             []
-            if is_contentpage_swapped()
+            if swapper.is_swapped("sites_conformes_core", "ContentPage")
             else [
                 migrations.AddField(
                     model_name="contentpage",
