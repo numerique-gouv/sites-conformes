@@ -110,6 +110,8 @@ L’envoi d’e-mails ne s’active que si `DEFAULT_FROM_EMAIL` est renseigné.
 | `EMAIL_TIMEOUT` | Délai d’expiration en secondes. | `30` | ⚪ |
 | `EMAIL_SSL_KEYFILE` | Fichier de clé PEM (si TLS/SSL). | *(aucun)* | ⚪ |
 | `EMAIL_SSL_CERTFILE` | Fichier de certificat PEM (si TLS/SSL). | *(aucun)* | ⚪ |
+| `ADMINS` | Adresses e-mail, séparées par des virgules, qui reçoivent les erreurs du serveur (erreurs 500 et, si `LOG_LEVEL` est défini, toute erreur journalisée par l’application). Sans effet si `DEBUG` vaut `True`. | *(vide)* | ⚪ |
+| `SERVER_EMAIL` | Adresse d’expéditeur des e-mails d’erreur envoyés à `ADMINS`. | valeur de `DEFAULT_FROM_EMAIL` | ⚪ |
 | `WAGTAIL_PASSWORD_RESET_ENABLED` | Affiche le lien « mot de passe oublié ». | `False` | 🟠 |
 
 ## Connexion ProConnect (authentification de l’État)
@@ -173,6 +175,23 @@ Docker, systemd, `just run_gunicorn`).
 | `GUNICORN_TIMEOUT` | Délai (en secondes) avant qu’un processus bloqué soit redémarré. | `120` | ⚪ |
 | `GUNICORN_MAX_REQUESTS` | Nombre de requêtes traitées avant redémarrage d’un processus (limite les fuites mémoire). | `10000` | ⚪ |
 | `GUNICORN_MAX_REQUESTS_JITTER` | Aléa ajouté à `GUNICORN_MAX_REQUESTS` pour étaler les redémarrages. | `2500` | ⚪ |
+
+## Journaux applicatifs
+
+Par défaut, la configuration des journaux de Django est conservée : en
+production, les erreurs applicatives n’apparaissent pas dans les logs de
+l’hébergeur. Définir `LOG_LEVEL` envoie les journaux de l’application sur la
+sortie standard, visibles dans l’onglet « Logs » de Scalingo (ou via
+`docker logs`, `journalctl`…).
+
+Les erreurs peuvent aussi être envoyées par e-mail aux adresses de `ADMINS`
+(voir la section « Envoi d’e-mails » ci-dessus).
+
+| Variable | Rôle | Défaut | Niveau |
+| --- | --- | --- | --- |
+| `LOG_LEVEL` | Niveau des journaux de l’application (`DEBUG`, `INFO`, `WARNING`, `ERROR`). Sa présence active l’écriture des journaux sur la sortie standard. | *(vide)* | ⚪ |
+| `DJANGO_LOG_LEVEL` | Niveau des journaux internes de Django. Pris en compte uniquement si `LOG_LEVEL` est défini. | `INFO` | ⚪ |
+| `LOG_SCRUB_PII` | Retire les données personnelles des journaux et des e-mails d’erreur : adresses e-mail et IP remplacées par `[email]` et `[ip]`, utilisateur connecté, cookie de session et champs de formulaire nominatifs (nom, e-mail, téléphone, adresse) masqués. Le repérage des adresses dans le texte libre est approximatif : un nom cité dans un message d’erreur n’est pas détecté. | `True` | ⚪ |
 
 ## Supervision des erreurs (Sentry)
 

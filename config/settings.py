@@ -474,6 +474,12 @@ if DEFAULT_FROM_EMAIL:
     EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 30))
     EMAIL_SSL_KEYFILE = os.getenv("EMAIL_SSL_KEYFILE", None)
     EMAIL_SSL_CERTFILE = os.getenv("EMAIL_SSL_CERTFILE", None)
+    # Sender of the error emails sent to ADMINS
+    SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+
+    # Addresses receiving server errors (500s, ERROR logs) by email when DEBUG is
+    # False.
+    ADMINS = list(filter(None, os.getenv("ADMINS", "").replace(" ", "").split(",")))
 
 # Forms
 WAGTAIL_PASSWORD_RESET_ENABLED = getenv_bool("WAGTAIL_PASSWORD_RESET_ENABLED", False)
@@ -550,6 +556,55 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # so this does not conflict with the per-site policy emitted by
 # sites_conformes.core.middleware.IframeMiddleware.
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# Strip personal data (e-mail/IP addresses, user, session cookie) from logs and
+# error e-mails, see sites_conformes.core.services.log_scrubbing.
+LOG_SCRUB_PII = getenv_bool("LOG_SCRUB_PII", True)
+if LOG_SCRUB_PII:
+    DEFAULT_EXCEPTION_REPORTER = "sites_conformes.core.services.log_scrubbing.PIIExceptionReporter"
+    DEFAULT_EXCEPTION_REPORTER_FILTER = "sites_conformes.core.services.log_scrubbing.PIIExceptionReporterFilter"
+log_handler_filters = ["scrub_pii"] if LOG_SCRUB_PII else []
+
+# Logging to stdout, collected by the hosting platform (Scalingo, Docker,
+# journald). Opt-in: set LOG_LEVEL to enable it, otherwise Django's default
+# logging is kept. Timestamps are added by the collector.
+if log_level := os.getenv("LOG_LEVEL"):
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "default": {"format": "%(levelname)s [%(name)s] %(message)s"},
+        },
+        "filters": {
+            "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+            "scrub_pii": {"()": "sites_conformes.core.services.log_scrubbing.ScrubPIIFilter"},
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+                "formatter": "default",
+                "filters": log_handler_filters,
+            },
+            # No-op while ADMINS is empty
+            "mail_admins": {
+                "class": "django.utils.log.AdminEmailHandler",
+                "level": "ERROR",
+                "filters": ["require_debug_false", *log_handler_filters],
+            },
+        },
+        "root": {"handlers": ["console", "mail_admins"], "level": log_level.upper()},
+        "loggers": {
+            "django": {
+                "handlers": ["console", "mail_admins"],
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO").upper(),
+                "propagate": False,
+            },
+            # 4xx are already visible in the router logs; keep only 5xx tracebacks
+            "django.request": {"handlers": ["console", "mail_admins"], "level": "ERROR", "propagate": False},
+            "django.server": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        },
+    }
 
 # Sentry config
 if sentry_dsn := os.getenv("SENTRY_DSN"):
