@@ -176,8 +176,11 @@ Docker, systemd, `just run_gunicorn`).
 
 ## Supervision des erreurs (Sentry)
 
+Mode d’emploi complet : {doc}`sentry`.
+
 | Variable | Rôle | Défaut | Niveau |
 | --- | --- | --- | --- |
 | `SENTRY_DSN` | Adresse du projet Sentry. Sa présence active la remontée d’erreurs. | *(vide)* | ⚪ |
 | `SENTRY_ENVIRONMENT` | Nom de l’environnement signalé à Sentry. | `production` | ⚪ |
-| `SENTRY_USE_DEBUG_URL` | Activation de l’URL de test d’activation de Sentry | `False` | ⚪ |
+| `SENTRY_SEND_DEFAULT_PII` | Joint des données personnelles aux rapports (adresse IP, utilisateur connecté, cookies). Voir {doc}`sentry`. | `False` | ⚪ |
+| `SENTRY_USE_DEBUG_URL` | Active l’URL `/sentry-debug/`, qui déclenche volontairement une erreur pour tester Sentry. À désactiver après usage. | `False` | ⚪ |
