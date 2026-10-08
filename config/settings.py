@@ -64,6 +64,9 @@ SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 # Selection order: S3_HOST wins if set, then SF_USE_DB_STORAGE, then filesystem (default)
 SF_USE_DB_STORAGE = getenv_bool("SF_USE_DB_STORAGE", False)
 
+# Ask search engines not to index anything served by this instance (disabled by default)
+SF_NOINDEX = getenv_bool("SF_NOINDEX", False)
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
@@ -133,6 +136,8 @@ if not TESTING and DEBUG and "localhost" in HOST_URL:
 # Middleware definition
 
 MIDDLEWARE = [
+    # Must stay first so that it also wraps WhiteNoise, appended below
+    "sites_conformes.core.middleware.NoIndexMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

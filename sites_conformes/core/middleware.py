@@ -15,6 +15,25 @@ logger = logging.getLogger(__name__)
 _FRAME_FETCH_DESTS = ("iframe", "frame")
 
 
+class NoIndexMiddleware:
+    """
+    Ask search engines not to index anything served by this instance.
+
+    Enabled with the ``SF_NOINDEX`` setting. The header is used rather than
+    ``robots.txt`` because a ``Disallow`` rule blocks crawling, not indexing,
+    and would prevent crawlers from reading the directive.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest) -> HttpResponse:
+        response = self.get_response(request)
+        if settings.SF_NOINDEX:
+            response.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return response
+
+
 class IframeMiddleware:
     """
     Iframe embedding support:
