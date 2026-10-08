@@ -551,13 +551,13 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # sites_conformes.core.middleware.IframeMiddleware.
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-# Sentry
+# Sentry config
 if sentry_dsn := os.getenv("SENTRY_DSN"):
     import sentry_sdk  # noqa: E402
 
     sentry_sdk.init(
         dsn=sentry_dsn,
-        send_default_pii=True,
+        send_default_pii=getenv_bool("SENTRY_SEND_DEFAULT_PII", False),
         environment=os.getenv("SENTRY_ENVIRONMENT", "production"),
     )
 
