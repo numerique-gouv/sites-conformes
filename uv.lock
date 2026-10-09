@@ -1983,8 +1983,8 @@ dependencies = [
     { name = "unidecode" },
     { name = "wagtail" },
     { name = "wagtail-2fa" },
-    { name = "wagtail-admin-treebeard" },
     { name = "wagtail-honeypot" },
+    { name = "wagtail-in-a-tree" },
     { name = "wagtail-localize" },
     { name = "wagtail-markdown" },
     { name = "wagtailmenus" },
@@ -2036,8 +2036,8 @@ requires-dist = [
     { name = "unidecode", specifier = ">=1.4.0" },
     { name = "wagtail", specifier = ">=7.2.0,<8.0.0" },
     { name = "wagtail-2fa", specifier = "==1.8.0" },
-    { name = "wagtail-admin-treebeard", url = "https://github.com/incubateur-ademe/plusfraisautravail/archive/593a25895082b3b190dfbf7ba9c6964de9936677.tar.gz", subdirectory = "packages/wagtail-admin-treebeard" },
     { name = "wagtail-honeypot", specifier = ">=1.2.1" },
+    { name = "wagtail-in-a-tree", specifier = ">=0.1.0" },
     { name = "wagtail-localize", specifier = ">=1.12.1" },
     { name = "wagtail-markdown", specifier = ">=0.12.1" },
     { name = "wagtailmenus", specifier = ">=4.0.3" },
@@ -2287,29 +2287,6 @@ wheels = [
 ]
 
 [[package]]
-name = "wagtail-admin-treebeard"
-version = "0.1.0"
-source = { url = "https://github.com/incubateur-ademe/plusfraisautravail/archive/593a25895082b3b190dfbf7ba9c6964de9936677.tar.gz", subdirectory = "packages/wagtail-admin-treebeard" }
-dependencies = [
-    { name = "django" },
-    { name = "django-treebeard" },
-    { name = "wagtail" },
-]
-sdist = { hash = "sha256:53b0d82add602e630f588cc9f589dff833dd5753a051731d18c02ea015cdc3e2" }
-
-[package.metadata]
-requires-dist = [
-    { name = "beautifulsoup4", marker = "extra == 'dev'", specifier = ">=4.12" },
-    { name = "django", specifier = ">=5.0" },
-    { name = "django-treebeard", specifier = ">=5.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3" },
-    { name = "pytest-django", marker = "extra == 'dev'", specifier = ">=4.9" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.7" },
-    { name = "wagtail", specifier = ">=7.0" },
-]
-provides-extras = ["dev"]
-
-[[package]]
 name = "wagtail-factories"
 version = "4.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2332,6 +2309,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/23/c7/d2a6130617ca2f1b0279ef80b93e034cc1b426b0d7b52ac1a3d76996bf5a/wagtail_honeypot-1.3.1.tar.gz", hash = "sha256:e09cbb99ef6e18b98a3c36b06d9c2b7bd357477af4470404146af55d567528ff", size = 14055, upload-time = "2026-07-16T11:45:41.405Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3b/17/70dc2a8f118046a9d12f67ea8061de2fe78e4a9d9bfdb9f42345d9cc42a4/wagtail_honeypot-1.3.1-py3-none-any.whl", hash = "sha256:793f7bf91cdc8cf9b2516c4e6a274f939bfa94ef977fe031cabeef6c5e47cd91", size = 8670, upload-time = "2026-07-16T11:45:40.324Z" },
+]
+
+[[package]]
+name = "wagtail-in-a-tree"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-treebeard" },
+    { name = "wagtail" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/97/4a/a169c5720e6d3263834bc5a7875aea57aa1a4c6f871bda64c3b8cb7084ab/wagtail_in_a_tree-0.1.0.tar.gz", hash = "sha256:f710835cd40a38e06540d49be6f62ac44ea49d2dc01e2da07cc0e18206bb758d", size = 20620, upload-time = "2026-10-09T14:35:40.459Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ba/3c/ab2fd76c69ffd6d8ac63c0567d9f05e1c318109736884513912405fa291f/wagtail_in_a_tree-0.1.0-py3-none-any.whl", hash = "sha256:caba0e33b926b0e1659150150e6e22c49d845d2c116c9016d1cecca1acbdb481", size = 29414, upload-time = "2026-10-09T14:35:38.91Z" },
 ]
 
 [[package]]
