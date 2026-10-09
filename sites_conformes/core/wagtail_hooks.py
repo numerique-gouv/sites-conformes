@@ -10,7 +10,7 @@ from wagtail.admin.rich_text.converters.html_to_contentstate import (
     BlockElementHandler,
 )
 from wagtail.snippets.models import register_snippet
-from wagtail_admin_treebeard.views import TreeSnippetViewSet
+from wagtail_in_a_tree.views import TreeSnippetViewSet
 
 from sites_conformes.core.models import Category
 
@@ -141,7 +141,9 @@ def editor_js():
 class CategoryViewSet(TreeSnippetViewSet):
     model = Category
     icon = "tag"  # type: ignore
-    list_display = ["name", "parent"]
+    add_to_admin_menu = True
+    menu_order = 150  # right after Pages (100), before Images (300)
+    list_display = ["name"]
     search_fields = ["name"]
 
 
