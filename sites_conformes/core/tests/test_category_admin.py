@@ -5,7 +5,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from wagtail.test.utils import WagtailPageTestCase
-from wagtail_admin_treebeard.forms import INVALID_MOVE_MESSAGE
+from wagtail_in_a_tree.forms import INVALID_MOVE_MESSAGE
 
 from sites_conformes.core.models import Category
 
@@ -20,11 +20,28 @@ class CategoryTreeTest(WagtailPageTestCase):
         self.public = Category.objects.create(name="Public", slug="public")
         self.companies = Category.objects.create(name="Entreprises", slug="entreprises", parent=self.public)
 
-    def test_tree_lists_children_after_their_parent_sorted_by_name(self):
+    def test_tree_lists_children_after_their_parent_in_creation_order(self):
         self.assertEqual(
             [category.name for category in Category.get_tree()],
-            ["Public", "Entreprises", "Thème", "Emploi", "Logement"],
+            ["Thème", "Logement", "Emploi", "Public", "Entreprises"],
         )
+
+    def test_migration_numbers_siblings_from_one_in_name_order(self):
+        Category.objects.update(sib_order=0)
+        number_siblings = import_module("sites_conformes.core.migrations.0088_category_sib_order").number_siblings
+
+        number_siblings(apps, None)
+
+        self.assertEqual([c.name for c in Category.get_root_nodes()], ["Public", "Thème"])
+        self.assertEqual([c.name for c in self.theme.get_children()], ["Emploi", "Logement"])
+        self.housing.refresh_from_db()
+        self.housing.move(Category.objects.get(pk=self.jobs.pk), "left")
+        self.assertEqual([c.name for c in self.theme.get_children()], ["Logement", "Emploi"])
+
+    def test_siblings_can_be_reordered_by_hand(self):
+        self.jobs.move(self.housing, "left")
+
+        self.assertEqual([c.name for c in self.theme.get_children()], ["Emploi", "Logement"])
 
     def test_depth(self):
         depths = {category.name: category.get_depth() for category in Category.get_tree()}
@@ -50,7 +67,7 @@ class CategoryTreeTest(WagtailPageTestCase):
 
 
 class CategoryAdminTest(WagtailPageTestCase):
-    form_data = {"colophon-count": "0", "treebeard_position": "sorted-child"}
+    form_data = {"colophon-count": "0", "treebeard_position": "first-child"}
 
     def setUp(self):
         self.login()
@@ -58,13 +75,35 @@ class CategoryAdminTest(WagtailPageTestCase):
         self.housing = Category.objects.create(name="Logement", slug="logement", parent=self.theme)
         self.public = Category.objects.create(name="Public", slug="public")
 
-    def test_listing_nests_children_inside_their_parent(self):
+    def test_listing_shows_the_root_categories_only(self):
         response = self.client.get(reverse("wagtailsnippets_sites_conformes_core_category:list"))
 
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, "html.parser")
-        self.assertIsNotNone(soup.select_one(f'[data-node="{self.theme.pk}"] [data-node="{self.housing.pk}"]'))
-        self.assertIsNotNone(soup.select_one("[data-root-zone]"))
+        rows = soup.select("tr[data-node]")
+        self.assertEqual([row["data-node"] for row in rows], [str(self.theme.pk), str(self.public.pk)])
+
+    def test_each_category_lists_its_children(self):
+        response = self.client.get(
+            reverse("wagtailsnippets_sites_conformes_core_category:children", args=[self.theme.pk])
+        )
+
+        soup = BeautifulSoup(response.content, "html.parser")
+        self.assertEqual([row["data-node"] for row in soup.select("tr[data-node]")], [str(self.housing.pk)])
+
+    def test_categories_have_their_own_menu_item(self):
+        response = self.client.get(reverse("wagtailadmin_home"))
+
+        self.assertContains(response, reverse("wagtailsnippets_sites_conformes_core_category:list"))
+
+    def test_pages_choose_their_categories_in_a_tree(self):
+        from wagtail_in_a_tree.widgets import TreeCheckboxSelectMultiple
+
+        from sites_conformes.core.models import ContentPage
+
+        form_class = ContentPage.get_edit_handler().get_form_class()
+
+        self.assertIsInstance(form_class.base_fields["categories"].widget, TreeCheckboxSelectMultiple)
 
     def test_search_falls_back_to_the_flat_table(self):
         response = self.client.get(reverse("wagtailsnippets_sites_conformes_core_category:list") + "?q=Logement")

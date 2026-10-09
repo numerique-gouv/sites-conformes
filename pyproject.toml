@@ -49,8 +49,8 @@ dependencies = [
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
     "django-treebeard>=5.3.1",
-    # Not on PyPI yet: pinned to the commit that merged it in the plusfraisautravail monorepo.
-    "wagtail-admin-treebeard @ https://github.com/incubateur-ademe/plusfraisautravail/archive/593a25895082b3b190dfbf7ba9c6964de9936677.tar.gz#subdirectory=packages/wagtail-admin-treebeard",
+    # Not on PyPI yet. TODO: pin to a commit archive (…/archive/<sha>.tar.gz) once incubateur-ademe/wagtail-in-a-tree is pushed.
+    "wagtail-in-a-tree @ https://github.com/incubateur-ademe/wagtail-in-a-tree/archive/refs/heads/main.tar.gz",
 ]
 
 [dependency-groups]
