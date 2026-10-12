@@ -50,6 +50,7 @@ Renseignez les variables d’environnement suivantes :
 | `SENTRY_DSN` | Le DSN copié depuis Sentry | Oui |
 | `SENTRY_ENVIRONMENT` | Nom de l’instance : `production`, `recette`, `staging`… | Non (défaut : `production`) |
 | `SENTRY_SEND_DEFAULT_PII` | `True` pour joindre des données personnelles aux rapports (voir [Données personnelles](#donnees-personnelles)) | Non (défaut : `False`) |
+| `SENTRY_TRACES_SAMPLE_RATE` | Proportion des requêtes mesurées pour le suivi des performances, entre `0` et `1` (voir [Suivi des performances](#suivi-performances)) | Non (défaut : désactivé) |
 
 La façon de les définir dépend de votre mode de déploiement.
 
@@ -143,6 +144,52 @@ en joignant la trace fournie par Sentry (après en avoir retiré les données
 personnelles).
 :::
 
+(suivi-performances)=
+
+## Suivi des performances (optionnel)
+
+En plus des erreurs, Sentry peut mesurer les **performances** du site : temps
+de réponse de chaque page, détail des requêtes à la base de données et des
+appels à des services externes. Ces mesures apparaissent dans l’onglet
+**Performance** (ou **Traces**) de Sentry et permettent de repérer les pages
+lentes et leur cause.
+
+Ce suivi est **désactivé par défaut**. Pour l’activer, définissez la variable
+`SENTRY_TRACES_SAMPLE_RATE` : c’est la **proportion des requêtes mesurées**,
+entre `0` et `1`. Par exemple, `0.1` signifie qu’une requête sur dix est
+mesurée.
+
+Chaque requête mesurée est envoyée à Sentry et **consomme du quota**. Ce réglage
+n’a en revanche aucun effet sur les erreurs : elles sont toujours toutes
+remontées.
+
+Valeurs suggérées :
+
+| Environnement | Valeur | Pourquoi |
+| --- | --- | --- |
+| Développement local | `1.0` | Peu de requêtes : on mesure tout. |
+| Recette / préproduction | `0.5` à `1.0` | Trafic faible ; utile pour mesurer avant une mise en production. |
+| Production, trafic modéré (quelques milliers de visites par jour) | `0.1` | Bon compromis entre représentativité et quota. |
+| Production, fort trafic | `0.01` à `0.05` | Suffisant pour des statistiques fiables. |
+| Suivi des performances inutile | *(ne pas définir)* | Désactivé. |
+
+Par exemple, pour une production :
+
+```sh
+# Scalingo
+scalingo --app mon-site env-set SENTRY_TRACES_SAMPLE_RATE=0.1
+
+# Serveur Linux ou Docker : dans le fichier .env, puis redémarrer
+SENTRY_TRACES_SAMPLE_RATE=0.1
+```
+
+:::{note}
+Sur une instance Sentry **mutualisée** (comme celle de Beta.gouv.fr), le volume
+de données reçu est partagé entre tous les projets : renseignez-vous auprès de
+l’équipe qui l’administre avant d’augmenter cette valeur. Dans tous les cas,
+commencez bas et ajustez selon le volume constaté dans Sentry.
+:::
+
 (donnees-personnelles)=
 
 ## Données personnelles
@@ -168,6 +215,10 @@ connecté, ainsi que les **cookies et en-têtes** de la requête.
 :::{important}
 N’activez cette option qu’en connaissance de cause. Elle constitue un traitement
 de données personnelles au sens du RGPD.
+
+Elle constitue également un risque de sécurité, dans l’éventualité où l’instance
+Sentry serait piratée. La [documentation de Beta](https://doc.incubateur.net/communaute/les-outils-de-la-communaute/autres-services/sentry)
+recommande fortement de ne pas envoyer de données personnelles à Sentry.
 :::
 
 Si vous l’activez :
@@ -202,6 +253,7 @@ if sentry_dsn := os.getenv("SENTRY_DSN"):
         dsn=sentry_dsn,
         send_default_pii=getenv_bool("SENTRY_SEND_DEFAULT_PII", False),
         environment=os.getenv("SENTRY_ENVIRONMENT", "production"),
+        traces_sample_rate=float(rate) if (rate := os.getenv("SENTRY_TRACES_SAMPLE_RATE")) else None,
     )
 ```
 

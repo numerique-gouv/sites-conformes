@@ -183,4 +183,5 @@ Mode d’emploi complet : {doc}`sentry`.
 | `SENTRY_DSN` | Adresse du projet Sentry. Sa présence active la remontée d’erreurs. | *(vide)* | ⚪ |
 | `SENTRY_ENVIRONMENT` | Nom de l’environnement signalé à Sentry. | `production` | ⚪ |
 | `SENTRY_SEND_DEFAULT_PII` | Joint des données personnelles aux rapports (adresse IP, utilisateur connecté, cookies). Voir {doc}`sentry`. | `False` | ⚪ |
+| `SENTRY_TRACES_SAMPLE_RATE` | Proportion des requêtes mesurées pour le suivi des performances (entre `0` et `1`, par exemple `0.1`). Non définie : suivi désactivé. Voir {doc}`sentry`. | *(vide)* | ⚪ |
 | `SENTRY_USE_DEBUG_URL` | Active l’URL `/sentry-debug/`, qui déclenche volontairement une erreur pour tester Sentry. À désactiver après usage. | `False` | ⚪ |
