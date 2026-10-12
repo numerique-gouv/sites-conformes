@@ -1,6 +1,7 @@
 import re
 
 from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import RequestFactory, SimpleTestCase
 from dsfr.forms import DsfrBoundField
@@ -8,6 +9,11 @@ from wagtail.test.utils import WagtailPageTestCase
 from wagtail_localize.models import TranslationSource
 
 from sites_conformes.core.views import SearchResultsView
+from sites_conformes.forms.autocomplete import (
+    AUTOCOMPLETE_FIELD_TYPES,
+    AUTOCOMPLETE_TOKENS,
+    get_autocomplete_choices_for,
+)
 from sites_conformes.forms.models import FormField, FormPage, SitesFacilesFormBuilder
 
 
@@ -67,6 +73,15 @@ class FormsTestCase(WagtailPageTestCase):
         response = self.client.get(form_page.url)
 
         self.assertRegex(response.content.decode(), r"<form [^>]*novalidate")
+
+    def test_form_fields_have_autocomplete_attributes(self):
+        form_page = FormPage.objects.first()
+        response = self.client.get(form_page.url)
+        content = response.content.decode()
+
+        self.assertRegex(content, r'<input [^>]*name="votre_nom_complet"[^>]*autocomplete="name"')
+        self.assertRegex(content, r'<input [^>]*name="votre_adresse_electronique"[^>]*autocomplete="email"')
+        self.assertRegex(content, r'<input [^>]*name="votre_numero_de_telephone"[^>]*autocomplete="tel"')
 
     def test_empty_form_shows_all_errors(self):
         form_page = FormPage.objects.first()
@@ -195,3 +210,65 @@ class SitesFacilesCustomFormDsfrRenderingTestCase(SimpleTestCase):
         html = str(bound_field.as_field_group())
         self.assertIn("fr-fieldset", html)
         self.assertIn("fr-radio-group", html)
+
+
+class FormFieldAutocompleteTestCase(SimpleTestCase):
+    def build_form(self, *fields):
+        return SitesFacilesFormBuilder(list(fields)).get_form_class()()
+
+    def test_autocomplete_attribute_is_rendered(self):
+        field = FormField(field_type="singleline", label="Prénom", autocomplete="given-name")
+        form = self.build_form(field)
+
+        self.assertIn('autocomplete="given-name"', str(form["prenom"]))
+
+    def test_empty_autocomplete_is_not_rendered(self):
+        field = FormField(field_type="singleline", label="Titre")
+        form = self.build_form(field)
+
+        self.assertNotIn("autocomplete=", str(form["titre"]))
+
+    def test_email_field_defaults_to_email_autocomplete(self):
+        field = FormField(field_type="email", label="Courriel")
+        form = self.build_form(field)
+
+        self.assertIn('autocomplete="email"', str(form["courriel"]))
+
+    def test_incompatible_autocomplete_is_rejected(self):
+        field = FormField(field_type="email", label="Courriel", autocomplete="name")
+
+        with self.assertRaises(ValidationError) as context:
+            field.clean()
+        self.assertIn("autocomplete", context.exception.message_dict)
+
+    def test_compatible_autocomplete_is_accepted(self):
+        field = FormField(field_type="multiline", label="Adresse", autocomplete="street-address")
+        field.clean()
+
+    def test_empty_autocomplete_is_accepted_except_for_email(self):
+        for field_type, _label in FormField.CHOICES:
+            field = FormField(field_type=field_type, label="Champ")
+            field.clean()
+            expected = "email" if field_type == "email" else ""
+            self.assertEqual(field.autocomplete, expected, field_type)
+
+    def test_autocomplete_mapping_is_consistent(self):
+        field_types = {field_type for field_type, _label in FormField.CHOICES}
+        self.assertEqual(len(AUTOCOMPLETE_TOKENS), len(set(AUTOCOMPLETE_TOKENS)))
+        self.assertEqual(set(AUTOCOMPLETE_TOKENS), set(AUTOCOMPLETE_FIELD_TYPES))
+        for token, compatible_types in AUTOCOMPLETE_FIELD_TYPES.items():
+            self.assertTrue(compatible_types, token)
+            self.assertLessEqual(compatible_types, field_types, token)
+
+    def test_choice_fields_have_no_autocomplete(self):
+        for field_type in ("checkbox", "checkboxes", "radio", "hidden"):
+            self.assertEqual(get_autocomplete_choices_for(field_type), [], field_type)
+        self.assertEqual(get_autocomplete_choices_for("email"), ["email"])
+
+    def test_field_without_type_is_ignored(self):
+        # A field being added in the editor has no type yet: previews must not crash
+        untyped = FormField(field_type="", label="Sans type")
+        typed = FormField(field_type="singleline", label="Avec type")
+        form = self.build_form(untyped, typed)
+
+        self.assertEqual(list(form.fields), ["avec_type"])

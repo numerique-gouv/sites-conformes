@@ -223,6 +223,7 @@ class Command(BaseCommand):
             {
                 "sort_order": 2,
                 "clean_name": "adresse_email",
+                "autocomplete": "email",
                 "label": "Adresse email",
                 "required": True,
                 "page": form_page,
@@ -240,6 +241,7 @@ class Command(BaseCommand):
             {
                 "sort_order": 4,
                 "clean_name": "url",
+                "autocomplete": "url",
                 "label": "URL",
                 "required": True,
                 "page": form_page,
