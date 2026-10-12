@@ -90,9 +90,22 @@
             <div class="fr-collapse" id="fr-sidemenu-wrapper-{{ page.slug }}">
               <h2 class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters and export" %}</h2>
 
-              <h3 class="fr-h6">{% translate "Filter by date" %}</h3>
-
-              {{ form }}
+              <form method="get"
+                    action="{% pageurl page %}#posts-list"
+                    id="events-filters-form">
+                {% for name, value in preserved_filters %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+                <fieldset class="fr-fieldset" aria-labelledby="events-period-legend">
+                  <legend class="fr-fieldset__legend fr-fieldset__legend--regular"
+                          id="events-period-legend">
+                    <h3 class="fr-h6 fr-mb-0">{% translate "Filter by period" %}</h3>
+                  </legend>
+                  <div class="fr-fieldset__element">{{ form.date_from.as_field_group }}</div>
+                  <div class="fr-fieldset__element">{{ form.date_to.as_field_group }}</div>
+                  <div class="fr-fieldset__element">
+                    <button type="submit" class="fr-btn">{% translate "Filter" context "submit button" %}</button>
+                  </div>
+                </fieldset>
+              </form>
 
               {% if categories and page.filter_by_category %}
                 <div class="fr-my-3w">
@@ -169,9 +182,8 @@
               <h3 class="fr-h6">{% translate "Export" %}</h3>
               <ul class="fr-btns-group fr-mt-1w">
                 <li>
-                  <a type="button"
-                     href="{% routablepageurl page 'ical_view' %}"
-                     class="fr-btn fr-btn--secondary">{% translate "Add to your calendar (iCal)" %}</a>
+                  <a href="{% routablepageurl page 'ical_view' %}"
+                     class="fr-btn fr-btn--secondary">{% translate "Download events (iCal)" %}</a>
                 </li>
               </ul>
 
@@ -193,10 +205,20 @@
 
       <div class="fr-col fr-col-md-8 fr-col-12" id="posts-list">
         <h2>{% translate "Events" %}</h2>
-        <div class="fr-grid-row fr-grid-row--gutters">{% include "sites_conformes_events/blocks/events_index_posts_list.html" %}</div>
-        {% if posts.paginator.num_pages > 1 %}
-          <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>
-        {% endif %}
+        <p class="fr-mb-2w"
+           id="events-results-count"
+           aria-live="polite"
+           aria-atomic="true">
+          {% blocktranslate count counter=paginator.count %}{{ counter }} event found{% plural %}{{ counter }} events found{% endblocktranslate %}
+        </p>
+        <div id="events-results">
+          <div class="fr-grid-row fr-grid-row--gutters">
+            {% include "sites_conformes_events/blocks/events_index_posts_list.html" %}
+          </div>
+          {% if posts.paginator.num_pages > 1 %}
+            <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
