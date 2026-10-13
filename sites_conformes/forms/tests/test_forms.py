@@ -44,6 +44,25 @@ class FormsTestCase(WagtailPageTestCase):
             "<p>Merci pour votre message ! Nous reviendrons vers vous rapidement.</p>",
         )
 
+    def test_submitted_form_shows_focused_success_alert(self):
+        form_page = FormPage.objects.first()
+        post_data = {
+            "votre_nom_complet": "Félix Faure",
+            "votre_adresse_electronique": "no7@elysee.fr",
+            "titre_de_votre_message": "Ma connaissance",
+            "votre_message": "S’est enfuie par l’escalier !",
+        }
+        response = self.client.post(form_page.url, post_data)
+
+        self.assertContains(
+            response,
+            """<div class="fr-alert fr-alert--success fr-my-4w" role="alert" tabindex="-1" autofocus>
+              <h2 class="fr-alert__title">Succès</h2>
+              <p>Votre formulaire a été envoyé.</p>
+            </div>""",
+            html=True,
+        )
+
     def test_incorrect_form_is_rejected(self):
         form_page = FormPage.objects.first()
         post_data = {

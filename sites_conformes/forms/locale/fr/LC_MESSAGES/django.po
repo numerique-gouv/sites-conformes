@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 10:27+0200\n"
-"PO-Revision-Date: 2026-10-13 10:28+0200\n"
+"POT-Creation-Date: 2026-10-13 14:20+0200\n"
+"PO-Revision-Date: 2026-10-13 14:21+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -271,6 +271,15 @@ msgstr "Tous les champs sont obligatoires."
 
 msgid "Fields marked with an asterisk (*) are mandatory."
 msgstr "Les champs marqués d’un astérisque (*) sont obligatoires."
+
+msgid "Your form has been successfully submitted"
+msgstr "Votre formulaire a été envoyé avec succès"
+
+msgid "Success"
+msgstr "Succès"
+
+msgid "Your form has been submitted."
+msgstr "Votre formulaire a été envoyé."
 
 msgid "Your form has been successfully submitted. Thank you!"
 msgstr "Votre formulaire a été envoyé avec succès. Merci !"
