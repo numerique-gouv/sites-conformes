@@ -222,6 +222,7 @@ class Command(BaseCommand):
             {
                 "sort_order": 0,
                 "clean_name": "votre_nom_complet",
+                "autocomplete": "name",
                 "label": "Votre nom complet",
                 "required": True,
                 "page": contact_page,
@@ -230,6 +231,7 @@ class Command(BaseCommand):
             {
                 "sort_order": 1,
                 "clean_name": "votre_adresse_electronique",
+                "autocomplete": "email",
                 "label": "Votre adresse électronique",
                 "required": True,
                 "choices": "",
@@ -241,6 +243,7 @@ class Command(BaseCommand):
             {
                 "sort_order": 2,
                 "clean_name": "votre_numero_de_telephone",
+                "autocomplete": "tel",
                 "label": "Votre numéro de téléphone",
                 "required": False,
                 "page": contact_page,
