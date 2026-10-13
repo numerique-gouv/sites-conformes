@@ -3,7 +3,7 @@
 {% load i18n wagtailcore_tags %}
 
 {% block title %}
-  <title>{{ page.seo_title|default:page.title }} — {{ settings.sites_conformes_core.CmsDsfrConfig.site_title }}</title>
+  <title>{% translate "Your form has been successfully submitted" %} — {{ page.seo_title|default:page.title }} — {{ settings.sites_conformes_core.CmsDsfrConfig.site_title }}</title>
 {% endblock title %}
 
 {% block content %}
@@ -11,6 +11,13 @@
     {% include "sites_conformes_core/blocks/breadcrumbs.html" %}
     <h1>{{ page.title }}</h1>
 
+    <div class="fr-alert fr-alert--success fr-my-4w"
+         role="alert"
+         tabindex="-1"
+         autofocus>
+      <h2 class="fr-alert__title">{% translate "Success" %}</h2>
+      <p>{% translate "Your form has been submitted." %}</p>
+    </div>
   </div>
 
   {% include "sites_conformes_core/blocks/messages.html" %}
