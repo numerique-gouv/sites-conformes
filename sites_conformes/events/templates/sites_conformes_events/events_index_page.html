@@ -61,6 +61,8 @@
 
 {% block content %}
   {% include "sites_conformes_core/blocks/heading.html" %}
+  {% translate "selected" as selected_label %}
+  {% translate "unselected" as unselected_label %}
 
   <div class="fr-container fr-pt-4w">
     {% include "sites_conformes_core/blocks/breadcrumbs.html" %}
@@ -90,88 +92,102 @@
             <div class="fr-collapse" id="fr-sidemenu-wrapper-{{ page.slug }}">
               <h2 class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters and export" %}</h2>
 
-              <h3 class="fr-h6">{% translate "Filter by date" %}</h3>
+              <form method="get"
+                    action="{% pageurl page %}#posts-list"
+                    id="events-filters-form">
+                {% for name, value in preserved_filters %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+                <fieldset class="fr-fieldset" aria-labelledby="events-period-legend">
+                  <legend class="fr-fieldset__legend fr-fieldset__legend--regular"
+                          id="events-period-legend">
+                    <h3 class="fr-h6 fr-mb-0">{% translate "Filter by period" %}</h3>
+                  </legend>
+                  <div class="fr-fieldset__element">{{ form.date_from.as_field_group }}</div>
+                  <div class="fr-fieldset__element">{{ form.date_to.as_field_group }}</div>
+                  <div class="fr-fieldset__element">
+                    <button type="submit" class="fr-btn">{% translate "Filter" context "submit button" %}</button>
+                  </div>
+                </fieldset>
+              </form>
 
-              {{ form }}
+              <div id="events-other-filters">
+                {% if categories and page.filter_by_category %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for category in categories %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
+                             title="{% if category.slug == current_category.slug %}{{ selected_label }} {% else %}{{ unselected_label }} {% endif %}"
+                             {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                            {{ category.name }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
 
-              {% if categories and page.filter_by_category %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for category in categories %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
-                           title="{% if category.slug == current_category.slug %}{% translate 'selected' %} {% else %}{% translate 'unselected' %} {% endif %}"
-                           {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
-                          {{ category.name }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+                {% if tags and page.filter_by_tag %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by tag" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for tag in tags %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
+                             {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}
+                             title="{% if tag.slug in current_tag %}{{ selected_label }} {% else %}{{ unselected_label }}{% endif %}">
+                            {{ tag }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
 
-              {% if tags and page.filter_by_tag %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by tag" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for tag in tags %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
-                           {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}
-                           title="{% if tag.slug in current_tag %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}">
-                          {{ tag }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+                {% if authors and page.filter_by_author %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by author" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for author in authors %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter author=author %}#posts-list"
+                             title="{% if author == current_author %}{{ selected_label }} {% else %}{{ unselected_label }} {% endif %}"
+                             {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
 
-              {% if authors and page.filter_by_author %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by author" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for author in authors %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter author=author %}#posts-list"
-                           title="{% if author == current_author %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
-                           {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
-
-              {% if sources and page.filter_by_source %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by source" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for source in sources %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter source=source %}#posts-list"
-                           title="{% if source == current_source %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
-                           {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+                {% if sources and page.filter_by_source %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by source" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for source in sources %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter source=source %}#posts-list"
+                             title="{% if source == current_source %}{{ selected_label }} {% else %}{{ unselected_label }}{% endif %}"
+                             {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
 
               <h3 class="fr-h6">{% translate "Export" %}</h3>
               <ul class="fr-btns-group fr-mt-1w">
                 <li>
-                  <a type="button"
-                     href="{% routablepageurl page 'ical_view' %}"
-                     class="fr-btn fr-btn--secondary">{% translate "Add to your calendar (iCal)" %}</a>
+                  <a href="{% routablepageurl page 'ical_view' %}"
+                     class="fr-btn fr-btn--secondary">{% translate "Download events (iCal)" %}</a>
                 </li>
               </ul>
 
@@ -193,10 +209,20 @@
 
       <div class="fr-col fr-col-md-8 fr-col-12" id="posts-list">
         <h2>{% translate "Events" %}</h2>
-        <div class="fr-grid-row fr-grid-row--gutters">{% include "sites_conformes_events/blocks/events_index_posts_list.html" %}</div>
-        {% if posts.paginator.num_pages > 1 %}
-          <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>
-        {% endif %}
+        <p class="fr-mb-2w"
+           id="events-results-count"
+           aria-live="polite"
+           aria-atomic="true">
+          {% blocktranslate count counter=paginator.count %}{{ counter }} event found{% plural %}{{ counter }} events found{% endblocktranslate %}
+        </p>
+        <div id="events-results">
+          <div class="fr-grid-row fr-grid-row--gutters">
+            {% include "sites_conformes_events/blocks/events_index_posts_list.html" %}
+          </div>
+          {% if posts.paginator.num_pages > 1 %}
+            <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>

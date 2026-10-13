@@ -8,22 +8,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 12:02+0200\n"
-"PO-Revision-Date: 2026-03-26 13:59+0100\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2026-10-13 11:10+0200\n"
+"PO-Revision-Date: 2026-10-13 11:29+0200\n"
+"Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 
 msgid "Start date"
 msgstr "Date de début"
 
 msgid "End date"
 msgstr "Date de fin"
+
+msgid "The end date must be on or after the start date."
+msgstr "La date de fin doit être identique ou postérieure à la date de début."
 
 msgid "Events per page"
 msgstr "Événements par page"
@@ -41,8 +44,7 @@ msgid "Filter by source"
 msgstr "Filtrer par source"
 
 msgid "The source is the organization of the event author"
-msgstr ""
-"La source est l’organisation à laquelle appartient l’auteur de l’événement"
+msgstr "La source est l’organisation à laquelle appartient l’auteur de l’événement"
 
 msgid "Show filters"
 msgstr "Afficher les filtres"
@@ -122,8 +124,8 @@ msgstr "Lieu :"
 msgid "Registration link:"
 msgstr "Lien d’inscription :"
 
-msgid "Add to your calendar (iCal)"
-msgstr "Ajouter à votre calendrier (iCal)"
+msgid "Download event (iCal)"
+msgstr "Télécharger l’événement (iCal)"
 
 msgid "Year:"
 msgstr "Année :"
@@ -162,23 +164,42 @@ msgstr "Date de début :"
 msgid "End date:"
 msgstr "Date de fin :"
 
-msgid "Filter by date"
-msgstr "Filtrer par date"
-
 msgid "selected"
 msgstr "étiquette sélectionnée"
 
 msgid "unselected"
-msgstr "étiquette non-sélectionnée"
+msgstr "étiquette non sélectionnée"
+
+msgid "Filter by period"
+msgstr "Filtrer par période"
+
+msgctxt "submit button"
+msgid "Filter"
+msgstr "Filtrer"
 
 msgid "Export"
 msgstr "Export"
+
+msgid "Download events (iCal)"
+msgstr "Télécharger les événements (iCal)"
 
 msgid "Archives"
 msgstr "Archives"
 
 msgid "See archives"
 msgstr "Voir les archives"
+
+#, python-format
+msgid "%(counter)s event found"
+msgid_plural "%(counter)s events found"
+msgstr[0] "%(counter)s événement trouvé"
+msgstr[1] "%(counter)s événements trouvés"
+
+#~ msgid "Filter by date"
+#~ msgstr "Filtrer par date"
+
+#~ msgid "Add to your calendar (iCal)"
+#~ msgstr "Ajouter à votre calendrier (iCal)"
 
 #~ msgid "From…"
 #~ msgstr "Du…"

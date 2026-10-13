@@ -5,6 +5,7 @@ from django.utils import timezone
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
+from sites_conformes.core.models import Tag
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
 
 User = get_user_model()
@@ -85,6 +86,43 @@ class EventsTestCase(WagtailPageTestCase):
             response,
             "Événement futur",
         )
+
+    def test_events_index_page_has_accessible_date_filters(self):
+        response = self.client.get(self.events_index_page.url)
+
+        self.assertContains(response, '<form method="get"')
+        self.assertContains(response, '<fieldset class="fr-fieldset" aria-labelledby="events-period-legend">')
+        self.assertContains(response, "Filtrer par période")
+        self.assertContains(response, '<button type="submit" class="fr-btn">Filtrer</button>', html=True)
+        self.assertContains(response, 'aria-live="polite"')
+        self.assertContains(response, "2 événements trouvés")
+
+    def test_events_index_page_filters_by_date(self):
+        date_from = (timezone.now() + timedelta(days=300)).date().isoformat()
+        response = self.client.get(self.events_index_page.url, {"date_from": date_from})
+
+        self.assertNotContains(response, "Événement en cours")
+        self.assertContains(response, "Événement futur")
+        self.assertContains(response, "1 événement trouvé")
+
+    def test_events_index_page_ignores_invalid_date(self):
+        response = self.client.get(self.events_index_page.url, {"date_from": "invalid"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "2 événements trouvés")
+
+    def test_events_index_page_rejects_end_date_before_start_date(self):
+        response = self.client.get(self.events_index_page.url, {"date_from": "2026-06-10", "date_to": "2026-06-01"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "fr-input-group--error")
+        self.assertContains(response, "La date de fin doit être identique ou postérieure à la date de début.")
+
+    def test_events_index_page_date_filters_keep_other_filters(self):
+        Tag.objects.create(name="Atelier", slug="atelier")
+        response = self.client.get(self.events_index_page.url, {"tag": "atelier"})
+
+        self.assertContains(response, '<input type="hidden" name="tag" value="atelier">', html=True)
 
     def test_events_archives_have_only_finished_events(self):
         response = self.client.get(self.events_index_page.url + "archives/")

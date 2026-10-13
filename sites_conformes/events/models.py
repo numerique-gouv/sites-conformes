@@ -1,5 +1,3 @@
-import datetime
-
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -140,17 +138,23 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
             }
             posts = posts.filter(authors=author)
 
-        date_from = request.GET.get("date_from", "")
+        form = EventSearchForm(request.GET)
+        form.is_valid()
+        # Invalid dates are left out of cleaned_data, so they are ignored (and the error is shown on the field)
+        date_from = form.cleaned_data.get("date_from")
         if date_from:
             posts = posts.filter(event_date_end__date__gte=date_from)
-            context["current_date_from"] = datetime.datetime.strptime(date_from, "%Y-%m-%d").date()
+            context["current_date_from"] = date_from
 
-        date_to = request.GET.get("date_to", "")
+        date_to = form.cleaned_data.get("date_to")
         if date_to:
             posts = posts.filter(event_date_start__date__lte=date_to)
-            context["current_date_to"] = datetime.datetime.strptime(date_to, "%Y-%m-%d").date()
+            context["current_date_to"] = date_to
 
-        form = EventSearchForm(initial={"date_from": date_from, "date_to": date_to})
+        # Other active filters, kept as hidden fields in the date filter form
+        context["preserved_filters"] = [
+            (name, request.GET[name]) for name in ("tag", "category", "author", "source") if request.GET.get(name)
+        ]
 
         # Pagination
         page_number = request.GET.get("page")
