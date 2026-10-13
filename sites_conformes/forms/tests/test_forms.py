@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.models import AnonymousUser
 from django.core.management import call_command
 from django.test import RequestFactory, SimpleTestCase
@@ -58,6 +60,31 @@ class FormsTestCase(WagtailPageTestCase):
             r"<li class=\"fr-error-text\">(\\n)?\s*(Ce champ est requis|Ce champ est obligatoire)\.(\\n)?\s*<\/li>",
         )
         # Updates sometimes mess with the order of the translations and so the displayed translation. Both are fine.
+
+    def test_form_disables_native_browser_validation(self):
+        # Native validation only flags the first invalid field: let the server display all the errors at once
+        form_page = FormPage.objects.first()
+        response = self.client.get(form_page.url)
+
+        self.assertRegex(response.content.decode(), r"<form [^>]*novalidate")
+
+    def test_empty_form_shows_all_errors(self):
+        form_page = FormPage.objects.first()
+        post_data = {
+            "votre_nom_complet": "",
+            "votre_adresse_electronique": "",
+            "titre_de_votre_message": "",
+            "votre_message": "",
+        }
+        response = self.client.post(form_page.url, post_data)
+
+        self.assertEqual(response.status_code, 200)
+
+        errors = re.findall(
+            r"<li class=\"fr-error-text\">\s*(?:Ce champ est requis|Ce champ est obligatoire)\.\s*</li>",
+            response.content.decode(),
+        )
+        self.assertEqual(len(errors), len(post_data))
 
     def test_form_field_clean_name_set_on_save(self):
         """

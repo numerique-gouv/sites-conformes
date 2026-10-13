@@ -21,7 +21,7 @@
   <div class="fr-container fr-pb-6w">
     {{ page.intro|richtext }}
 
-    <form action="{% pageurl page %}" method="post" autocomplete="on">
+    <form action="{% pageurl page %}" method="post" autocomplete="on" novalidate>
       {% settings_value "DSFR_MARK_OPTIONAL_FIELDS" as dsfr_mark_optional_fields %}
       {% if not dsfr_mark_optional_fields %}
         <div class="fr-fieldset__element">
