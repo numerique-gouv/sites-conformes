@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 12:50+0200\n"
-"PO-Revision-Date: 2026-04-16 11:36+0200\n"
+"POT-Creation-Date: 2026-10-13 10:27+0200\n"
+"PO-Revision-Date: 2026-10-13 10:28+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -19,279 +19,210 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.9\n"
 
-#: autocomplete.py:20
 msgid "Identity"
 msgstr "Identité"
 
-#: autocomplete.py:22
 msgid "Full name"
 msgstr "Nom complet"
 
-#: autocomplete.py:23
 msgid "Prefix or title"
 msgstr "Préfixe, civilité ou titre"
 
-#: autocomplete.py:24
 msgid "Given name"
 msgstr "Prénom"
 
-#: autocomplete.py:25
 msgid "Additional names"
 msgstr "Prénoms additionnels"
 
-#: autocomplete.py:26
 msgid "Family name"
 msgstr "Nom de famille"
 
-#: autocomplete.py:27
 msgid "Suffix"
 msgstr "Suffixe"
 
-#: autocomplete.py:28
 msgid "Nickname"
 msgstr "Surnom, pseudonyme"
 
-#: autocomplete.py:29
 msgid "Job title"
 msgstr "Titre du poste"
 
-#: autocomplete.py:30
 msgid "Username"
 msgstr "Nom d’utilisateur"
 
-#: autocomplete.py:31
 msgid "Organization"
 msgstr "Organisme"
 
-#: autocomplete.py:32
 msgid "Birthday"
 msgstr "Date de naissance"
 
-#: autocomplete.py:33
 msgid "Day of birth"
 msgstr "Jour de naissance"
 
-#: autocomplete.py:34
 msgid "Month of birth"
 msgstr "Mois de naissance"
 
-#: autocomplete.py:35
 msgid "Year of birth"
 msgstr "Année de naissance"
 
-#: autocomplete.py:36
 msgid "Gender identity"
 msgstr "Identité de genre"
 
-#: autocomplete.py:37
 msgid "Preferred language"
 msgstr "Langue préférée"
 
-#: autocomplete.py:38
 msgid "Photograph, icon or other image"
 msgstr "Photographie, icône ou autre image"
 
-#: autocomplete.py:42
 msgid "Postal address"
 msgstr "Adresse postale"
 
-#: autocomplete.py:44
 msgid "Street address (multiple lines)"
 msgstr "Adresse postale (plusieurs lignes)"
 
-#: autocomplete.py:45
 msgid "Street address (line 1)"
 msgstr "Adresse postale (ligne 1)"
 
-#: autocomplete.py:46
 msgid "Street address (line 2)"
 msgstr "Adresse postale (ligne 2)"
 
-#: autocomplete.py:47
 msgid "Street address (line 3)"
 msgstr "Adresse postale (ligne 3)"
 
-#: autocomplete.py:48
 msgid "Address level 4 (most fine-grained)"
 msgstr "Niveau administratif 4 (le plus détaillé)"
 
-#: autocomplete.py:49
 msgid "Address level 3"
 msgstr "Niveau administratif 3"
 
-#: autocomplete.py:50
 msgid "Address level 2 (city)"
 msgstr "Niveau administratif 2 (ville)"
 
-#: autocomplete.py:51
 msgid "Address level 1 (broadest, e.g. state)"
 msgstr "Niveau administratif 1 (le plus général, ex. région)"
 
-#: autocomplete.py:52
 msgid "Postal code"
 msgstr "Code postal"
 
-#: autocomplete.py:53
 msgid "Country code"
 msgstr "Code du pays"
 
-#: autocomplete.py:54
 msgid "Country name"
 msgstr "Nom du pays"
 
-#: autocomplete.py:58
 msgid "Contact details"
 msgstr "Coordonnées"
 
-#: autocomplete.py:60
 msgid "Email address"
 msgstr "Adresse de courrier électronique"
 
-#: autocomplete.py:61
 msgid "Full telephone number, including country code"
 msgstr "Numéro de téléphone complet, avec l’indicatif du pays"
 
-#: autocomplete.py:62
 msgid "Telephone country code"
 msgstr "Indicatif du pays du numéro de téléphone"
 
-#: autocomplete.py:63
 msgid "Telephone number without the country code"
 msgstr "Numéro de téléphone sans l’indicatif du pays"
 
-#: autocomplete.py:64
 msgid "Telephone area code"
 msgstr "Indicatif régional du numéro de téléphone"
 
-#: autocomplete.py:65
 msgid "Telephone number without the country code and area code"
 msgstr "Numéro de téléphone sans l’indicatif du pays ni l’indicatif régional"
 
-#: autocomplete.py:66
 msgid "First part of the local telephone number"
 msgstr "Première partie du numéro de téléphone local"
 
-#: autocomplete.py:67
 msgid "Second part of the local telephone number"
 msgstr "Deuxième partie du numéro de téléphone local"
 
-#: autocomplete.py:68
 msgid "Telephone extension code"
 msgstr "Extension interne du numéro de téléphone"
 
-#: autocomplete.py:69
 msgid "Home page or other web page"
 msgstr "Page d’accueil ou autre page web"
 
-#: autocomplete.py:70
 msgid "Instant messaging protocol endpoint URL"
 msgstr "URL de messagerie instantanée"
 
-#: autocomplete.py:74
 msgid "Payment"
 msgstr "Paiement"
 
-#: autocomplete.py:76
 msgid "Full name as given on the payment instrument"
 msgstr "Nom complet figurant sur le moyen de paiement"
 
-#: autocomplete.py:77
 msgid "Given name as given on the payment instrument"
 msgstr "Prénom figurant sur le moyen de paiement"
 
-#: autocomplete.py:78
 msgid "Additional names as given on the payment instrument"
 msgstr "Prénoms additionnels figurant sur le moyen de paiement"
 
-#: autocomplete.py:79
 msgid "Family name as given on the payment instrument"
 msgstr "Nom de famille figurant sur le moyen de paiement"
 
-#: autocomplete.py:80
 msgid "Payment instrument number"
 msgstr "Numéro du moyen de paiement"
 
-#: autocomplete.py:81
 msgid "Payment instrument expiration date"
 msgstr "Date d’expiration du moyen de paiement"
 
-#: autocomplete.py:82
 msgid "Payment instrument expiration month"
 msgstr "Mois d’expiration du moyen de paiement"
 
-#: autocomplete.py:83
 msgid "Payment instrument expiration year"
 msgstr "Année d’expiration du moyen de paiement"
 
-#: autocomplete.py:84
 msgid "Payment instrument security code"
 msgstr "Code de sécurité du moyen de paiement"
 
-#: autocomplete.py:85
 msgid "Payment instrument type"
 msgstr "Type de moyen de paiement"
 
-#: autocomplete.py:86
 msgid "Transaction currency"
 msgstr "Devise de la transaction"
 
-#: autocomplete.py:87
 msgid "Transaction amount"
 msgstr "Montant de la transaction"
 
-#: models.py:29
 msgid "Text field"
 msgstr "Champ de texte"
 
-#: models.py:30
 msgid "Text area"
 msgstr "Zone de texte"
 
-#: models.py:31
 msgid "Email"
 msgstr "Adresse e-mail"
 
-#: models.py:32
 msgid "Number"
 msgstr "Nombre"
 
-#: models.py:33
 msgid "URL"
 msgstr "URL"
 
-#: models.py:34
 msgid "Checkbox"
 msgstr "Case à cocher"
 
-#: models.py:35
 msgid "Checkboxes"
 msgstr "Cases à cocher"
 
-#: models.py:36
 msgid "Drop down"
 msgstr "Liste déroulante"
 
-#: models.py:37
 msgid "Radio buttons"
 msgstr "Boutons radio"
 
-#: models.py:38
 msgid "Date"
 msgstr "Date"
 
-#: models.py:40
 msgid "Hidden field"
 msgstr "Champ caché"
 
-#: models.py:45
 msgid "Field type"
 msgstr "Type de champ"
 
-#: models.py:48
 msgid "Autocomplete"
 msgstr "Autocomplétion"
 
-#: models.py:53
 msgid ""
 "Purpose of the field, allowing browsers to fill it automatically. Only the "
 "values relevant to the field type are available."
@@ -299,61 +230,47 @@ msgstr ""
 "Finalité du champ, permettant aux navigateurs de le remplir automatiquement. "
 "Seules les valeurs pertinentes pour le type de champ sont proposées."
 
-#: models.py:83
 msgid "This autocomplete value is not compatible with the selected field type."
 msgstr ""
 "Cette valeur d’autocomplétion n’est pas compatible avec le type de champ "
 "sélectionné."
 
-#: models.py:94 models.py:155
 msgid "Form field"
 msgstr "Champ de formulaire"
 
-#: models.py:95 models.py:155
 msgid "Form fields"
 msgstr "Champs de formulaire"
 
-#: models.py:154
 msgid "Introduction"
 msgstr "Introduction"
 
-#: models.py:156
 msgid "Thank you text"
 msgstr "Texte de remerciement"
 
-#: models.py:167
 msgid "E-mail notification when an answer is sent"
 msgstr "Notification par e-mail quand une réponse est envoyée"
 
-#: models.py:168
 msgid "Optional, will only work if SMTP parameters have been set."
 msgstr ""
 "Optionnel, ne fonctionnera que si les paramètres SMTP ont été configurés."
 
-#: models.py:175
 msgid "Reduce Form Spam"
 msgstr "Réduction des spams"
 
-#: models.py:188
 msgid "Form page"
 msgstr "Page de formulaire"
 
-#: models.py:189
 msgid "Form pages"
 msgstr "Pages de formulaire"
 
-#: templates/sites_conformes_forms/form_page.html:13
 msgid "Submit form"
 msgstr "Envoyer le formulaire"
 
-#: templates/sites_conformes_forms/form_page.html:29
 msgid "All fields are mandatory."
 msgstr "Tous les champs sont obligatoires."
 
-#: templates/sites_conformes_forms/form_page.html:31
 msgid "Fields marked with an asterisk (*) are mandatory."
 msgstr "Les champs marqués d’un astérisque (*) sont obligatoires."
 
-#: templates/sites_conformes_forms/form_page_landing.html:22
 msgid "Your form has been successfully submitted. Thank you!"
 msgstr "Votre formulaire a été envoyé avec succès. Merci !"
