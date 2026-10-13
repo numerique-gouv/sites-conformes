@@ -111,6 +111,13 @@ class EventsTestCase(WagtailPageTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "2 événements trouvés")
 
+    def test_events_index_page_rejects_end_date_before_start_date(self):
+        response = self.client.get(self.events_index_page.url, {"date_from": "2026-06-10", "date_to": "2026-06-01"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "fr-input-group--error")
+        self.assertContains(response, "La date de fin doit être identique ou postérieure à la date de début.")
+
     def test_events_index_page_date_filters_keep_other_filters(self):
         Tag.objects.create(name="Atelier", slug="atelier")
         response = self.client.get(self.events_index_page.url, {"tag": "atelier"})

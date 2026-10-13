@@ -61,6 +61,8 @@
 
 {% block content %}
   {% include "sites_conformes_core/blocks/heading.html" %}
+  {% translate "selected" as selected_label %}
+  {% translate "unselected" as unselected_label %}
 
   <div class="fr-container fr-pt-4w">
     {% include "sites_conformes_core/blocks/breadcrumbs.html" %}
@@ -107,77 +109,79 @@
                 </fieldset>
               </form>
 
-              {% if categories and page.filter_by_category %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for category in categories %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
-                           title="{% if category.slug == current_category.slug %}{% translate 'selected' %} {% else %}{% translate 'unselected' %} {% endif %}"
-                           {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
-                          {{ category.name }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+              <div id="events-other-filters">
+                {% if categories and page.filter_by_category %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by category" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for category in categories %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
+                             title="{% if category.slug == current_category.slug %}{{ selected_label }} {% else %}{{ unselected_label }} {% endif %}"
+                             {% if category.slug == current_category.slug %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+                            {{ category.name }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
 
-              {% if tags and page.filter_by_tag %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by tag" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for tag in tags %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
-                           {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}
-                           title="{% if tag.slug in current_tag %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}">
-                          {{ tag }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+                {% if tags and page.filter_by_tag %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by tag" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for tag in tags %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
+                             {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}
+                             title="{% if tag.slug in current_tag %}{{ selected_label }} {% else %}{{ unselected_label }}{% endif %}">
+                            {{ tag }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
 
-              {% if authors and page.filter_by_author %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by author" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for author in authors %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter author=author %}#posts-list"
-                           title="{% if author == current_author %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
-                           {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+                {% if authors and page.filter_by_author %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by author" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for author in authors %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter author=author %}#posts-list"
+                             title="{% if author == current_author %}{{ selected_label }} {% else %}{{ unselected_label }} {% endif %}"
+                             {% if author == current_author %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ author.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
 
-              {% if sources and page.filter_by_source %}
-                <div class="fr-my-3w">
-                  <h3 class="fr-h6">{% translate "Filter by source" %}</h3>
-                  <ul class="fr-tags-group fr-mt-1w">
-                    {% for source in sources %}
-                      <li>
-                        <a type="button"
-                           class="fr-tag"
-                           href="{% pageurl page %}{% toggle_url_filter source=source %}#posts-list"
-                           title="{% if source == current_source %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
-                           {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
+                {% if sources and page.filter_by_source %}
+                  <div class="fr-my-3w">
+                    <h3 class="fr-h6">{% translate "Filter by source" %}</h3>
+                    <ul class="fr-tags-group fr-mt-1w">
+                      {% for source in sources %}
+                        <li>
+                          <a type="button"
+                             class="fr-tag"
+                             href="{% pageurl page %}{% toggle_url_filter source=source %}#posts-list"
+                             title="{% if source == current_source %}{{ selected_label }} {% else %}{{ unselected_label }}{% endif %}"
+                             {% if source == current_source %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>{{ source.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
 
               <h3 class="fr-h6">{% translate "Export" %}</h3>
               <ul class="fr-btns-group fr-mt-1w">

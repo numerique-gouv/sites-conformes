@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 16:42+0200\n"
-"PO-Revision-Date: 2026-10-12 15:33+0200\n"
+"POT-Creation-Date: 2026-10-13 11:10+0200\n"
+"PO-Revision-Date: 2026-10-13 11:29+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -24,6 +24,9 @@ msgstr "Date de début"
 
 msgid "End date"
 msgstr "Date de fin"
+
+msgid "The end date must be on or after the start date."
+msgstr "La date de fin doit être identique ou postérieure à la date de début."
 
 msgid "Events per page"
 msgstr "Événements par page"
@@ -41,8 +44,7 @@ msgid "Filter by source"
 msgstr "Filtrer par source"
 
 msgid "The source is the organization of the event author"
-msgstr ""
-"La source est l’organisation à laquelle appartient l’auteur de l’événement"
+msgstr "La source est l’organisation à laquelle appartient l’auteur de l’événement"
 
 msgid "Show filters"
 msgstr "Afficher les filtres"
@@ -162,18 +164,18 @@ msgstr "Date de début :"
 msgid "End date:"
 msgstr "Date de fin :"
 
+msgid "selected"
+msgstr "étiquette sélectionnée"
+
+msgid "unselected"
+msgstr "étiquette non sélectionnée"
+
 msgid "Filter by period"
 msgstr "Filtrer par période"
 
 msgctxt "submit button"
 msgid "Filter"
 msgstr "Filtrer"
-
-msgid "selected"
-msgstr "étiquette sélectionnée"
-
-msgid "unselected"
-msgstr "étiquette non-sélectionnée"
 
 msgid "Export"
 msgstr "Export"

@@ -42,7 +42,22 @@ if (filtersForm && "fetch" in window && "URLSearchParams" in window) {
                 throw new Error("Invalid form");
             }
 
+            // Date fields, to clear any previous error message
+            let focusedId = document.activeElement ? document.activeElement.id : "";
+            for (let field of ["date_from", "date_to"]) {
+                let current = document.querySelector(`#id_${field}`)?.closest(".fr-fieldset__element");
+                let updated = doc.querySelector(`#id_${field}`)?.closest(".fr-fieldset__element");
+                if (current && updated) {
+                    current.replaceWith(updated);
+                }
+            }
+            if (focusedId && document.activeElement !== document.getElementById(focusedId)) {
+                document.getElementById(focusedId)?.focus();
+            }
+
             replace_content(doc, "#events-results");
+            // The links of the other filters include the current dates in their URL
+            replace_content(doc, "#events-other-filters");
 
             // Only the content of the live region is changed, so that it is announced
             let count = document.querySelector("#events-results-count");
