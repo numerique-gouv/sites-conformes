@@ -437,40 +437,164 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
             % {"title": gettext("Pages tagged with %(tag)s") % {"tag": "Tag 2"}, "category": "Guides"},
         )
 
-    @staticmethod
-    def list_groups(response):
-        return [(heading, list(group)) for heading, group in response.context["category_groups"]]
-
-    def test_category_groups_default_to_a_single_block(self):
-        category = Category.objects.create(name="Guides", slug="guides", locale=self.catalog_index_page.locale)
-        self.entry1.categories.add(category)
-        self.entry1.save()
-
-        response = self.client.get(self.catalog_index_page.url)
-
-        self.assertEqual(self.list_groups(response), [(gettext("Filter by category"), [category])])
-        self.assertContains(response, gettext("Filter by category"))
-
-    def test_category_groups_follow_the_selected_parents(self):
+    def make_category_tree(self, selection=CatalogIndexPage.MULTIPLE_FILTERS, operator=CatalogIndexPage.OR_OPERATOR):
+        self.catalog_index_page.filter_selection = selection
+        self.catalog_index_page.multiple_filter_operator = operator
+        self.catalog_index_page.save()
         locale = self.catalog_index_page.locale
-        theme = Category.objects.create(name="Thème", slug="theme", locale=locale)
-        region = Category.objects.create(name="Région", slug="region", locale=locale)
-        guides = Category.objects.create(name="Guides", slug="guides", parent=theme, locale=locale)
-        Category.objects.create(name="Inutilisée", slug="inutilisee", parent=theme, locale=locale)
-        bretagne = Category.objects.create(name="Bretagne", slug="bretagne", parent=region, locale=locale)
-        self.entry1.categories.add(guides, bretagne)
+        self.regions = Category.objects.create(name="Régions", slug="regions", locale=locale)
+        self.bretagne = Category.objects.create(name="Bretagne", slug="bretagne", parent=self.regions, locale=locale)
+        self.finistere = Category.objects.create(
+            name="Finistère", slug="finistere", parent=self.bretagne, locale=locale
+        )
+        self.alsace = Category.objects.create(name="Alsace", slug="alsace", parent=self.regions, locale=locale)
+        Category.objects.create(name="Corse", slug="corse", parent=self.regions, locale=locale)  # unused
+        self.sectors = Category.objects.create(name="Secteurs", slug="secteurs", locale=locale)
+        self.btp = Category.objects.create(name="BTP", slug="btp", parent=self.sectors, locale=locale)
+        self.entry1.categories.add(self.finistere, self.btp)
         self.entry1.save()
-        self.catalog_index_page.filter_categories.add(theme)
+        self.entry2.categories.add(self.alsace)
+        self.entry2.save()
+        self.entry3.categories.add(self.btp)
+        self.entry3.save()
+        self.entry4.categories.add(self.bretagne)
+        self.entry4.save()
+
+    def get_entries(self, query=""):
+        response = self.client.get(self.catalog_index_page.url + query)
+        return response, sorted(entry.title for entry in response.context["entries"])
+
+    @staticmethod
+    def list_rows(response):
+        return [
+            (heading, [(chip.category, chip.checked) for chip in chips])
+            for heading, chips in response.context["category_filters"].rows
+        ]
+
+    def test_each_root_category_in_use_is_a_group_of_its_subcategories(self):
+        self.make_category_tree()
+
+        response, entries = self.get_entries()
+
+        self.assertEqual(
+            self.list_rows(response),
+            [
+                (self.regions, [(self.bretagne, False), (self.alsace, False)]),  # Corse is unused
+                (self.sectors, [(self.btp, False)]),
+            ],
+        )
+        self.assertEqual(len(entries), 4)
+        self.assertContains(response, '<h3 class="fr-h6">Régions</h3>', html=True)
+        self.assertContains(response, 'id="category-bretagne"')
+        # The group itself is a heading, not a filter.
+        self.assertNotContains(response, 'id="category-regions"')
+
+    def test_a_group_heading_cannot_be_ticked(self):
+        self.make_category_tree()
+
+        response, entries = self.get_entries("?category=regions")
+
+        self.assertEqual(len(entries), 4)
+        self.assertEqual(response.context["current_categories"], [])
+
+    def test_or_operator_matches_any_ticked_category(self):
+        self.make_category_tree()
+
+        _, entries = self.get_entries("?category=bretagne&category=alsace")
+        self.assertEqual(entries, ["Entrée 1", "Entrée 2", "Entrée 4"])
+
+        _, entries = self.get_entries("?category=bretagne&category=btp")
+        self.assertEqual(entries, ["Entrée 1", "Entrée 3", "Entrée 4"])
+
+    def test_and_operator_matches_every_ticked_category(self):
+        self.make_category_tree(operator=CatalogIndexPage.AND_OPERATOR)
+
+        _, entries = self.get_entries("?category=bretagne&category=alsace")
+        self.assertEqual(entries, [])
+
+        response, entries = self.get_entries("?category=bretagne&category=btp")
+
+        # Entrée 3 is in the BTP sector but in no region, Entrée 4 in Bretagne but in no sector.
+        self.assertEqual(entries, ["Entrée 1"])
+        self.assertEqual(response.context["current_categories"], [self.bretagne, self.btp])
+        self.assertContains(response, 'id="category-bretagne"')  # checkboxes, as for the tags
+        self.assertEqual(
+            response.context["extra_title"],
+            gettext("Pages in category %(category)s") % {"category": "Bretagne, BTP"},
+        )
+
+    def test_ticking_a_category_matches_its_branch_and_shows_its_subcategories(self):
+        self.make_category_tree()
+
+        response, entries = self.get_entries("?category=bretagne")
+
+        self.assertEqual(entries, ["Entrée 1", "Entrée 4"])  # Entrée 1 is in Finistère
+        self.assertEqual(
+            self.list_rows(response),
+            [
+                (self.regions, [(self.bretagne, True), (self.alsace, False)]),
+                (self.bretagne, [(self.finistere, False)]),
+                (self.sectors, [(self.btp, False)]),
+            ],
+        )
+
+    def test_a_ticked_subcategory_narrows_its_parent(self):
+        self.make_category_tree()
+
+        response, entries = self.get_entries("?category=bretagne&category=finistere")
+
+        self.assertEqual(entries, ["Entrée 1"])
+        self.assertEqual(response.context["current_category"], self.finistere)
+
+    def test_a_link_to_a_subcategory_opens_its_branch(self):
+        self.make_category_tree()
+
+        response, entries = self.get_entries("?category=finistere")
+
+        self.assertEqual(entries, ["Entrée 1"])
+        self.assertEqual(self.list_rows(response)[1], (self.bretagne, [(self.finistere, True)]))
+
+    def test_single_selection_keeps_one_category(self):
+        self.make_category_tree(selection=CatalogIndexPage.SINGLE_FILTER)
+
+        response, entries = self.get_entries("?category=bretagne&category=alsace")
+
+        self.assertEqual(entries, ["Entrée 1", "Entrée 4"])
+        self.assertEqual(response.context["current_categories"], [self.bretagne])
+        # Links, as for the tags: one replaces the current category, the current one is removed.
+        self.assertNotContains(response, 'id="category-bretagne"')
+        self.assertContains(response, 'href="/catalog-index/?category=alsace#posts-list"')
+        self.assertContains(response, 'href="/catalog-index/#posts-list"')
+
+    def test_single_selection_still_narrows_down_the_tree(self):
+        self.make_category_tree(selection=CatalogIndexPage.SINGLE_FILTER)
+
+        response, entries = self.get_entries("?category=finistere")
+
+        self.assertEqual(entries, ["Entrée 1"])
+        self.assertEqual(self.list_rows(response)[1], (self.bretagne, [(self.finistere, True)]))
+        # Clicking Bretagne goes back up one level.
+        self.assertContains(response, 'href="/catalog-index/?category=bretagne#posts-list"')
+
+    def test_the_tag_form_keeps_the_ticked_categories(self):
+        self.make_category_tree()
+
+        response, _ = self.get_entries("?category=finistere&tag=tag-1")
+
+        self.assertContains(response, '<input type="hidden" name="category" value="bretagne">', html=True)
+        self.assertContains(response, '<input type="hidden" name="category" value="finistere">', html=True)
+        self.assertContains(response, '<input type="hidden" name="tag" value="tag-1">', html=True)
+
+    def test_chosen_categories_are_the_only_groups(self):
+        self.make_category_tree()
+        # Bretagne was chosen before only root categories could be: it is left out.
+        self.catalog_index_page.filter_categories.add(self.regions, self.bretagne)
         self.catalog_index_page.save()
 
-        response = self.client.get(self.catalog_index_page.url)
+        response, entries = self.get_entries("?category=btp")  # not offered: ignored
 
-        self.assertEqual(self.list_groups(response), [("Thème", [guides])])
-        self.assertContains(response, '<h3 class="fr-h6">Thème</h3>', html=True)
-        # Neither is offered in the sidebar; Bretagne still shows as a chip on the card of entry 1.
-        self.assertNotContains(response, "?category=inutilisee")
-        self.assertNotContains(response, "?category=bretagne")
-        self.assertNotContains(response, gettext("Filter by category"))
+        self.assertEqual(self.list_rows(response), [(self.regions, [(self.bretagne, False), (self.alsace, False)])])
+        self.assertEqual(len(entries), 4)
 
     def test_sidebar_is_hidden_when_the_chosen_groups_have_nothing_to_show(self):
         locale = self.catalog_index_page.locale
@@ -488,10 +612,12 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         self.assertFalse(self.catalog_index_page.show_filters)
         self.assertNotContains(response, 'class="fr-sidemenu')
 
-    def test_only_parent_categories_can_be_filter_groups(self):
+    def test_only_top_level_parent_categories_can_be_filter_groups(self):
         locale = self.catalog_index_page.locale
         theme = Category.objects.create(name="Thème", slug="theme", locale=locale)
-        Category.objects.create(name="Guides", slug="guides", parent=theme, locale=locale)
+        guides = Category.objects.create(name="Guides", slug="guides", parent=theme, locale=locale)
+        Category.objects.create(name="Pratiques", slug="pratiques", parent=guides, locale=locale)
+        Category.objects.create(name="Seule", slug="seule", locale=locale)
 
         form_class = CatalogIndexPage.get_edit_handler().get_form_class()
         form = form_class(instance=self.catalog_index_page, for_user=self.admin)

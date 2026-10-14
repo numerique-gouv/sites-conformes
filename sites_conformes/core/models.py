@@ -42,6 +42,7 @@ from wagtail_in_a_tree.forms import TreeNodeForm, tree_panel
 
 from sites_conformes.core.abstract import AbstractIndexPage, SitesFacilesBasePage
 from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
+from sites_conformes.core.category_filters import CategoryFilters
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
 from sites_conformes.core.validators import validate_iframe_allow_origins
@@ -271,7 +272,6 @@ class CatalogIndexPage(AbstractIndexPage):
                 "paginator": paginator,
                 "tags": self.get_tags(),
                 "categories": self.get_categories(),
-                "category_groups": self.get_category_groups(),
                 "filter_selection_mode": self.filter_selection,
                 **filtered_data,
             }
@@ -294,6 +294,7 @@ class CatalogIndexPage(AbstractIndexPage):
             "current_tags": [],
             "current_tag": None,
             "current_category": None,
+            "current_categories": [],
             "selected_tag_slugs": selected_tag_slugs or [],
         }
 
@@ -301,7 +302,8 @@ class CatalogIndexPage(AbstractIndexPage):
         """
         Reads the "tag" GET params and dispatches to the filter mode configured on the page.
         """
-        entries, category = self._filter_by_category(request, entries)
+        category_filters = self.category_filters(request.GET.getlist("category"))
+        entries = category_filters.filter(entries)
 
         selected_tag_slugs = request.GET.getlist("tag")
         if not selected_tag_slugs:
@@ -313,30 +315,35 @@ class CatalogIndexPage(AbstractIndexPage):
         else:
             filtered = self._default_filter_context(entries, selected_tag_slugs)
 
-        if category:
-            filtered["current_category"] = category
-            filtered["extra_title"] = self._category_title(category, filtered["extra_title"])
-            # A tag filter already put its own trail in place; otherwise show "Catalog > Category".
+        filtered["category_filters"] = category_filters
+        current = category_filters.current
+        if current:
+            names = ", ".join(c.name for c in current)
+            filtered["current_categories"] = current
+            filtered["current_category"] = current[0] if len(current) == 1 else None
+            filtered["extra_title"] = self._category_title(names, filtered["extra_title"])
+            # A tag filter already put its own trail in place; otherwise show "Catalog > Categories".
             filtered["extra_breadcrumbs"] = filtered["extra_breadcrumbs"] or {
                 "links": [{"url": self.get_url(), "title": self.title}],
-                "current": category.name,
+                "current": names,
             }
         return filtered
 
-    def _category_title(self, category: "Category", tag_title: str) -> str:
+    def _category_title(self, names: str, tag_title: str) -> str:
         if tag_title:
-            return _("%(title)s, in category %(category)s") % {"title": tag_title, "category": category.name}
-        return _("Pages in category %(category)s") % {"category": category.name}
+            return _("%(title)s, in category %(category)s") % {"title": tag_title, "category": names}
+        return _("Pages in category %(category)s") % {"category": names}
 
-    def _filter_by_category(
-        self, request: HttpRequest, entries: models.QuerySet
-    ) -> tuple[models.QuerySet, "Category | None"]:
-        """Narrows the entries to one category, read from the "category" GET param."""
-        slug = request.GET.get("category")
-        if not slug:
-            return entries, None
-        category = get_object_or_404(Category, slug=slug, locale=self.locale)
-        return entries.filter(categories=category), category
+    def category_filters(self, selected_slugs: list | None = None) -> CategoryFilters:
+        used_ids = self.posts.exclude(categories=None).values_list("categories", flat=True)
+        return CategoryFilters(
+            list(Category.objects.filter(locale=self.locale)),
+            set(used_ids),
+            selected_slugs or [],
+            list(self.filter_categories.values_list("pk", flat=True)),
+            single=self.filter_selection == self.SINGLE_FILTER,
+            match_all=self.multiple_filter_operator == self.AND_OPERATOR,
+        )
 
     def _handle_single_filter(self, selected_tag_slugs: list, entries: models.QuerySet) -> dict:
         """
@@ -427,7 +434,7 @@ class CatalogIndexPage(AbstractIndexPage):
 
     @property
     def show_filters(self) -> bool:
-        has_categories = any(group for _, group in self.get_category_groups())
+        has_categories = self.category_filters().has_filters
         return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and has_categories)
 
     @path("tags/", name="tags_list")
