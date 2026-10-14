@@ -38,6 +38,10 @@ Ou en ligne de commande, si vous avez le CLI Scalingo :
 scalingo -a mon-site logs --lines 200
 ```
 
+Pour y voir aussi les erreurs de l’application elle-même (détail des erreurs
+500, avertissements), définissez la variable `LOG_LEVEL=INFO`, détaillée dans
+{doc}`variables-environnement`.
+
 Les causes classiques, par ordre de fréquence :
 
 - **`SECRET_KEY` absente** — le site ne démarre pas tant qu’elle n’est pas
