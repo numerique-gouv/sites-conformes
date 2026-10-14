@@ -553,14 +553,18 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # sites_conformes.core.middleware.IframeMiddleware.
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-# Sentry
+# Sentry config
 if sentry_dsn := os.getenv("SENTRY_DSN"):
     import sentry_sdk  # noqa: E402
 
+    # Share of requests traced for performance monitoring; tracing is
+    # disabled while unset.
+    traces_sample_rate = os.getenv("SENTRY_TRACES_SAMPLE_RATE")
     sentry_sdk.init(
         dsn=sentry_dsn,
-        send_default_pii=True,
+        send_default_pii=getenv_bool("SENTRY_SEND_DEFAULT_PII", False),
         environment=os.getenv("SENTRY_ENVIRONMENT", "production"),
+        traces_sample_rate=float(traces_sample_rate) if traces_sample_rate else None,
     )
 
 SENTRY_USE_DEBUG_URL = getenv_bool("SENTRY_USE_DEBUG_URL", False)

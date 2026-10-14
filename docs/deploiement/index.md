@@ -22,5 +22,6 @@ scalingo
 serveur-linux
 docker
 migrer-hebergement
+sentry
 variables-environnement
 ```
