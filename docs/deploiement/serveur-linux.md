@@ -255,8 +255,7 @@ jour de semaine 0 = dimanche).
 
 - `update` met à jour l’application (synchronise les dépendances verrouillées et
 redéploie).
-- `upgrade` **monte les versions** des dépendances
-(`uv lock --upgrade`, `pre-commit autoupdate`, `npm update`) :
+- `upgrade` **monte les versions** des dépendances (via `uv`, `prek` et `npm`) :
 c’est une opération de maintenance du dépôt, à réserver au développement,
 pas à un serveur de production.
 :::

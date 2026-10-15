@@ -62,7 +62,7 @@ dev = [
     "djlint>=1.36.4",
     "factory-boy>=3.3.3",
     "ipython>=9.3.0",
-    "pre-commit>=4.2.0",
+    "prek>=0.5.5",
     "ruff>=0.12.0",
     "tblib>=3.1.0",
     "wagtail-factories>=4.5.0",
@@ -117,6 +117,7 @@ omit = [
 ]
 
 [tool.djlint]
+profile = "django"
 max_blank_lines = 1
 ignore = "H030,H031,H006,D018,T003"
 indent = 2
@@ -183,6 +184,7 @@ combine-as-imports = true
 # supply-chain advisories have time to surface before we adopt a version.
 # Re-run `uv lock` after changing this value.
 [tool.uv]
+required-version = ">=0.9.17"
 exclude-newer = "7 days"
 # Per-package opt-out: set a package to false to bypass the cooldown for an
 # urgent security fix published inside the window. Example:

@@ -74,7 +74,7 @@ init:
 init-dev:
     {{docker_cmd}} uv sync
     just deploy
-    {{docker_cmd}} {{uv_run}} pre-commit install
+    {{docker_cmd}} {{uv_run}} prek install --overwrite
 
 alias messages := makemessages
 # Update the translation files
@@ -127,7 +127,7 @@ update:
 
 upgrade:
     {{docker_cmd}} uv lock --upgrade
-    {{docker_cmd}} {{uv_run}} pre-commit autoupdate
+    {{docker_cmd}} {{uv_run}} prek update --cooldown-days 7
     {{docker_cmd}} npm update
     just sync-tarteaucitron
     {{docker_cmd}} uv lock --upgrade --project ./demo
@@ -153,10 +153,10 @@ scalingo-postdeploy:
 check +apps="":
     {{docker_cmd}} {{uv_run}} python manage.py check {{apps}}
 
-# Run a global pre-commit check
+# Run a global quality check
 [group('Code audit')]
 quality:
-    {{docker_cmd}} {{uv_run}} pre-commit run --all-files
+    {{docker_cmd}} {{uv_run}} prek run --all-files
 
 # Check that all imported packages are declared as dependencies (and vice versa)
 [group('Code audit')]

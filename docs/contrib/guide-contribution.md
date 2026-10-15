@@ -144,13 +144,7 @@ Pour que cette vérification soit faite systématiquement, nous utilisons des
 Ils doivent être installés via :
 
 ```sh
-pre-commit install
-```
-
-Il est possible de faire une passe manuelle sur l’ensemble du code via :
-
-```sh
-pre-commit run --all-files
+uv run prek install --overwrite
 ```
 
 ## Ajouter une dépendance

@@ -26,15 +26,15 @@ Le projet s’appuie sur trois outils que vous rencontrerez partout :
 - **[`just`](https://just.systems/)** — lanceur de commandes. Le fichier
   `justfile` regroupe des *recettes* qui enchaînent des commandes Django/uv.
   Tapez `just` pour afficher la liste complète.
-- **[`pre-commit`](https://pre-commit.com/)** — vérifie et formate
+- **[`prek`](https://prek.j178.dev/)** — vérifie et formate
   automatiquement votre code (`ruff`, `black`) à chaque `git commit`. Les *hooks*
-  sont installés par `just init-dev` ; sinon, lancez `pre-commit install` une
-  fois le projet installé.
+  sont installés par `just init-dev` ; sinon, lancez
+  `uv run prek install --overwrite` une fois le projet installé.
 
 :::{tip}
 **N’oubliez pas d’installer les *pre-commit hooks*.** Sans eux, rien ne
 formate votre code localement, et le **contrôle qualité de la CI échouera** :
-l’intégration continue rejoue `pre-commit` et `just quality` (ruff + black) sur
+l’intégration continue rejoue `prek` et `just quality` (ruff + black) sur
 l’ensemble des fichiers, et bloque la *pull request* au moindre écart de
 formatage.
 :::
@@ -167,7 +167,7 @@ python manage.py create_starter_pages
 python manage.py import_page_templates
 python manage.py import_illustration_images
 python manage.py update_index
-pre-commit install
+prek install --overwrite
 ```
 
 :::
