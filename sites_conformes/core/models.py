@@ -340,7 +340,8 @@ class CatalogIndexPage(AbstractIndexPage):
             list(Category.objects.filter(locale=self.locale)),
             set(used_ids),
             selected_slugs or [],
-            list(self.filter_categories.values_list("pk", flat=True)),
+            # Not values_list("pk"): unsaved, in a preview, the relation is a modelcluster FakeQuerySet.
+            [category.pk for category in self.filter_categories.all()],
             single=self.filter_selection == self.SINGLE_FILTER,
             match_all=self.multiple_filter_operator == self.AND_OPERATOR,
         )

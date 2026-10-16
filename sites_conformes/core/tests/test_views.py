@@ -597,6 +597,18 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         # Clicking a ticked category, Bretagne included, clears the filter.
         self.assertContains(response, 'href="/catalog-index/#posts-list"', count=2)
 
+    def test_preview_with_unsaved_category_groups(self):
+        self.make_category_tree()
+        # The preview renders the page from the edit form, unsaved: its groups are an in-memory relation.
+        page = CatalogIndexPage.objects.get(pk=self.catalog_index_page.pk)
+        page.filter_categories = [self.regions]
+        request = self.client.get(self.catalog_index_page.url).wsgi_request
+
+        response = page.make_preview_request(request, page.default_preview_mode)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([heading for heading, _ in page.category_filters().rows], [self.regions])
+
     def test_the_tag_form_keeps_the_ticked_categories(self):
         self.make_category_tree()
 
