@@ -211,7 +211,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
     subpage_types = []
 
     search_fields = SitesFacilesBasePage.search_fields + [
-        index.SearchField("categories"),
+        index.RelatedFields("categories", [index.SearchField("name")]),
         index.SearchField("event_date_start"),
         index.SearchField("event_date_end"),
         index.SearchField("location"),

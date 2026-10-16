@@ -155,7 +155,7 @@ class AbstractContentPage(SitesFacilesBasePage):
     ]
 
     search_fields = SitesFacilesBasePage.search_fields + [
-        index.SearchField("categories"),
+        index.RelatedFields("categories", [index.SearchField("name")]),
     ]
 
     class Meta:
