@@ -489,13 +489,34 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         # The group itself is a heading, not a filter.
         self.assertNotContains(response, 'id="category-regions"')
 
-    def test_a_group_heading_cannot_be_ticked(self):
+    def test_a_link_to_a_group_heading_filters_its_branch(self):
         self.make_category_tree()
 
         response, entries = self.get_entries("?category=regions")
 
-        self.assertEqual(len(entries), 4)
-        self.assertEqual(response.context["current_categories"], [])
+        self.assertEqual(entries, ["Entrée 1", "Entrée 2", "Entrée 4"])
+        self.assertEqual(response.context["current_categories"], [self.regions])
+
+    def test_a_chosen_group_without_subcategories_in_use_is_left_out(self):
+        self.make_category_tree()
+        self.catalog_index_page.filter_categories.add(
+            self.regions, Category.objects.create(name="Vide", slug="vide", locale=self.catalog_index_page.locale)
+        )
+        self.catalog_index_page.save()
+
+        response, _ = self.get_entries()
+
+        self.assertEqual([heading for heading, _ in self.list_rows(response)], [self.regions])
+
+    def test_falls_back_to_every_category_when_no_chosen_group_has_anything_to_show(self):
+        self.make_category_tree()
+        # A subcategory chosen before only root categories could be groups.
+        self.catalog_index_page.filter_categories.add(self.bretagne)
+        self.catalog_index_page.save()
+
+        response, _ = self.get_entries()
+
+        self.assertEqual([heading for heading, _ in self.list_rows(response)], [self.regions, self.sectors])
 
     def test_or_operator_matches_any_ticked_category(self):
         self.make_category_tree()
@@ -573,8 +594,8 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
 
         self.assertEqual(entries, ["Entrée 1"])
         self.assertEqual(self.list_rows(response)[1], (self.bretagne, [(self.finistere, True)]))
-        # Clicking Bretagne goes back up one level.
-        self.assertContains(response, 'href="/catalog-index/?category=bretagne#posts-list"')
+        # Clicking a ticked category, Bretagne included, clears the filter.
+        self.assertContains(response, 'href="/catalog-index/#posts-list"', count=2)
 
     def test_the_tag_form_keeps_the_ticked_categories(self):
         self.make_category_tree()
@@ -596,13 +617,10 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         self.assertEqual(self.list_rows(response), [(self.regions, [(self.bretagne, False), (self.alsace, False)])])
         self.assertEqual(len(entries), 4)
 
-    def test_sidebar_is_hidden_when_the_chosen_groups_have_nothing_to_show(self):
+    def test_sidebar_is_hidden_when_no_category_is_in_use(self):
         locale = self.catalog_index_page.locale
         theme = Category.objects.create(name="Thème", slug="theme", locale=locale)
         Category.objects.create(name="Guides", slug="guides", parent=theme, locale=locale)
-        region = Category.objects.create(name="Région", slug="region", locale=locale)
-        self.entry1.categories.add(region)  # in use, but not under the chosen group
-        self.entry1.save()
         self.catalog_index_page.filter_categories.add(theme)
         self.catalog_index_page.filter_by_tag = False  # the fixture entries carry tags
         self.catalog_index_page.save()

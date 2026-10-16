@@ -18,10 +18,10 @@
           {% for chip in chips %}
             <li>
               {% if page.filter_selection == page.SINGLE_FILTER %}
-                {# One category at a time: a link that replaces the current one, as for the tags. #}
+                {# One category at a time, as for the tags: a link replaces the current one, a ticked one clears it. #}
                 <a class="fr-tag"
                    type="button"
-                   href="{% pageurl page %}{% toggle_url_filter category=chip.category %}#posts-list"
+                   href="{% pageurl page %}{% if chip.checked %}{% toggle_url_filter category=current_category %}{% else %}{% toggle_url_filter category=chip.category %}{% endif %}#posts-list"
                    title="{% if chip.checked %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
                    aria-pressed="{% if chip.checked %}true{% else %}false{% endif %}">{{ chip.category.name }}</a>
               {% else %}
@@ -33,9 +33,7 @@
                        data-path="{{ chip.path }}"
                        {% if chip.checked %}checked{% endif %}
                        onchange="if (!this.checked) this.form.querySelectorAll('[data-path^=&quot;' + this.dataset.path + '&quot;]').forEach((input) => { input.checked = false; }); this.form.submit()"
-                       style="position: absolute;
-                              opacity: 0;
-                              pointer-events: none">
+                       class="fr-sr-only">
                 <label class="fr-tag"
                        for="category-{{ chip.category.slug }}"
                        aria-pressed="{% if chip.checked %}true{% else %}false{% endif %}"

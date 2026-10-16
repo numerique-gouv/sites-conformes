@@ -38,13 +38,13 @@ class CategoryFilters:
         for category_id in used_ids:
             self.visible_ids.update(c.pk for c in self.ancestors(self.by_id.get(category_id)))
 
-        visible = [c for c in self.walk(self.children[None]) if c.pk in self.visible_ids]
-        if group_ids:
-            # Only root categories can be groups; a subcategory chosen before that rule is left out.
-            self.heads = [c for c in visible if c.pk in set(group_ids) and c.parent_id is None]
-            self.loose = []
+        roots = [c for c in self.children[None] if c.pk in self.visible_ids]
+        # A group without subcategories in use would be an empty heading.
+        chosen = [c for c in roots if c.pk in set(group_ids or []) and self.visible_children(c)]
+        if chosen:
+            self.heads, self.loose = chosen, []
         else:
-            roots = [c for c in visible if c.parent_id is None]
+            # Nothing chosen, or nothing left to show among the chosen groups: every category in use.
             self.heads = [c for c in roots if self.visible_children(c)]
             self.loose = [c for c in roots if not self.visible_children(c)]
         self.head_ids = {c.pk for c in self.heads}
@@ -79,7 +79,8 @@ class CategoryFilters:
         return next((c for c in list(self.ancestors(category))[1:] if c.pk in self.head_ids), None)
 
     def is_selectable(self, category) -> bool:
-        return category in self.loose or self.group_of(category) is not None
+        # A group heading has no chip, but a link to it (?category=<group>) still filters its branch.
+        return category.pk in self.head_ids or category in self.loose or self.group_of(category) is not None
 
     @property
     def has_filters(self) -> bool:

@@ -271,7 +271,6 @@ class CatalogIndexPage(AbstractIndexPage):
                 "entries": paginated_entries,
                 "paginator": paginator,
                 "tags": self.get_tags(),
-                "categories": self.get_categories(),
                 "filter_selection_mode": self.filter_selection,
                 **filtered_data,
             }
@@ -303,6 +302,7 @@ class CatalogIndexPage(AbstractIndexPage):
         Reads the "tag" GET params and dispatches to the filter mode configured on the page.
         """
         category_filters = self.category_filters(request.GET.getlist("category"))
+        self._category_filters = category_filters  # read back by show_filters, called from the template
         entries = category_filters.filter(entries)
 
         selected_tag_slugs = request.GET.getlist("tag")
@@ -434,7 +434,8 @@ class CatalogIndexPage(AbstractIndexPage):
 
     @property
     def show_filters(self) -> bool:
-        has_categories = self.category_filters().has_filters
+        category_filters = getattr(self, "_category_filters", None) or self.category_filters()
+        has_categories = category_filters.has_filters
         return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and has_categories)
 
     @path("tags/", name="tags_list")
