@@ -14,8 +14,14 @@ La migration renomme la table en place et conserve les données, les traductions
 et les révisions. Lancez `python manage.py update_index` après `migrate` pour
 que la recherche de l’admin retrouve les catégories.
 
-Les catégories forment désormais un arbre django-treebeard. Supprimer une catégorie
-parente supprime aussi ses sous-catégories (elles remontaient à la racine auparavant).
+Les catégories forment désormais un arbre django-treebeard. Dans l’admin, une
+catégorie qui a encore des sous-catégories ne peut plus être supprimée : déplacez
+ou supprimez d’abord ses sous-catégories, ou supprimez-les ensemble par une action
+groupée. Supprimer une catégorie parente par le code supprime toujours tout son
+sous-arbre (elles remontaient à la racine auparavant).
+
+Les pages sont désormais retrouvées par le nom de leurs catégories : lancez
+`python manage.py update_index` après `migrate`.
 
 ## v4.0.0 - Packagification
 

@@ -151,3 +151,27 @@ class CategoryAdminTest(WagtailPageTestCase):
         self.assertContains(response, INVALID_MOVE_MESSAGE)
         self.theme.refresh_from_db()
         self.assertIsNone(self.theme.parent)
+
+    def test_a_category_with_subcategories_cannot_be_deleted(self):
+        response = self.client.post(
+            reverse("wagtailsnippets_sites_conformes_core_category:delete", args=[self.theme.pk])
+        )
+
+        self.assertRedirects(response, reverse("wagtailsnippets_sites_conformes_core_category:list"))
+        self.assertTrue(Category.objects.filter(pk=self.theme.pk).exists())
+        self.assertTrue(Category.objects.filter(pk=self.housing.pk).exists())
+
+    def test_a_category_without_subcategories_can_be_deleted(self):
+        self.client.post(reverse("wagtailsnippets_sites_conformes_core_category:delete", args=[self.housing.pk]))
+
+        self.assertFalse(Category.objects.filter(pk=self.housing.pk).exists())
+
+    def test_a_category_can_be_bulk_deleted_along_with_its_subcategories(self):
+        url = (
+            reverse("wagtail_bulk_action", args=("sites_conformes_core", "category", "delete"))
+            + f"?id={self.theme.pk}&id={self.housing.pk}"
+        )
+
+        self.client.post(url)
+
+        self.assertFalse(Category.objects.filter(pk__in=[self.theme.pk, self.housing.pk]).exists())
