@@ -13,3 +13,9 @@ class ContentManagerConfig(AppConfig):
         from .monkey_patches import patch_wagtail_localize_handle_image_block
 
         patch_wagtail_localize_handle_image_block()
+
+        # Wagtail registers every concrete page class descending from its base page model,
+        # including a swapped-out ContentPage, which would keep it creatable in the admin.
+        from wagtail.models import PAGE_MODEL_CLASSES
+
+        PAGE_MODEL_CLASSES[:] = [model for model in PAGE_MODEL_CLASSES if not model._meta.swapped]

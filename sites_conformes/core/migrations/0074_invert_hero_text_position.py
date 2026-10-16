@@ -3,8 +3,14 @@
 from django.db import migrations
 from itertools import chain
 
+import swapper
+
 
 def invert_text_position(apps, schema_editor):
+    if swapper.is_swapped("sites_conformes_core", "ContentPage"):
+        # Custom content page models only exist on new installs, which have no rows to migrate.
+        return
+
     ContentPage = apps.get_model("sites_conformes_core", "ContentPage")
     CatalogIndexPage = apps.get_model("sites_conformes_core", "CatalogIndexPage")
 

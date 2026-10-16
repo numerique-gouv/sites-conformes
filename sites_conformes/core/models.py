@@ -1,5 +1,6 @@
 from typing import Union
 
+import swapper
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -31,23 +32,49 @@ from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-class ContentPage(SitesFacilesBasePage):
-    tags = ClusterTaggableManager(through="TagContentPage", blank=True)
+class AbstractContentPage(SitesFacilesBasePage):
+    """
+    Base class for the swappable content page model.
+
+    To use your own model, subclass this and point ``SF_CONTENTPAGE_MODEL`` at it,
+    the way Wagtail 8 handles ``WAGTAIL_PAGE_MODEL`` (both rely on ``swapper``).
+    Declare ``tags`` and its through model on the concrete subclass: a through model
+    shipped by this app would point at your model, so this app's migrations would
+    depend on yours while yours depend on it.
+    """
 
     class Meta:
+        abstract = True
+
+    def get_template(self, request, *args, **kwargs):
+        # Wagtail derives ``template`` from the concrete model's app label;
+        # fall back to the shipped template when the subclass app has none.
+        return [self.template, "sites_conformes_core/content_page.html"]
+
+
+class ContentPage(AbstractContentPage):
+    class Meta:
         verbose_name = _("Content page")
+        swappable = swapper.swappable_setting("sites_conformes_core", "ContentPage")
 
-    content_panels = SitesFacilesBasePage.content_panels + [
-        FieldPanel("tags"),
-    ]
+    if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
+        # A swapped project declares its own tags and through model (see AbstractContentPage);
+        # declaring ours against the swapped-in model would register a phantom child relation on it.
+        tags = ClusterTaggableManager(through="TagContentPage", blank=True)
 
-    api_fields = SitesFacilesBasePage.api_fields + [
-        APIField("tags"),
-    ]
+        content_panels = AbstractContentPage.content_panels + [
+            FieldPanel("tags"),
+        ]
+
+        api_fields = AbstractContentPage.api_fields + [
+            APIField("tags"),
+        ]
 
 
-class TagContentPage(TaggedItemBase):
-    content_object = ParentalKey("ContentPage", related_name="contentpage_tags")  # type: ignore
+if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
+
+    class TagContentPage(TaggedItemBase):
+        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
 
 
 class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
@@ -98,7 +125,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = ["sites_conformes_core.ContentPage"]
+    subpage_types = [swapper.get_model_name("sites_conformes_core", "ContentPage")]
 
     class Meta:
         verbose_name = _("Catalog index page")
@@ -106,6 +133,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     @property
     def entries(self):
         # Get a list of live content pages that are children of this page
+        ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
         return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
 
     def get_context(self, request, *args, **kwargs):
