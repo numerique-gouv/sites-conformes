@@ -1,5 +1,6 @@
 import warnings
 
+import swapper
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -98,19 +99,6 @@ class PersonSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class CategoryEntryPage(models.Model):
-    category = models.ForeignKey(Category, related_name="+", verbose_name=_("Category"), on_delete=models.CASCADE)
-    page = ParentalKey("BlogEntryPage", related_name="entry_categories")  # type: ignore
-    panels = [FieldPanel("category")]
-
-    def __str__(self):
-        return self.category
-
-
-class TagEntryPage(TaggedItemBase):
-    content_object = ParentalKey("BlogEntryPage", related_name="entry_tags")  # type: ignore
-
-
 class BlogIndexPage(AbstractAuthoredIndexPage):
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
@@ -149,7 +137,7 @@ class BlogIndexPage(AbstractAuthoredIndexPage):
         ),
     ]
 
-    subpage_types = ["sites_conformes_blog.BlogEntryPage"]
+    subpage_types = [swapper.get_model_name("sites_conformes_blog", "BlogEntryPage")]
 
     class Meta:
         verbose_name = _("Blog index")
@@ -157,6 +145,7 @@ class BlogIndexPage(AbstractAuthoredIndexPage):
     @property
     def posts(self):
         # Get list of blog pages that are descendants of this page
+        BlogEntryPage = swapper.load_model("sites_conformes_blog", "BlogEntryPage")
         posts = BlogEntryPage.objects.descendant_of(self).live()
         posts = posts.order_by("-date").select_related("owner").prefetch_related("tags", "categories", "date__year")
         return posts
@@ -318,14 +307,14 @@ class BlogIndexPage(AbstractAuthoredIndexPage):
         )
 
 
-class BlogEntryPage(SitesFacilesBasePage):
-    tags = ClusterTaggableManager(through="TagEntryPage", blank=True)
-    categories = ParentalManyToManyField(
-        "sites_conformes_core.Category",
-        through="CategoryEntryPage",
-        blank=True,
-        verbose_name=_("Categories"),
-    )
+class AbstractBlogEntryPage(SitesFacilesBasePage):
+    """
+    Base class of the swappable blog entry model (setting ``SF_BLOGENTRYPAGE_MODEL``).
+
+    Declare ``tags``, ``categories`` and their through models on the concrete subclass,
+    as ``BlogEntryPage`` does below.
+    """
+
     date = models.DateTimeField(verbose_name=_("Post date"), default=timezone.now)
     authors = ParentalManyToManyField(
         "sites_conformes_blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
@@ -385,5 +374,41 @@ class BlogEntryPage(SitesFacilesBasePage):
     def get_absolute_url(self):
         return self.url
 
+    def get_template(self, request, *args, **kwargs):
+        # Wagtail derives ``template`` from the concrete model's app label;
+        # fall back to the shipped template when the subclass app has none.
+        return [self.template, "sites_conformes_blog/blog_entry_page.html"]
+
+    class Meta:
+        abstract = True
+
+
+class BlogEntryPage(AbstractBlogEntryPage):
     class Meta:
         verbose_name = _("Blog page")
+        swappable = swapper.swappable_setting("sites_conformes_blog", "BlogEntryPage")
+
+    if not swapper.is_swapped("sites_conformes_blog", "BlogEntryPage"):
+        # A swapped project declares its own tags, categories and through models (see AbstractBlogEntryPage);
+        # declaring ours against the swapped-in model would register phantom child relations on it.
+        tags = ClusterTaggableManager(through="TagEntryPage", blank=True)
+        categories = ParentalManyToManyField(
+            "sites_conformes_core.Category",
+            through="CategoryEntryPage",
+            blank=True,
+            verbose_name=_("Categories"),
+        )
+
+
+if not swapper.is_swapped("sites_conformes_blog", "BlogEntryPage"):
+
+    class CategoryEntryPage(models.Model):
+        category = models.ForeignKey(Category, related_name="+", verbose_name=_("Category"), on_delete=models.CASCADE)
+        page = ParentalKey(BlogEntryPage, related_name="entry_categories")  # type: ignore
+        panels = [FieldPanel("category")]
+
+        def __str__(self):
+            return self.category
+
+    class TagEntryPage(TaggedItemBase):
+        content_object = ParentalKey(BlogEntryPage, related_name="entry_tags")  # type: ignore

@@ -8,9 +8,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.SeparateDatabaseAndState(
-            database_operations=[
-                migrations.AlterModelTable(name="category", table="sites_conformes_core_category"),
-            ],
-        ),
+        # State too, not only the database: a project whose own migrations add a foreign key
+        # to the category after this one (a swapped BlogEntryPage) must point it at the new table.
+        migrations.AlterModelTable(name="category", table="sites_conformes_core_category"),
     ]
