@@ -3,8 +3,12 @@ Admin customisations: Draftail text alignment features and the category tree lis
 """
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
+from django.contrib import messages
+from django.shortcuts import redirect
 from django.templatetags.static import static
+from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.translation import gettext as _
 from wagtail import hooks
 from wagtail.admin.rich_text.converters.html_to_contentstate import (
     BlockElementHandler,
@@ -148,3 +152,24 @@ class CategoryViewSet(TreeSnippetViewSet):
 
 
 register_snippet(CategoryViewSet)
+
+
+@hooks.register("before_delete_snippet")
+def keep_categories_with_subcategories(request, instances):
+    """
+    Deleting a category deletes its whole subtree, and the pages lose those categories:
+    the subcategories have to be moved or deleted first, unless they are deleted along with it.
+    """
+    deleted_ids = {instance.pk for instance in instances if isinstance(instance, Category)}
+    blocked = [
+        category.name
+        for category in instances
+        if isinstance(category, Category) and category.children.exclude(pk__in=deleted_ids).exists()
+    ]
+    if not blocked:
+        return None
+    messages.error(
+        request,
+        _("%(categories)s still has subcategories: move or delete them first.") % {"categories": ", ".join(blocked)},
+    )
+    return redirect(reverse("wagtailsnippets_sites_conformes_core_category:list"))
