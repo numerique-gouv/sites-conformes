@@ -1,16 +1,22 @@
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.proconnect.models import UserOIDC, WhitelistedEmailDomain
-from sites_conformes.proconnect.utils import (
-    email_domain_basic_whitelist,
-    email_domain_db_whitelist,
-    get_user_by_sub_or_email,
-)
+from sites_conformes.proconnect.tests import requires_proconnect
+
+# The ProConnect models can only be imported when the app is installed.
+if apps.is_installed("sites_conformes.proconnect"):
+    from sites_conformes.proconnect.models import UserOIDC, WhitelistedEmailDomain
+    from sites_conformes.proconnect.utils import (
+        email_domain_basic_whitelist,
+        email_domain_db_whitelist,
+        get_user_by_sub_or_email,
+    )
 
 User = get_user_model()
 
 
+@requires_proconnect
 class ProconnectUtilsTestCase(WagtailPageTestCase):
     def setUp(self):
         self.local_user = User.objects.create_superuser("local_user@example.com", "local_user@example.com", "pass")

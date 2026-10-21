@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase
 
-from sites_conformes.proconnect.backends import OIDCAuthenticationBackend
 from sites_conformes.proconnect.mfa import PROCONNECT_MFA_SESSION_KEY, is_mfa_acr
+from sites_conformes.proconnect.tests import requires_proconnect
 
 User = get_user_model()
 
@@ -25,10 +25,14 @@ class IsMfaAcrTest(TestCase):
                 self.assertFalse(is_mfa_acr(payload))
 
 
+@requires_proconnect
 class ProconnectMfaLoginTest(TestCase):
     """
     The backend flags the request from the ID token "acr" claim, and the
     user_logged_in receiver stores that flag in the session once logged in.
+
+    Needs the ProConnect app (its models and its user_logged_in receiver), so
+    the backend is imported lazily for the module to load without it.
     """
 
     def setUp(self):
@@ -37,6 +41,8 @@ class ProconnectMfaLoginTest(TestCase):
         SessionMiddleware(get_response=lambda r: None).process_request(self.request)
 
     def _proconnect_login(self, acr):
+        from sites_conformes.proconnect.backends import OIDCAuthenticationBackend
+
         backend = OIDCAuthenticationBackend()
         backend.request = self.request
         user_info = {"sub": "alice-sub", "email": self.user.email}

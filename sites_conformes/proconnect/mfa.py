@@ -45,8 +45,13 @@ def record_proconnect_mfa(sender, request, user, **kwargs):
 
 
 def is_session_verified_by_proconnect(request) -> bool:
-    """Whether the second factor of this session was already checked by ProConnect."""
-    if not settings.PROCONNECT_DELEGATE_2FA:
+    """
+    Whether the second factor of this session was already checked by ProConnect.
+
+    Also checks PROCONNECT_ACTIVATED, so that turning ProConnect off makes
+    sessions opened through it ask for the local 2FA code again.
+    """
+    if not (settings.PROCONNECT_ACTIVATED and settings.PROCONNECT_DELEGATE_2FA):
         return False
 
     session = getattr(request, "session", None)
