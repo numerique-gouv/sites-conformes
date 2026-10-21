@@ -6,6 +6,7 @@ from django.urls import reverse
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from sites_conformes.dashboard.middleware import VerifyUserStaticFilesMiddleware
+from sites_conformes.proconnect.mfa import PROCONNECT_MFA_SESSION_KEY
 
 User = get_user_model()
 
@@ -126,3 +127,32 @@ class VerifyUserStaticFilesMiddlewareTest(TestCase):
         """
         request = self._request("/oidc/logout-callback/")
         self.assertFalse(self.middleware._require_verified_user(request))
+
+    # -- 2FA delegated to ProConnect (see sites_conformes.proconnect.mfa)
+
+    def _request_verified_by_proconnect(self, path, user=None):
+        request = self._request_with_session(path, user=user)
+        request.session[PROCONNECT_MFA_SESSION_KEY] = str(self.admin.pk)
+        return request
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=True, PROCONNECT_DELEGATE_2FA=True)
+    def test_proconnect_mfa_session_does_not_require_verification(self):
+        TOTPDevice.objects.create(user=self.admin, name="Device", confirmed=True)
+        request = self._request_verified_by_proconnect("/cms-admin/")
+        self.assertFalse(self.middleware._require_verified_user(request))
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=True, PROCONNECT_DELEGATE_2FA=False)
+    def test_proconnect_mfa_session_requires_verification_when_delegation_is_disabled(self):
+        request = self._request_verified_by_proconnect("/cms-admin/")
+        self.assertTrue(self.middleware._require_verified_user(request))
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=True, PROCONNECT_DELEGATE_2FA=True)
+    def test_proconnect_mfa_session_of_another_user_requires_verification(self):
+        other_admin = User.objects.create_superuser("other", "other@test.com", "pass")
+        request = self._request_verified_by_proconnect("/cms-admin/", user=other_admin)
+        self.assertTrue(self.middleware._require_verified_user(request))
+
+    @override_settings(WAGTAIL_2FA_REQUIRED=True, PROCONNECT_DELEGATE_2FA=True)
+    def test_session_without_proconnect_mfa_requires_verification(self):
+        request = self._request_with_session("/cms-admin/")
+        self.assertTrue(self.middleware._require_verified_user(request))
