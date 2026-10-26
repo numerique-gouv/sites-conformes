@@ -151,3 +151,11 @@ test-results
 __screenshots__
 playwright-report
 blob-report
+
+# Database dumps and backups (never commit these)
+*.sql
+*.sql.gz
+*.dump
+*.pgdump
+backup_*
+!scripts/backup_local.sh

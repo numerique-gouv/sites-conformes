@@ -27,3 +27,15 @@ repos:
     hooks:
     - id: bandit
       exclude: '(^|/)(tests|migrations)/|^demo/'
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: "v8.30.1"
+    hooks:
+    - id: gitleaks
+  - repo: local
+    hooks:
+    - id: forbid-db-dumps
+      name: Forbid database dumps and backups
+      language: fail
+      entry: "Database dumps and backups must not be committed"
+      files: '\.(sql|dump|pgdump)(\.gz)?$|(^|/)backup_[^/]*$'
+      exclude: '^scripts/backup_local\.sh$'

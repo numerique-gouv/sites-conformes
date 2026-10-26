@@ -147,6 +147,13 @@ Ils doivent être installés via :
 uv run prek install --overwrite
 ```
 
+Les hooks incluent aussi [gitleaks](https://github.com/gitleaks/gitleaks), qui
+bloque les secrets (mots de passe, clés d’API…), et un contrôle qui refuse les
+dumps de base de données et sauvegardes (`*.sql`, `*.sql.gz`, `*.dump`,
+`backup_*`…). Les sauvegardes doivent être stockées dans `BACKUP_DIR`, en
+dehors du dépôt. Un scan gitleaks est également exécuté par l’intégration
+continue.
+
 ## Ajouter une dépendance
 
 Le projet gère ses dépendances avec [uv](https://docs.astral.sh/uv/)
