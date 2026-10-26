@@ -1,11 +1,12 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES_ILLUSTRATION, IMAGE_RATIOS
 from wagtail import blocks
 from wagtail.admin.telepath import register
 from wagtail.blocks import StructValue
-from wagtail.blocks.struct_block import StructBlockAdapter
+from wagtail.blocks.struct_block import StructBlockAdapter, StructBlockValidationError
 from wagtail.images import get_image_model
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
@@ -267,7 +268,7 @@ class CenteredImageBlock(blocks.StructBlock):
         label=_("Image ratio"),
         choices=[("original", _("Original proportions"))] + list(IMAGE_RATIOS),
         required=False,
-        default="h3",
+        default="original",
         help_text=_(
             "Image ratio is the ratio between width and height of the image. "
             "Choose “Original proportions” to keep the image's own ratio (never cropped), "
@@ -276,6 +277,18 @@ class CenteredImageBlock(blocks.StructBlock):
     )
     caption = blocks.CharBlock(label=_("Caption"), required=False)
     url = blocks.URLBlock(label=_("Link"), required=False)
+
+    def clean(self, value):
+        value = super().clean(value)
+        if value.get("width") == "natural" and value.get("image_ratio") != "original":
+            raise StructBlockValidationError(
+                block_errors={
+                    "image_ratio": ValidationError(
+                        _("The “Actual size” width can only be used with the “Original proportions” ratio.")
+                    )
+                }
+            )
+        return value
 
     class Meta:
         icon = "image"

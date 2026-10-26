@@ -157,6 +157,14 @@ IMAGE_FORMAT_CHOICES = [
     ("fr-responsive-img--32x9", _("Panoramic (32:9)")),
 ]
 
+# Width of the image within its column, in the "image and text" hero. The default
+# fills the column, as the image did before this option existed.
+HERO_IMAGE_SIZE_CHOICES = [
+    ("sm", _("Small")),
+    ("md", _("Medium")),
+    ("", _("Large")),
+]
+
 TEXT_SIZE_CHOICES = [
     ("fr-text--sm", _("Small")),
     ("", _("Medium")),

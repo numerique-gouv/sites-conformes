@@ -1,13 +1,16 @@
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
-from django.test import override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext
+from wagtail.blocks.struct_block import StructBlockValidationError
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category
+from sites_conformes.core.blocks.basics import CenteredImageBlock
+from sites_conformes.core.blocks.heros import HeroBackgroundImageBlock, HeroImageAndTextBlock
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
@@ -820,3 +823,120 @@ class HeroBackgroundImageBlockTestCase(WagtailPageTestCase):
         edit_url = reverse("wagtailadmin_pages:edit", args=[self.content_page.id])
         response = self.client.get(edit_url)
         self.assertEqual(response.status_code, 200)
+
+
+class CenteredImageBlockTestCase(TestCase):
+    def setUp(self):
+        self.block = CenteredImageBlock()
+        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "Centered image")
+
+    def get_value(self, **kwargs):
+        return self.block.to_python(
+            {"image": {"image": self.image.pk, "decorative": True, "alt_text": ""}, "caption": "", **kwargs}
+        )
+
+    def test_ratio_crops_the_image(self):
+        value = self.get_value(width="", image_ratio="fr-ratio-1x1")
+        self.assertEqual(value.extra_classes(), "fr-responsive-img fr-ratio-1x1")
+
+    def test_original_proportions_keep_the_width_option(self):
+        value = self.get_value(width="fr-content-media--sm", image_ratio="original")
+        self.assertEqual(value.extra_classes(), "fr-responsive-img cmsfr-image-original")
+
+    def test_actual_size_shows_the_image_at_its_natural_size(self):
+        value = self.get_value(width="natural", image_ratio="original")
+        self.assertEqual(value.extra_classes(), "cmsfr-image-natural")
+
+    def test_new_blocks_keep_original_proportions_by_default(self):
+        self.assertEqual(self.block.get_default()["image_ratio"], "original")
+
+    def test_actual_size_requires_original_proportions(self):
+        value = self.get_value(width="natural", image_ratio="fr-ratio-16x9")
+        with self.assertRaises(StructBlockValidationError) as context:
+            self.block.clean(value)
+        self.assertIn("image_ratio", context.exception.block_errors)
+
+        self.block.clean(self.get_value(width="natural", image_ratio="original"))
+
+
+class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
+    def setUp(self):
+        self.block = HeroImageAndTextBlock()
+        self.image = import_image(
+            "sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png", "Hero image"
+        )
+
+    def get_value(self, **kwargs):
+        return self.block.to_python(
+            {
+                "text_content": {"hero_title": "Sample hero", "position": ""},
+                "buttons": [],
+                "image": {"image": self.image.pk, "decorative": False, "alt_text": "Hero alt"},
+                "layout": {},
+                **kwargs,
+            }
+        )
+
+    def render_image(self, value):
+        return BeautifulSoup(self.block.render(value), "html.parser").find("img")
+
+    def test_existing_heroes_stay_square(self):
+        # Heroes saved before the format and size options existed
+        value = self.get_value()
+
+        self.assertEqual(value.image_rendition().filter_spec, "fill-1200x1200")
+        img = self.render_image(value)
+        self.assertEqual(img["class"], ["fr-responsive-img", "fr-responsive-img--1x1"])
+        self.assertEqual(img["alt"], "Hero alt")
+        self.assertEqual(img.parent["class"], ["cmsfr-hero-media"])
+
+    def test_ratio_formats_crop_around_the_focal_point(self):
+        expected_specs = {
+            "fr-responsive-img--16x9": "fill-1200x675",
+            "fr-responsive-img--32x9": "fill-1200x338",
+            "fr-responsive-img--3x4": "fill-900x1200",
+            "fr-responsive-img--2x3": "fill-800x1200",
+        }
+        for image_format, filter_spec in expected_specs.items():
+            with self.subTest(image_format=image_format):
+                value = self.get_value(image_format=image_format)
+                self.assertEqual(value.image_rendition().filter_spec, filter_spec)
+
+    def test_original_proportions_are_not_cropped(self):
+        value = self.get_value(image_format="", image_size="sm")
+
+        self.assertEqual(value.image_rendition().filter_spec, "max-1200x1200")
+        img = self.render_image(value)
+        self.assertEqual(img["class"], ["cmsfr-hero-img"])
+        self.assertEqual(img.parent["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])
+
+
+class HeroBackgroundImageFormatTestCase(TestCase):
+    def setUp(self):
+        self.block = HeroBackgroundImageBlock()
+        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "Hero background")
+
+    def render_hero(self, background_color_or_image):
+        value = self.block.to_python(
+            {
+                "text_content": {"hero_title": "Sample hero", "position": ""},
+                "buttons": [],
+                "background_color_or_image": background_color_or_image,
+                "image": {
+                    "image": {"image": self.image.pk, "decorative": True, "alt_text": ""},
+                    "background_format": "16x9",
+                },
+                "background_color": "blue-france",
+            }
+        )
+        return BeautifulSoup(self.block.render(value), "html.parser").find("div", class_="cmsfr-hero")
+
+    def test_image_banner_uses_the_chosen_ratio(self):
+        hero = self.render_hero("image")
+        self.assertIn("fr-ratio-16x9", hero["class"])
+        self.assertNotIn("min-height: 650px", hero["style"])
+
+    def test_color_banner_ignores_the_image_format(self):
+        hero = self.render_hero("color")
+        self.assertNotIn("fr-ratio-16x9", hero["class"])
+        self.assertIn("min-height: 650px", hero["style"])
