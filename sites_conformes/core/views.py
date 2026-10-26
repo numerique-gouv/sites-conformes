@@ -1,5 +1,7 @@
 from django.conf import settings
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
+from django.template import loader
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, TemplateView
@@ -141,3 +143,11 @@ class SiteMapView(TemplateView):
             "root_dir": root_dir,
         }
         return context
+
+
+def csrf_failure(request, reason=""):
+    """
+    Displays the site's 403 page on CSRF errors, with the cause of the error.
+    """
+    template = loader.get_template("sites_conformes_core/403.html")
+    return HttpResponseForbidden(template.render(request=request, context={"error_reason": reason}))

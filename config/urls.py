@@ -3,7 +3,8 @@ from functools import partial
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
-from django.urls import include, path
+from django.middleware.csrf import REASON_NO_CSRF_COOKIE
+from django.urls import get_callable, include, path
 from django.views.defaults import page_not_found, permission_denied, server_error
 from django.views.generic.base import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog
@@ -53,12 +54,17 @@ if settings.PROCONNECT_ACTIVATED:
     ]
 
 if settings.DEBUG or settings.TESTING:
+
+    def simulate_csrf_failure(request):
+        return get_callable(settings.CSRF_FAILURE_VIEW)(request, reason=REASON_NO_CSRF_COOKIE)
+
     urlpatterns += i18n_patterns(
         path(
             "403/",
             permission_denied,
             kwargs={"exception": Exception("Access denied"), "template_name": TEMPLATE_403},
         ),
+        path("403-csrf/", simulate_csrf_failure),
         path(
             "404/",
             page_not_found,

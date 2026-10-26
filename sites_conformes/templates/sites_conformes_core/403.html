@@ -11,6 +11,11 @@
       <div class="fr-py-0 fr-col-12 fr-col-md-6">
         <h1>{% translate "Access denied" %}</h1>
         <p class="fr-text--sm fr-mb-3w">{% translate "Error 403" %}</p>
+        {% if error_reason %}
+          <div class="fr-alert fr-alert--error fr-alert--sm fr-mb-3w">
+            <p>{% translate "Cause of the error:" %} {{ error_reason }}</p>
+          </div>
+        {% endif %}
         <p class="fr-text--lead fr-mb-3w">
           {% translate "You do not have permission to access this page. We apologize for any inconvenience." %}
         </p>

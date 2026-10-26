@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 16:57+0200\n"
+"POT-Creation-Date: 2026-10-26 15:25+0100\n"
 "PO-Revision-Date: 2026-04-09 13:09+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -27,6 +27,9 @@ msgstr "Accès refusé"
 
 msgid "Error 403"
 msgstr "Erreur 403"
+
+msgid "Cause of the error:"
+msgstr "Cause de l’erreur :"
 
 msgid ""
 "You do not have permission to access this page. We apologize for any "

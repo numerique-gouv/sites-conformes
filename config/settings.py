@@ -531,6 +531,7 @@ if PROCONNECT_ACTIVATED:
     LOGOUT_URL = f"{FORCE_SCRIPT_NAME}/oidc/logout/"
 
 # CSRF
+CSRF_FAILURE_VIEW = "sites_conformes.core.views.csrf_failure"
 CSRF_TRUSTED_ORIGINS = []
 for host in ALLOWED_HOSTS:
     if host not in ["127.0.0.1", "localhost", ".localhost"]:

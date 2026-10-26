@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
@@ -442,6 +442,27 @@ class ErrorPagesTestCase(TestCase):
             "<title>Erreur 403 — Accès refusé — Titre du site</title>",
             response.content.decode(),
         )
+        self.assertNotContains(response, "fr-alert", status_code=403)
+
+    def test_403_csrf_simulated_page(self):
+        response = self.client.get("/403-csrf/")
+        self.assertEqual(response.status_code, 403)
+        self.assertInHTML(
+            "<title>Erreur 403 — Accès refusé — Titre du site</title>",
+            response.content.decode(),
+        )
+        self.assertContains(response, "fr-alert", status_code=403)
+        self.assertContains(response, "Cause de l’erreur : CSRF cookie not set.", status_code=403)
+
+    def test_403_on_real_csrf_failure(self):
+        client = Client(enforce_csrf_checks=True)
+        response = client.post("/403/")
+        self.assertEqual(response.status_code, 403)
+        self.assertInHTML(
+            "<title>Erreur 403 — Accès refusé — Titre du site</title>",
+            response.content.decode(),
+        )
+        self.assertContains(response, "CSRF cookie not set.", status_code=403)
 
     def test_404_error_page(self):
         response = self.client.get("/404/")
