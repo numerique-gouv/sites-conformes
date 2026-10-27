@@ -51,9 +51,13 @@
 
     {% translate "Alphabetical" as alphabetical_label %}
     <nav role="navigation" class="fr-mb-2w" aria-label="{{ alphabetical_label }}">
-      {% for first_letter in sorted_tags.keys|dictsort:0 %}
-        <a href="#{{ first_letter }}" class="fr-tag">{{ first_letter }}</a>
-      {% endfor %}
+      <ul class="fr-tags-group">
+        {% for first_letter in sorted_tags.keys|dictsort:0 %}
+          <li>
+            <a href="#{{ first_letter }}" class="fr-tag">{{ first_letter }}</a>
+          </li>
+        {% endfor %}
+      </ul>
     </nav>
 
     {% for first_letter, tags in sorted_tags.items|dictsort:0 %}
