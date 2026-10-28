@@ -27,15 +27,15 @@ Sur une offre infogérée, passez à l’étape 2.
 :::
 
 Mettez à jour le système puis installez les paquets nécessaires :
-Python, PostgreSQL, Nginx, Git et les outils de compilation requis par
-certaines dépendances Python.
+Python, PostgreSQL, Nginx, Git, gettext et les outils de compilation requis
+par certaines dépendances Python.
 
 ```sh
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y \
   python3 python3-venv python3-dev \
   postgresql postgresql-contrib \
-  nginx git \
+  nginx git gettext \
   build-essential libpq-dev
 ```
 
@@ -43,6 +43,7 @@ sudo apt install -y \
 - `libpq-dev` et `build-essential` sont nécessaires pour compiler `psycopg`
 (le pilote PostgreSQL de Python).
 - `postgresql-contrib` ajoute des extensions utiles à PostgreSQL.
+- `gettext` est nécessaire pour compiler les fichiers de traduction.
 
 ## Étape 2 — Mise en place de la base de données
 
@@ -82,7 +83,7 @@ just createsuperuser
 ```
 
 `just init` installe les dépendances de production puis lance
-`just deploy`, qui enchaîne : `migrate`, `collectstatic`,
+`just deploy`, qui enchaîne : `migrate`, `compilemessages`, `collectstatic`,
 `create_starter_pages`, `import_page_templates`,
 `import_illustration_images` et l’indexation (`update_index`).
 
@@ -99,6 +100,7 @@ pip install .                 # dépendances déclarées dans pyproject.toml
 # Éditer le .env
 # Initialisation manuelle du site
 python manage.py migrate
+python manage.py compilemessages -l fr --ignore=venv
 python manage.py collectstatic --noinput --ignore="*.sass"
 python manage.py createsuperuser
 python manage.py set_config
@@ -235,7 +237,7 @@ jour de semaine 0 = dimanche).
       ```
 
       (= `uv sync --no-group dev` puis `just deploy`, qui inclut migrations,
-      fichiers statiques et indexation).
+      traductions, fichiers statiques et indexation).
 
    - **Voie B (pip + venv)** :
 
@@ -243,6 +245,7 @@ jour de semaine 0 = dimanche).
      source venv/bin/activate
      pip install .
      python manage.py migrate
+     python manage.py compilemessages -l fr --ignore=venv
      python manage.py collectstatic --noinput --ignore="*.sass"
      ```
 

@@ -52,8 +52,18 @@ jobs:
           echo "Publishing version: ${VERSION}"
           printf '__version__ = "%s"\n' "${VERSION}" > sites_conformes/_version.py
 
+      # The .mo files are not versioned: compile them so they ship in the wheel
+      - name: Compile translation files
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext
+          uv run --no-group dev django-admin compilemessages -l fr --ignore=.venv
+
       - name: Build package
         run: uv build
+
+      - name: Check that the translation files are in the wheel
+        run: unzip -l dist/*.whl | grep -q 'sites_conformes/locale/fr/LC_MESSAGES/django.mo'
 
       - name: Upload dist
         uses: actions/upload-artifact@v7

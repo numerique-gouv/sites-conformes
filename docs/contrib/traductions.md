@@ -20,9 +20,14 @@ que l’on obtient avec :
 just compilemessages
 ```
 
+Les fichiers `.mo` ne sont pas versionnés : seuls les fichiers `.po` sont
+commités. Ils sont compilés automatiquement au déploiement (`just deploy`,
+image Docker, build Scalingo, paquet PyPI). La commande ci-dessus n’est donc
+utile que pour voir ses traductions en local.
+
 ## Poedit
 
 Il est recommandé d’utiliser [Poedit](https://poedit.net/) pour les traductions,
 afin de profiter de sa mémoire de traduction basée sur celles déjà existantes.
 Il permet de compiler directement le fichier `.mo` à la sauvegarde :
-il n’est alors pas nécessaire de le compiler manuellement.
+il n’est alors pas nécessaire de le compiler manuellement pour tester en local.
