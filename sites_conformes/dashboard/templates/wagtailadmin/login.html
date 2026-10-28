@@ -36,7 +36,8 @@
               {% if use_proconnect and not disable_local_login %}
                 <p class="fr-hr-or">{% translate "or" %}</p>
               {% endif %}
-              {% if not disable_local_login %}
+              {% comment %}The local login can only be disabled if another login method is available{% endcomment %}
+              {% if not use_proconnect or not disable_local_login %}
                 <div>
                   <form id="login-form" action="{% url 'wagtailadmin_login' %}" method="post">
                     <fieldset class="fr-fieldset"

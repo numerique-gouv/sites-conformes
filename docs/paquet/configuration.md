@@ -102,12 +102,47 @@ SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 
 ## SF_DISABLE_LOCAL_LOGIN
 
-Désactive la connexion par mot de passe au profit d’un SSO (ProConnect, etc.).
-Désactivé par défaut.
+Désactive la connexion par identifiant et mot de passe : seul ProConnect permet
+alors de se connecter. Désactivé par défaut.
 
 ```python
-SF_DISABLE_LOCAL_LOGIN = os.getenv("SF_DISABLE_LOCAL_LOGIN", "") in ("1", "True")
+SF_DISABLE_LOCAL_LOGIN = getenv_bool("SF_DISABLE_LOCAL_LOGIN", False)
 ```
+
+Le réglage n’a d’effet que si `PROCONNECT_ACTIVATED` vaut aussi `True` : la
+connexion par mot de passe ne peut pas être désactivée sans autre moyen de se
+connecter. Sans ProConnect, le formulaire de connexion reste affiché.
+
+:::{warning}
+Côté package, ce réglage ne fait que **masquer** le formulaire de connexion.
+La vue de connexion accepte toujours un identifiant et un mot de passe tant
+que `django.contrib.auth.backends.ModelBackend` figure dans
+`AUTHENTICATION_BACKENDS`. Il faut donc le retirer dans les réglages du projet
+hôte :
+
+```python
+if PROCONNECT_ACTIVATED:
+    if SF_DISABLE_LOCAL_LOGIN:
+        AUTHENTICATION_BACKENDS = []
+        WAGTAIL_PASSWORD_RESET_ENABLED = False
+        WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+        WAGTAILUSERS_PASSWORD_ENABLED = False
+    else:
+        AUTHENTICATION_BACKENDS = [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+    AUTHENTICATION_BACKENDS.append("sites_conformes.proconnect.backends.OIDCAuthenticationBackend")
+```
+
+Le backend ProConnect hérite de `ModelBackend` : les droits des utilisateurs
+continuent de fonctionner. La réinitialisation et le changement de mot de
+passe sont désactivés, et les formulaires de création et de modification
+d’utilisateur n’ont plus de champ mot de passe : un compte créé dans l’admin
+ne sert qu’à autoriser à l’avance une connexion via ProConnect (le compte est
+retrouvé par son adresse e-mail). Les sessions déjà ouvertes par mot de passe
+sont fermées au prochain chargement de page.
+:::
 
 :::{seealso}
 Pour les réglages Django et Wagtail, référez-vous à leurs documentations

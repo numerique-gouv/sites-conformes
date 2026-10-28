@@ -528,10 +528,17 @@ if PROCONNECT_ACTIVATED:
         "sites_conformes.proconnect",
     ]
 
-    AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.ModelBackend",
-        "sites_conformes.proconnect.backends.OIDCAuthenticationBackend",
-    ]
+    if SF_DISABLE_LOCAL_LOGIN:
+        AUTHENTICATION_BACKENDS = []
+        WAGTAIL_PASSWORD_RESET_ENABLED = False
+        WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+        WAGTAILUSERS_PASSWORD_ENABLED = False
+    else:
+        AUTHENTICATION_BACKENDS = [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+    AUTHENTICATION_BACKENDS.append("sites_conformes.proconnect.backends.OIDCAuthenticationBackend")
 
     LOGOUT_URL = f"{FORCE_SCRIPT_NAME}/oidc/logout/"
 
