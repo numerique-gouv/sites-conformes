@@ -7,7 +7,6 @@ from django.middleware.csrf import REASON_NO_CSRF_COOKIE
 from django.urls import get_callable, include, path
 from django.views.defaults import page_not_found, permission_denied, server_error
 from django.views.generic.base import RedirectView, TemplateView
-from django.views.i18n import JavaScriptCatalog
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.contrib.sitemaps.views import sitemap
 from wagtail.documents import urls as wagtaildocs_urls
@@ -84,7 +83,6 @@ if settings.SENTRY_USE_DEBUG_URL:
     ]
 
 urlpatterns += i18n_patterns(
-    path("jsi18n/", JavaScriptCatalog.as_view(packages=["sites_conformes.core"]), name="javascript-catalog"),
     path("", include("sites_conformes.core.urls")),
     prefix_default_language=False,
 )
