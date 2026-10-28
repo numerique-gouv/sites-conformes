@@ -22,7 +22,7 @@ collectstatic:
 # Compile the translation files
 [group('Internationalization')]
 compilemessages:
-    {{docker_cmd}} {{uv_run}} python manage.py compilemessages -l fr --ignore=.venv
+    {{docker_cmd}} {{uv_run}} python manage.py compilemessages -l fr --ignore=.venv*
 
 alias csu := createsuperuser
 createsuperuser:
@@ -31,6 +31,7 @@ createsuperuser:
 alias first-deploy := deploy
 deploy:
     just migrate
+    just compilemessages
     just collectstatic
     {{docker_cmd}} {{uv_run}} python manage.py create_starter_pages
     {{docker_cmd}} {{uv_run}} python manage.py import_page_templates

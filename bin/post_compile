@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Scalingo build hook, run by the Python buildpack once dependencies are installed.
+# The .mo files are not versioned: compile them here so they are part of the build.
+set -euo pipefail
+
+python manage.py compilemessages -l fr --ignore=.venv
