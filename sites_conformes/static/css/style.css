@@ -13,6 +13,14 @@ p:empty {
 .flex {
     display: flex;
 }
+
+/*** Fixes to wagtail-honeypot output ***/
+/* Its JS pushes the trap field past the right edge of the page
+   ("margin-left: 100%"), which adds a horizontal scrollbar: hide it on the left instead */
+input[data-whf_name] {
+    left: -10000px !important;
+    margin-left: 0 !important;
+}
 /*** Prefix the classes defined here with cmsfr- ***/
 
 /* Text alignment classes */
