@@ -1,9 +1,13 @@
+from datetime import UTC, datetime
 from functools import partial
+from pathlib import Path
 
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.urls import include, path
+from django.views.decorators.cache import cache_control, cache_page
+from django.views.decorators.http import last_modified
 from django.views.defaults import page_not_found, server_error
 from django.views.generic.base import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog
@@ -17,6 +21,21 @@ from sites_conformes.proconnect import urls as oidc_urls
 
 TEMPLATE_404 = "sites_conformes_core/404.html"
 TEMPLATE_500 = "sites_conformes_core/500.html"
+
+
+# The JS catalog is rebuilt from the .mo files on each request, so cache it both server-side and
+# client-side (browsers revalidate and get a 304) until the translations are compiled again.
+# It only serves the djangojs translations from LOCALE_PATHS: packages can't be empty, so it names
+# an app without djangojs translations. Wagtail and wagtail_localize serve their own catalogs.
+JS_CATALOG_MO = Path(settings.LOCALE_PATHS[0]) / "fr" / "LC_MESSAGES" / "djangojs.mo"
+JS_CATALOG_MTIME = int(JS_CATALOG_MO.stat().st_mtime) if JS_CATALOG_MO.exists() else 0
+javascript_catalog = last_modified(lambda request, **kwargs: datetime.fromtimestamp(JS_CATALOG_MTIME, tz=UTC))(
+    cache_control(no_cache=True)(
+        cache_page(86400, key_prefix=f"jsi18n-{JS_CATALOG_MTIME}")(
+            JavaScriptCatalog.as_view(packages=["sites_conformes.core"])
+        )
+    )
+)
 
 urlpatterns = [
     path("sitemap.xml", sitemap, name="xml_sitemap"),
@@ -72,7 +91,7 @@ if settings.SENTRY_USE_DEBUG_URL:
     ]
 
 urlpatterns += i18n_patterns(
-    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+    path("jsi18n/", javascript_catalog, name="javascript-catalog"),
     path("", include("sites_conformes.core.urls")),
     prefix_default_language=False,
 )
