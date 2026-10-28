@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
-from django.utils.cache import patch_vary_headers
+from django.utils.cache import patch_cache_control, patch_vary_headers
 
 from sites_conformes.core.models import CmsDsfrConfig
 
@@ -32,6 +32,68 @@ class NoIndexMiddleware:
         if settings.SF_NOINDEX:
             response.headers["X-Robots-Tag"] = "noindex, nofollow"
         return response
+
+
+class PublicCacheMiddleware:
+    """
+    Let browsers and the CDN cache pages served to anonymous visitors.
+
+    Enabled with the ``SF_PUBLIC_CACHE_MAX_AGE`` setting (in seconds). Only
+    successful ``GET``/``HEAD`` responses get ``Cache-Control: public``, and
+    never when:
+
+    - the request carries a session (logged-in user, password-protected page,
+      pending messages): these responses get ``Cache-Control: private``,
+    - the response sets a cookie (CSRF token of a form, new session): a shared
+      cache would hand it to every visitor,
+    - the response already has a ``Cache-Control`` header (static files…),
+    - the request targets the admin.
+
+    ``Cookie`` is removed from the ``Vary`` header of cacheable responses:
+    ``SessionMiddleware`` adds it as soon as the session is read (e.g. through
+    ``request.user``), which keeps most CDNs from caching the page. Without a
+    session nor a cookie set, the page is the same for every anonymous
+    visitor. A logged-in user may therefore get the anonymous version from the
+    CDN, for at most ``SF_PUBLIC_CACHE_MAX_AGE`` seconds.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest) -> HttpResponse:
+        response = self.get_response(request)
+
+        max_age = getattr(settings, "SF_PUBLIC_CACHE_MAX_AGE", 0)
+        if max_age <= 0 or response.has_header("Cache-Control"):
+            return response
+
+        if settings.SESSION_COOKIE_NAME in request.COOKIES:
+            patch_cache_control(response, private=True)
+        elif self._is_cacheable(request, response):
+            patch_cache_control(response, public=True, max_age=max_age)
+            self._remove_vary_cookie(response)
+
+        return response
+
+    @staticmethod
+    def _is_cacheable(request: HttpRequest, response: HttpResponse) -> bool:
+        return (
+            request.method in ("GET", "HEAD")
+            and response.status_code == 200
+            and not response.cookies
+            and not request.path_info.lstrip("/").startswith(settings.WAGTAILADMIN_PATH.lstrip("/"))
+        )
+
+    @staticmethod
+    def _remove_vary_cookie(response: HttpResponse) -> None:
+        if not response.has_header("Vary"):
+            return
+        vary = [header.strip() for header in response["Vary"].split(",")]
+        vary = [header for header in vary if header and header.lower() != "cookie"]
+        if vary:
+            response["Vary"] = ", ".join(vary)
+        else:
+            del response["Vary"]
 
 
 class IframeMiddleware:

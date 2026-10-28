@@ -67,6 +67,9 @@ SF_USE_DB_STORAGE = getenv_bool("SF_USE_DB_STORAGE", False)
 # Ask search engines not to index anything served by this instance (disabled by default)
 SF_NOINDEX = getenv_bool("SF_NOINDEX", False)
 
+# Let browsers and the CDN cache anonymous pages for this many seconds (0 = disabled, default)
+SF_PUBLIC_CACHE_MAX_AGE = int(os.getenv("SF_PUBLIC_CACHE_MAX_AGE", 0))
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
@@ -139,6 +142,8 @@ if not TESTING and DEBUG and "localhost" in HOST_URL:
 MIDDLEWARE = [
     # Must stay first so that it also wraps WhiteNoise, appended below
     "sites_conformes.core.middleware.NoIndexMiddleware",
+    # Outside of the session and CSRF middlewares, to see the cookies they set
+    "sites_conformes.core.middleware.PublicCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
