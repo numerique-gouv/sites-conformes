@@ -84,7 +84,7 @@ if settings.SENTRY_USE_DEBUG_URL:
     ]
 
 urlpatterns += i18n_patterns(
-    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+    path("jsi18n/", JavaScriptCatalog.as_view(packages=["sites_conformes.core"]), name="javascript-catalog"),
     path("", include("sites_conformes.core.urls")),
     prefix_default_language=False,
 )
