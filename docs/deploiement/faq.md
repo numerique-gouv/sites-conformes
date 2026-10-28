@@ -248,6 +248,18 @@ python manage.py set_config
 
 Voir {doc}`migrer-hebergement` pour la procédure complète.
 
+### Les e-mails contiennent l’adresse `*.scalingo.io` au lieu de mon domaine
+
+Les liens des e-mails (mot de passe perdu, notifications…) sont construits à
+partir de `HOST_URL`. Remplacez sa valeur par votre domaine définitif (nom de
+domaine seul), vérifiez qu’il figure dans `ALLOWED_HOSTS`, puis lancez :
+
+```sh
+python manage.py set_config
+```
+
+Voir {ref}`scalingo-domaine-definitif`.
+
 ### Les e-mails ne partent pas
 
 L’envoi d’e-mails n’est activé que si **`DEFAULT_FROM_EMAIL` est renseignée**. Si
