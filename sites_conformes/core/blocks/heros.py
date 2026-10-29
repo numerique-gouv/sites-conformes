@@ -11,6 +11,8 @@ from wagtail.blocks.struct_block import StructBlockAdapter, StructBlockValidatio
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
     ALIGN_VERTICAL_CHOICES,
+    HERO_IMAGE_SIZE_CHOICES,
+    IMAGE_FORMAT_CHOICES,
     MEDIA_WIDTH_CHOICES,
     TEMPLATE_EXAMPLE_BUTTON_LIST,
 )
@@ -100,15 +102,14 @@ class HeroImageBlockWithMask(HeroImageBlock):
         default_image_title="Banner Sites Faciles Dimitri Iakymuk Unsplash",
         required=False,
         help_text=help_text_with_details(
-            _("Recommended size: at least 1900 × 650 px, with the important element in the center."),
+            _("Recommended size: at least 1920 px wide, with the important element in the center."),
             _(
-                "The image is placed in the background, behind the text, across the full width of the screen "
-                "and at least 650 px high (more if the text is long). It is first cropped into a 1900 × 650 px "
-                "banner: if it is taller, its focal point (to be set in the media library) indicates the band "
-                "to keep, otherwise the center is kept.<br>"
-                "<strong>On desktop</strong>, the banner is visible almost in full.<br>"
-                "<strong>On mobile</strong>, only a band about 400 px wide, in the center of the image, "
-                "remains visible, whatever the focal point.<br>"
+                "The image is placed in the background, behind the text, across the full width of the screen. "
+                "Its height depends on the “Banner format” field: at least 650 px in the standard format, "
+                "or the chosen ratio (more if the text is long). The image covers the whole banner: "
+                "what overflows is hidden, and the “Image positioning” field indicates the part to keep visible.<br>"
+                "<strong>On mobile</strong>, the banner is narrower: in the standard format, only a vertical band "
+                "of the image remains visible.<br>"
                 "The text is displayed on top of it: choose an uncluttered image, "
                 "or use the “Image mask” field to darken or lighten it."
             ),
@@ -137,9 +138,40 @@ class HeroImageBlockWithMask(HeroImageBlock):
         default="",
         help_text=_("Add a mask to lighten or darken the image"),
     )
+    background_format = blocks.ChoiceBlock(
+        label=_("Banner format"),
+        choices=[
+            ("", _("Standard (fixed height)")),
+            ("32x9", "32:9"),
+            ("16x9", "16:9"),
+        ],
+        required=False,
+        default="",
+        help_text=_("Aspect ratio of the banner. Standard keeps a minimum height of 650 px."),
+    )
 
     class Meta:
         value_class = HeroImageStructValue
+
+
+class HeroImageAndTextStructValue(StructValue):
+    def image_rendition(self):
+        """
+        Crop the image to the chosen format around its focal point, or keep its original proportions.
+        """
+        image = self.get("image")
+        if not image:
+            return None
+
+        image_format = self.get("image_format")
+        if not image_format:
+            return image.get_rendition("max-1200x1200")
+
+        # Formats are DSFR classes ending with the ratio, e.g. "fr-responsive-img--16x9"
+        ratio_width, ratio_height = (int(n) for n in image_format.rsplit("--", 1)[1].split("x"))
+        if ratio_width >= ratio_height:
+            return image.get_rendition(f"fill-1200x{round(1200 * ratio_height / ratio_width)}")
+        return image.get_rendition(f"fill-{round(1200 * ratio_width / ratio_height)}x1200")
 
 
 class HeroImageAndTextBlock(blocks.StructBlock):
@@ -155,21 +187,53 @@ class HeroImageAndTextBlock(blocks.StructBlock):
         label=_("Hero image"),
         default_image_title="Illustration Sites Faciles Homme Nuages",
         help_text=help_text_with_details(
-            _("Recommended size: at least 600 × 600 px. The image is displayed as a square."),
+            _("Recommended size: at least 600 px wide. Its shape depends on the “Image format” field below."),
             _(
-                "The image is cropped into a square keeping its focal point (to be set in the media library) "
-                "in the frame, or around its center if there is none.<br>"
-                "<strong>On desktop</strong>, it is displayed next to the text, in a square of up to 600 px.<br>"
-                "<strong>On mobile</strong>, it moves below the text and takes up the full width of the screen, "
-                "still as a square."
+                "With a ratio format (square by default), the image is cropped to that ratio keeping its "
+                "focal point (to be set in the media library) in the frame, or around its center if there is none.<br>"
+                "With “Original proportions”, the image is never cropped.<br>"
+                "<strong>On desktop</strong>, it is displayed next to the text, in a column of up to 600 px.<br>"
+                "<strong>On mobile</strong>, it moves below the text and takes up the full width of the screen."
             ),
         ),
+    )
+    image_format = blocks.ChoiceBlock(
+        label=_("Image format"),
+        choices=IMAGE_FORMAT_CHOICES,
+        required=False,
+        default="fr-responsive-img--1x1",
+        help_text=_(
+            "Shape in which the image is displayed. "
+            "“Original proportions” keeps the whole image; the other formats crop it to that ratio."
+        ),
+    )
+    image_size = blocks.ChoiceBlock(
+        label=_("Image size"),
+        choices=HERO_IMAGE_SIZE_CHOICES,
+        required=False,
+        default="",
+        help_text=_("Width of the image within its column. “Large” fills the whole column."),
     )
     layout = LayoutBlock(label=_("Layout"))
 
     class Meta:
         icon = "minus"
         template = "sites_conformes_core/heros/hero_image_text.html"
+        value_class = HeroImageAndTextStructValue
+        form_classname = "struct-block hero-image-text-block"
+
+
+class HeroImageAndTextBlockAdapter(StructBlockAdapter):
+    """Lay out the image format/size fields side by side in the admin form."""
+
+    @cached_property
+    def media(self):
+        return forms.Media(
+            css={"all": ("css/admin-block/hero-image-text-block-admin.css",)},
+        )
+
+
+register(HeroImageAndTextBlockAdapter(), HeroImageAndTextBlock)
 
 
 class HeroWideImageAndTextBlock(blocks.StructBlock):
