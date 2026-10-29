@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 19:40+0200\n"
+"POT-Creation-Date: 2026-10-29 15:04+0100\n"
 "PO-Revision-Date: 2026-08-31 19:41+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -25,6 +25,47 @@ msgstr "Appareil #%s"
 
 msgid "Two-factor authentication has been successfully configured."
 msgstr "L'authentification à deux facteurs a été configurée avec succès."
+
+msgid "Code received by email"
+msgstr "Code reçu par e-mail"
+
+msgid "Invalid or expired code. Please request a new one."
+msgstr "Code invalide ou expiré. Veuillez en demander un nouveau."
+
+msgid "Two-factor authentication can't be set up without sending an email."
+msgstr ""
+"L’authentification à deux facteurs ne peut pas être configurée sans envoi "
+"d’e-mail."
+
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"Here is your confirmation code to set up two-factor authentication on "
+"%(site_name)s:\n"
+"\n"
+"%(code)s\n"
+"\n"
+"This code is valid for %(validity_minutes)s minutes.\n"
+"\n"
+"If you didn't request it, someone may be trying to access your account: "
+"please contact the site administrator."
+msgstr ""
+"Bonjour,\n"
+"\n"
+"Voici votre code de confirmation pour configurer l’authentification à deux "
+"facteurs sur %(site_name)s :\n"
+"\n"
+"%(code)s\n"
+"\n"
+"Ce code est valable %(validity_minutes)s minutes.\n"
+"\n"
+"Si vous n’êtes pas à l’origine de cette demande, quelqu’un essaie peut-être "
+"d’accéder à votre compte : contactez l’administrateur du site."
+
+#, python-format
+msgid "%(site_name)s: your confirmation code"
+msgstr "%(site_name)s : votre code de confirmation"
 
 msgid "Learn more"
 msgstr "En savoir plus"
@@ -72,6 +113,24 @@ msgstr ""
 "Si vous perdez votre téléphone, vous pourriez ne plus pouvoir accéder à "
 "votre compte."
 
+msgid ""
+"Your password can't be used to confirm this operation, and no confirmation "
+"code can be sent by email: the site doesn't send emails, or your account has "
+"no email address. Please contact the site administrator."
+msgstr ""
+"Votre mot de passe ne peut pas servir à confirmer cette opération, et aucun "
+"code de confirmation ne peut vous être envoyé par e-mail : le site n’envoie "
+"pas d’e-mails, ou votre compte n’a pas d’adresse e-mail. Contactez "
+"l’administrateur du site."
+
+msgid "To confirm this operation, you need a code sent to your email address."
+msgstr ""
+"Pour confirmer cette opération, vous devez saisir un code envoyé à votre "
+"adresse e-mail."
+
+msgid "Send me a code"
+msgstr "Recevoir un code"
+
 msgid "QR Code"
 msgstr "QR Code"
 
@@ -96,6 +155,9 @@ msgstr "Code de sécurité"
 
 msgid "Please enter the 6-digit code displayed in your application."
 msgstr "Entrez le code à six chiffres affiché dans l’application."
+
+msgid "To confirm, enter the code sent to your email address."
+msgstr "Pour confirmer, saisissez le code envoyé à votre adresse e-mail."
 
 msgid "Enter your password to confirm."
 msgstr "Saisissez votre mot de passe pour confirmer."
@@ -272,6 +334,18 @@ msgstr "Se souvenir de moi"
 
 msgid "Connect"
 msgstr "Se connecter"
+
+#, python-format
+msgid "Please wait %(seconds)s seconds before requesting a new code."
+msgstr ""
+"Veuillez patienter %(seconds)s secondes avant de demander un nouveau code."
+
+msgid "The email could not be sent. Please try again later."
+msgstr "L’e-mail n’a pas pu être envoyé. Veuillez réessayer plus tard."
+
+#, python-format
+msgid "A code has been sent to %(email)s."
+msgstr "Un code a été envoyé à %(email)s."
 
 #, python-format
 msgid "Sites Conformes %(version)s"

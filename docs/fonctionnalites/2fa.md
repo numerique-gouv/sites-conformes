@@ -40,6 +40,35 @@ Aegis, Authy, 1Password…).
 4. Lors des connexions suivantes, un écran intermédiaire lui demande son code à
 6 chiffres.
 
+### Confirmation par code envoyé par e-mail
+
+Pour ajouter ou modifier un appareil, wagtail-2fa demande normalement le mot
+de passe actuel de l’utilisateur. Ce n’est pas possible après une connexion
+via ProConnect : le compte peut ne pas avoir de mot de passe (comptes créés
+lors d’une connexion ProConnect), ou la connexion par mot de passe peut être
+désactivée (`SF_DISABLE_LOCAL_LOGIN`).
+
+Quand la session a été ouverte via ProConnect, le champ « Mot de passe actuel »
+est donc remplacé par un code de confirmation, envoyé à l’adresse e-mail du
+compte via le bouton « Recevoir un code ». Après une connexion par mot de
+passe, c’est toujours le mot de passe qui est demandé. Ce code :
+
+- comporte 6 chiffres et reste valable 5 minutes ;
+- ne peut servir qu’une fois et est refusé après 5 essais erronés ;
+- ne peut être redemandé qu’après un délai d’une minute.
+
+:::{warning}
+Ce code nécessite l’envoi d’e-mails (`DEFAULT_FROM_EMAIL` renseigné, voir
+{doc}`../deploiement/variables-environnement`) et une adresse e-mail sur le
+compte. Sinon, **l’ajout d’un appareil est bloqué** et un message invite à
+contacter l’administrateur du site : il serait sinon possible sans aucune
+confirmation.
+
+Avec `WAGTAIL_2FA_REQUIRED=True`, un utilisateur sans appareil reste alors
+bloqué sur la page de configuration. Configurez l’envoi d’e-mails avant
+d’activer `SF_DISABLE_LOCAL_LOGIN` avec une 2FA obligatoire.
+:::
+
 ## Accéder à la gestion des appareils 2FA
 
 Le lien vers la page de gestion des appareils 2FA est accessible depuis :

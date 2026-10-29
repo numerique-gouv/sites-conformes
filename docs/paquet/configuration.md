@@ -102,12 +102,83 @@ SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 
 ## SF_DISABLE_LOCAL_LOGIN
 
-Désactive la connexion par mot de passe au profit d’un SSO (ProConnect, etc.).
-Désactivé par défaut.
+Désactive la connexion par identifiant et mot de passe : seul ProConnect permet
+alors de se connecter. Désactivé par défaut.
 
 ```python
-SF_DISABLE_LOCAL_LOGIN = os.getenv("SF_DISABLE_LOCAL_LOGIN", "") in ("1", "True")
+SF_DISABLE_LOCAL_LOGIN = getenv_bool("SF_DISABLE_LOCAL_LOGIN", False)
 ```
+
+Le réglage n’a d’effet que si `PROCONNECT_ACTIVATED` vaut aussi `True` : la
+connexion par mot de passe ne peut pas être désactivée sans autre moyen de se
+connecter. Sans ProConnect, le formulaire de connexion reste affiché.
+
+:::{warning}
+Côté package, ce réglage ne fait que **masquer** le formulaire de connexion.
+La vue de connexion accepte toujours un identifiant et un mot de passe tant
+que `django.contrib.auth.backends.ModelBackend` figure dans
+`AUTHENTICATION_BACKENDS`. Il faut donc le retirer dans les réglages du projet
+hôte :
+
+```python
+if PROCONNECT_ACTIVATED:
+    if SF_DISABLE_LOCAL_LOGIN:
+        AUTHENTICATION_BACKENDS = []
+        WAGTAIL_PASSWORD_RESET_ENABLED = False
+        WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+        WAGTAILUSERS_PASSWORD_ENABLED = False
+    else:
+        AUTHENTICATION_BACKENDS = [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+    AUTHENTICATION_BACKENDS.append("sites_conformes.proconnect.backends.OIDCAuthenticationBackend")
+```
+
+Le backend ProConnect hérite de `ModelBackend` : les droits des utilisateurs
+continuent de fonctionner. La réinitialisation et le changement de mot de
+passe sont désactivés, et les formulaires de création et de modification
+d’utilisateur n’ont plus de champ mot de passe : un compte créé dans l’admin
+ne sert qu’à autoriser à l’avance une connexion via ProConnect (le compte est
+retrouvé par son adresse e-mail). Les sessions déjà ouvertes par mot de passe
+sont fermées au prochain chargement de page.
+:::
+
+Pour ajouter un appareil de double authentification (2FA), un code envoyé par
+e-mail remplace alors la saisie du mot de passe : l’envoi d’e-mails doit être
+configuré (`DEFAULT_FROM_EMAIL`), sinon l’ajout d’un appareil est bloqué. Voir
+{doc}`../fonctionnalites/2fa`.
+
+(acces-de-secours)=
+
+### Accès de secours
+
+Si ProConnect est indisponible, ou si plus aucun compte n’a les droits
+nécessaires, une personne ayant accès au serveur peut rétablir
+temporairement la connexion par mot de passe :
+
+1. Passer `SF_DISABLE_LOCAL_LOGIN` à `False` et redémarrer l’application : le
+   formulaire de connexion réapparaît à côté du bouton ProConnect.
+2. Définir un mot de passe pour un compte superadmin avec
+   `python manage.py changepassword <identifiant>`, ou créer un compte avec
+   `python manage.py createsuperuser`. Les comptes créés dans l’admin ont un
+   mot de passe vide, et ceux créés via ProConnect un mot de passe inconnu.
+   Pour lancer ces commandes selon l’hébergement, voir
+   {doc}`../deploiement/scalingo`, {doc}`../deploiement/docker` ou
+   {doc}`../deploiement/serveur-linux`.
+3. Se connecter et faire l’opération nécessaire, par exemple donner des droits
+   à un compte ProConnect.
+4. Remettre `SF_DISABLE_LOCAL_LOGIN` à `True` et redémarrer : les sessions
+   ouvertes par mot de passe sont fermées.
+
+Si la 2FA est activée, le code de l’appareil est demandé après la connexion. Si
+le compte n’a pas encore d’appareil, l’ajout est à confirme avec le mot de passe
+défini ci-dessus.
+
+:::{warning}
+Pendant cette opération, la connexion par mot de passe est rétablie pour **tous**
+les comptes qui en ont un.
+:::
 
 :::{seealso}
 Pour les réglages Django et Wagtail, référez-vous à leurs documentations
