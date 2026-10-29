@@ -1,0 +1,10 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate %}Hello,
+
+Here is your confirmation code to set up two-factor authentication on {{ site_name }}:
+
+{{ code }}
+
+This code is valid for {{ validity_minutes }} minutes.
+
+If you didn't request it, someone may be trying to access your account: please contact the site administrator.{% endblocktranslate %}
+{% endautoescape %}
