@@ -22,6 +22,7 @@ scalingo
 serveur-linux
 docker
 migrer-hebergement
+changer-nom-de-domaine
 gunicorn
 sentry
 variables-environnement

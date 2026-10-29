@@ -334,7 +334,9 @@ suivie de `/cms-admin/`.
 ## Utiliser votre nom de domaine définitif
 
 Au départ, le site est joignable à une adresse en `*.scalingo.io`. Quand votre
-nom de domaine définitif (par exemple `mon-site.gouv.fr`) est prêt :
+nom de domaine définitif (par exemple `mon-site.gouv.fr`) est prêt, suivez les
+étapes ci-dessous (voir aussi {doc}`changer-nom-de-domaine` pour les explications
+et les vérifications à faire ensuite) :
 
 1. ajoutez-le dans le tableau de bord Scalingo, onglet **« Paramètres » →
    « Routage public »**, puis configurez le domaine en suivant la

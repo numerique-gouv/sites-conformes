@@ -132,7 +132,8 @@ Là encore, des variantes permettent de ne traiter qu’une moitié :
 :::{note}
 Après avoir chargé des données de production en local,
 lancez `python manage.py set_config` pour réécrire l’`HOST_URL` en base :
-sans cela, votre site local continuerait de pointer vers le domaine de production.
+sans cela, votre site local continuerait de pointer vers le domaine de production
+(voir {doc}`../deploiement/changer-nom-de-domaine`).
 :::
 
 ## Aide-mémoire des recettes

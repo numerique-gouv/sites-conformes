@@ -246,7 +246,7 @@ répercutez-le en base :
 python manage.py set_config
 ```
 
-Voir {doc}`migrer-hebergement` pour la procédure complète.
+Voir {doc}`changer-nom-de-domaine`.
 
 ### Les e-mails contiennent l’adresse `*.scalingo.io` au lieu de mon domaine
 
@@ -258,7 +258,8 @@ domaine seul), vérifiez qu’il figure dans `ALLOWED_HOSTS`, puis lancez :
 python manage.py set_config
 ```
 
-Voir {ref}`scalingo-domaine-definitif`.
+Voir {doc}`changer-nom-de-domaine` et, sur Scalingo,
+{ref}`scalingo-domaine-definitif`.
 
 ### Les e-mails ne partent pas
 
