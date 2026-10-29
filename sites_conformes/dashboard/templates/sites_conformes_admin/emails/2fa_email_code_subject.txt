@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktranslate %}{{ site_name }}: your confirmation code{% endblocktranslate %}

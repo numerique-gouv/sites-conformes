@@ -144,6 +144,11 @@ retrouvé par son adresse e-mail). Les sessions déjà ouvertes par mot de passe
 sont fermées au prochain chargement de page.
 :::
 
+Pour ajouter un appareil de double authentification (2FA), un code envoyé par
+e-mail remplace alors la saisie du mot de passe : l’envoi d’e-mails doit être
+configuré (`DEFAULT_FROM_EMAIL`), sinon l’ajout d’un appareil est bloqué. Voir
+{doc}`../fonctionnalites/2fa`.
+
 :::{seealso}
 Pour les réglages Django et Wagtail, référez-vous à leurs documentations
 officielles : <https://docs.djangoproject.com/> et <https://docs.wagtail.org/>.

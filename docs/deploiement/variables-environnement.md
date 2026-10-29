@@ -130,7 +130,7 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | `PROCONNECT_DOMAIN` | Domaine du fournisseur ProConnect. | `fca.integ01.dev-agentconnect.fr` | 🟠 |
 | `PROCONNECT_API_ROOT` | Racine de l’API ProConnect. | *(déduit du domaine)* | ⚪ |
 | `PROCONNECT_USER_CREATION_FILTER` | Filtre restreignant les comptes créés (ex. par domaine e-mail). | *(vide)* | ⚪ |
-| `SF_DISABLE_LOCAL_LOGIN` | Seul ProConnect permet de se connecter. Le formulaire identifiant/mot de passe, la réinitialisation et le changement de mot de passe sont désactivés. Les comptes créés dans l’admin n’ont pas de mot de passe : ils servent à autoriser à l’avance une connexion ProConnect par adresse e-mail. | `False` | ⚪ |
+| `SF_DISABLE_LOCAL_LOGIN` | Seul ProConnect permet de se connecter. Le formulaire identifiant/mot de passe, la réinitialisation et le changement de mot de passe sont désactivés. Les comptes créés dans l’admin n’ont pas de mot de passe : ils servent à autoriser à l’avance une connexion ProConnect par adresse e-mail. Avec la 2FA, l’envoi d’e-mails doit être configuré : voir {doc}`../fonctionnalites/2fa`. | `False` | ⚪ |
 | `LASUITE_DOMAINE_API_KEY` | Clé API La Suite (intégration domaine). | *(vide)* | ⚪ |
 
 ## Affichage et divers
