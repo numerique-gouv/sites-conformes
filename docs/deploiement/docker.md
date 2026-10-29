@@ -141,4 +141,4 @@ d’éventuels écarts entre l’index et les contenus. Selon votre plateforme :
     Si vous venez de faire une migration depuis un site en prod avec une base
     de données de prod pour le faire tourner en local, n’oubliez pas
     d’effectuer la commande `set_config` pour réécrire la valeur de
-    `HOST_URL` en base.
+    `HOST_URL` en base (voir {doc}`changer-nom-de-domaine`).

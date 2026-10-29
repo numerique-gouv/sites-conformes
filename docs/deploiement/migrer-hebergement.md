@@ -119,6 +119,7 @@ python manage.py set_config
 
 Cette commande réécrit le nom d’hôte du site Wagtail à partir de `HOST_URL`. Sans
 elle, le site continuerait de générer des liens vers l’ancien domaine.
+Voir {doc}`changer-nom-de-domaine` pour le détail et les vérifications.
 
 Basculez enfin le DNS vers le nouvel hébergement.
 
