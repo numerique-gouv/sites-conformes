@@ -149,6 +149,37 @@ e-mail remplace alors la saisie du mot de passe : l’envoi d’e-mails doit êt
 configuré (`DEFAULT_FROM_EMAIL`), sinon l’ajout d’un appareil est bloqué. Voir
 {doc}`../fonctionnalites/2fa`.
 
+(acces-de-secours)=
+
+### Accès de secours
+
+Si ProConnect est indisponible, ou si plus aucun compte n’a les droits
+nécessaires, une personne ayant accès au serveur peut rétablir
+temporairement la connexion par mot de passe :
+
+1. Passer `SF_DISABLE_LOCAL_LOGIN` à `False` et redémarrer l’application : le
+   formulaire de connexion réapparaît à côté du bouton ProConnect.
+2. Définir un mot de passe pour un compte superadmin avec
+   `python manage.py changepassword <identifiant>`, ou créer un compte avec
+   `python manage.py createsuperuser`. Les comptes créés dans l’admin ont un
+   mot de passe vide, et ceux créés via ProConnect un mot de passe inconnu.
+   Pour lancer ces commandes selon l’hébergement, voir
+   {doc}`../deploiement/scalingo`, {doc}`../deploiement/docker` ou
+   {doc}`../deploiement/serveur-linux`.
+3. Se connecter et faire l’opération nécessaire, par exemple donner des droits
+   à un compte ProConnect.
+4. Remettre `SF_DISABLE_LOCAL_LOGIN` à `True` et redémarrer : les sessions
+   ouvertes par mot de passe sont fermées.
+
+Si la 2FA est activée, le code de l’appareil est demandé après la connexion. Si
+le compte n’a pas encore d’appareil, l’ajout est à confirme avec le mot de passe
+défini ci-dessus.
+
+:::{warning}
+Pendant cette opération, la connexion par mot de passe est rétablie pour **tous**
+les comptes qui en ont un.
+:::
+
 :::{seealso}
 Pour les réglages Django et Wagtail, référez-vous à leurs documentations
 officielles : <https://docs.djangoproject.com/> et <https://docs.wagtail.org/>.
