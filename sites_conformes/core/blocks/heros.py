@@ -193,7 +193,8 @@ class HeroImageAndTextBlock(blocks.StructBlock):
                 "focal point (to be set in the media library) in the frame, or around its center if there is none.<br>"
                 "With “Original proportions”, the image is never cropped.<br>"
                 "<strong>On desktop</strong>, it is displayed next to the text, in a column of up to 600 px.<br>"
-                "<strong>On mobile</strong>, it moves below the text and takes up the full width of the screen."
+                "<strong>On mobile</strong>, it moves below the text and, with the “Large” size, "
+                "takes up the full width of the screen."
             ),
         ),
     )
