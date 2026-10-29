@@ -15,6 +15,7 @@ from mozilla_django_oidc.auth import (
 )
 
 from sites_conformes.proconnect.exceptions import DuplicateEmailError
+from sites_conformes.proconnect.mfa import is_mfa_acr
 from sites_conformes.proconnect.models import UserOIDC
 from sites_conformes.proconnect.utils import get_user_by_sub_or_email
 
@@ -122,6 +123,9 @@ class OIDCAuthenticationBackend(MozillaOIDCAuthenticationBackend):
                     raise SuspiciousOperation(filter_passed["message"])
             else:
                 user = self.create_user_custom(sub, user_info, user_properties)
+
+        # Read by the user_logged_in receiver, see sites_conformes.proconnect.mfa
+        self.request.proconnect_mfa = is_mfa_acr(payload)
 
         return user
 

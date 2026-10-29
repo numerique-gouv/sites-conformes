@@ -13,6 +13,7 @@ Inspiration
 https://github.com/betagouv/tous-a-bord/blob/main/config/settings.py
 """
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -513,7 +514,19 @@ OIDC_OP_TOKEN_ENDPOINT = f"{PROCONNECT_API_ROOT}/token"
 OIDC_OP_USER_ENDPOINT = f"{PROCONNECT_API_ROOT}/userinfo"
 OIDC_OP_LOGOUT_ENDPOINT = f"{PROCONNECT_API_ROOT}/session/end"
 USER_OIDC_ESSENTIAL_CLAIMS = ["email"]
-OIDC_AUTH_REQUEST_EXTRA_PARAMS = {"acr_values": "eidas1"}
+# (Optional) Delegate 2FA to ProConnect: require a multi-factor authentication
+# on ProConnect's side, and don't ask for the local 2FA code again after a
+# ProConnect login whose ID token "acr" claim confirms it.
+# See sites_conformes/proconnect/mfa.py and
+# https://partenaires.proconnect.gouv.fr/docs/fournisseur-service/double_authentification
+PROCONNECT_DELEGATE_2FA = getenv_bool("PROCONNECT_DELEGATE_2FA", False)
+PROCONNECT_MFA_ACR_VALUES = ["eidas0-mfa", "eidas1-mfa", "eidas2", "eidas3"]
+if PROCONNECT_DELEGATE_2FA:
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
+        "claims": json.dumps({"id_token": {"acr": {"essential": True, "values": PROCONNECT_MFA_ACR_VALUES}}})
+    }
+else:
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS = {"acr_values": "eidas1"}
 OIDC_REDIRECT_ALLOWED_HOSTS = ALLOWED_HOSTS
 PROCONNECT_USER_CREATION_FILTER = os.getenv("PROCONNECT_USER_CREATION_FILTER", None)
 LASUITE_DOMAINE_API_KEY = os.getenv("LASUITE_DOMAINE_API_KEY", None)

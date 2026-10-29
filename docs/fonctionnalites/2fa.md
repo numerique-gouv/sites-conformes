@@ -40,6 +40,29 @@ Aegis, Authy, 1Password…).
 4. Lors des connexions suivantes, un écran intermédiaire lui demande son code à
 6 chiffres.
 
+## Connexion via ProConnect
+
+ProConnect sait réaliser lui-même une double authentification. Pour éviter de
+redemander un code 2FA local après une connexion ProConnect :
+
+```python
+PROCONNECT_DELEGATE_2FA=True
+```
+
+Avec cette option :
+
+- ProConnect est tenu d’exiger une double authentification à chaque connexion
+(niveaux `eidas0-mfa`, `eidas1-mfa`, `eidas2` ou `eidas3`) ;
+- le niveau renvoyé par ProConnect (claim `acr` de l’ID token) est toujours
+vérifié : si la double authentification n’est pas confirmée, le code 2FA local
+reste demandé ;
+- une connexion par identifiant et mot de passe demande toujours le code 2FA
+local ;
+- un utilisateur connecté via ProConnect n’a pas besoin de configurer d’appareil
+2FA local, même si `WAGTAIL_2FA_REQUIRED=True`.
+
+Voir la [documentation ProConnect](https://partenaires.proconnect.gouv.fr/docs/fournisseur-service/double_authentification).
+
 ## Accéder à la gestion des appareils 2FA
 
 Le lien vers la page de gestion des appareils 2FA est accessible depuis :

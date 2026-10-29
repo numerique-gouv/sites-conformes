@@ -3,6 +3,8 @@ from django.conf import settings
 from django.urls import resolve
 from wagtail_2fa.middleware import VerifyUserMiddleware
 
+from sites_conformes.proconnect.mfa import is_session_verified_by_proconnect
+
 
 class VerifyUserStaticFilesMiddleware(VerifyUserMiddleware):
     """
@@ -23,6 +25,10 @@ class VerifyUserStaticFilesMiddleware(VerifyUserMiddleware):
     has a confirmed 2FA device even when WAGTAIL_2FA_REQUIRED=False: 2FA being optional
     should only mean that users who never opted in aren't forced through it, not that users
     who did opt in stop being asked for their code.
+
+    Finally, when PROCONNECT_DELEGATE_2FA=True, a ProConnect login whose multi-factor
+    authentication was confirmed by ProConnect is not asked for the local code again
+    (see sites_conformes.proconnect.mfa).
     """
 
     _allowed_url_names = VerifyUserMiddleware._allowed_url_names + ["oidc_logout_callback"]
@@ -36,6 +42,9 @@ class VerifyUserStaticFilesMiddleware(VerifyUserMiddleware):
 
         user = request.user
         if not user.is_authenticated:
+            return False
+
+        if is_session_verified_by_proconnect(request):
             return False
 
         user_has_device = django_otp.user_has_device(user, confirmed=True)

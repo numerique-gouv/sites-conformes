@@ -129,6 +129,7 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | `PROCONNECT_SIGN_ALGO` | Algorithme de signature. | `RS256` | ⚪ |
 | `PROCONNECT_DOMAIN` | Domaine du fournisseur ProConnect. | `fca.integ01.dev-agentconnect.fr` | 🟠 |
 | `PROCONNECT_API_ROOT` | Racine de l’API ProConnect. | *(déduit du domaine)* | ⚪ |
+| `PROCONNECT_DELEGATE_2FA` | Exige une double authentification côté ProConnect, et ne redemande pas le code 2FA local après une connexion ProConnect dont la double authentification est confirmée. Voir {doc}`../fonctionnalites/2fa`. | `False` | ⚪ |
 | `PROCONNECT_USER_CREATION_FILTER` | Filtre restreignant les comptes créés (ex. par domaine e-mail). | *(vide)* | ⚪ |
 | `SF_DISABLE_LOCAL_LOGIN` | Désactive la connexion par identifiant/mot de passe classique (ProConnect uniquement). | `False` | ⚪ |
 | `LASUITE_DOMAINE_API_KEY` | Clé API La Suite (intégration domaine). | *(vide)* | ⚪ |
