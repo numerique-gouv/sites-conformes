@@ -133,12 +133,15 @@ def patch_wagtail_2fa_device_form_password_check():
 
     from sites_conformes.dashboard.services.email_code import (
         check_email_code,
+        consume_email_code,
         email_code_available,
         password_check_available,
     )
 
     original_init = DeviceForm.__init__
     original_clean = DeviceForm.clean
+    original_clean_otp_token = DeviceForm.clean_otp_token
+    original_save = DeviceForm.save
 
     def __init__(self, request, **kwargs):
         original_init(self, request, **kwargs)
@@ -163,13 +166,28 @@ def patch_wagtail_2fa_device_form_password_check():
             raise forms.ValidationError(_("Invalid or expired code. Please request a new one."))
         return code
 
+    def clean_otp_token(self):
+        # Verifying a TOTP token consumes it: don't do it when the form is already invalid,
+        # so that the user can submit the same token again with the right confirmation.
+        if self.has_error("email_code") or self.has_error("password"):
+            return self.cleaned_data.get("otp_token")
+        return original_clean_otp_token(self)
+
     def clean(self):
         if self.email_code_unavailable:
             raise forms.ValidationError(_("Two-factor authentication can't be set up without sending an email."))
         return original_clean(self)
 
+    def save(self):
+        result = original_save(self)
+        if "email_code" in self.fields:
+            consume_email_code(self.request)
+        return result
+
     DeviceForm.__init__ = __init__
+    DeviceForm.save = save
     DeviceForm.clean_email_code = clean_email_code
+    DeviceForm.clean_otp_token = clean_otp_token
     DeviceForm.clean = clean
 
 

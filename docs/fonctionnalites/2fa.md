@@ -50,11 +50,15 @@ désactivée (`SF_DISABLE_LOCAL_LOGIN`).
 
 Quand la session a été ouverte via ProConnect, le champ « Mot de passe actuel »
 est donc remplacé par un code de confirmation, envoyé à l’adresse e-mail du
-compte via le bouton « Recevoir un code ». Après une connexion par mot de
-passe, c’est toujours le mot de passe qui est demandé. Ce code :
+compte via le bouton « Recevoir un code » placé à côté du champ. Après une
+connexion par mot de passe, c’est toujours le mot de passe qui est demandé. Ce
+code :
 
-- comporte 6 chiffres et reste valable 5 minutes ;
-- ne peut servir qu’une fois et est refusé après 5 essais erronés ;
+- comporte 6 chiffres et reste valable 15 minutes, durée réglable avec
+  `SF_2FA_EMAIL_CODE_VALIDITY_DURATION` (le temps d’installer l’application
+  d’authentification et de scanner le QR code) ;
+- ne peut servir qu’une fois et est refusé après 3 essais erronés, nombre
+  réglable avec `SF_2FA_EMAIL_CODE_MAX_ATTEMPTS` ;
 - ne peut être redemandé qu’après un délai d’une minute.
 
 :::{warning}

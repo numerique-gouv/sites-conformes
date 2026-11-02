@@ -1,5 +1,5 @@
 {% extends "wagtailadmin/base.html" %}
-{% load i18n %}
+{% load i18n wagtailadmin_tags %}
 
 {% block titletag %}{% translate "Add a new device for 2 factor authentication" %}{% endblock %}
 
@@ -52,12 +52,13 @@
     {% endif %}
 
     {% if "email_code" in form.fields %}
-      {# Separate form, so that pressing Enter in the main form doesn't send a new code #}
-      <form action="{% url 'sites_conformes_2fa_email_code' %}" method="post">
+      {# Separate form, submitted by the button next to the email code field (form attribute): #}
+      {# pressing Enter in the main form doesn't send a new code #}
+      <form id="send-email-code-form"
+            action="{% url 'sites_conformes_2fa_email_code' %}"
+            method="post">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-        <p>{% translate "To confirm this operation, you need a code sent to your email address." %}</p>
-        <button type="submit" class="button button-secondary">{% translate "Send me a code" %}</button>
       </form>
     {% endif %}
 
@@ -108,7 +109,15 @@
               {% include "wagtailadmin/shared/field.html" with field=field label_text=label_otp help_text=help_otp %}
             {% elif field.name == "email_code" %}
               {% translate "To confirm, enter the code sent to your email address." as help_email_code %}
-              {% include "wagtailadmin/shared/field.html" with field=field help_text=help_email_code %}
+              {% fragment as email_code_input %}
+                <div class="cmsfr-email-code-field">
+                  {{ field }}
+                  <button type="submit"
+                          form="send-email-code-form"
+                          class="button button-secondary cmsfr-email-code-field__button">{% translate "Send me a code" %}</button>
+                </div>
+              {% endfragment %}
+              {% include "wagtailadmin/shared/field.html" with field=field rendered_field=email_code_input help_text=help_email_code %}
             {% elif field.name == "password" %}
               {% translate "Enter your password to confirm." as help_password %}
               {% include "wagtailadmin/shared/field.html" with field=field help_text=help_password %}

@@ -496,6 +496,9 @@ DSFR_MARK_OPTIONAL_FIELDS = getenv_bool("DSFR_MARK_OPTIONAL_FIELDS", True)
 # See https://wagtail-2fa.readthedocs.io/en/stable/
 WAGTAIL_2FA_REQUIRED = getenv_bool("WAGTAIL_2FA_REQUIRED", False)
 WAGTAIL_2FA_OTP_TOTP_NAME = os.getenv("WAGTAIL_2FA_OTP_TOTP_NAME", WAGTAIL_SITE_NAME)
+# Duration of the confirmation code sent by email to add a 2FA device after a ProConnect login
+SF_2FA_EMAIL_CODE_VALIDITY_DURATION = int(os.getenv("SF_2FA_EMAIL_CODE_VALIDITY_DURATION", 15 * 60))
+SF_2FA_EMAIL_CODE_MAX_ATTEMPTS = int(os.getenv("SF_2FA_EMAIL_CODE_MAX_ATTEMPTS", 3))
 
 # (Optional) ProConnect settings
 PROCONNECT_ACTIVATED = getenv_bool("PROCONNECT_ACTIVATED", False)

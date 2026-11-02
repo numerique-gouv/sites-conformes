@@ -16,9 +16,9 @@ from django.utils.crypto import constant_time_compare, get_random_string, salted
 PROCONNECT_BACKEND = "sites_conformes.proconnect.backends.OIDCAuthenticationBackend"
 SESSION_KEY = "sites_conformes_email_code"
 CODE_LENGTH = 6
-CODE_VALIDITY = 5 * 60  # seconds
+DEFAULT_CODE_VALIDITY = 15 * 60  # seconds
 SEND_COOLDOWN = 60  # seconds
-MAX_ATTEMPTS = 5
+DEFAULT_MAX_ATTEMPTS = 3
 
 
 def password_check_available(request) -> bool:
@@ -28,6 +28,14 @@ def password_check_available(request) -> bool:
     (see SF_DISABLE_LOCAL_LOGIN in config/settings.py).
     """
     return request.session.get(BACKEND_SESSION_KEY) != PROCONNECT_BACKEND
+
+
+def code_validity() -> int:
+    return getattr(settings, "SF_2FA_EMAIL_CODE_VALIDITY_DURATION", DEFAULT_CODE_VALIDITY)
+
+
+def max_attempts() -> int:
+    return getattr(settings, "SF_2FA_EMAIL_CODE_MAX_ATTEMPTS", DEFAULT_MAX_ATTEMPTS)
 
 
 def email_code_available(user) -> bool:
@@ -57,7 +65,7 @@ def send_email_code(request) -> None:
     context = {
         "code": code,
         "site_name": settings.WAGTAIL_SITE_NAME,
-        "validity_minutes": CODE_VALIDITY // 60,
+        "validity_minutes": code_validity() // 60,
     }
     send_mail(
         subject=render_to_string("sites_conformes_admin/emails/2fa_email_code_subject.txt", context).strip(),
@@ -70,20 +78,27 @@ def send_email_code(request) -> None:
 def check_email_code(request, code: str) -> bool:
     """
     Check the code against the last one sent to the user in this session.
-    A code can only be used once, and is rejected once expired or after MAX_ATTEMPTS failed attempts.
+    The code stays valid until consume_email_code() is called, so that the user can correct
+    another field of the form. It is rejected once expired or after max_attempts() failed attempts.
     (It is kept in the session in that case, so that SEND_COOLDOWN still applies.)
     """
     data = request.session.get(SESSION_KEY)
     if not data or data["user_id"] != str(request.user.pk):
         return False
 
-    if time.time() > data["sent_at"] + CODE_VALIDITY or data["attempts"] >= MAX_ATTEMPTS:
+    if time.time() > data["sent_at"] + code_validity() or data["attempts"] >= max_attempts():
         return False
 
     if code and constant_time_compare(_hash(code), data["hash"]):
-        del request.session[SESSION_KEY]
         return True
 
     data["attempts"] += 1
     request.session[SESSION_KEY] = data
     return False
+
+
+def consume_email_code(request) -> None:
+    """
+    A code can only be used once: to be called when the operation it confirms is done.
+    """
+    request.session.pop(SESSION_KEY, None)

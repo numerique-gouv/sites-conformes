@@ -1,5 +1,6 @@
 import re
-from unittest.mock import patch
+import time
+from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -40,6 +41,9 @@ class EmailCodeDeviceFormTestCase(TestCase):
 
     def post_device(self, code):
         device = TOTPDevice.objects.get(user=self.user, confirmed=False)
+        # A TOTP token can only be used once: allow the same one again, to only test the email code
+        device.last_t = -1
+        device.save()
         token = str(totp(device.bin_key)).zfill(6)
         return self.client.post(self.url, {"name": "My phone", "otp_token": token, "email_code": code})
 
@@ -76,6 +80,28 @@ class EmailCodeDeviceFormTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(TOTPDevice.objects.get(user=self.user).confirmed)
 
+    def test_code_is_still_valid_after_a_wrong_totp_token(self):
+        self.client.get(self.url)
+        code = self.request_code()
+
+        response = self.client.post(self.url, {"name": "My phone", "otp_token": "abcdef", "email_code": code})
+        self.assertEqual(list(response.context["form"].errors), ["otp_token"])
+        TOTPDevice.objects.filter(user=self.user).update(throttling_failure_count=0)
+
+        response = self.post_device(code)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(TOTPDevice.objects.get(user=self.user).confirmed)
+
+    def test_wrong_code_does_not_consume_the_totp_token(self):
+        self.client.get(self.url)
+        code = self.request_code()
+        wrong_code = "000000" if code != "000000" else "111111"
+
+        self.post_device(wrong_code)
+
+        self.assertEqual(TOTPDevice.objects.get(user=self.user).last_t, -1)
+
     def test_code_is_rejected_without_request(self):
         self.client.get(self.url)
 
@@ -94,27 +120,54 @@ class EmailCodeDeviceFormTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    @override_settings(SF_2FA_EMAIL_CODE_VALIDITY_DURATION=120)
     def test_code_expires(self):
         self.client.get(self.url)
         code = self.request_code()
 
-        with patch.object(email_code.time, "time", return_value=email_code.time.time() + email_code.CODE_VALIDITY + 1):
+        self.assertIn("2 minutes", mail.outbox[-1].body)
+        with patch.object(email_code, "time", Mock(time=Mock(return_value=time.time() + 2 * 60 + 1))):
             response = self.post_device(code)
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(TOTPDevice.objects.get(user=self.user).confirmed)
 
+    @override_settings(SF_2FA_EMAIL_CODE_VALIDITY_DURATION=120)
+    def test_code_is_valid_until_expiry(self):
+        self.client.get(self.url)
+        code = self.request_code()
+
+        with patch.object(email_code, "time", Mock(time=Mock(return_value=time.time() + 2 * 60 - 5))):
+            response = self.post_device(code)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(TOTPDevice.objects.get(user=self.user).confirmed)
+
+    @override_settings(SF_2FA_EMAIL_CODE_MAX_ATTEMPTS=2)
     def test_code_is_rejected_after_too_many_attempts(self):
         self.client.get(self.url)
         code = self.request_code()
         wrong_code = "000000" if code != "000000" else "111111"
-        for _attempt in range(email_code.MAX_ATTEMPTS):
+        for _attempt in range(2):
             self.post_device(wrong_code)
 
         response = self.post_device(code)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context["form"].errors), ["email_code"])
         self.assertFalse(TOTPDevice.objects.get(user=self.user).confirmed)
+
+    @override_settings(SF_2FA_EMAIL_CODE_MAX_ATTEMPTS=2)
+    def test_code_is_accepted_before_too_many_attempts(self):
+        self.client.get(self.url)
+        code = self.request_code()
+        wrong_code = "000000" if code != "000000" else "111111"
+        self.post_device(wrong_code)
+
+        response = self.post_device(code)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(TOTPDevice.objects.get(user=self.user).confirmed)
 
     def test_codes_cannot_be_requested_too_often(self):
         self.client.get(self.url)
@@ -158,6 +211,17 @@ class PasswordDeviceFormTestCase(TestCase):
 
         self.assertContains(response, 'name="password"')
         self.assertNotContains(response, 'name="email_code"')
+
+    def test_wrong_password_does_not_consume_the_totp_token(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+        device = TOTPDevice.objects.get(user=self.user)
+        token = str(totp(device.bin_key)).zfill(6)
+
+        self.client.post(self.url, {"name": "My phone", "otp_token": token, "password": "wrong"})
+
+        device.refresh_from_db()
+        self.assertEqual(device.last_t, -1)
 
     def test_email_code_is_asked_after_a_proconnect_login(self):
         # Local login still enabled, but the session was opened through ProConnect
