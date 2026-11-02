@@ -7,6 +7,11 @@
     <meta charset="utf-8" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    {% block title %}
+      <title>
+        {% if title %}{{ title }} —{% endif %}
+      {{ settings.sites_conformes_core.CmsDsfrConfig.site_title }}</title>
+    {% endblock title %}
     {% dsfr_css %}
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
     {% block extra_css %}

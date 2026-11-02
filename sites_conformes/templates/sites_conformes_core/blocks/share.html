@@ -62,6 +62,7 @@
         <li>
           {% translate "Page URL copied to clipboard." as copied_to_clipboard %}
           <button class="fr-btn--copy fr-btn"
+                  type="button"
                   id="share-{{ block.id }}-clipboard"
                   onclick="navigator.clipboard.writeText(window.location).then(function() {alert('{{ copied_to_clipboard }}')});">
             {% translate "Copy to clipboard" %}

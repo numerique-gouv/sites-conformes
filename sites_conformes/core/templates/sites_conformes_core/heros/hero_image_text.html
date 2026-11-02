@@ -1,5 +1,6 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
+{# djlint: off H021 #}
 <div style="{% if value.layout.background_color %}background-color: var(--background-alt-{{ value.layout.background_color }});
             {% endif %} min-height: 350px">
   <div class="fr-container fr-py-3w">
@@ -15,6 +16,6 @@
              alt="{{ header_image.alt }}" />
       </div>
     </div>
-
   </div>
 </div>
+{# djlint: on #}

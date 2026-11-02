@@ -10,7 +10,7 @@
             <img src="{{ item.rendition.full_url }}" alt="{{ item.rendition.alt }}" />
           </div>
           <h3 class="fr-h5 fr-pt-5v">{{ item.title }}</h3>
-          <p class="">{{ item.text|richtext }}</p>
+          {{ item.text|richtext }}
         </div>
       {% endfor %}
     </div>

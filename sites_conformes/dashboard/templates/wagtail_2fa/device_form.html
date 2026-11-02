@@ -62,12 +62,14 @@
                         <h2>URL:</h2>
                       </div>
                       <div class="col10">
+                        {# djlint: off H021 #}
                         {% spaceless %}
                           <pre style="white-space:pre-wrap;
                                       overflow:auto;
                                       margin:0;
                                       padding:5px 0"><code style="padding:8px 0">{{ form.instance.config_url }}</code></pre>
                         {% endspaceless %}
+                        {# djlint: on #}
                       </div>
                     </div>
                   </li>
