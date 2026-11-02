@@ -294,7 +294,7 @@ class CenteredImageBlock(blocks.StructBlock):
         icon = "image"
         template = "sites_conformes_core/blocks/image.html"
         value_class = CenteredImageStructValue
-        form_classname = "struct-block centered-image-block"
+        form_classname = "struct-block cmsfr-centered-image-block"
 
 
 class CenteredImageBlockAdapter(StructBlockAdapter):

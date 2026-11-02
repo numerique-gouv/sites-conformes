@@ -221,7 +221,7 @@ class HeroImageAndTextBlock(blocks.StructBlock):
         icon = "minus"
         template = "sites_conformes_core/heros/hero_image_text.html"
         value_class = HeroImageAndTextStructValue
-        form_classname = "struct-block hero-image-text-block"
+        form_classname = "struct-block cmsfr-hero-image-text-block"
 
 
 class HeroImageAndTextBlockAdapter(StructBlockAdapter):
