@@ -7,8 +7,6 @@ from django.test import TestCase
 
 from sites_conformes.core.management.commands.migrate_from_sites_faciles import Command
 
-COMMAND_MODULE = "sites_conformes.core.management.commands.migrate_from_sites_faciles"
-
 
 def table_exists(table_name):
     return table_name in connection.introspection.table_names()
