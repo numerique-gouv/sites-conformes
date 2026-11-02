@@ -1,4 +1,5 @@
 {% load i18n %}
+
 {% for entry in entries %}
   <div class="fr-col fr-col-md-6 fr-col-12">
     <div class="fr-card fr-enlarge-link">
@@ -24,9 +25,7 @@
       {% if entry.cover %}
         <div class="fr-card__header">
           <div class="fr-card__img">
-            <img class="fr-responsive-img"
-                 src="{{ entry.cover.file.url }}"
-                 alt="">
+            <img class="fr-responsive-img" src="{{ entry.cover.file.url }}" alt="">
           </div>
         </div>
       {% endif %}

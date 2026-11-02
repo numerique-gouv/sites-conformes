@@ -1,5 +1,6 @@
 {% extends "sites_conformes_core/base.html" %}
 {% load widget_tweaks wagtailadmin_tags i18n static %}
+
 {% block content %}
   <div class="fr-container fr-container--fluid fr-my-md-14v">
     <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
@@ -14,7 +15,7 @@
                 {% csrf_token %}
 
                 {{ form.email.as_field_group }}
-                
+
                 <button type="submit" class="fr-btn">{% translate "Reset password" %}</button>
               </form>
             </div>

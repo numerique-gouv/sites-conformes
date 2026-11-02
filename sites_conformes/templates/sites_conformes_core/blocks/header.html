@@ -44,7 +44,7 @@
     {% top_menu %}
     {% language_selector %}
   {% endif %}
-    {% include "sites_conformes_core/blocks/user_menu.html" %}
+  {% include "sites_conformes_core/blocks/user_menu.html" %}
 {% endblock header_tools %}
 
 {% block header_search %}
@@ -75,7 +75,9 @@
 
 {% block burger_menu %}
   {% translate "Search" as search_label %}
-  <nav role=navigation class="fr-header__navbar" aria-label="{{ search_label }}">
+  <nav role="navigation"
+       class="fr-header__navbar"
+       aria-label="{{ search_label }}">
     {% if settings.sites_conformes_core.CmsDsfrConfig.search_bar %}
       <button class="fr-btn--search fr-btn"
               data-fr-opened="false"
