@@ -106,6 +106,15 @@ msgstr "S’abonner"
 msgid "Follow us <br /> on social media"
 msgstr "Suivez-nous<br />sur les réseaux sociaux"
 
+msgid "Newsletter and social media"
+msgstr "Lettre d’information et réseaux sociaux"
+
+msgid "Newsletter"
+msgstr "Lettre d’information"
+
+msgid "Social media"
+msgstr "Réseaux sociaux"
+
 msgid "Sitemap"
 msgstr "Plan du site"
 

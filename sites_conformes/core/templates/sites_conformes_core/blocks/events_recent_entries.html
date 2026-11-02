@@ -77,9 +77,9 @@
         <div class="fr-card fr-enlarge-link">
           <div class="fr-card__body">
             <div class="fr-card__content">
-              <h2 class="fr-card__title">
+              <{{ value.card_heading_tag }} class="fr-card__title">
                 <a href="{{ post.url }}">{{ post.title|truncatewords:8 }}</a>
-              </h2>
+              </{{ value.card_heading_tag }}>
                <p class="fr-card__desc fr-icon-calendar-event-fill">
                 {% event_date_range post.event_date_start post.event_date_end %}
               </p>
