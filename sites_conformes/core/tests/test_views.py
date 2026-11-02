@@ -354,6 +354,13 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         )
         self.entry4.save()
 
+    def test_catalog_index_page_tags_list(self):
+        response = self.client.get(self.catalog_index_page.url + "tags/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context["sorted_tags"].keys()), ["T"])
+        self.assertEqual([t.slug for t in response.context["sorted_tags"]["T"]], ["tag-1", "tag-2"])
+
     def test_catalog_index_page_is_renderable(self):
         self.assertPageIsRenderable(self.catalog_index_page)
 
