@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 15:04+0100\n"
+"POT-Creation-Date: 2026-10-29 18:38+0100\n"
 "PO-Revision-Date: 2026-08-31 19:41+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -123,14 +123,6 @@ msgstr ""
 "pas d’e-mails, ou votre compte n’a pas d’adresse e-mail. Contactez "
 "l’administrateur du site."
 
-msgid "To confirm this operation, you need a code sent to your email address."
-msgstr ""
-"Pour confirmer cette opération, vous devez saisir un code envoyé à votre "
-"adresse e-mail."
-
-msgid "Send me a code"
-msgstr "Recevoir un code"
-
 msgid "QR Code"
 msgstr "QR Code"
 
@@ -158,6 +150,9 @@ msgstr "Entrez le code à six chiffres affiché dans l’application."
 
 msgid "To confirm, enter the code sent to your email address."
 msgstr "Pour confirmer, saisissez le code envoyé à votre adresse e-mail."
+
+msgid "Send me a code"
+msgstr "Recevoir un code"
 
 msgid "Enter your password to confirm."
 msgstr "Saisissez votre mot de passe pour confirmer."
@@ -359,6 +354,12 @@ msgstr "Voir la page dans l’API"
 
 msgid "(Opens a new window)"
 msgstr "(Ouvre une nouvelle fenêtre)"
+
+#~ msgid ""
+#~ "To confirm this operation, you need a code sent to your email address."
+#~ msgstr ""
+#~ "Pour confirmer cette opération, vous devez saisir un code envoyé à votre "
+#~ "adresse e-mail."
 
 #~ msgid "Add a new 2FA device"
 #~ msgstr "Ajouter un nouvel appareil pour l'authentification à deux facteurs"

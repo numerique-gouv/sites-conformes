@@ -167,3 +167,14 @@
 .sf-help-details[open] > summary {
     margin-bottom: 0.25rem;
 }
+
+/* 2FA device form: button to request a code, next to the field to enter it */
+.cmsfr-email-code-field {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.cmsfr-email-code-field__button {
+    flex-shrink: 0;
+}
