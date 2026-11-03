@@ -6,8 +6,11 @@
    sérialisées via `{{ value|json_script }}` (échappement JSON correct par
    défaut) puis lues par le module ESM. #}
 
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
-<link rel="stylesheet" href="https://unpkg.com/carte-facile@0.9.0/dist/carte-facile.css">
+<link rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
+<link rel="stylesheet"
+      href="https://unpkg.com/carte-facile@0.9.0/dist/carte-facile.css">
+<link rel="stylesheet" href="{% static 'annuaire/annuaire.css' %}">
 
 <section class="fr-container fr-py-6w" aria-labelledby="annuaire-titre">
   <h2 id="annuaire-titre" class="fr-h3">Annuaire des psychologues</h2>
@@ -15,19 +18,19 @@
   <div class="fr-grid-row fr-grid-row--gutters">
     <div class="fr-col-12 fr-col-md-7">
       <div id="annuaire-carte"
-           style="height: 480px; width: 100%; border: 1px solid var(--border-default-grey);"
+           class="demo-annuaire-carte"
            role="application"
-           aria-label="Carte interactive de l'annuaire">
-      </div>
+           aria-label="Carte interactive de l'annuaire"></div>
     </div>
 
     <div class="fr-col-12 fr-col-md-5">
-      <ul class="fr-list" style="max-height: 480px; overflow-y: auto;">
+      <ul class="fr-list demo-annuaire-liste">
         {% for psy in psychologues %}
           <li>
-            <strong>{{ psy.nom }}</strong> &mdash; {{ psy.ville }}<br>
+            <strong>{{ psy.nom }}</strong> — {{ psy.ville }}
+            <br>
             {% if psy.email %}<a href="mailto:{{ psy.email }}">{{ psy.email }}</a>{% endif %}
-            {% if psy.telephone %}&nbsp;&middot;&nbsp;{{ psy.telephone }}{% endif %}
+            {% if psy.telephone %}&nbsp;·&nbsp;{{ psy.telephone }}{% endif %}
           </li>
         {% empty %}
           <li>Aucun psychologue dans l'annuaire pour le moment.</li>

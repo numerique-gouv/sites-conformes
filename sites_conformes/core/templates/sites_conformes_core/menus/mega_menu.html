@@ -1,9 +1,11 @@
 {% load menu_tags i18n %}
+
 <div class="fr-collapse fr-mega-menu"
      id="mega-menu-{{ menu.parent_menu_item.id }}"
      tabindex="-1">
   <div class="fr-container fr-container--fluid fr-container-lg">
     <button class="fr-link--close fr-link"
+            type="button"
             aria-controls="mega-menu-{{ menu.parent_menu_item.id }}">{% translate "Close" %}</button>
     <div class="fr-grid-row fr-grid-row-lg--gutters">
       <div class="fr-col-12 fr-col-lg-8 fr-col-offset-lg-4--right">

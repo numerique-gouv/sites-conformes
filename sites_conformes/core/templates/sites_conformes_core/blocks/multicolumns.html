@@ -1,5 +1,7 @@
 {% load dsfr_tags wagtailcore_tags wagtailimages_tags %}
+
 {% image value.bg_image original as bg_img %}
+{# djlint: off H021 #}
 <div class="fr-py-5w {{ value.vertical_margin }} cmsfr-block-multicolumns"
      {% if value.bg_color_class or bg_img or value.bg_color %}style="background:{% endif %}
      {% if bg_img %}no-repeat center url({{ bg_img.url }}){% endif %}
@@ -33,3 +35,4 @@
     </div>
   </div>
 </div>
+{# djlint: on #}
