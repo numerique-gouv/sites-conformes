@@ -1531,6 +1531,10 @@ msgstr "Pages avec l’étiquette {tag}"
 msgid "List of pages tagged with {tag}"
 msgstr "Liste de pages avec l’étiquette {tag}"
 
+#, python-format
+msgid "%(categories)s still has subcategories: move or delete them first."
+msgstr "%(categories)s a encore des sous-catégories : déplacez-les ou supprimez-les d’abord."
+
 #~ msgid "Parent category cannot be self."
 #~ msgstr "La catégorie ne peut être sa propre parente."
 
