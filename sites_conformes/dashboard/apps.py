@@ -14,6 +14,7 @@ class DashboardConfig(AppConfig):
         from sites_conformes.dashboard.monkey_patches import (
             patch_wagtail_2fa_device_create_view_success_message,
             patch_wagtail_2fa_device_form_field_order,
+            patch_wagtail_2fa_device_form_password_check,
             patch_wagtail_2fa_new_unconfirmed_device,
             patch_wagtail_2fa_token_form_device_selection,
             patch_wagtail_2fa_token_form_report_unexpected_errors,
@@ -22,5 +23,6 @@ class DashboardConfig(AppConfig):
         patch_wagtail_2fa_new_unconfirmed_device()
         patch_wagtail_2fa_device_create_view_success_message()
         patch_wagtail_2fa_device_form_field_order()
+        patch_wagtail_2fa_device_form_password_check()
         patch_wagtail_2fa_token_form_device_selection()
         patch_wagtail_2fa_token_form_report_unexpected_errors()

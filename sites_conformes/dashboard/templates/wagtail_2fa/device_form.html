@@ -1,5 +1,5 @@
 {% extends "wagtailadmin/base.html" %}
-{% load i18n %}
+{% load i18n wagtailadmin_tags %}
 
 {% block titletag %}
   {% translate "Add a new device for 2 factor authentication" %}
@@ -44,8 +44,32 @@
       {% endif %}
     </div>
 
+    {% if form.email_code_unavailable %}
+      <div class="help-block help-critical">
+        <p>
+          {% translate "Your password can't be used to confirm this operation, and no confirmation code can be sent by email: the site doesn't send emails, or your account has no email address. Please contact the site administrator." %}
+        </p>
+      </div>
+    {% endif %}
+
+    {% if "email_code" in form.fields %}
+      {# Separate form, submitted by the button next to the email code field (form attribute): #}
+      {# pressing Enter in the main form doesn't send a new code #}
+      <form id="send-email-code-form"
+            action="{% url 'sites_conformes_2fa_email_code' %}"
+            method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+      </form>
+    {% endif %}
+
     <form action="" method="post" novalidate>
       {% csrf_token %}
+      {% for error in form.non_field_errors %}
+        <div class="help-block help-critical">
+          <p>{{ error }}</p>
+        </div>
+      {% endfor %}
       <ul class="fields">
         {% if not form.instance.confirmed %}
           <li>
@@ -89,6 +113,17 @@
               {% translate "Security code" as label_otp %}
               {% translate "Please enter the 6-digit code displayed in your application." as help_otp %}
               {% include "wagtailadmin/shared/field.html" with field=field label_text=label_otp help_text=help_otp %}
+            {% elif field.name == "email_code" %}
+              {% translate "To confirm, enter the code sent to your email address." as help_email_code %}
+              {% fragment as email_code_input %}
+                <div class="cmsfr-email-code-field">
+                  {{ field }}
+                  <button type="submit"
+                          form="send-email-code-form"
+                          class="button button-secondary cmsfr-email-code-field__button">{% translate "Send me a code" %}</button>
+                </div>
+              {% endfragment %}
+              {% include "wagtailadmin/shared/field.html" with field=field rendered_field=email_code_input help_text=help_email_code %}
             {% elif field.name == "password" %}
               {% translate "Enter your password to confirm." as help_password %}
               {% include "wagtailadmin/shared/field.html" with field=field help_text=help_password %}
@@ -103,9 +138,11 @@
              class="button button-secondary">{% translate "Cancel" %}</a>
           {% translate "Activate" as activate_label %}
           {% translate "Update" as update_label %}
-          <input type="submit"
-                 value="{% if form.instance.confirmed %}{{ update_label }}{% else %}{{ activate_label }}{% endif %}"
-                 class="button" />
+          {% if not form.email_code_unavailable %}
+            <input type="submit"
+                   value="{% if form.instance.confirmed %}{{ update_label }}{% else %}{{ activate_label }}{% endif %}"
+                   class="button" />
+          {% endif %}
         </li>
       </ul>
     </form>

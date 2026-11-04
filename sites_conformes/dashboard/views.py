@@ -1,9 +1,15 @@
+import logging
 from datetime import date
 
 import requests
+from django.contrib import messages
 from django.contrib.admin.utils import quote
 from django.core.cache import cache
+from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import gettext as _
+from django.views import View
 from wagtail.admin.admin_url_finder import AdminURLFinder
 from wagtail.admin.ui.components import Component
 from wagtail.admin.views.account import PasswordResetConfirmView as WagtailPasswordResetConfirmView
@@ -11,6 +17,13 @@ from wagtail.models import Site
 
 from sites_conformes.dashboard.forms import DsfrSetPasswordForm
 from sites_conformes.dashboard.notifications import get_all_notifications
+from sites_conformes.dashboard.services.email_code import (
+    email_code_available,
+    seconds_before_next_code,
+    send_email_code,
+)
+
+logger = logging.getLogger(__name__)
 
 finder = AdminURLFinder()
 
@@ -112,3 +125,36 @@ class PasswordResetConfirmView(WagtailPasswordResetConfirmView):
     # There's no settings hook for it (unlike WAGTAILADMIN_USER_PASSWORD_RESET_FORM), so the
     # URL below overrides the one from wagtailadmin_urls (matched first by Django).
     form_class = DsfrSetPasswordForm
+
+
+class SendEmailCodeView(View):
+    """
+    Send the confirmation code asked by the 2FA device form when the password can't be checked.
+    See sites_conformes.dashboard.services.email_code
+    """
+
+    http_method_names = ["post"]
+
+    def post(self, request):
+        next_url = request.POST.get("next", "")
+        if not url_has_allowed_host_and_scheme(
+            next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            next_url = reverse("wagtail_2fa_device_new")
+
+        if not email_code_available(request.user):
+            messages.error(request, _("Two-factor authentication can't be set up without sending an email."))
+        elif wait := seconds_before_next_code(request):
+            messages.warning(
+                request, _("Please wait %(seconds)s seconds before requesting a new code.") % {"seconds": wait}
+            )
+        else:
+            try:
+                send_email_code(request)
+            except Exception:
+                logger.exception("Unable to send the 2FA confirmation code to user %s", request.user.pk)
+                messages.error(request, _("The email could not be sent. Please try again later."))
+            else:
+                messages.success(request, _("A code has been sent to %(email)s.") % {"email": request.user.email})
+
+        return redirect(next_url)

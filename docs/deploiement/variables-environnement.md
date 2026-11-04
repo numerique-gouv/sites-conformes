@@ -130,7 +130,7 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | `PROCONNECT_DOMAIN` | Domaine du fournisseur ProConnect. | `fca.integ01.dev-agentconnect.fr` | 🟠 |
 | `PROCONNECT_API_ROOT` | Racine de l’API ProConnect. | *(déduit du domaine)* | ⚪ |
 | `PROCONNECT_USER_CREATION_FILTER` | Filtre restreignant les comptes créés (ex. par domaine e-mail). | *(vide)* | ⚪ |
-| `SF_DISABLE_LOCAL_LOGIN` | Désactive la connexion par identifiant/mot de passe classique (ProConnect uniquement). | `False` | ⚪ |
+| `SF_DISABLE_LOCAL_LOGIN` | Seul ProConnect permet de se connecter. Le formulaire identifiant/mot de passe, la réinitialisation et le changement de mot de passe sont désactivés. Les comptes créés dans l’admin n’ont pas de mot de passe : ils servent à autoriser à l’avance une connexion ProConnect par adresse e-mail. Avec la 2FA, l’envoi d’e-mails doit être configuré : voir {doc}`../fonctionnalites/2fa`. | `False` | ⚪ |
 | `LASUITE_DOMAINE_API_KEY` | Clé API La Suite (intégration domaine). | *(vide)* | ⚪ |
 
 ## Affichage et divers
@@ -147,6 +147,8 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | `DSFR_USE_INTEGRITY_CHECKSUMS` | Active les sommes de contrôle d’intégrité du DSFR (peut entrer en conflit avec WhiteNoise). | `False` | ⚪ |
 | `DSFR_MARK_OPTIONAL_FIELDS` | Marque les champs optionnels (plutôt que les champs obligatoires) dans les formulaires DSFR. | `True` | ⚪ |
 | `WAGTAIL_2FA_OTP_TOTP_NAME` | Nom affiché dans l’application d’authentification TOTP (Google Authenticator, etc.). | *(valeur de `SITE_NAME`)* | ⚪ |
+| `SF_2FA_EMAIL_CODE_VALIDITY_DURATION` | Durée de validité (en secondes) du code envoyé par e-mail pour ajouter un appareil 2FA après une connexion ProConnect. Voir {doc}`../fonctionnalites/2fa`. | `900` | ⚪ |
+| `SF_2FA_EMAIL_CODE_MAX_ATTEMPTS` | Nombre d’essais erronés au-delà duquel ce code est refusé. Voir {doc}`../fonctionnalites/2fa`. | `3` | ⚪ |
 | `SEARCH_VIEW` | Chemin pointé vers une vue de résultats de recherche personnalisée (mode paquet). Voir {doc}`../paquet/recherche`. | `sites_conformes.core.views.SearchResultsView` | ⚪ |
 
 ## Notifications et mises à jour
