@@ -660,6 +660,31 @@ class RecentEntriesBlockTestMixin:
 
         self.assertEqual(button.get_text(strip=True), see_all_button_custom_label)
 
+    def assert_card_title_tag(self, expected_tag, slug_suffix, **block_overrides):
+        content_page = self.create_page_with_recent_entries_block(
+            app_name=self.app_name,
+            show_filters=False,
+            slug_suffix=slug_suffix,
+            **block_overrides,
+        )
+        response = self.client.get(content_page.url)
+        card_title = self.get_recent_entries_block(response, self.app_name).select_one(".fr-card__title")
+
+        self.assertIsNotNone(card_title)
+        self.assertEqual(card_title.name, expected_tag)
+
+    def test_card_titles_are_one_level_below_block_title(self):
+        self.assert_card_title_tag("h3", "title-h2", heading_tag="h2")
+        self.assert_card_title_tag("h4", "title-h3", heading_tag="h3")
+
+    def test_card_titles_use_block_heading_level_without_title(self):
+        self.assert_card_title_tag("h2", "no-title-h2", title="", heading_tag="h2")
+        self.assert_card_title_tag("h3", "no-title-h3", title="", heading_tag="h3")
+
+    def test_card_titles_default_when_heading_level_is_empty(self):
+        self.assert_card_title_tag("h3", "empty-level", heading_tag="")
+        self.assert_card_title_tag("h2", "empty-level-no-title", title="", heading_tag="")
+
 
 class BlogRecentEntriesBlockTestCase(RecentEntriesBlockTestMixin, WagtailPageTestCase):
     app_name = "blog"
