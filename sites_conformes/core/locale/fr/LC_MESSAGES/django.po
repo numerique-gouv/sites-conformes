@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 12:24+0100\n"
+"POT-Creation-Date: 2026-11-04 12:25+0100\n"
 "PO-Revision-Date: 2026-10-19 12:56+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1021,17 +1021,14 @@ msgstr "Affiché en haut de la page de la catégorie"
 msgid "Text displayed at the end of every page in the category"
 msgstr "Texte affiché à la fin de chaque page de la catégorie"
 
+msgid "Place in the category tree"
+msgstr "Place dans l’arborescence des catégories"
+
 msgid "Category"
 msgstr "Catégorie"
 
 msgid "Categories"
 msgstr "Catégories"
-
-msgid "Parent category cannot be self."
-msgstr "La catégorie ne peut être sa propre parente."
-
-msgid "Cannot have circular Parents."
-msgstr "Il est impossible d’avoir des parents circulaires."
 
 msgid "Content page"
 msgstr "Page de contenu"
@@ -1533,6 +1530,12 @@ msgstr "Pages avec l’étiquette {tag}"
 #, python-brace-format
 msgid "List of pages tagged with {tag}"
 msgstr "Liste de pages avec l’étiquette {tag}"
+
+#~ msgid "Parent category cannot be self."
+#~ msgstr "La catégorie ne peut être sa propre parente."
+
+#~ msgid "Cannot have circular Parents."
+#~ msgstr "Il est impossible d’avoir des parents circulaires."
 
 #~ msgid "“See all posts” button"
 #~ msgstr "Bouton « Voir tous les articles »"
