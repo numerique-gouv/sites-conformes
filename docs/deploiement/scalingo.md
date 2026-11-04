@@ -124,7 +124,7 @@ Le tableau indique exactement quoi taper dans la colonne « valeur » :
 
 | Nom du réglage (à gauche) | Valeur à taper (à droite) ou exemple | À quoi ça sert ? |
 | --- | --- | --- |
-| 🔴 `HOST_URL` | Exemple : `test-sites-faciles.osc-fr1.scalingo.io` | le nom de domaine de l’URL principale de votre site |
+| 🔴 `HOST_URL` | Exemple : `test-sites-faciles.osc-fr1.scalingo.io` | le nom de domaine de l’URL principale de votre site. Remplacez-le par le domaine définitif dès qu’il est branché (voir {ref}`scalingo-domaine-definitif`) |
 | 🔴 `ALLOWED_HOSTS` | Exemple : `test-sites-faciles.osc-fr1.scalingo.io,test-sites-faciles.numerique.gouv.fr` | le ou les domaines autorisés à accéder au site, séparés par des virgules s’il y en a plusieurs. On peut déjà entrer le domaine définitif si on le connaît |
 | 🔴 `SECRET_KEY` | *(voir encart ci-dessous)* | clé secrète, par exemple générée dans un terminal (rapprochez-vous d’un utilisateur technique pour cette étape) |
 | 🔴 `DATABASE_URL` | *(rempli automatiquement)* | Ce paramètre a normalement été rempli automatiquement par Scalingo à l’étape 1, vérifiez que c’est bien le cas |
@@ -328,6 +328,34 @@ entre guillemets pour que la CLI Scalingo ne les interprète pas :
 Votre site est maintenant en ligne à l’adresse définie dans `HOST_URL`,
 et son administration est accessible par défaut à l’adresse de votre site
 suivie de `/cms-admin/`.
+
+(scalingo-domaine-definitif)=
+
+## Utiliser votre nom de domaine définitif
+
+Au départ, le site est joignable à une adresse en `*.scalingo.io`. Quand votre
+nom de domaine définitif (par exemple `mon-site.gouv.fr`) est prêt, suivez les
+étapes ci-dessous (voir aussi {doc}`changer-nom-de-domaine` pour les explications
+et les vérifications à faire ensuite) :
+
+1. ajoutez-le dans le tableau de bord Scalingo, onglet **« Paramètres » →
+   « Routage public »**, puis configurez le domaine en suivant la
+   [documentation de Scalingo](https://doc.scalingo.com/platform/app/domain) ;
+2. ajoutez-le à `ALLOWED_HOSTS` (vous pouvez garder l’adresse `*.scalingo.io`
+   à côté, séparée par une virgule) ;
+3. **remplacez la valeur de `HOST_URL`** par ce domaine (nom de domaine seul, sans
+   `https://`) ;
+4. répercutez le domaine en base de données :
+
+```sh
+scalingo -a ${APP_NAME} run python manage.py set_config
+```
+
+:::{warning}
+Si `HOST_URL` contient toujours l’adresse `*.scalingo.io`, les liens générés par
+le site l’utiliseront encore : e-mails de réinitialisation de mot de passe et de
+notification, plan du site, adresses absolues des pages…
+:::
 
 ## Indexation des contenus
 
