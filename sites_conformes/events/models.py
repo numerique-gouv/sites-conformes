@@ -1,3 +1,5 @@
+import warnings
+
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -357,6 +359,16 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
         APIField("go_live_at"),
         APIField("expire_at"),
     ]
+
+    @property
+    def event_categories(self):
+        warnings.warn(
+            "EventEntryPage.event_categories is deprecated and will be removed in the next major version:"
+            " use categories instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.categories
 
     def get_absolute_url(self):
         return self.url

@@ -1,3 +1,5 @@
+import warnings
+
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -470,6 +472,16 @@ class BlogEntryPage(SitesFacilesBasePage):
         APIField("go_live_at"),
         APIField("expire_at"),
     ]
+
+    @property
+    def blog_categories(self):
+        warnings.warn(
+            "BlogEntryPage.blog_categories is deprecated and will be removed in the next major version:"
+            " use categories instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.categories
 
     def get_absolute_url(self):
         return self.url
