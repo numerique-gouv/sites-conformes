@@ -598,7 +598,7 @@ class RecentEntriesBlockTestMixin:
         )
 
         self.assert_see_all_button_targets_index(button)
-        self.assertNotIn("?", button["href"])
+        self.assertNotIn("?", button["href"])  # type: ignore
 
     def test_see_all_link_includes_block_filters_when_configured(self):
         content_page = self.create_page_with_recent_entries_block(
@@ -613,7 +613,7 @@ class RecentEntriesBlockTestMixin:
         )
 
         self.assert_see_all_button_targets_index(button)
-        self.assertIn(f"category={self.category.slug}", button["href"])
+        self.assertIn(f"category={self.category.slug}", button["href"])  # type: ignore
 
     def test_see_all_link_omits_query_when_unfiltered(self):
         content_page = self.create_page_with_recent_entries_block(
@@ -628,7 +628,7 @@ class RecentEntriesBlockTestMixin:
         )
 
         self.assert_see_all_button_targets_index(button)
-        self.assertNotIn("?", button["href"])
+        self.assertNotIn("?", button["href"])  # type: ignore
 
     def test_see_all_button_uses_default_text(self):
         see_all_button_default_label = f"See all {self.entry_type}s"

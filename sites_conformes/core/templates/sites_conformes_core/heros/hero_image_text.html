@@ -1,4 +1,6 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
+
+{# djlint: off H021 #}
 <div style="{% if value.layout.background_color %}background-color: var(--background-alt-{{ value.layout.background_color }});
             {% endif %} min-height: 350px">
   <div class="fr-container fr-py-3w">
@@ -7,13 +9,13 @@
         {% include "sites_conformes_core/heros/_hero_text_content.html" %}
         {% include "sites_conformes_core/heros/_hero_buttons.html" %}
       </div>
-       <div class="fr-col-md-6">
-      {% image value.image fill-600x600 as header_image %}
-      <img class="fr-responsive-img"
-           src="{{ header_image.full_url }}"
-           alt="{{ header_image.alt }}" />
+      <div class="fr-col-md-6">
+        {% image value.image fill-600x600 as header_image %}
+        <img class="fr-responsive-img"
+             src="{{ header_image.full_url }}"
+             alt="{{ header_image.alt }}" />
+      </div>
     </div>
-    </div>
-   
   </div>
 </div>
+{# djlint: on #}

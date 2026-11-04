@@ -61,11 +61,13 @@
 {% endblock social_media %}
 
 {% block content %}
+  {% translate "selected" as selected_label %}
+  {% translate "unselected" as unselected_label %}
   {% include "sites_conformes_core/blocks/heading.html" %}
 
   <div class="fr-container fr-pt-4w">
     {% include "sites_conformes_core/blocks/breadcrumbs.html" %}
-    
+
     {% if page.show_title %}
       <h1>
         {{ page.title }}
@@ -85,9 +87,11 @@
     {% if page.show_filters %}
       <div class="fr-grid-row fr-grid-row--gutters fr-mb-3w">
         <div class="fr-col fr-col-md-4 fr-col-12">
-          <nav class="fr-sidemenu fr-sidemenu--sticky-full-height fr-mb-0-5v" aria-labelledby="fr-sidemenu-title">
+          <nav class="fr-sidemenu fr-sidemenu--sticky-full-height fr-mb-0-5v"
+               aria-labelledby="fr-sidemenu-title">
             <div class="fr-sidemenu__inner">
               <button class="fr-sidemenu__btn"
+                      type="button"
                       hidden
                       aria-controls="fr-sidemenu-wrapper-{{ page.slug }}"
                       aria-expanded="false">{% translate "Filters" %}</button>
@@ -102,7 +106,7 @@
                           <a type="button"
                              class="fr-tag"
                              href="{% pageurl page %}{% toggle_url_filter category=category %}#posts-list"
-                             title="{% if category.slug == current_category.slug %}{% translate 'selected' %}{% else %}{% translate 'unselected' %} {% endif %}"
+                             title="{% if category.slug == current_category.slug %}{{ selected_label }}{% else %}{{ unselected_label }}{% endif %}"
                              {% if category.slug == current_category.slug %} aria-pressed="true" {% else %} aria-pressed="false" {% endif %}>
                             {{ category.name }}
                           </a>
@@ -121,7 +125,7 @@
                           <a class="fr-tag"
                              type="button"
                              href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
-                             title="{% if tag.slug in current_tag %}{% translate 'selected' %}{% else %}{% translate 'unselected' %}{% endif %}"
+                             title="{% if tag.slug in current_tag %}{{ selected_label }}{% else %}{{ unselected_label }}{% endif %}"
                              {% if tag.id == current_tag.id %} aria-pressed="true" {% else %} aria-pressed="false" {% endif %}>
                             {{ tag }}
                           </a>
@@ -169,7 +173,9 @@
 
         <div class="fr-col fr-col-md-8 fr-col-12" id="posts-list">
           <h2>{% translate "Posts" %}</h2>
-          <div class="fr-grid-row fr-grid-row--gutters">{% include "sites_conformes_blog/blocks/blog_index_posts_list.html" %}</div>
+          <div class="fr-grid-row fr-grid-row--gutters">
+            {% include "sites_conformes_blog/blocks/blog_index_posts_list.html" %}
+          </div>
           {% if posts.paginator.num_pages > 1 %}
             <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>
           {% endif %}
@@ -179,7 +185,9 @@
     {% else %}
       <div id="posts-list">
         <h2>{% translate "Posts" %}</h2>
-        <div class="fr-grid-row fr-grid-row--gutters">{% include "sites_conformes_blog/blocks/blog_index_posts_list.html" %}</div>
+        <div class="fr-grid-row fr-grid-row--gutters">
+          {% include "sites_conformes_blog/blocks/blog_index_posts_list.html" %}
+        </div>
         {% if posts.paginator.num_pages > 1 %}
           <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>
         {% endif %}

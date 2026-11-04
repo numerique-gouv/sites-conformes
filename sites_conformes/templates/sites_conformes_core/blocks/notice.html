@@ -1,4 +1,5 @@
 {% load i18n wagtailcore_tags wagtail_dsfr_tags %}
+
 {% translate "Hide message" as hide_message %}
 {% translate "Consultation link" as consultation_link %}
 {% translate "Opens a new window" as new_window_label %}
@@ -20,6 +21,7 @@
       {% endif %}
       {% if settings.sites_conformes_core.CmsDsfrConfig.notice_is_collapsible %}
         <button class="fr-btn--close fr-btn"
+                type="button"
                 title="{{ hide_message }}"
                 onclick="const notice = this.parentNode.parentNode.parentNode; notice.parentNode.removeChild(notice)">
           {{ hide_message }}

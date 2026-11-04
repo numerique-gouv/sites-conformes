@@ -1,10 +1,12 @@
 {% load i18n wagtailcore_tags %}
+
 <div class="fr-tabs fr-mb-2w">
   {% translate "Tabs group" as tabs_group %}
   <ul class="fr-tabs__list" role="tablist" aria-label="{{ tabs_group }}">
     {% for tab_block in block.value %}
       <li role="presentation">
         <button id="tabpanel-{{ block.id }}-{{ forloop.counter }}"
+                type="button"
                 class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
                 tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
                 role="tab"
