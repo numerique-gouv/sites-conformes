@@ -1,0 +1,12 @@
+# Gitleaks configuration: the default rules, plus targeted exceptions
+[extend]
+useDefault = true
+
+# The fixtures of the fictional demo sites contain the UUIDs that Wagtail uses as translation keys:
+# the name of the field makes them look like API keys
+[[allowlists]]
+description = "Translation keys (UUIDs) of the demo site fixtures"
+condition = "AND"
+paths = ['''^sites_conformes/core/demo_data/fixtures/[^/]+\.json$''']
+regexTarget = "line"
+regexes = ['''^\s*"translation_key": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",?$''']
