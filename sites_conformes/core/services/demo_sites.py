@@ -437,6 +437,24 @@ class DemoSitesBuilder:
         if "intro" in spec:
             page.intro = RichText(spec["intro"])
 
+    def build_hero(self, image_key: str | None) -> list:
+        """
+        Returns a header showing the page title over the darkened image, or no header.
+        """
+        image = self.get_image(image_key)
+        if not image:
+            return []
+        return [
+            (
+                "old_hero",
+                {
+                    "header_with_title": True,
+                    "header_image": {"image": image, "alt_text": "", "decorative": True},
+                    "header_darken": True,
+                },
+            )
+        ]
+
     def build_page(self, spec: dict) -> Page:
         page_type = spec.get("type", "content")
 
@@ -454,12 +472,7 @@ class DemoSitesBuilder:
         self.set_page_fields(page, spec)
         page.show_in_menus = True
 
-        header_image = self.get_image(spec.get("header_image"))
-        if header_image:
-            page.header_image = header_image
-            page.header_with_title = True
-            page.header_darken = True
-
+        page.hero = self.build_hero(spec.get("header_image"))
         return page
 
     def add_page(self, parent: Page, page: Page) -> Page:
@@ -511,6 +524,7 @@ class DemoSitesBuilder:
         entry.authors = authors
         self.set_page_fields(entry, spec)
         entry.preview_image = self.get_image(spec.get("preview_image"))
+        entry.hero = self.build_hero(spec.get("preview_image"))
         return entry
 
     def create_form_fields(self, page: FormPage) -> None:

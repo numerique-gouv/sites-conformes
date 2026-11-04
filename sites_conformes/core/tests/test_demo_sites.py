@@ -1,4 +1,6 @@
 from io import StringIO
+from pathlib import Path
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -137,6 +139,11 @@ class LoadReferenceBaseTestCase(ClearSiteRootPathsCacheMixin, TestCase):
     migrations exist, the fixtures only load from the commit they were exported from.
     """
 
+    def get_demo_images(self):
+        return get_image_model().objects.exclude(
+            collection__name__in=["Pictogrammes DSFR", "Illustrations par défaut"]
+        )
+
     def assertBaseLoads(self, site_keys: list, default_host: str, pages: int, users: set):
         call_command("load_reference_base", *site_keys, skip_migrate=True, stdout=StringIO())
 
@@ -151,10 +158,9 @@ class LoadReferenceBaseTestCase(ClearSiteRootPathsCacheMixin, TestCase):
             self.assertTrue(image_file.read(4))
 
         # Every demo image is used, which the admin knows from the reference index
-        demo_images = get_image_model().objects.exclude(
-            collection__name__in=["Pictogrammes DSFR", "Illustrations par défaut"]
-        )
-        unused = [image.title for image in demo_images if not ReferenceIndex.get_references_to(image).exists()]
+        unused = [
+            image.title for image in self.get_demo_images() if not ReferenceIndex.get_references_to(image).exists()
+        ]
         self.assertEqual(unused, [])
 
         welcomes = {
@@ -192,6 +198,23 @@ class LoadReferenceBaseTestCase(ClearSiteRootPathsCacheMixin, TestCase):
                 "editeur-ab",
             },
         )
+        # Every demo image is displayed somewhere, not only referenced by a field that no template shows.
+        # The portrait of Paul Verdier is the exception: on purpose, no site uses this person.
+        html = ""
+        for page in Page.objects.live().filter(depth__gt=1).specific():
+            _site_id, root_url, path = page.get_url_parts()
+            response = self.client.get(path, HTTP_HOST=urlparse(root_url).hostname)
+            self.assertEqual(response.status_code, 200, path)
+            # Not the <head>, whose social media tags also use the legacy header image
+            html += response.content.decode().split("<body", 1)[1]
+
+        not_displayed = [
+            image.title
+            for image in self.get_demo_images()
+            if Path(image.file.name).stem[:20] not in html  # Renditions keep the start of the file name
+        ]
+        self.assertEqual(not_displayed, ["Portrait de Paul Verdier"])
+
         # Not in the fixtures, as it belongs to both sites
         editeur_ab = get_user_model().objects.get(username="editeur-ab")
         self.assertEqual(editeur_ab.groups.filter(name__endswith="– Éditeurs").count(), 2)

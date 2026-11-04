@@ -1,5 +1,5 @@
 {
- "commit": "119a3d1879d6ea8135d32addbe3821b98a71ab72",
+ "commit": "60a0cee26fe5090b10040c1730848d7e4c10a03d",
  "migrations": {
   "auth": "0012_alter_user_first_name_max_length",
   "contenttypes": "0002_remove_content_type_name",
