@@ -222,9 +222,10 @@ INSTALLED_APPS.extend(
         "sites_conformes.proconnect",
     ]
 )
-# Custom content page model, set before the first migration
+# Custom content and blog entry page models, set before the first migration
 # (see docs/paquet/modele-de-page-personnalise.md).
 SF_CONTENTPAGE_MODEL = "home.CustomContentPage"
+SF_BLOGENTRYPAGE_MODEL = "home.CustomBlogEntryPage"
 
 WAGTAILADMIN_PATH = "admin/"
 WAGTAILIMAGES_IMAGE_MODEL = "sites_conformes_customimages.CustomImage"
