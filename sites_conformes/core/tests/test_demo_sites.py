@@ -7,15 +7,21 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from wagtail.contrib.redirects.models import Redirect
 from wagtail.images import get_image_model
 from wagtail.models import Page, ReferenceIndex, Site
 
 from sites_conformes.blog.models import Category, CategoryEntryPage, Organization, Person
+from sites_conformes.core.models import CmsDsfrConfig, CustomScriptsSettings
 from sites_conformes.core.services.demo_sites import DEFAULT_PASSWORD, create_demo_sites
 from sites_conformes.core.tests.base import ClearSiteRootPathsCacheMixin, MonositeTestCase, MultisiteTestCase
 from sites_conformes.events.models import CategoryEventEntryPage
 from sites_conformes.menus.models import MainMenu
+
+
+def get_settings_edit_url(model, site: Site) -> str:
+    return reverse("wagtailsettings:edit", args=[model._meta.app_label, model._meta.model_name, site.pk])
 
 
 class DemoSitesTestsMixin:
@@ -106,6 +112,14 @@ class DemoSitesTestsMixin:
                     permissions = tested_page.permissions_for_user(user)
                     self.assertEqual(permissions.can_edit(), can_edit)
                     self.assertEqual(permissions.can_publish(), can_publish)
+
+    def test_site_a_administrators_can_edit_its_settings(self):
+        self.client.force_login(self.users["admin-a"])
+        for model in [CmsDsfrConfig, CustomScriptsSettings]:
+            with self.subTest(model=model.__name__):
+                url = get_settings_edit_url(model, self.site_a)
+                response = self.client.get(url, HTTP_HOST=self.site_a.hostname)
+                self.assertEqual(response.status_code, 200)
 
     def test_no_redirect_is_created(self):
         self.assertFalse(Redirect.objects.exists())
@@ -320,3 +334,37 @@ class MultisiteDemoSitesTestCase(DemoSitesTestsMixin, MultisiteTestCase):
         self.assertEqual(
             self.get_page(self.site_b, "contact").get_workflow().name, "Validation Recensement des étoiles"
         )
+
+    def test_settings_permissions_are_limited_to_the_site(self):
+        expectations = {
+            "superadmin": (True, True),
+            "admin-a": (True, False),
+            "admin-b": (False, True),
+            "moderateur-a": (False, False),
+            "editeur-ab": (False, False),
+        }
+        sites = [self.site_a, self.site_b]
+        for model in [CmsDsfrConfig, CustomScriptsSettings]:
+            policy = model.get_permission_policy()
+            for username, (can_change_a, can_change_b) in expectations.items():
+                with self.subTest(model=model.__name__, username=username):
+                    user = self.users[username]
+                    can_change = [policy.user_has_permission_for_instance(user, "change", site) for site in sites]
+                    self.assertEqual(can_change, [can_change_a, can_change_b])
+
+    def test_site_a_administrators_cannot_read_or_edit_the_settings_of_site_b(self):
+        self.client.force_login(self.users["admin-a"])
+        config_b = CmsDsfrConfig.for_site(self.site_b)
+        site_title = config_b.site_title
+
+        for model in [CmsDsfrConfig, CustomScriptsSettings]:
+            url = get_settings_edit_url(model, self.site_b)
+            with self.subTest(model=model.__name__, method="GET"):
+                response = self.client.get(url, HTTP_HOST=self.site_a.hostname)
+                self.assertRedirects(response, reverse("wagtailadmin_home"), fetch_redirect_response=False)
+            with self.subTest(model=model.__name__, method="POST"):
+                response = self.client.post(url, {"site_title": "Piraté"}, HTTP_HOST=self.site_a.hostname)
+                self.assertRedirects(response, reverse("wagtailadmin_home"), fetch_redirect_response=False)
+
+        config_b.refresh_from_db()
+        self.assertEqual(config_b.site_title, site_title)

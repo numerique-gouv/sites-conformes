@@ -30,7 +30,9 @@ Ce sont les sites de deux administrations centrales fictives, inspirées du
 
 Chaque site a sa collection d’images, ses menus, sa configuration, trois groupes
 (`<site> – Administrateurs`, `– Modérateurs`, `– Éditeurs`) et un workflow
-« Validation » approuvé par ses modérateurs et ses administrateurs.
+« Validation » approuvé par ses modérateurs et ses administrateurs. Les
+administrateurs ne modifient la configuration et les scripts que de leur site
+(droits de site Wagtail, et non droits globaux).
 
 Certains éléments sont **volontairement communs** aux deux sites, pour révéler
 les collisions :

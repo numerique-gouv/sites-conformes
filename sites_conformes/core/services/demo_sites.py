@@ -25,6 +25,7 @@ from wagtail.models import (
     GroupApprovalTask,
     GroupCollectionPermission,
     GroupPagePermission,
+    GroupSitePermission,
     Locale,
     Page,
     Site,
@@ -55,7 +56,7 @@ EDITORS = "Éditeurs"
 
 # Permissions of each role, following the roles table of the multisite plan.
 # Page permissions are given on the home page of the site and its translations,
-# collection permissions on the collection of the site.
+# collection and site permissions on the collection and the site.
 ROLE_PERMISSIONS = {
     ADMINISTRATORS: {
         "page": ["add_page", "change_page", "publish_page", "bulk_delete_page", "lock_page", "unlock_page"],
@@ -89,14 +90,17 @@ ROLE_PERMISSIONS = {
             "sites_conformes_menus.add_footerbottommenu",
             "sites_conformes_menus.change_footerbottommenu",
             "sites_conformes_menus.delete_footerbottommenu",
-            "sites_conformes_core.change_cmsdsfrconfig",
-            "sites_conformes_core.change_customscriptssettings",
             "wagtailredirects.add_redirect",
             "wagtailredirects.change_redirect",
             "wagtailredirects.delete_redirect",
             "auth.add_user",
             "auth.change_user",
             "auth.delete_user",
+        ],
+        # Site settings: a global permission would give access to the settings of every site
+        "site": [
+            "sites_conformes_core.change_cmsdsfrconfig",
+            "sites_conformes_core.change_customscriptssettings",
         ],
     },
     MODERATORS: {
@@ -699,6 +703,9 @@ class DemoSitesBuilder:
                 GroupCollectionPermission.objects.create(
                     group=group, collection=collection, permission=get_permission(identifier)
                 )
+
+            for identifier in permissions.get("site", []):
+                GroupSitePermission.objects.create(group=group, site=site, permission=get_permission(identifier))
 
             for shared_collection in shared_collections:
                 GroupCollectionPermission.objects.create(
