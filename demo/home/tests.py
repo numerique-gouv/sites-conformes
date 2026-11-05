@@ -92,7 +92,7 @@ class CustomContentPageTests(WagtailPageTestCase):
         catalog = self.home.add_child(instance=CatalogIndexPage(title="Catalogue", slug="catalogue"))
         child = catalog.add_child(instance=CustomContentPage(title="Entry", slug="entry", live=True))
 
-        self.assertEqual(list(catalog.entries), [child])
+        self.assertEqual(list(catalog.posts), [child])
 
     def test_accessor_creates_the_swapped_model(self):
         page = get_or_create_content_page(slug="via-accessor", title="Via accessor", body=[])
