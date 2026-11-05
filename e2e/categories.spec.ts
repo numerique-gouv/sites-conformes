@@ -81,3 +81,70 @@ test.describe("Catégories du blog", () => {
     ])
   })
 })
+
+test.describe("Administration des catégories", () => {
+  const categories = "/cms-admin/snippets/sites_conformes_core/category/"
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/cms-admin/login/")
+    await page.locator("#id_username").fill(process.env.DJANGO_SUPERUSER_USERNAME!)
+    await page.locator("#id_password").fill(process.env.DJANGO_SUPERUSER_PASSWORD!)
+    await page.locator("#id_password").press("Enter")
+    await expect(page).toHaveURL(/cms-admin\/$/)
+  })
+
+  test("La liste parcourt l’arborescence", async ({ page }) => {
+    const names = page.locator("table tbody").getByRole("link")
+
+    await page.goto(categories)
+    await expect(names).toHaveText(["Régions", "Secteurs"])
+
+    await page.getByRole("link", { name: "Régions", exact: true }).click()
+    await expect(names).toHaveText(["Bretagne", "Finistère", "Morbihan", "Alsace"])
+
+    const finistere = names.filter({ hasText: "Finistère" })
+    await expect(finistere).toBeVisible()
+    await page.getByRole("button", { name: "Sous-éléments de Bretagne" }).click()
+    await expect(finistere).toBeHidden()
+  })
+
+  test("Une catégorie créée puis choisie sur une page filtre le catalogue", async ({
+    page,
+  }) => {
+    const name = `Bas-Rhin ${Date.now()}`
+
+    // networkidle: the slug is filled in by JavaScript, once the page is hydrated
+    await page.goto(`${categories}add/`, { waitUntil: "networkidle" })
+    await page.getByRole("textbox", { name: "Nom de la catégorie" }).pressSequentially(name)
+    await expect(page.getByRole("textbox", { name: "Slug" })).toHaveValue(/^bas-rhin-\d+$/)
+    await page.getByRole("combobox", { name: "Relative à" }).selectOption("Alsace")
+    await page.getByRole("button", { name: "Enregistrer" }).click()
+    await expect(page.locator(".messages .success")).toBeVisible()
+
+    await page.goto("/guides/patients-strasbourg/")
+    await page.locator("wagtail-userbar").getByRole("button").first().click()
+    await page.getByRole("menuitem", { name: "Modifier cette page" }).click()
+    await expect(page.getByRole("checkbox", { name })).toBeHidden()
+    await page.getByRole("button", { name: "Sous-éléments de Alsace" }).click()
+    await page.getByRole("checkbox", { name }).check()
+    await page.getByRole("button", { name: "Plus d'actions" }).click()
+    await page.getByRole("button", { name: "Publier" }).click()
+    await expect(page.locator(".messages .success")).toBeVisible()
+
+    await page.goto("/guides/?category=alsace")
+    await chip(page, name).click()
+    await expect(page).toHaveURL(/category=bas-rhin/)
+    await expectGuides(page, [STRASBOURG])
+
+    await page.goto(categories)
+    await page.getByRole("radio", { name: "Arborescence complète" }).check()
+    await page.getByRole("button", { name: `Plus d’options pour « ${name} »` }).click()
+    await page.getByRole("link", { name: "Supprimer" }).click()
+    await page.getByRole("button", { name: /Oui, supprimer/ }).click()
+    await expect(page.locator(".messages .success")).toBeVisible()
+
+    await page.goto("/guides/?category=alsace")
+    await expectGuides(page, [STRASBOURG])
+    await expect(chip(page, name)).toHaveCount(0)
+  })
+})
