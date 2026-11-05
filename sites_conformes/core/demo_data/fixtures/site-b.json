@@ -18,7 +18,7 @@
   "pk": 2,
   "fields": {
    "hostname": "site-b.localhost",
-   "port": 8008,
+   "port": 80,
    "site_name": "Direction générale du Recensement des étoiles",
    "root_page": 53,
    "is_default_site": false

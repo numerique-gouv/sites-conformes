@@ -66,6 +66,13 @@ class Command(BaseCommand):
             if not Site.objects.filter(is_default_site=True).exists():
                 Site.objects.filter(pk=Site.objects.order_by("pk").first().pk).update(is_default_site=True)
 
+            # The fixtures contain a fixed port: use the one of this instance.
+            # save() rather than update(), so that Wagtail clears its cache of the site root paths
+            port = int(settings.HOST_PORT or 80)
+            for site in Site.objects.all():
+                site.port = port
+                site.save()
+
             # Accounts that belong to several sites are not in the fixtures
             if len(site_keys) > 1:
                 create_demo_users(site_keys, only_cross_site=True)

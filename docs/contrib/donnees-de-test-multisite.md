@@ -130,6 +130,13 @@ Les médias sont dans `medias_ref_<base>/`. Les recettes ne fonctionnent
 qu’avec PostgreSQL en
 local, pas avec Docker.
 
+Le serveur écoute sur `127.0.0.1`, au port `HOST_PORT` (8000 s’il est vide) :
+ouvrez `http://site-a.localhost:<port>/`. Les fixtures ne contiennent pas le
+port de la machine qui les a exportées : au chargement, les sites prennent ce
+port, et les liens du back-office (« Voir en ligne ») pointent au bon endroit.
+Si votre navigateur ne résout pas `*.localhost`, ajoutez
+`127.0.0.1 site-a.localhost site-b.localhost` à `/etc/hosts`.
+
 :::{important}
 **Une fixture se charge avec les modèles du code qui l’a exportée.** Une fois
 les nouvelles migrations écrites, la commande refuse de charger la fixture et

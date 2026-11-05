@@ -18,7 +18,7 @@
   "pk": 1,
   "fields": {
    "hostname": "site-a.localhost",
-   "port": 8008,
+   "port": 80,
    "site_name": "Ministère des Lampadaires et des Planètes",
    "root_page": 3,
    "is_default_site": true

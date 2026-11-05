@@ -220,6 +220,16 @@ class LoadReferenceBaseTestCase(ClearSiteRootPathsCacheMixin, TestCase):
         self.assertEqual(editeur_ab.groups.filter(name__endswith="– Éditeurs").count(), 2)
         self.assertTrue(self.client.login(username="editeur-ab", password=DEFAULT_PASSWORD))
 
+    @override_settings(HOST_PORT="8000")
+    def test_sites_use_the_port_of_the_instance(self):
+        # The fixtures contain a fixed port, not the one of the machine they were exported from
+        call_command("load_reference_base", "a", "b", skip_migrate=True, stdout=StringIO())
+
+        self.assertEqual(set(Site.objects.values_list("port", flat=True)), {8000})
+        home = Site.objects.get(hostname="site-a.localhost").root_page
+        _site_id, root_url, _path = home.get_url_parts()
+        self.assertEqual(root_url, "http://site-a.localhost:8000")
+
 
 class MonositeBDemoSitesTestCase(ClearSiteRootPathsCacheMixin, TestCase):
     def test_site_b_alone_is_the_default_site(self):

@@ -78,6 +78,12 @@ def dump_data() -> list:
     call_command("dumpdata", exclude=get_installed_exclusions(), stdout=output, verbosity=0)
     objects = json.loads(output.getvalue())
 
+    # The port depends on the machine: load_reference_base sets the one of the instance
+    site_label = Site._meta.label_lower
+    for obj in objects:
+        if obj["model"] == site_label:
+            obj["fields"]["port"] = 80
+
     natural_keys = {
         ContentType: {content_type.pk: list(content_type.natural_key()) for content_type in ContentType.objects.all()},
         Permission: {

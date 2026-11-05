@@ -17,6 +17,9 @@ set -a
 [ -f  ${SCRIPT_DIR}/../.env ] && . ${SCRIPT_DIR}/../.env && echo "Local env variables loaded"
 set +a
 
+# Same port for loading (written in the sites) and for running the server
+export HOST_PORT="${HOST_PORT:-8000}"
+
 ACTION=${1:-}
 NAME=${2:-}
 
@@ -45,6 +48,8 @@ use_database() {
     export S3_HOST=""
     export SF_USE_DB_STORAGE=0
     export DEBUG=True
+    # The demo sites use *.localhost hostnames
+    export ALLOWED_HOSTS="127.0.0.1,localhost,.localhost"
 }
 
 reset_database() {
@@ -75,7 +80,10 @@ case "${ACTION}" in
         ;;
     runserver)
         use_database "${NAME}"
-        ${PYTHON} manage.py runserver "${RUN_HOST}:${HOST_PORT:-8000}"
+        # Bind to the loopback address: unlike Linux, macOS doesn't resolve *.localhost hostnames,
+        # but browsers do
+        echo "Open http://${RUN_HOST}:${HOST_PORT}/"
+        ${PYTHON} manage.py runserver "127.0.0.1:${HOST_PORT}"
         ;;
     django)
         use_database "${NAME}"
