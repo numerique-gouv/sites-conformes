@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from dsfr.constants import NOTICE_TYPE_CHOICES
-from modelcluster.fields import ParentalKey
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
 from rest_framework import serializers
@@ -135,6 +135,20 @@ class AbstractContentPage(SitesFacilesBasePage):
     depend on yours while yours depend on it.
     """
 
+    categories = ParentalManyToManyField("sites_conformes_core.Category", blank=True, verbose_name=_("Categories"))
+
+    content_panels = SitesFacilesBasePage.content_panels + [
+        FieldPanel("categories"),
+    ]
+
+    api_fields = SitesFacilesBasePage.api_fields + [
+        APIField("categories", serializer=CategorySerializer(many=True)),
+    ]
+
+    search_fields = SitesFacilesBasePage.search_fields + [
+        index.RelatedFields("categories", [index.SearchField("name")]),
+    ]
+
     class Meta:
         abstract = True
 
@@ -177,6 +191,8 @@ class CatalogIndexPage(AbstractIndexPage):
     )
 
     # Filters
+    filter_by_category = models.BooleanField(_("Filter by category"), default=True)
+
     SINGLE_FILTER = "single"
     MULTIPLE_FILTERS = "multiple"
     FILTER_SELECTION_CHOICES = [
@@ -207,6 +223,7 @@ class CatalogIndexPage(AbstractIndexPage):
         FieldPanel("posts_per_page"),
         MultiFieldPanel(
             [
+                FieldPanel("filter_by_category"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
@@ -224,7 +241,7 @@ class CatalogIndexPage(AbstractIndexPage):
     def posts(self):
         # Get a list of live content pages that are children of this page
         ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
-        return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
+        return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags", "categories")
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
@@ -243,6 +260,7 @@ class CatalogIndexPage(AbstractIndexPage):
                 "entries": paginated_entries,
                 "paginator": paginator,
                 "tags": self.get_tags(),
+                "categories": self.get_categories(),
                 "filter_selection_mode": self.filter_selection,
                 **filtered_data,
             }
@@ -264,6 +282,7 @@ class CatalogIndexPage(AbstractIndexPage):
             "extra_title": "",
             "current_tags": [],
             "current_tag": None,
+            "current_category": None,
             "selected_tag_slugs": selected_tag_slugs or [],
         }
 
@@ -271,16 +290,42 @@ class CatalogIndexPage(AbstractIndexPage):
         """
         Reads the "tag" GET params and dispatches to the filter mode configured on the page.
         """
+        entries, category = self._filter_by_category(request, entries)
+
         selected_tag_slugs = request.GET.getlist("tag")
         if not selected_tag_slugs:
-            return self._default_filter_context(entries)
+            filtered = self._default_filter_context(entries)
+        elif self.filter_selection == self.SINGLE_FILTER:
+            filtered = self._handle_single_filter(selected_tag_slugs, entries)
+        elif self.filter_selection == self.MULTIPLE_FILTERS:
+            filtered = self._handle_multiple_filters(selected_tag_slugs, entries)
+        else:
+            filtered = self._default_filter_context(entries, selected_tag_slugs)
 
-        if self.filter_selection == self.SINGLE_FILTER:
-            return self._handle_single_filter(selected_tag_slugs, entries)
-        if self.filter_selection == self.MULTIPLE_FILTERS:
-            return self._handle_multiple_filters(selected_tag_slugs, entries)
+        if category:
+            filtered["current_category"] = category
+            filtered["extra_title"] = self._category_title(category, filtered["extra_title"])
+            # A tag filter already put its own trail in place; otherwise show "Catalog > Category".
+            filtered["extra_breadcrumbs"] = filtered["extra_breadcrumbs"] or {
+                "links": [{"url": self.get_url(), "title": self.title}],
+                "current": category.name,
+            }
+        return filtered
 
-        return self._default_filter_context(entries, selected_tag_slugs)
+    def _category_title(self, category: "Category", tag_title: str) -> str:
+        if tag_title:
+            return _("%(title)s, in category %(category)s") % {"title": tag_title, "category": category.name}
+        return _("Pages in category %(category)s") % {"category": category.name}
+
+    def _filter_by_category(
+        self, request: HttpRequest, entries: models.QuerySet
+    ) -> tuple[models.QuerySet, "Category | None"]:
+        """Narrows the entries to one category, read from the "category" GET param."""
+        slug = request.GET.get("category")
+        if not slug:
+            return entries, None
+        category = get_object_or_404(Category, slug=slug, locale=self.locale)
+        return entries.filter(categories=category), category
 
     def _handle_single_filter(self, selected_tag_slugs: list, entries: models.QuerySet) -> dict:
         """
@@ -365,9 +410,13 @@ class CatalogIndexPage(AbstractIndexPage):
         ids = self.posts.values_list("tags", flat=True)
         return Tag.objects.tags_with_usecount(1).filter(id__in=ids).order_by("name")
 
+    def get_categories(self) -> models.QuerySet:
+        ids = self.posts.values_list("categories", flat=True)
+        return Category.objects.filter(id__in=ids).order_by("name")
+
     @property
-    def show_filters(self) -> bool | models.BooleanField:
-        return self.filter_by_tag and self.get_tags().count() > 0
+    def show_filters(self) -> bool:
+        return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and self.get_categories())
 
     @path("tags/", name="tags_list")
     def tags_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
