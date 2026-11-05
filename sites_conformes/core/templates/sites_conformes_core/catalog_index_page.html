@@ -92,7 +92,7 @@
                       aria-expanded="false">{% translate "Filters" %}</button>
               <div class="fr-collapse" id="fr-sidemenu-wrapper-{{ page.slug }}">
                 <h2 class="fr-sidemenu__title" id="fr-sidemenu-title">{% translate "Filters" %}</h2>
-                {% include "sites_conformes_core/blocks/index_filter_categories.html" %}
+                {% include "sites_conformes_core/blocks/index_filter_category_tree.html" %}
 
                 {% if tags and page.filter_by_tag %}
                   <div class="fr-my-3w">
@@ -115,6 +115,9 @@
                       <form method="get"
                             action="{% pageurl page %}#posts-list"
                             id="tag-filter-form">
+                        {% for category in category_filters.selected %}
+                          <input type="hidden" name="category" value="{{ category.slug }}">
+                        {% endfor %}
                         <ul class="fr-tags-group">
                           {% for tag in tags %}
                             <li>
