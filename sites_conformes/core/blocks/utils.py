@@ -1,3 +1,7 @@
+"""
+Helpers for the StreamField blocks: sample values for tests, and help texts for the admin.
+"""
+
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
@@ -12,8 +16,17 @@ except ImportError:
 
 
 def block_to_sample_dict(block):
-    # Returns a minimal valid Python value for the given Wagtail block instance.
-    # Chooser blocks return None so the caller can substitute a real object when needed.
+    """
+    Returns a minimal valid Python value for the given Wagtail block instance.
+
+    StructBlocks are filled recursively, StreamBlocks get a single entry (the first
+    required child block) and ListBlocks are left empty. Chooser blocks (images,
+    pages, documents, snippets) and StaticBlocks return None, so that the caller
+    can substitute a real object when needed.
+
+    Used in the tests to check that every block accepts a value, without having to
+    write a sample value for each of them.
+    """
 
     # Chooser blocks
     if isinstance(block, ImageChooserBlock):
@@ -123,7 +136,11 @@ def block_to_sample_dict(block):
 
 
 def stream_entry(block_name: str, block_instance) -> tuple:
-    # Convenience wrapper: returns (block_name, block_to_sample_dict(block_instance)).
+    """
+    Returns a `(block_name, sample_value)` tuple, ready to be added to the value of a StreamField.
+
+    Convenience wrapper around `block_to_sample_dict`.
+    """
     return (block_name, block_to_sample_dict(block_instance))
 
 
@@ -135,6 +152,13 @@ def help_text_with_details(summary, details, details_label=None):
     """
     Returns a help text made of a short summary, always visible,
     and a collapsible section (<details>) holding the full explanation.
+
+    `details_label` is the text of the button that opens the section. It defaults to
+    "How is the image displayed?", as the helper is mostly used on image fields:
+    pass another label for other kinds of fields.
+
+    The result is lazy, so it can be used directly as the `help_text` of a block.
+    The arguments are inserted without escaping: `details` can hold HTML markup.
     """
     if details_label is None:
         details_label = _("How is the image displayed?")

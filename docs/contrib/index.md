@@ -20,6 +20,7 @@ maxdepth: 1
 ---
 installation-locale
 architecture
+utilitaires
 guide-contribution
 traductions
 definition-of-done

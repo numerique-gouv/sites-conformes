@@ -1,3 +1,11 @@
+"""
+Import and export of pages and images between Wagtail instances, through the API (`api/v2/`).
+
+Used by the `migrate_pages` command (copy pages from another site), and by the
+`export_page_templates` / `import_page_templates` commands, which store the page
+templates in `PAGE_TEMPLATES_ROOT` (pages in `pages_data.json`, images in `img/`).
+"""
+
 import copy
 import json
 import os
@@ -29,6 +37,11 @@ Image = get_image_model()
 class ExportPage:
     """
     Generic class for export of a ContentPage from a wagtail instance
+
+    The page is fetched from the API of `source_site` (a base URL ending with a slash)
+    when the class is instantiated. The block IDs, the tags, the rendered header images
+    and some meta keys are removed, and the IDs of the images used by the page are
+    listed in `image_ids`, so that they can be exported with `ImportExportImages`.
     """
 
     def __init__(self, source_page_id, source_site) -> None:
@@ -51,19 +64,31 @@ class ExportPage:
 
     @property
     def json_export(self) -> dict:
+        """
+        The cleaned page content, ready to be imported with `ImportPages`.
+        """
         return self.content
 
     @property
     def source_page_api_url(self):
+        """
+        The URL of the page in the API of the source site.
+        """
         return f"{self.source_site}api/v2/pages/{self.source_page_id}/"
 
     def get_content_from_source_page(self):
+        """
+        Fetch the page from the API of the source site and return its JSON content.
+        """
         response = requests.get(self.source_page_api_url, timeout=5)
         return response.json()
 
     def get_source_images(self) -> None:
         """
         Get a list of images present in the source content.
+
+        Fills `image_ids` with the IDs of the header image and of the images of the body,
+        without duplicates.
         """
 
         # Header image
@@ -73,13 +98,15 @@ class ExportPage:
             self.image_ids.append(header_image["id"])
             self.content["header_image"]["meta"].pop("download_url")
 
-        # Remove fields with credentials
-
         # Images from the body
         self.locate_image_ids(self.source_body)
         self.image_ids = list(set(self.image_ids))
 
     def locate_image_ids(self, json_object):  # NOSONAR
+        """
+        Recursively walk a StreamField JSON representation and add to `image_ids`
+        the values of the `image` and `bg_image` keys.
+        """
         if isinstance(json_object, dict) and json_object:
             for key, value in json_object.items():
                 if key in ["image", "bg_image"] and value:
@@ -96,6 +123,9 @@ class ExportPage:
                 self.locate_image_ids(item)
 
     def clear_meta_keys(self):
+        """
+        Remove the meta keys that should not be copied to the imported page.
+        """
         keys = ["parent", "seo_title", "search_description"]
         for key in keys:
             self.content["meta"].pop(key, None)
@@ -104,6 +134,11 @@ class ExportPage:
 class ImportPages:
     """
     Generic class for import of a list of ContentPages from a previously made export
+
+    `pages_data` is a dict with a `pages` key (the exported pages, by source page ID)
+    and an `image_ids` key. It defaults to the content of `TEMPLATES_DATA_FILE`.
+    The pages are imported under the page whose slug is `parent_page_slug`, or under
+    a page templates index created right under the Root page.
     """
 
     def __init__(
@@ -128,6 +163,9 @@ class ImportPages:
             self.parent_page = None
 
     def get_or_create_page_templates_index(self) -> ContentPage:
+        """
+        Get or create the page templates index, used as parent page when none is given.
+        """
         # The templates index is created right under the Root page, like a site
         parent_page = Page.objects.first()
         body = [("subpageslist", None)]
@@ -136,6 +174,12 @@ class ImportPages:
         )
 
     def import_pages(self):
+        """
+        Import the images, then the pages.
+
+        A page that was already imported under the parent page (same `source_url`)
+        is updated instead of being duplicated.
+        """
         self.image_importer.import_images()
 
         if not self.parent_page:
@@ -154,6 +198,9 @@ class ImportPages:
                 self.import_page(page_id)
 
     def import_page(self, page_id: str) -> ContentPage:
+        """
+        Create a new page from the exported page with the given source ID.
+        """
         raw_page = self.pages[page_id]
         source_url = raw_page["meta"]["html_url"]
 
@@ -173,6 +220,10 @@ class ImportPages:
         return get_or_create_content_page(**page_dict)
 
     def update_page(self, source_page_id, existing_page):
+        """
+        Update an existing page (slug, title, body and header fields)
+        with the content of the exported page with the given source ID.
+        """
         raw_page = self.pages[source_page_id]
         existing_page.slug = raw_page["meta"]["slug"]
         existing_page.title = raw_page["title"]
@@ -187,6 +238,9 @@ class ImportPages:
         return existing_page
 
     def update_image_ids(self, page_id):
+        """
+        Replace the source image IDs of the exported page with the IDs of the imported images.
+        """
         page = self.pages[page_id]
 
         if page["header_image"]:
@@ -202,6 +256,12 @@ class ImportPages:
 class ImportExportImages:
     """
     Generic class for import/export of a list of Images from a wagtail instance
+
+    `image_folder` holds the image files and an `image_data.json` file with their metadata.
+    `source_site` (a base URL ending with a slash) is only needed to download images.
+
+    When instantiated, the class creates `image_folder` and the
+    "Images des modèles de page" collection if they don't exist.
     """
 
     def __init__(self, image_ids, source_site=None, image_folder: PosixPath | None = IMAGES_FOLDER) -> None:
@@ -222,6 +282,9 @@ class ImportExportImages:
         self.image_data = self.get_image_data()
 
     def get_image_data(self) -> dict:
+        """
+        Return the content of `image_data.json`, or an empty dict if the file doesn't exist.
+        """
         if os.path.isfile(self.image_data_file):
             with open(self.image_data_file, "r") as json_file:
                 image_data = json.load(json_file)
@@ -231,13 +294,26 @@ class ImportExportImages:
         return image_data
 
     def source_image_api_url(self, image_id: int) -> str:
+        """
+        Return the URL of the image in the API of the source site.
+        """
         return f"{self.source_site}api/v2/images/{image_id}/"
 
     def get_content_from_source_image(self, image_id: int) -> dict:
+        """
+        Fetch the image from the API of the source site and return its JSON content.
+        """
         response = requests.get(self.source_image_api_url(image_id), timeout=5)
         return response.json()
 
     def download_images(self) -> None:
+        """
+        Download the images from the source site to `image_folder`, and save their metadata
+        in `image_data.json`.
+
+        The DSFR pictograms are not downloaded, as they should already be present
+        on the target site: they are found again by their title when imported.
+        """
         for i in self.image_ids:
             i = str(i)
             image = self.get_content_from_source_image(i)
@@ -270,6 +346,10 @@ class ImportExportImages:
             json_file.write("\n")
 
     def import_images(self) -> None:
+        """
+        Import the images from `image_folder`, and store the ID of each local image
+        in the `local_id` key of its entry in `image_data`.
+        """
         for i in self.image_ids:
             i = str(i)
             image_data = self.image_data[i]
@@ -283,6 +363,9 @@ class ImportExportImages:
                 image_data["local_id"] = image.id
 
     def get_or_create_image(self, image_data) -> Image:
+        """
+        Return the local image with the same file hash, or create it from the file in `image_folder`.
+        """
         filename = image_data["filename"]
         imported_filename = f"template_image_{filename.lower()}"
         title = image_data["title"]
@@ -308,6 +391,8 @@ class ImportExportImages:
 def remove_block_ids(json_object):
     """
     Parse a page JSON StreamField representation and strip the block IDs
+
+    Returns a new structure, the original one is not modified.
     """
     if not isinstance(json_object, (dict, list)):
         return json_object
@@ -319,6 +404,10 @@ def remove_block_ids(json_object):
 def update_streamfield_image_ids(json_object, image_ids):
     """
     Parse a page JSON StreamField representation and update the image IDs
+
+    `image_ids` maps the source image IDs (as strings) to dicts holding the local ID
+    in their `local_id` key, such as `ImportExportImages.image_data`.
+    The dicts are updated in place; the updated structure is also returned.
     """
     if isinstance(json_object, dict):
         for k, v in json_object.items():
