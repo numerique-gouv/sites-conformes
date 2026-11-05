@@ -70,6 +70,9 @@ SF_NOINDEX = getenv_bool("SF_NOINDEX", False)
 # Let browsers and the CDN cache anonymous pages for this many seconds (0 = disabled, default)
 SF_PUBLIC_CACHE_MAX_AGE = int(os.getenv("SF_PUBLIC_CACHE_MAX_AGE", 0))
 
+# Restricts each contributor to the sites of their groups
+SF_MULTISITE_ISOLATION_ENABLED = getenv_bool("SF_MULTISITE_ISOLATION_ENABLED", False)
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]

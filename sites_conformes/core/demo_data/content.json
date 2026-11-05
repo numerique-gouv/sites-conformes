@@ -1,0 +1,804 @@
+{
+  "images": {
+    "allumeur": {
+      "file": "allumeur.jpg",
+      "title": "Allumeur de réverbères (Carle Vernet, entre 1816 et 1836, domaine public)",
+      "alt": "Lithographie : un allumeur en tablier, debout sur une rue pavée, prépare la lanterne d’un réverbère descendue au bout de sa corde.",
+      "site": "a"
+    },
+    "lampadaire": {
+      "file": "place-du-marche-de-nuit.jpg",
+      "title": "La place du Vieux Marché de Varsovie la nuit (Józef Pankiewicz, 1892, domaine public)",
+      "alt": "Tableau : une place pavée et mouillée, la nuit, éclairée par deux réverbères à gaz accrochés à une façade ; des passants se détachent dans l’ombre.",
+      "site": "a"
+    },
+    "lanternes": {
+      "file": "lanternes-a-gaz.jpg",
+      "title": "Lanternes à gaz (Jorge Láscar, CC BY 2.0)",
+      "alt": "Une rangée de lanternes à gaz le long d’une rue.",
+      "site": "a"
+    },
+    "pont": {
+      "file": "pont-lampadaires.jpg",
+      "title": "Pont et lampadaires (Dimitri Destugues, CC BY-SA 3.0)",
+      "alt": "Un pont bordé de lampadaires dorés au crépuscule.",
+      "site": "a"
+    },
+    "reverbere": {
+      "file": "reverbere.jpg",
+      "title": "Réverbère (Matti Blume, CC BY-SA 4.0)",
+      "alt": "Un réverbère en fonte au premier plan d’une place.",
+      "site": "a"
+    },
+    "europe-nuit": {
+      "file": "europe-de-nuit.jpg",
+      "title": "L’Espagne, la France et l’Italie la nuit, vues de la Station spatiale internationale (NASA)",
+      "alt": "Vue nocturne de l’Europe de l’Ouest depuis l’espace : les lumières des villes et des côtes de l’Espagne, de la France et de l’Italie, sous la fine ligne bleue de l’atmosphère.",
+      "site": "a"
+    },
+    "ville": {
+      "file": "ville-de-nuit.jpg",
+      "title": "Une ville la nuit vue de l’espace (NASA)",
+      "alt": "Vue nocturne d’une grande ville depuis l’orbite terrestre.",
+      "site": "a"
+    },
+    "lune": {
+      "file": "pleine-lune.jpg",
+      "title": "Pleine lune (NASA/Kim Shiflett)",
+      "alt": "La pleine lune sur un ciel noir.",
+      "site": null
+    },
+    "saturne": {
+      "file": "saturne.jpg",
+      "title": "Saturne (NASA/JPL)",
+      "alt": "La planète Saturne et ses anneaux.",
+      "site": "b"
+    },
+    "mars": {
+      "file": "sol-martien.jpg",
+      "title": "Sol martien (NASA/JPL-Caltech/MSSS)",
+      "alt": "Un sol couvert de graviers sur la planète Mars.",
+      "site": "b"
+    },
+    "jupiter": {
+      "file": "jupiter.jpg",
+      "title": "Jupiter (NASA/JPL-Caltech/SwRI)",
+      "alt": "La face sombre de Jupiter photographiée par la sonde Juno.",
+      "site": "b"
+    },
+    "voie-lactee": {
+      "file": "voie-lactee.jpg",
+      "title": "Centre de la Voie lactée (NASA/JPL-Caltech)",
+      "alt": "Le centre de la Voie lactée en infrarouge, rougeoyant de poussières.",
+      "site": "b"
+    },
+    "orion": {
+      "file": "nebuleuse-orion.jpg",
+      "title": "Nébuleuse d’Orion (NASA, Hubble Heritage Team)",
+      "alt": "Une étoile jeune entourée de gaz dans la nébuleuse d’Orion.",
+      "site": "b"
+    },
+    "observatoire": {
+      "file": "planisphere-celeste.jpg",
+      "title": "Planisphère céleste (J. Forest, 1947, domaine public)",
+      "alt": "Carte ancienne du ciel : les hémisphères boréal et austral, avec leurs constellations nommées, au-dessus d’une bande représentant le zodiaque.",
+      "site": "b"
+    },
+    "telescope": {
+      "file": "telescope.jpg",
+      "title": "Coupole de télescope la nuit (KPNO/NOIRLab/NSF/AURA/P. Marenfeld, CC BY 4.0)",
+      "alt": "La coupole d’un télescope sous la Voie lactée.",
+      "site": "b"
+    },
+    "schema-mars": {
+      "file": "schema-mars.svg",
+      "title": "Schéma : déclarer une étoile sur Mars",
+      "alt": "Schéma : la planète Mars, surmontée de l’antenne de la direction générale, et un calendrier où seuls les jours pairs sont mis en évidence.",
+      "site": "b"
+    },
+    "schema-jupiter": {
+      "file": "schema-jupiter.svg",
+      "title": "Schéma : déclarer une étoile sur Jupiter",
+      "alt": "Schéma : la planète Jupiter entourée d’éclairs, et un appareil photo barré, avec la mention « Sans photo ».",
+      "site": "b"
+    },
+    "schema-saturne": {
+      "file": "schema-saturne.svg",
+      "title": "Schéma : déclarer une étoile sur Saturne",
+      "alt": "Schéma : la planète Saturne et ses anneaux, et une étoile vue à travers les anneaux, comptée une seule fois.",
+      "site": "b"
+    },
+    "ministre-a": {
+      "file": "ministre-lampadaires.jpg",
+      "title": "Portrait officiel de Luc Falotier, ministre des Lampadaires et des Planètes",
+      "alt": "Luc Falotier, assis à son bureau devant une carte du système solaire, porte à la boutonnière un insigne en forme de lampadaire.",
+      "site": "a"
+    },
+    "ministre-b": {
+      "file": "ministre-recensement.jpg",
+      "title": "Portrait officiel de Najma Al-Biruni, ministre déléguée chargée du Recensement des étoiles",
+      "alt": "Najma Al-Biruni, assise à son bureau, porte une écharpe tricolore et une broche en forme d’étoile.",
+      "site": "b"
+    },
+    "portrait-camille": {
+      "file": "portrait-camille-roux.svg",
+      "title": "Portrait de Camille Roux",
+      "alt": "",
+      "site": null
+    },
+    "portrait-leon": {
+      "file": "portrait-leon-marchal.svg",
+      "title": "Portrait de Léon Marchal",
+      "alt": "",
+      "site": null
+    },
+    "portrait-ines": {
+      "file": "portrait-ines-garnier.svg",
+      "title": "Portrait d’Inès Garnier",
+      "alt": "",
+      "site": null
+    },
+    "portrait-hugo": {
+      "file": "portrait-hugo-lambert.svg",
+      "title": "Portrait d’Hugo Lambert",
+      "alt": "",
+      "site": null
+    },
+    "portrait-nora": {
+      "file": "portrait-nora-benali.svg",
+      "title": "Portrait de Nora Benali",
+      "alt": "",
+      "site": null
+    },
+    "portrait-lucie": {
+      "file": "portrait-lucie-moreau.svg",
+      "title": "Portrait de Lucie Moreau",
+      "alt": "",
+      "site": null
+    },
+    "portrait-paul": {
+      "file": "portrait-paul-verdier.svg",
+      "title": "Portrait de Paul Verdier",
+      "alt": "",
+      "site": null
+    }
+  },
+  "categories": [
+    {
+      "key": "actualites",
+      "name": "Actualités",
+      "slug": "actualites",
+      "description": "Toutes les actualités de l’administration.",
+      "en": { "name": "News", "slug": "news" }
+    },
+    {
+      "key": "eclairage",
+      "name": "Éclairage",
+      "slug": "eclairage",
+      "description": "L’éclairage public sur toutes les planètes habitées.",
+      "en": { "name": "Lighting", "slug": "lighting" }
+    },
+    {
+      "key": "lampadaires",
+      "name": "Lampadaires",
+      "slug": "lampadaires",
+      "parent": "eclairage",
+      "description": "Installation, entretien et allumage des lampadaires.",
+      "en": { "name": "Street lamps", "slug": "street-lamps" }
+    },
+    {
+      "key": "horaires",
+      "name": "Horaires",
+      "slug": "horaires",
+      "description": "Changements d’horaires d’allumage et d’extinction.",
+      "en": { "name": "Schedules", "slug": "schedules" }
+    },
+    { "key": "recensement", "name": "Recensement", "slug": "recensement", "description": "Le recensement annuel des étoiles." },
+    { "key": "demarches", "name": "Démarches", "slug": "demarches", "description": "Vos démarches auprès de la direction générale." },
+    { "key": "evenements", "name": "Événements", "slug": "evenements", "description": "Observations, conférences et nuits des étoiles." },
+    { "key": "archives", "name": "Archives", "slug": "archives", "description": "Catégorie conservée pour les anciens contenus." }
+  ],
+  "organizations": [
+    { "key": "longitudes", "name": "Bureau des longitudes", "slug": "bureau-des-longitudes" },
+    { "key": "allumage", "name": "Service de l’allumage", "slug": "service-de-l-allumage" },
+    { "key": "observatoire", "name": "Observatoire du recensement", "slug": "observatoire-du-recensement" },
+    { "key": "asteroides", "name": "Commission des astéroïdes", "slug": "commission-des-asteroides" }
+  ],
+  "persons": [
+    {
+      "key": "camille",
+      "name": "Camille Roux",
+      "role": "Cheffe du bureau des longitudes",
+      "organization": "longitudes",
+      "contact_info": "bureau.longitudes@example.org",
+      "image": "portrait-camille"
+    },
+    {
+      "key": "leon",
+      "name": "Léon Marchal",
+      "role": "Allumeur en chef",
+      "organization": "allumage",
+      "contact_info": "",
+      "image": "portrait-leon"
+    },
+    {
+      "key": "ines",
+      "name": "Inès Garnier",
+      "role": "Chargée de communication",
+      "organization": "allumage",
+      "contact_info": "communication@example.org",
+      "image": "portrait-ines"
+    },
+    {
+      "key": "hugo",
+      "name": "Hugo Lambert",
+      "role": "Astronome recenseur",
+      "organization": "observatoire",
+      "contact_info": "",
+      "image": "portrait-hugo"
+    },
+    {
+      "key": "nora",
+      "name": "Nora Benali",
+      "role": "Directrice adjointe",
+      "organization": "observatoire",
+      "contact_info": "",
+      "image": "portrait-nora"
+    },
+    {
+      "key": "lucie",
+      "name": "Lucie Moreau",
+      "role": "Responsable des événements",
+      "organization": "observatoire",
+      "contact_info": "evenements@example.org",
+      "image": "portrait-lucie"
+    },
+    {
+      "key": "paul",
+      "name": "Paul Verdier",
+      "role": "Rapporteur",
+      "organization": "asteroides",
+      "contact_info": "",
+      "image": "portrait-paul"
+    }
+  ],
+  "sites": [
+    {
+      "key": "a",
+      "hostname": "site-a.localhost",
+      "site_name": "Ministère des Lampadaires et des Planètes",
+      "short_name": "Lampadaires",
+      "config": {
+        "header_brand": "Ministère des Lampadaires et des Planètes",
+        "header_brand_html": "Ministère<br />des Lampadaires<br />et des Planètes",
+        "footer_brand": "Ministère des Lampadaires et des Planètes",
+        "footer_brand_html": "Ministère<br />des Lampadaires<br />et des Planètes",
+        "site_title": "Ministère des Lampadaires et des Planètes",
+        "site_tagline": "Un réverbère allumé sur chaque planète",
+        "footer_description": "<p><strong>Site de démonstration :</strong> le ministère des Lampadaires et des Planètes est une administration fictive. Ce site sert uniquement au développement et aux tests de Sites Conformes.</p>",
+        "language_selector_mode": "simple"
+      },
+      "main_menu": [
+        {
+          "megamenu": {
+            "label": "Le ministère",
+            "description": "Qui sommes-nous et que pouvons-nous faire pour votre planète ?",
+            "main_link": { "page": "le-ministere", "text": "Voir toute la rubrique" },
+            "columns": [
+              {
+                "label": "Découvrir le ministère",
+                "links": ["le-ministere/nos-missions", "le-ministere/organisation", "le-ministere/le-ministre", "le-ministere/nos-implantations"]
+              },
+              {
+                "label": "Vos services",
+                "links": ["vos-services/horaires-d-allumage", "vos-services/signaler-une-panne", "vos-services/demander-un-reverbere", "vos-services/devenir-allumeur"]
+              }
+            ],
+            "en": {
+              "label": "The ministry",
+              "description": "Who we are and what we can do for your planet.",
+              "main_link_text": "See the whole section",
+              "columns": ["Discover the ministry", "Services"]
+            }
+          }
+        },
+        { "link": "actualites" },
+        { "link": "contact" }
+      ],
+      "home": {
+        "title": "Accueil",
+        "header_image": "pont",
+        "body": [
+          { "paragraph": "<h2>Bienvenue sur le site du ministère des Lampadaires et des Planètes</h2><p>Le ministère veille à ce que chaque planète habitée dispose d’un éclairage public fiable, allumé et éteint aux heures fixées par la consigne.</p>" },
+          { "image": "europe-nuit" },
+          { "paragraph": "<p>Retrouvez nos missions, les horaires d’allumage de votre planète et nos dernières actualités.</p>" }
+        ],
+        "en": {
+          "title": "Home",
+          "body": [
+            { "paragraph": "<h2>Welcome to the Ministry of Street Lamps and Planets</h2><p>The ministry makes sure every inhabited planet has reliable street lighting, lit and put out at the hours set by the instructions.</p>" },
+            { "image": "europe-nuit" },
+            { "paragraph": "<p>Find out about our missions, the lighting schedule for your planet and our latest news.</p>" }
+          ]
+        },
+        "children": [
+          {
+            "slug": "le-ministere",
+            "title": "Le ministère",
+            "body": [
+              { "paragraph": "<p>Missions, organisation et implantations du ministère des Lampadaires et des Planètes.</p>" },
+              { "subpageslist": null }
+            ],
+            "en": {
+              "slug": "the-ministry",
+              "title": "The ministry",
+              "body": [{ "paragraph": "<p>Missions, organisation and locations of the Ministry of Street Lamps and Planets.</p>" }, { "subpageslist": null }]
+            },
+            "children": [
+          {
+            "slug": "nos-missions",
+            "title": "Nos missions",
+            "header_image": "lampadaire",
+            "body": [
+              { "paragraph": "<p>Le ministère des Lampadaires et des Planètes exerce trois missions :</p><ul><li>installer et entretenir les réverbères sur les planètes habitées ;</li><li>fixer la consigne d’allumage et d’extinction ;</li><li>former et accompagner les allumeurs.</li></ul>" },
+              { "image": "allumeur", "width": "fr-content-media--sm" },
+              { "paragraph": "<p>Il travaille avec le bureau des longitudes, qui calcule la durée des jours de chaque planète.</p>" }
+            ],
+            "en": {
+              "slug": "our-missions",
+              "title": "Our missions",
+              "body": [
+                { "paragraph": "<p>The Ministry of Street Lamps and Planets has three missions:</p><ul><li>installing and maintaining street lamps on inhabited planets;</li><li>setting the lighting instructions;</li><li>training and supporting lamplighters.</li></ul>" },
+                { "image": "allumeur", "width": "fr-content-media--sm" },
+                { "paragraph": "<p>It works with the Longitude Office, which computes the length of the day on each planet.</p>" }
+              ]
+            }
+          },
+          {
+            "slug": "organisation",
+            "title": "Organisation",
+            "body": [
+              { "paragraph": "<p>Le ministère comprend trois directions et un secrétariat général :</p><ul><li>la direction de l’allumage ;</li><li>la direction des planètes ;</li><li>la direction de l’entretien des lanternes ;</li><li>le secrétariat général.</li></ul>" }
+            ],
+            "en": {
+              "slug": "organisation",
+              "title": "Organisation",
+              "body": [{ "paragraph": "<p>The ministry has three directorates and a general secretariat: lighting, planets, and lantern maintenance.</p>" }]
+            }
+          },
+          {
+            "slug": "le-ministre",
+            "title": "Le ministre",
+            "body": [
+              {
+                "imageandtext": {
+                  "image": "ministre-a",
+                  "text": "<h2>Luc Falotier</h2><p><strong>Ministre des Lampadaires et des Planètes</strong> depuis le 3 mars 2024.</p><p>Le ministre fixe la consigne d’allumage et préside le conseil des allumeurs. Il reçoit le public le premier lundi de chaque mois, entre deux couchers de soleil.</p>"
+                }
+              },
+              { "paragraph": "<h2>Biographie</h2><p>Né en 1961 sur la planète 325, Luc Falotier commence sa carrière comme allumeur sur une petite planète qui tournait si vite qu’il rallumait son réverbère toutes les minutes.</p><p>Diplômé de l’École nationale des lanternes, il entre au ministère en 1989 comme ingénieur de l’éclairage. Il dirige ensuite le service de l’allumage, où il conduit le plan de rénovation des lanternes à gaz, puis devient directeur des planètes en 2015.</p><p>Il est nommé ministre des Lampadaires et des Planètes le 3 mars 2024.</p><h2>Parcours</h2><ul><li>2024 : ministre des Lampadaires et des Planètes ;</li><li>2015-2024 : directeur des planètes ;</li><li>2003-2015 : chef du service de l’allumage ;</li><li>1989-2003 : ingénieur de l’éclairage ;</li><li>1982-1989 : allumeur sur la planète 329.</li></ul>" }
+            ],
+            "en": {
+              "slug": "the-minister",
+              "title": "The minister",
+              "body": [
+                {
+                  "imageandtext": {
+                    "image": "ministre-a",
+                    "text": "<h2>Luc Falotier</h2><p><strong>Minister of Street Lamps and Planets</strong> since 3 March 2024.</p><p>The minister sets the lighting instructions and chairs the lamplighters’ council.</p>"
+                  }
+                },
+                { "paragraph": "<h2>Biography</h2><p>Born in 1961 on planet 325, Luc Falotier began his career as a lamplighter on a small planet that spun so fast he relit his lamp every minute.</p><p>A graduate of the National School of Lanterns, he joined the ministry in 1989 as a lighting engineer, then headed the lighting service and the planets directorate before being appointed minister in 2024.</p>" }
+              ]
+            }
+          },
+          {
+            "slug": "nos-implantations",
+            "title": "Nos implantations",
+            "header_image": "ville",
+            "body": [
+              { "paragraph": "<p>Le ministère dispose d’une antenne sur chaque planète habitée. Les plus petites planètes sont rattachées à l’antenne la plus proche.</p>" }
+            ],
+            "en": {
+              "slug": "our-locations",
+              "title": "Our locations",
+              "body": [{ "paragraph": "<p>The ministry has an office on every inhabited planet. The smallest planets depend on the nearest office.</p>" }]
+            }
+          }
+            ]
+          },
+          {
+            "slug": "vos-services",
+            "title": "Vos services",
+            "body": [
+              { "paragraph": "<p>Horaires, signalements et démarches auprès du ministère.</p>" },
+              { "subpageslist": null }
+            ],
+            "en": {
+              "slug": "services",
+              "title": "Services",
+              "body": [{ "paragraph": "<p>Schedules, reports and procedures with the ministry.</p>" }, { "subpageslist": null }]
+            },
+            "children": [
+          {
+            "slug": "horaires-d-allumage",
+            "title": "Horaires d’allumage",
+            "header_image": "lanternes",
+            "body": [
+              { "alert": { "title": "Planète à rotation rapide", "description": "Sur certaines petites planètes, le jour dure une minute : l’allumeur rallume alors son réverbère toutes les trente secondes.", "level": "info" } },
+              { "paragraph": "<p>Les horaires d’allumage dépendent de la durée du jour sur chaque planète. Ils sont publiés chaque mois par le bureau des longitudes.</p><p>Les réverbères sont allumés au coucher du soleil et éteints à son lever.</p>" }
+            ],
+            "en": {
+              "slug": "lighting-schedule",
+              "title": "Lighting schedule",
+              "body": [
+                { "alert": { "title": "Fast-spinning planets", "description": "On some small planets, a day lasts one minute: the lamplighter then relights the lamp every thirty seconds.", "level": "info" } },
+                { "paragraph": "<p>Lighting hours depend on the length of the day on each planet. They are published every month by the Longitude Office.</p><p>Street lamps are lit at sunset and put out at sunrise.</p>" }
+              ]
+            }
+          },
+          {
+            "slug": "signaler-une-panne",
+            "title": "Signaler une panne de réverbère",
+            "body": [
+              { "alert": { "title": "Réverbère éteint en pleine nuit ?", "description": "Signalez-le dans l’heure : l’allumeur de votre planète intervient avant le prochain coucher de soleil.", "level": "warning" } },
+              { "paragraph": "<p>Indiquez la planète, l’emplacement du réverbère et la nature de la panne : lanterne cassée, mèche usée ou réverbère qui ne s’éteint plus.</p>" }
+            ],
+            "en": {
+              "slug": "report-a-faulty-street-lamp",
+              "title": "Report a faulty street lamp",
+              "body": [{ "paragraph": "<p>Give the planet, the location of the street lamp and the type of fault.</p>" }]
+            }
+          },
+          {
+            "slug": "demander-un-reverbere",
+            "title": "Demander un réverbère",
+            "header_image": "reverbere",
+            "body": [
+              { "paragraph": "<p>Toute planète habitée peut demander l’installation d’un réverbère. La demande est faite par son habitant, ou par l’un d’eux s’ils sont plusieurs.</p><ol><li>Remplissez le formulaire de demande.</li><li>Un agent du ministère visite la planète.</li><li>Le réverbère est installé dans un délai de trois rotations.</li></ol>" }
+            ],
+            "en": {
+              "slug": "request-a-street-lamp",
+              "title": "Request a street lamp",
+              "body": [{ "paragraph": "<p>Any inhabited planet can request a street lamp. An agent of the ministry visits the planet before installation.</p>" }]
+            }
+          },
+          {
+            "slug": "devenir-allumeur",
+            "title": "Devenir allumeur",
+            "header_image": "allumeur",
+            "body": [
+              { "paragraph": "<p>Le métier d’allumeur demande de la rigueur : la consigne doit être respectée, même quand la planète tourne de plus en plus vite.</p><p>Les candidatures sont ouvertes toute l’année.</p>" }
+            ],
+            "en": {
+              "slug": "become-a-lamplighter",
+              "title": "Become a lamplighter",
+              "body": [{ "paragraph": "<p>Being a lamplighter takes discipline: the instructions must be followed, even when the planet spins faster and faster.</p>" }]
+            }
+          }
+            ]
+          },
+          {
+            "type": "blog_index",
+            "slug": "actualites",
+            "title": "Actualités",
+            "body": [{ "paragraph": "<p>Les dernières actualités du ministère.</p>" }],
+            "en": { "slug": "news", "title": "News", "body": [{ "paragraph": "<p>The latest news from the ministry.</p>" }] },
+            "entries": [
+              {
+                "slug": "nouvelle-consigne-d-allumage",
+                "title": "Une nouvelle consigne d’allumage",
+                "date": "2026-01-12",
+                "categories": ["actualites", "horaires"],
+                "authors": ["ines"],
+                "preview_image": "lanternes",
+                "body": [{ "paragraph": "<p>À partir du 1er février, les réverbères seront allumés dix minutes avant le coucher du soleil.</p>" }],
+                "en": { "slug": "new-lighting-instructions", "title": "New lighting instructions", "body": [{ "paragraph": "<p>From 1 February, street lamps will be lit ten minutes before sunset.</p>" }] }
+              },
+              {
+                "slug": "mille-reverberes-renoves",
+                "title": "Mille réverbères rénovés en un an",
+                "date": "2026-02-03",
+                "categories": ["lampadaires"],
+                "authors": ["leon"],
+                "preview_image": "reverbere",
+                "body": [{ "paragraph": "<p>Le plan de rénovation a permis de remplacer mille lanternes usées par des modèles plus sobres.</p>" }],
+                "en": { "slug": "a-thousand-lamps-renovated", "title": "A thousand street lamps renovated in a year", "body": [{ "paragraph": "<p>The renovation plan replaced a thousand worn lanterns with more efficient models.</p>" }] }
+              },
+              {
+                "slug": "recrutement-allumeurs",
+                "title": "Le ministère recrute des allumeurs",
+                "date": "2026-03-10",
+                "categories": ["actualites"],
+                "authors": ["ines", "camille"],
+                "preview_image": "allumeur",
+                "body": [{ "paragraph": "<p>Vingt postes d’allumeur sont ouverts sur les planètes de la ceinture extérieure.</p>" }],
+                "en": { "slug": "lamplighters-wanted", "title": "The ministry is hiring lamplighters", "body": [{ "paragraph": "<p>Twenty lamplighter positions are open on the planets of the outer belt.</p>" }] }
+              },
+              {
+                "slug": "eclairage-et-etoiles",
+                "title": "Éclairer sans cacher les étoiles",
+                "date": "2026-04-02",
+                "categories": ["eclairage"],
+                "authors": ["camille"],
+                "preview_image": "ville",
+                "body": [{ "paragraph": "<p>Le ministère et la direction générale du Recensement des étoiles réduisent la lumière dirigée vers le ciel.</p>" }],
+                "en": { "slug": "lighting-without-hiding-stars", "title": "Lighting without hiding the stars", "body": [{ "paragraph": "<p>The ministry and the Star Census Directorate are reducing light pointed at the sky.</p>" }] }
+              },
+              {
+                "slug": "planete-b612",
+                "title": "Un réverbère pour la planète B 612",
+                "date": "2026-04-28",
+                "categories": ["lampadaires"],
+                "authors": ["leon"],
+                "preview_image": "lampadaire",
+                "body": [{ "paragraph": "<p>La planète B 612 reçoit son premier réverbère, installé entre deux volcans.</p>" }],
+                "en": { "slug": "asteroid-b612", "title": "A street lamp for asteroid B 612", "body": [{ "paragraph": "<p>Asteroid B 612 gets its first street lamp, set between two volcanoes.</p>" }] }
+              },
+              {
+                "slug": "horaires-d-ete",
+                "title": "Passage aux horaires d’été",
+                "date": "2026-05-15",
+                "categories": ["horaires"],
+                "authors": ["ines"],
+                "preview_image": "europe-nuit",
+                "body": [{ "paragraph": "<p>Les horaires d’été s’appliquent dès le 1er juin sur les planètes de l’hémisphère nord.</p>" }],
+                "en": { "slug": "summer-schedule", "title": "Switching to the summer schedule", "body": [{ "paragraph": "<p>The summer schedule applies from 1 June on northern-hemisphere planets.</p>" }] }
+              },
+              {
+                "slug": "rapport-annuel",
+                "title": "Le rapport annuel est en ligne",
+                "date": "2026-06-20",
+                "categories": ["actualites"],
+                "authors": ["camille"],
+                "preview_image": "pont",
+                "body": [{ "paragraph": "<p>Le rapport annuel présente l’activité du ministère et le nombre de réverbères allumés chaque soir.</p>" }],
+                "en": { "slug": "annual-report", "title": "The annual report is online", "body": [{ "paragraph": "<p>The annual report covers the ministry’s work and the number of lamps lit each evening.</p>" }] }
+              },
+              {
+                "slug": "lanternes-a-gaz",
+                "title": "Les dernières lanternes à gaz",
+                "date": "2026-07-08",
+                "categories": ["lampadaires"],
+                "authors": ["leon"],
+                "preview_image": "lanternes",
+                "body": [{ "paragraph": "<p>Quelques planètes gardent leurs lanternes à gaz, allumées à la main deux fois par jour.</p>" }],
+                "en": { "slug": "the-last-gas-lamps", "title": "The last gas lamps", "body": [{ "paragraph": "<p>A few planets keep their gas lamps, lit by hand twice a day.</p>" }] }
+              },
+              {
+                "slug": "nuit-sans-eclairage",
+                "title": "Une nuit sans éclairage pour observer le ciel",
+                "date": "2026-08-12",
+                "categories": ["eclairage", "actualites"],
+                "authors": ["ines"],
+                "preview_image": "lune",
+                "body": [{ "paragraph": "<p>Le 12 août, les réverbères resteront éteints pour la nuit des étoiles.</p>" }],
+                "en": { "slug": "a-night-without-lights", "title": "A night without street lights to watch the sky", "body": [{ "paragraph": "<p>On 12 August, street lamps will stay off for the night of the stars.</p>" }] }
+              },
+              {
+                "slug": "formation-des-allumeurs",
+                "title": "Une formation pour les nouveaux allumeurs",
+                "date": "2026-09-22",
+                "categories": ["lampadaires"],
+                "authors": ["leon", "ines"],
+                "preview_image": "reverbere",
+                "body": [{ "paragraph": "<p>La formation dure trois jours et porte sur la consigne, la sécurité et l’entretien des lanternes.</p>" }],
+                "en": { "slug": "training-new-lamplighters", "title": "Training for new lamplighters", "body": [{ "paragraph": "<p>The three-day course covers the instructions, safety and lantern maintenance.</p>" }] }
+              }
+            ]
+          },
+          {
+            "type": "contact",
+            "slug": "contact",
+            "title": "Contact",
+            "intro": "<p>Une question sur l’éclairage de votre planète ? Écrivez-nous avec le formulaire ci-dessous.</p>",
+            "en": { "slug": "contact", "title": "Contact", "intro": "<p>A question about the lighting on your planet? Write to us using the form below.</p>" }
+          },
+          {
+            "slug": "mentions-legales",
+            "title": "Mentions légales",
+            "menu": "footer",
+            "body": [{ "paragraph": "<p>Ce site est édité par le ministère des Lampadaires et des Planètes, administration fictive créée pour les tests de Sites Conformes.</p><p>Directeur de la publication : le ministre des Lampadaires et des Planètes.</p>" }],
+            "en": { "slug": "legal-notice", "title": "Legal notice", "body": [{ "paragraph": "<p>This site is published by the Ministry of Street Lamps and Planets, a fictional administration created to test Sites Conformes.</p>" }] }
+          },
+          {
+            "slug": "accessibilite",
+            "title": "Déclaration d’accessibilité",
+            "menu": "footer",
+            "footer_label": "Accessibilité : partiellement conforme",
+            "body": [{ "paragraph": "<p>Le ministère des Lampadaires et des Planètes s’engage à rendre son site accessible.</p><p>Ce site est partiellement conforme au référentiel général d’amélioration de l’accessibilité (RGAA).</p>" }],
+            "en": { "slug": "accessibility", "title": "Accessibility statement", "footer_label": "Accessibility: partially compliant", "body": [{ "paragraph": "<p>The Ministry of Street Lamps and Planets is committed to making its site accessible.</p>" }] }
+          }
+        ]
+      }
+    },
+    {
+      "key": "b",
+      "hostname": "site-b.localhost",
+      "site_name": "Direction générale du Recensement des étoiles",
+      "short_name": "Recensement des étoiles",
+      "config": {
+        "header_brand": "République française",
+        "header_brand_html": "République<br />française",
+        "footer_brand": "République française",
+        "footer_brand_html": "République<br />française",
+        "site_title": "Direction générale du Recensement des étoiles",
+        "site_tagline": "Compter les étoiles, une par une",
+        "footer_description": "<p><strong>Site de démonstration :</strong> la direction générale du Recensement des étoiles est une administration fictive. Ce site sert uniquement au développement et aux tests de Sites Conformes.</p>",
+        "language_selector_mode": "simple"
+      },
+      "main_menu": [
+        {
+          "submenu": {
+            "label": "Démarches",
+            "links": ["demarches", "demarches/declarer-une-etoile", "demarches/par-planete", "demarches/par-planete/fiche-mars", "demarches/par-planete/fiche-jupiter", "demarches/par-planete/fiche-saturne"],
+            "en": { "label": "Procedures" }
+          }
+        },
+        { "link": "agenda" },
+        { "link": "actualites" },
+        {
+          "submenu": {
+            "label": "Nous connaître",
+            "links": ["la-ministre", "recensement", "contact"],
+            "en": { "label": "About us" }
+          }
+        }
+      ],
+      "home": {
+        "title": "Accueil",
+        "header_image": "voie-lactee",
+        "body": [
+          { "paragraph": "<h2>Direction générale du Recensement des étoiles</h2><p>La direction générale tient le registre officiel des étoiles : leur nombre, leur propriétaire déclaré et leur planète de rattachement.</p>" },
+          { "image": "observatoire" },
+          { "paragraph": "<p>Déclarez une étoile, consultez les fiches par planète et retrouvez l’agenda des nuits d’observation.</p>" }
+        ],
+        "en": {
+          "title": "Home",
+          "body": [
+            { "paragraph": "<h2>Star Census Directorate</h2><p>The directorate keeps the official star register: how many stars there are, who declared them and which planet they belong to.</p>" },
+            { "image": "observatoire" }
+          ]
+        },
+        "children": [
+          {
+            "slug": "demarches",
+            "title": "Démarches",
+            "body": [
+              { "paragraph": "<p>Toutes les démarches auprès de la direction générale du Recensement des étoiles.</p>" },
+              { "subpageslist": null }
+            ],
+            "en": { "slug": "procedures", "title": "Procedures", "body": [{ "paragraph": "<p>All procedures with the Star Census Directorate.</p>" }] },
+            "children": [
+              {
+                "slug": "declarer-une-etoile",
+                "title": "Déclarer une étoile",
+                "body": [
+                  { "paragraph": "<p>Toute personne qui découvre une étoile peut la déclarer. La déclaration est gratuite.</p><ol><li>Notez la position de l’étoile.</li><li>Remplissez le formulaire de déclaration.</li><li>Conservez le numéro d’enregistrement.</li></ol>" }
+                ],
+                "en": { "slug": "declare-a-star", "title": "Declare a star", "body": [{ "paragraph": "<p>Anyone who discovers a star can declare it. Declaration is free.</p>" }] }
+              },
+              {
+                "slug": "par-planete",
+                "title": "Par planète",
+                "body": [
+                  { "paragraph": "<p>Les règles de recensement varient selon les planètes. Choisissez la vôtre.</p>" },
+                  { "subpageslist": null }
+                ],
+                "children": [
+                  {
+                    "slug": "fiche-mars",
+                    "title": "Fiche : Mars",
+                    "header_image": "mars",
+                    "body": [{ "imageandtext": { "image": "schema-mars", "text": "<p>Sur Mars, les étoiles se déclarent auprès de l’antenne de la direction générale, ouverte les jours pairs.</p>" } }]
+                  },
+                  {
+                    "slug": "fiche-jupiter",
+                    "title": "Fiche : Jupiter",
+                    "header_image": "jupiter",
+                    "body": [{ "imageandtext": { "image": "schema-jupiter", "text": "<p>Les orages de Jupiter rendent les observations difficiles : les déclarations y sont acceptées sans photographie.</p>" } }]
+                  },
+                  {
+                    "slug": "fiche-saturne",
+                    "title": "Fiche : Saturne",
+                    "header_image": "saturne",
+                    "body": [{ "imageandtext": { "image": "schema-saturne", "text": "<p>Les étoiles visibles à travers les anneaux de Saturne sont comptées une seule fois.</p>" } }]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "slug": "recensement",
+            "title": "Recensement",
+            "header_image": "orion",
+            "body": [
+              { "paragraph": "<p>Le recensement des étoiles a lieu chaque année, la nuit la plus longue.</p><p>En 2025, la direction générale a recensé cinq cent un millions six cent vingt-deux mille sept cent trente et une étoiles.</p>" },
+              { "image": "voie-lactee" }
+            ],
+            "en": {
+              "slug": "census",
+              "title": "Census",
+              "body": [{ "paragraph": "<p>The star census takes place every year, on the longest night.</p>" }]
+            }
+          },
+          {
+            "type": "events_index",
+            "slug": "agenda",
+            "title": "Agenda",
+            "body": [{ "paragraph": "<p>Nuits d’observation, conférences et rendez-vous de la direction générale.</p>" }],
+            "entries": [
+              { "slug": "nuit-des-etoiles", "title": "Nuit des étoiles", "date": "2026-07-01", "start": "2026-08-12T21:00", "end": "2026-08-13T03:00", "location": "Plateau de l’observatoire", "categories": ["evenements"], "authors": ["lucie"], "preview_image": "telescope", "body": [{ "paragraph": "<p>Observation guidée du ciel, ouverte à tous.</p>" }] },
+              { "slug": "conference-voie-lactee", "title": "Conférence : combien d’étoiles dans la Voie lactée ?", "date": "2026-08-20", "start": "2026-09-17T18:30", "end": "2026-09-17T20:00", "location": "Amphithéâtre de la direction générale", "categories": ["evenements", "recensement"], "authors": ["hugo"], "preview_image": "voie-lactee", "body": [{ "paragraph": "<p>Hugo Lambert présente les méthodes de comptage.</p>" }] },
+              { "slug": "atelier-declaration", "title": "Atelier : déclarer sa première étoile", "date": "2026-09-01", "start": "2026-10-03T10:00", "end": "2026-10-03T12:00", "location": "Antenne de Mars", "categories": ["demarches"], "authors": ["lucie"], "preview_image": "mars", "body": [{ "paragraph": "<p>Un atelier pratique pour remplir la déclaration en ligne.</p>" }] },
+              { "slug": "journee-portes-ouvertes", "title": "Journée portes ouvertes", "date": "2026-09-10", "start": "2026-10-17T09:00", "end": "2026-10-17T17:00", "location": "Siège de la direction générale", "categories": ["evenements"], "authors": ["nora"], "preview_image": "observatoire", "body": [{ "paragraph": "<p>Visite des salles de comptage et du registre des étoiles.</p>" }] },
+              { "slug": "observation-jupiter", "title": "Observation de Jupiter", "date": "2026-09-25", "start": "2026-11-05T20:00", "end": "2026-11-05T23:00", "location": "Coupole nord", "categories": ["evenements"], "authors": ["hugo"], "preview_image": "jupiter", "body": [{ "paragraph": "<p>Jupiter est au plus près : profitez-en pour observer ses bandes nuageuses.</p>" }] },
+              { "slug": "seminaire-recenseurs", "title": "Séminaire des recenseurs", "date": "2026-10-01", "start": "2026-11-19T09:30", "end": "2026-11-20T16:00", "location": "Siège de la direction générale", "categories": ["recensement"], "authors": ["nora", "camille"], "preview_image": "orion", "body": [{ "paragraph": "<p>Deux journées d’échanges entre les recenseurs de toutes les planètes.</p>" }] },
+              { "slug": "nuit-la-plus-longue", "title": "Recensement de la nuit la plus longue", "date": "2026-11-15", "start": "2026-12-21T17:00", "end": "2026-12-22T08:00", "location": "Toutes les planètes", "categories": ["recensement", "evenements"], "authors": ["hugo"], "preview_image": "voie-lactee", "body": [{ "paragraph": "<p>Le grand comptage annuel. Les bénévoles sont les bienvenus.</p>" }] },
+              { "slug": "conference-saturne", "title": "Conférence : les anneaux de Saturne", "date": "2026-12-01", "start": "2027-01-14T18:30", "end": "2027-01-14T20:00", "location": "Amphithéâtre de la direction générale", "categories": ["evenements"], "authors": ["camille"], "preview_image": "saturne", "body": [{ "paragraph": "<p>Faut-il compter deux fois une étoile vue à travers les anneaux ?</p>" }] },
+              { "slug": "pleine-lune-de-fevrier", "title": "Balade sous la pleine lune", "date": "2027-01-10", "start": "2027-02-20T20:30", "end": "2027-02-20T22:30", "location": "Jardin de l’observatoire", "categories": ["evenements"], "authors": ["lucie"], "preview_image": "lune", "body": [{ "paragraph": "<p>Une balade commentée, sans télescope.</p>" }] },
+              { "slug": "resultats-du-recensement", "title": "Présentation des résultats du recensement", "date": "2027-02-01", "start": "2027-03-11T11:00", "end": "2027-03-11T12:30", "location": "Siège de la direction générale", "categories": ["recensement"], "authors": ["nora"], "preview_image": "telescope", "body": [{ "paragraph": "<p>Les chiffres officiels de l’année écoulée.</p>" }] }
+            ]
+          },
+          {
+            "type": "blog_index",
+            "slug": "actualites",
+            "title": "Actualités",
+            "body": [{ "paragraph": "<p>Les actualités de la direction générale.</p>" }],
+            "entries": [
+              { "slug": "nouveau-registre", "title": "Le registre des étoiles passe en ligne", "date": "2026-02-16", "categories": ["actualites", "demarches"], "authors": ["nora"], "preview_image": "observatoire", "body": [{ "paragraph": "<p>Les déclarations peuvent désormais être faites en ligne.</p>" }] },
+              { "slug": "cinq-cents-millions", "title": "Le cap des cinq cents millions d’étoiles est franchi", "date": "2026-05-04", "categories": ["actualites", "recensement"], "authors": ["hugo", "camille"], "preview_image": "voie-lactee", "body": [{ "paragraph": "<p>Le dernier recensement dépasse pour la première fois les cinq cents millions d’étoiles.</p>" }] },
+              { "slug": "moins-de-lumiere", "title": "Moins de lumière, plus d’étoiles", "date": "2026-09-08", "categories": ["actualites"], "authors": ["camille"], "preview_image": "telescope", "body": [{ "paragraph": "<p>Grâce à l’accord avec le ministère des Lampadaires et des Planètes, mille étoiles de plus sont visibles chaque nuit.</p>" }] }
+            ]
+          },
+          {
+            "type": "contact",
+            "slug": "contact",
+            "title": "Contact",
+            "intro": "<p>Pour toute question sur le recensement ou une déclaration en cours, utilisez ce formulaire.</p>",
+            "en": { "slug": "contact", "title": "Contact", "intro": "<p>For any question about the census or a pending declaration, use this form.</p>" }
+          },
+          {
+            "slug": "la-ministre",
+            "title": "La ministre",
+            "body": [
+              {
+                "imageandtext": {
+                  "image": "ministre-b",
+                  "text": "<h2>Najma Al-Biruni</h2><p><strong>Ministre déléguée chargée du Recensement des étoiles</strong> depuis le 12 septembre 2025.</p><p>La ministre déléguée a autorité sur la direction générale du Recensement des étoiles. Elle arrête chaque année les résultats officiels du recensement.</p>"
+                }
+              },
+              { "paragraph": "<h2>Biographie</h2><p>Née en 1972, Najma Al-Biruni est astronome de formation. Elle passe quinze ans à l’observatoire du recensement, où elle met au point la méthode de comptage des étoiles visibles à travers les anneaux de Saturne.</p><p>Élue de la planète 330 en 2014, elle préside la commission du ciel nocturne, qui obtient l’accord sur la réduction de l’éclairage tourné vers le ciel.</p><p>Elle est nommée ministre déléguée chargée du Recensement des étoiles le 12 septembre 2025.</p><h2>Parcours</h2><ul><li>2025 : ministre déléguée chargée du Recensement des étoiles ;</li><li>2014-2025 : élue de la planète 330, présidente de la commission du ciel nocturne ;</li><li>1999-2014 : astronome à l’observatoire du recensement.</li></ul>" }
+            ],
+            "en": {
+              "slug": "the-minister",
+              "title": "The minister",
+              "body": [
+                {
+                  "imageandtext": {
+                    "image": "ministre-b",
+                    "text": "<h2>Najma Al-Biruni</h2><p><strong>Minister Delegate for the Star Census</strong> since 12 September 2025.</p><p>She oversees the Star Census Directorate and approves the official census results every year.</p>"
+                  }
+                },
+                { "paragraph": "<h2>Biography</h2><p>Born in 1972, Najma Al-Biruni is an astronomer. She spent fifteen years at the census observatory, then was elected for planet 330 in 2014, where she chaired the night sky committee.</p>" }
+              ]
+            }
+          },
+          {
+            "slug": "mentions-legales",
+            "title": "Mentions légales",
+            "menu": "footer",
+            "body": [{ "paragraph": "<p>Ce site est édité par la direction générale du Recensement des étoiles, administration fictive créée pour les tests de Sites Conformes.</p>" }]
+          },
+          {
+            "slug": "accessibilite",
+            "title": "Déclaration d’accessibilité",
+            "menu": "footer",
+            "footer_label": "Accessibilité : non conforme",
+            "body": [{ "paragraph": "<p>Ce site n’a pas encore fait l’objet d’un audit de conformité au RGAA.</p>" }]
+          }
+        ]
+      }
+    }
+  ]
+}

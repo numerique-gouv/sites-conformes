@@ -64,6 +64,7 @@ images/
 original_images/
 avatar_images/
 medias/
+medias_ref_*/
 
 # Flask stuff:
 instance/
