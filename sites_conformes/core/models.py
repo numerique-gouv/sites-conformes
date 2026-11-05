@@ -224,6 +224,7 @@ class CatalogIndexPage(AbstractIndexPage):
         MultiFieldPanel(
             [
                 FieldPanel("filter_by_category"),
+                FieldPanel("filter_categories"),
                 FieldPanel("filter_by_tag"),
                 FieldPanel("filter_selection"),
                 FieldPanel("multiple_filter_operator"),
@@ -261,6 +262,7 @@ class CatalogIndexPage(AbstractIndexPage):
                 "paginator": paginator,
                 "tags": self.get_tags(),
                 "categories": self.get_categories(),
+                "category_groups": self.get_category_groups(),
                 "filter_selection_mode": self.filter_selection,
                 **filtered_data,
             }
@@ -416,7 +418,8 @@ class CatalogIndexPage(AbstractIndexPage):
 
     @property
     def show_filters(self) -> bool:
-        return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and self.get_categories())
+        has_categories = any(group for _, group in self.get_category_groups())
+        return bool(self.filter_by_tag and self.get_tags()) or bool(self.filter_by_category and has_categories)
 
     @path("tags/", name="tags_list")
     def tags_list(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
