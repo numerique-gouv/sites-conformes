@@ -1,3 +1,12 @@
+"""
+Methods to get or create various type of contents (collections, pages, menus).
+Moved from utils to avoid circular module dependencies.
+
+They are mostly used by the management commands that create the starter and demo
+contents, and are imported automatically in `python manage.py shell`.
+They are idempotent: calling them twice doesn't create duplicates.
+"""
+
 import sys
 
 from django.core.management.color import color_style
@@ -11,13 +20,11 @@ from sites_conformes.menus.models import FooterBottomMenu, MainMenu
 
 style = color_style()
 
-"""
-Methods to get or create various type of contents.
-Moved from utils to avoid circular module dependencies.
-"""
-
 
 def get_or_create_collection(col_name: str) -> Collection:
+    """
+    Get the collection with the given name, or create it right under the root collection.
+    """
     qs = Collection.objects.filter(name=col_name)
     if qs.count():
         return qs.first()  # type: ignore
@@ -37,6 +44,16 @@ def get_or_create_catalog_index_page(
 ) -> CatalogIndexPage:
     """
     Get a CatalogIndexPage if it exists, or creates it instead.
+
+    Pages are looked up by slug in the locale of the default site, wherever they are
+    in the tree: an existing page is returned as is, without being updated.
+
+    - `body`: the StreamField value, as a list of `(block_name, value)` tuples.
+    - `parent_page`: defaults to the root page of the default site.
+    - `restriction_type`: if set, a `PageViewRestriction` of this type
+      (such as "login") is added to the new page.
+    - `page_fields`: other fields to set on the new page; only the header fields
+      (`HEADER_FIELDS`) and `source_url` are taken into account.
     """
 
     site = get_default_site()
@@ -93,6 +110,16 @@ def get_or_create_content_page(
 ) -> ContentPage:
     """
     Get a ContentPage if it exists, or creates it instead.
+
+    Pages are looked up by slug in the locale of the default site, wherever they are
+    in the tree: an existing page is returned as is, without being updated.
+
+    - `body`: the StreamField value, as a list of `(block_name, value)` tuples.
+    - `parent_page`: defaults to the root page of the default site.
+    - `restriction_type`: if set, a `PageViewRestriction` of this type
+      (such as "login") is added to the new page.
+    - `page_fields`: other fields to set on the new page; only the header fields
+      (`HEADER_FIELDS`) and `source_url` are taken into account.
     """
 
     site = get_default_site()
@@ -141,7 +168,7 @@ def get_or_create_content_page(
 
 def get_or_create_footer_bottom_menu() -> FooterBottomMenu:
     """
-    Get the footer menu or create it if it doesn't already exist
+    Get the footer menu of the default site (in its locale), or create it if it doesn't already exist.
 
     In any case, return it.
     """
@@ -157,9 +184,10 @@ def get_or_create_footer_bottom_menu() -> FooterBottomMenu:
 
 def get_or_create_main_menu() -> MainMenu:
     """
-    Get the main menu or create it if it doesn't already exist
+    Get the main menu of the default site (in its locale), or create it if it doesn't already exist.
 
     In any case, return it.
+    A new main menu gets a link to the home page.
     """
 
     default_site = get_default_site()
