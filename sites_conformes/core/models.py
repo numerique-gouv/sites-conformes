@@ -17,6 +17,7 @@ from modelcluster.models import ClusterableModel
 from modelcluster.tags import ClusterTaggableManager
 from rest_framework import serializers
 from taggit.models import Tag as TaggitTag, TaggedItemBase
+from treebeard.al_tree import AL_Node, AL_NodeManager
 from unidecode import unidecode
 from wagtail.admin.panels import (
     FieldPanel,
@@ -37,6 +38,7 @@ from wagtail.models import Orderable
 from wagtail.models.i18n import TranslatableMixin
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
+from wagtail_in_a_tree.forms import TreeNodeForm, tree_panel
 
 from sites_conformes.core.abstract import AbstractIndexPage, SitesFacilesBasePage
 from sites_conformes.core.blocks.colophon import COLOPHON_BLOCKS
@@ -46,8 +48,18 @@ from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-@register_snippet
-class Category(TranslatableMixin, index.Indexed, Orderable):
+class CategoryManager(AL_NodeManager):
+    def get_queryset(self):
+        # treebeard sorts by parent first, which puts the root categories last; keep the plain sibling order.
+        return models.Manager.get_queryset(self)
+
+
+class Category(AL_Node, TranslatableMixin, index.Indexed):
+    """A category tree (django-treebeard adjacency list), siblings ordered by hand in the admin."""
+
+    base_form_class = TreeNodeForm
+    objects = CategoryManager()
+
     name = models.CharField(max_length=80, unique=True, verbose_name=_("Category name"))
     slug = models.SlugField(unique=True, max_length=80)
     parent = models.ForeignKey(
@@ -56,8 +68,9 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
         null=True,
         related_name="children",
         verbose_name=_("Parent category"),
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
     )
+    sib_order = models.PositiveIntegerField(default=0, editable=False)
     description = RichTextField(
         max_length=500,
         features=LIMITED_RICHTEXTFIELD_FEATURES,
@@ -77,7 +90,7 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
         FieldPanel("slug", widget=SlugInput),
         FieldPanel("description"),
         FieldPanel("colophon"),
-        FieldPanel("parent"),
+        tree_panel(heading=_("Place in the category tree")),
     ]
 
     api_fields = [
@@ -91,7 +104,7 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
     search_fields = [index.SearchField("name")]
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["sib_order"]
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
         unique_together = [
@@ -103,17 +116,13 @@ class Category(TranslatableMixin, index.Indexed, Orderable):
     def __str__(self):
         return self.name
 
-    def clean(self):
-        if self.parent:
-            parent = self.parent
-            if self.parent == self:
-                raise ValidationError(_("Parent category cannot be self."))
-            if parent.parent and parent.parent == self:
-                raise ValidationError(_("Cannot have circular Parents."))
-
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        if self._state.adding and not self.sib_order:
+            # Created outside treebeard (objects.create): last among its siblings.
+            siblings = Category.objects.filter(parent_id=self.parent_id)
+            self.sib_order = (siblings.aggregate(models.Max("sib_order"))["sib_order__max"] or 0) + 1
         return super().save(*args, **kwargs)
 
 

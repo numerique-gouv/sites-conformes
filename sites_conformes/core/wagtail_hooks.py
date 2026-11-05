@@ -1,16 +1,22 @@
 """
-Text alignment features for Draftail editor.
-
-Implementation using BlockFeature with custom CSS that preserves content styling.
+Admin customisations: Draftail text alignment features and the category tree listing.
 """
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
+from django.contrib import messages
+from django.shortcuts import redirect
 from django.templatetags.static import static
+from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.translation import gettext as _
 from wagtail import hooks
 from wagtail.admin.rich_text.converters.html_to_contentstate import (
     BlockElementHandler,
 )
+from wagtail.snippets.models import register_snippet
+from wagtail_in_a_tree.views import TreeSnippetViewSet
+
+from sites_conformes.core.models import Category
 
 
 @hooks.register("register_rich_text_features")
@@ -134,3 +140,36 @@ def editor_js():
         '<script src="{}"></script>',
         static("content_manager/js/text-alignment.js"),
     )
+
+
+class CategoryViewSet(TreeSnippetViewSet):
+    model = Category
+    icon = "tag"  # type: ignore
+    add_to_admin_menu = True
+    menu_order = 150  # right after Pages (100), before Images (300)
+    list_display = ["name"]
+    search_fields = ["name"]
+
+
+register_snippet(CategoryViewSet)
+
+
+@hooks.register("before_delete_snippet")
+def keep_categories_with_subcategories(request, instances):
+    """
+    Deleting a category deletes its whole subtree, and the pages lose those categories:
+    the subcategories have to be moved or deleted first, unless they are deleted along with it.
+    """
+    deleted_ids = {instance.pk for instance in instances if isinstance(instance, Category)}
+    blocked = [
+        category.name
+        for category in instances
+        if isinstance(category, Category) and category.children.exclude(pk__in=deleted_ids).exists()
+    ]
+    if not blocked:
+        return None
+    messages.error(
+        request,
+        _("%(categories)s still has subcategories: move or delete them first.") % {"categories": ", ".join(blocked)},
+    )
+    return redirect(reverse("wagtailsnippets_sites_conformes_core_category:list"))
