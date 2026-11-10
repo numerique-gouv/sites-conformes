@@ -253,7 +253,7 @@ class ImportExportImages:
             # No need to export the pictograms, as they should already be present
             if "Pictogrammes_DSFR" in image_name:
                 pictogram_title = image_name.replace("__", " — ").replace("_", " ")
-                self.image_data[i]["filename"] = f"{pictogram_title}.svg"
+                self.image_data[i]["filename"] = f"{pictogram_title.removesuffix(".svg")}.svg"
                 self.image_data[i]["is_pictogram"] = True
 
             else:
