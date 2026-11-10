@@ -73,7 +73,6 @@ récupérer les fichiers médias depuis le S3 ;
 
 ```sh
 PROD_APP=            # nom de l’app Scalingo, par ex. sites-conformes
-PROD_DB_NAME=        # nom de la base dans Scalingo, par ex. sites_facil_123
 ```
 
 ## Sauvegarder et restaurer les données locales
