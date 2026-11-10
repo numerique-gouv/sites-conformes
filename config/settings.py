@@ -463,7 +463,7 @@ WAGTAILMENUS_MAIN_MENUS_EDITABLE_IN_WAGTAILADMIN = False
 WAGTAILDOCS_MAX_UPLOAD_SIZE = int(os.getenv("WAGTAILDOCS_MAX_UPLOAD_SIZE", 10 * 1024 * 1024))  # 10MB
 
 WAGTAILIMAGES_IMAGE_MODEL = "sites_conformes_customimages.CustomImage"
-WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
+WAGTAILIMAGES_EXTENSIONS = ["avif", "gif", "jpeg", "jpg", "png", "svg", "webp"]
 WAGTAILDOCS_EXTENSIONS = ["pdf", "docx", "odt", "xlsx", "ods", "pptx", "odp", "csv", "txt"]
 SF_SCHEME_DEPENDENT_SVGS = getenv_bool("SF_SCHEME_DEPENDENT_SVGS", False)
 

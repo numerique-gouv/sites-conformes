@@ -37,6 +37,7 @@ deploy:
     {{docker_cmd}} {{uv_run}} python manage.py import_page_templates
     {{docker_cmd}} {{uv_run}} python manage.py import_illustration_images
     just index
+    -{{docker_cmd}} {{uv_run}} python manage.py warm_renditions
 
 # Pass a django command (or list available django commands)
 django +command="":
@@ -143,13 +144,17 @@ web-prompt:
 #### Production-related recipes
 
 # Commands run by the Scalingo Procfile
+# TODO: remove fix_svg_images_extensions once https://github.com/numerique-gouv/sites-conformes/pull/672
+# has been merged and deployed on all Sites Conformes instances
 [group('Production')]
 scalingo-postdeploy:
     python manage.py migrate_from_sites_faciles --no-input
     python manage.py migrate
+    python manage.py fix_svg_images_extensions
     python manage.py create_starter_pages
     python manage.py import_page_templates
     python manage.py update_index
+    -python manage.py warm_renditions
 
 # Roll a Scalingo app back to a DB backup and to the code of a given git ref
 [group('Production')]

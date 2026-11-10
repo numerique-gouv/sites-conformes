@@ -357,3 +357,48 @@ class ImageAndTextSvgAltTestCase(WagtailPageTestCase):
 
         self.assertEqual(svg["aria-hidden"], "true")
         self.assertFalse(svg.has_attr("role"))
+
+
+class PictureTagTestCase(WagtailPageTestCase):
+    def setUp(self):
+        self.home = Page.objects.get(slug="home")
+        self.image = import_image(
+            "sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png", "Homme nuages"
+        )
+        self.image_value = {"image": self.image, "alt_text": "Un homme dans les nuages", "decorative": False}
+
+    def get_soup(self, page):
+        return BeautifulSoup(self.client.get(page.url).content, "html.parser")
+
+    def assert_picture(self, picture):
+        # WebP only for now, AVIF sources will come later
+        self.assertEqual(picture.select("source"), [])
+        self.assertTrue(picture.img["src"].endswith(".webp"))
+        self.assertEqual(picture.img["alt"], "Un homme dans les nuages")
+
+    def test_centered_image_keeps_contextual_alt(self):
+        value = {"image": self.image_value, "width": "", "image_ratio": ""}
+        page = self.home.add_child(instance=ContentPage(title="Image", slug="image", body=[("image", value)]))
+
+        self.assert_picture(self.get_soup(page).select_one(".fr-content-media__img picture"))
+
+    def test_hero_image_keeps_contextual_alt(self):
+        hero_block = ContentPage._meta.get_field("hero").stream_block.child_blocks["hero_text_image"]
+        value = {**dict(hero_block.get_default()), "image": self.image_value}
+        page = self.home.add_child(instance=ContentPage(title="Hero", slug="hero", hero=[("hero_text_image", value)]))
+
+        self.assert_picture(self.get_soup(page).select_one(".fr-col-md-6 picture"))
+
+    def test_grid_section_renders_picture(self):
+        grid_block = ContentPage._meta.get_field("body").stream_block.child_blocks["image_text_grid_section"]
+        value = dict(grid_block.get_default())
+        value["items"] = [{**dict(item), "image": self.image_value} for item in value["items"]]
+        page = self.home.add_child(
+            instance=ContentPage(title="Grid", slug="grid", body=[("image_text_grid_section", value)])
+        )
+
+        pictures = self.get_soup(page).select(".cmsfr-text-content--left picture")
+
+        self.assertTrue(pictures)
+        for picture in pictures:
+            self.assert_picture(picture)
