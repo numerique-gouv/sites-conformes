@@ -7,9 +7,15 @@
     "@playwright/test": "^1.60.0",
     "@types/node": "^22.10.0",
     "dotenv": "^16.4.5",
-    "dotenv-expand": "^11.0.7"
+    "dotenv-expand": "^11.0.7",
+    "lighthouse": "^13.6.0"
   },
   "dependencies": {
     "tarteaucitronjs": "^1.33.0"
+  },
+  "overrides": {
+    "@sentry/bundler-plugins": {
+      "glob": "^14.0.3"
+    }
   }
 }
