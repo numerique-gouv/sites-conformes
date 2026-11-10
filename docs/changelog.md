@@ -7,6 +7,28 @@ pour la liste complète des versions.
 Les notes de mise à jour qui requièrent une action de l’opérateur (migration de
 schéma, gel des contributions, etc.) sont reprises ci-dessous.
 
+## Prochaine version - Suppression des données de l’ancien système de menus
+
+Les menus ont été convertis vers l’application `sites_conformes.menus` lors
+du passage à la v4. Cette version supprime ce qui restait de l’ancien
+système :
+
+- les entrées de l’application obsolète `wagtailmenus` (menus principaux,
+  menus « plats » et leurs éléments) sont effacées par la migration
+  `sites_conformes_menus.0004_delete_legacy_menu_entries` ;
+- les modèles `MegaMenu` et `MegaMenuCategory` de `sites_conformes_core`
+  et leurs tables sont supprimés ;
+- le processeur de contexte `sites_conformes.core.context_processors.mega_menus`
+  est déprécié : il ne fait plus rien et peut être retiré de vos réglages
+  `TEMPLATES`.
+
+:::{important}
+`wagtailmenus` reste installé dans cette version, car la conversion des
+anciens menus en a besoin. Il sera retiré dans une version ultérieure :
+**passez par cette version avant de monter vers celle-là**, sans quoi vos
+anciens menus ne seraient pas convertis.
+:::
+
 ## v4.0.0 - Packagification
 
 Cette version transforme `sites-conformes` en package Python distribué sur

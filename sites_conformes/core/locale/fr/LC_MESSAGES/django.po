@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 12:55+0200\n"
+"POT-Creation-Date: 2026-11-10 12:45+0100\n"
 "PO-Revision-Date: 2026-10-19 12:56+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -1688,27 +1688,6 @@ msgstr "Classe d’icône"
 msgid "Social media item"
 msgstr "Lien de réseau social"
 
-msgid "Category"
-msgstr "Catégorie"
-
-msgid "Mega menu category"
-msgstr "Catégorie de méga menu"
-
-msgid "Mega menu categories"
-msgstr "Catégories de méga menu"
-
-msgid "Main link"
-msgstr "Lien principal"
-
-msgid "Categories"
-msgstr "Catégories"
-
-msgid "Maximum 4 categories, each with maximum 8 links."
-msgstr "Maximum 4 catégories, chacune contenant maximum 8 liens."
-
-msgid "Mega menu"
-msgstr "Méga menu"
-
 msgid "Home page"
 msgstr "Accueil"
 
@@ -1795,12 +1774,6 @@ msgstr "Filtres"
 msgid "Pages"
 msgstr "Pages"
 
-msgid "Close"
-msgstr "Fermer"
-
-msgid "See the whole section"
-msgstr "Voir toute la rubrique"
-
 msgid "Password required"
 msgstr "Mot de passe requis"
 
@@ -1881,6 +1854,33 @@ msgstr "Pages avec l’étiquette {tag}"
 #, python-brace-format
 msgid "List of pages tagged with {tag}"
 msgstr "Liste de pages avec l’étiquette {tag}"
+
+#~ msgid "Category"
+#~ msgstr "Catégorie"
+
+#~ msgid "Mega menu category"
+#~ msgstr "Catégorie de méga menu"
+
+#~ msgid "Mega menu categories"
+#~ msgstr "Catégories de méga menu"
+
+#~ msgid "Main link"
+#~ msgstr "Lien principal"
+
+#~ msgid "Categories"
+#~ msgstr "Catégories"
+
+#~ msgid "Maximum 4 categories, each with maximum 8 links."
+#~ msgstr "Maximum 4 catégories, chacune contenant maximum 8 liens."
+
+#~ msgid "Mega menu"
+#~ msgstr "Méga menu"
+
+#~ msgid "Close"
+#~ msgstr "Fermer"
+
+#~ msgid "See the whole section"
+#~ msgstr "Voir toute la rubrique"
 
 #~ msgid "“See all posts” button"
 #~ msgstr "Bouton « Voir tous les articles »"
