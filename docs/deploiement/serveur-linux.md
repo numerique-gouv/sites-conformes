@@ -85,7 +85,8 @@ just createsuperuser
 `just init` installe les dépendances de production puis lance
 `just deploy`, qui enchaîne : `migrate`, `compilemessages`, `collectstatic`,
 `create_starter_pages`, `import_page_templates`,
-`import_illustration_images` et l’indexation (`update_index`).
+`import_illustration_images`, l’indexation (`update_index`) et le
+pré-calcul des rendus d’images (`warm_renditions`).
 
 ### Voie B — pip + venv *(voie classique)*
 
@@ -108,6 +109,7 @@ python manage.py create_starter_pages
 python manage.py import_page_templates
 python manage.py import_illustration_images
 python manage.py update_index
+python manage.py warm_renditions
 ```
 
 :::{note}
