@@ -202,7 +202,6 @@ TEMPLATES = [
                 "wagtail.contrib.settings.context_processors.settings",
                 "wagtailmenus.context_processors.wagtailmenus",
                 "sites_conformes.core.context_processors.skiplinks",
-                "sites_conformes.core.context_processors.mega_menus",
                 "sites_conformes.core.context_processors.iframe",
             ],
         },
