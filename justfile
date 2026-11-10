@@ -144,7 +144,7 @@ web-prompt:
 #### Production-related recipes
 
 # Commands run by the Scalingo Procfile
-# TODO: remove fix_svg_image_extensions once https://github.com/numerique-gouv/sites-conformes/pull/441
+# TODO: remove fix_svg_images_extensions once https://github.com/numerique-gouv/sites-conformes/pull/672
 # has been merged and deployed on all Sites Conformes instances
 [group('Production')]
 scalingo-postdeploy:
