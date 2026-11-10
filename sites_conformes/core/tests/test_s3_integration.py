@@ -12,7 +12,7 @@ Usage::
     # Run these tests
     GARAGE_INTEGRATION_TESTS=1 uv run python3 manage.py test \\
         sites_conformes.core.tests.test_s3_integration \\
-        --settings=config.settings_test -v2
+        --settings=config.settings_s3_test -v2
 """
 
 import os
@@ -24,9 +24,6 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.test import TestCase
-from dotenv import load_dotenv
-
-load_dotenv(override=True)
 
 GARAGE_AVAILABLE = os.environ.get("GARAGE_INTEGRATION_TESTS") == "1"
 
@@ -36,7 +33,7 @@ def _garage_client():
     return boto3.client(
         "s3",
         endpoint_url="http://localhost:3900",
-        aws_access_key_id=os.getenv("S3_KEY_ID", "GKarag..."),
+        aws_access_key_id=os.getenv("S3_KEY_ID", "GKarageKEY00000000000000000"),
         aws_secret_access_key=os.getenv("S3_KEY_SECRET", ""),
         region_name=os.getenv("S3_BUCKET_REGION", "fr"),
         config=Config(signature_version="s3v4"),

@@ -11,13 +11,14 @@ Usage::
     python manage.py set_s3_cache_control --cache-control "public, max-age=604800"  # custom value
 
 The default ``cache-control`` value matches ``config/settings.py``:
-``public, max-age=31536000, immutable``.
+``S3_CACHE_CONTROL``, falling back to ``MEDIA_CACHE_CONTROL``.
 """
 
 import os
 
 import boto3
 from botocore.exceptions import ClientError
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -38,7 +39,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
-        header_value = options.get("cache_control") or os.getenv("S3_CACHE_CONTROL", "public, max-age=3600")
+        header_value = options.get("cache_control") or os.getenv("S3_CACHE_CONTROL", settings.MEDIA_CACHE_CONTROL)
 
         s3_config = self._get_s3_config()
         if not s3_config:
