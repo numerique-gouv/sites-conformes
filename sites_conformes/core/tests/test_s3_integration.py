@@ -7,7 +7,7 @@ variable is set to ``1`` and Garage is reachable at ``localhost:3900``.
 Usage::
 
     # Start Garage first
-    docker compose up -d garage
+    docker compose --profile s3 up -d garage
 
     # Run these tests
     GARAGE_INTEGRATION_TESTS=1 uv run python3 manage.py test \\
@@ -45,7 +45,7 @@ class S3CacheControlIntegrationTestCase(TestCase):
     """Verify Cache-Control headers on objects uploaded to Garage via django-storages.
 
     Prerequisites:
-        - Garage container running (``docker compose up -d garage``)
+        - Garage container running (``docker compose --profile s3 up -d garage``)
         - ``GARAGE_INTEGRATION_TESTS=1`` in the environment
         - ``.env`` configured with Garage credentials
     """

@@ -96,9 +96,9 @@ jobs:
           # compose interpolates the whole file, including the web service ports
           HOST_PORT: 8000
         run: |
-          docker compose up -d garage
+          docker compose --profile s3 up -d garage
           timeout 30 sh -c 'until nc -z localhost 3900; do sleep 1; done'
-          docker compose logs garage
+          docker compose --profile s3 logs garage
       - name: 🤹‍ Run S3 integration tests
         env:
           GARAGE_INTEGRATION_TESTS: "1"
