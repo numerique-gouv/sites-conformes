@@ -224,6 +224,10 @@ DEP002 = [
     "wand",             # ImageMagick backend auto-detected by Wagtail's Willow for animated GIFs (#390), never imported directly
     "wagtailmenus",     # obsolete app kept for its models/migrations (see config/settings.py), referenced only by string
 ]
+# Transitive but intentionally not declared: pinned in lockstep by boto3.
+DEP003 = [
+    "botocore",  # ClientError lives there; declaring it would fight boto3's exact pin
+]
 
 # Blocks installation of known malware (typosquatting, deliberately malicious packages)
 [tool.uv.audit]
