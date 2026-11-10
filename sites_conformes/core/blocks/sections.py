@@ -6,6 +6,8 @@ from wagtail.admin.telepath import register
 from wagtail.blocks import StructValue
 from wagtail.blocks.struct_block import StructBlockAdapter
 from wagtail.images import get_image_model
+from wagtail.images.models import Filter, Picture
+from wagtail.images.shortcuts import get_renditions_or_not_found
 
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES,
@@ -191,16 +193,17 @@ class ImageAndTextGridSection(BaseSection):
     def get_context(self, value, parent_context=None):
         context = super().get_context(value, parent_context=parent_context)
         size = value["images_size"]
-        filter_spec = f"fill-{size}x{size}"
+        # The {% picture %} tag doesn't accept a dynamic filter spec, so build the Picture here
+        filter_specs = Filter.expand_spec(f"fill-{size}x{size}|format-{{avif,webp,jpeg}}|preserve-svg")
 
         rendered_items = []
         for item in value["items"]:
-            rendition = item["image"].get_rendition(filter_spec) if item["image"] else None
+            picture = Picture(get_renditions_or_not_found(item["image"], filter_specs)) if item["image"] else None
             rendered_items.append(
                 {
                     "title": item["title"],
                     "text": item["text"],
-                    "rendition": rendition,
+                    "picture": picture,
                 }
             )
         context["rendered_items"] = rendered_items

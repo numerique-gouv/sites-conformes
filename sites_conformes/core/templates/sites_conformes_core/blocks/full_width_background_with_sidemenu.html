@@ -1,6 +1,6 @@
 {% load i18n dsfr_tags wagtailcore_tags wagtailimages_tags %}
 
-{% image value.bg_image original as bg_img %}
+{% image value.bg_image width-1900 as bg_img %}
 {# djlint: off H021 #}
 <div class="fr-py-5w {{ value.vertical_margin }} cmsfr-block-full-width-background-with-sidemenu"
      {% if value.bg_color_class or bg_img or value.bg_color %}style="background:{% endif %}

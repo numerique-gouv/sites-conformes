@@ -1,6 +1,6 @@
 {% load dsfr_tags wagtailcore_tags wagtailimages_tags %}
 
-{% image value.image original as img %}
+{% image value.image width-1500 as img %}
 
 {% if value.color %}
   {% with "fr-quote--"|concatenate:value.color as extra_classes %}
