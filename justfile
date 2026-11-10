@@ -37,6 +37,7 @@ deploy:
     {{docker_cmd}} {{uv_run}} python manage.py import_page_templates
     {{docker_cmd}} {{uv_run}} python manage.py import_illustration_images
     just index
+    -{{docker_cmd}} {{uv_run}} python manage.py warm_renditions
 
 # Pass a django command (or list available django commands)
 django +command="":
@@ -153,6 +154,7 @@ scalingo-postdeploy:
     python manage.py create_starter_pages
     python manage.py import_page_templates
     python manage.py update_index
+    -python manage.py warm_renditions
 
 # Roll a Scalingo app back to a DB backup and to the code of a given git ref
 [group('Production')]
