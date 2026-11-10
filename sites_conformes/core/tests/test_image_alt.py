@@ -371,7 +371,9 @@ class PictureTagTestCase(WagtailPageTestCase):
         return BeautifulSoup(self.client.get(page.url).content, "html.parser")
 
     def assert_picture(self, picture):
-        self.assertEqual([source["type"] for source in picture.select("source")], ["image/avif", "image/webp"])
+        # WebP only for now, AVIF sources will come later
+        self.assertEqual(picture.select("source"), [])
+        self.assertTrue(picture.img["src"].endswith(".webp"))
         self.assertEqual(picture.img["alt"], "Un homme dans les nuages")
 
     def test_centered_image_keeps_contextual_alt(self):

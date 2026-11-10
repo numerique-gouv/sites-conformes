@@ -194,7 +194,7 @@ class ImageAndTextGridSection(BaseSection):
         context = super().get_context(value, parent_context=parent_context)
         size = value["images_size"]
         # The {% picture %} tag doesn't accept a dynamic filter spec, so build the Picture here
-        filter_specs = Filter.expand_spec(f"fill-{size}x{size}|format-{{avif,webp,jpeg}}|preserve-svg")
+        filter_specs = Filter.expand_spec(f"fill-{size}x{size}|format-webp|preserve-svg")
 
         rendered_items = []
         for item in value["items"]:
