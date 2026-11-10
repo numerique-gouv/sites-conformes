@@ -7,13 +7,6 @@ const pages = [
   "/menu_page/common_blocks/",
 ]
 
-// main serves the images of these pages as PNG/JPEG, without width/height:
-// the picture tag PR (#672) fixes them and removes this list
-const failingOnMain = [
-  "/menu_page/hero_blocks/hero-text-image/",
-  "/menu_page/common_blocks/",
-]
-
 const debuggingPort = 9222
 
 // Lighthouse only gives each image optimization as a message, in English
@@ -38,7 +31,6 @@ test.describe("Lighthouse", () => {
       baseURL,
     }) => {
       test.slow()
-      test.fail(failingOnMain.includes(url))
       // Imported here rather than at the top of the file: the Baseline CI job
       // loads these specs on main, whose node_modules don't have lighthouse
       const { default: lighthouse } = await import("lighthouse")
