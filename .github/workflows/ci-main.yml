@@ -68,16 +68,23 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: config.settings_s3_test
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: dju
+          POSTGRES_PASSWORD: djpwd
+          POSTGRES_DB: djdb
+        ports:
+          - 5432:5432
     steps:
-      - uses: actions/checkout@v4
-      - name: 📔 Install just
-        uses: extractions/setup-just@v2
+      - uses: actions/checkout@v7
       - name: 🐍 Set up Python 3.13
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - name: 🐍 Set up uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10.3.0
       - name: 🌍 Install dependencies
         run: |
           uv sync --no-group dev
@@ -87,15 +94,14 @@ jobs:
       - name: 🐳 Start Garage cluster
         run: |
           docker compose up -d garage
-          echo "Waiting for Garage to be ready..."
-          sleep 5
+          timeout 30 sh -c 'until nc -z localhost 3900; do sleep 1; done'
           docker compose logs garage
       - name: 🤹‍ Run S3 integration tests
         env:
           GARAGE_INTEGRATION_TESTS: "1"
-          S3_HOST: garage:3900
+          S3_HOST: localhost:3900
           S3_KEY_ID: GKarageKEY00000000000000000
-          S3_KEY_SECRET: GKarag...
+          S3_KEY_SECRET: GKarageSECRETe1087f810d44b283bd7a61077c363893
           S3_BUCKET_NAME: sites-conformes-media
           S3_BUCKET_REGION: fr
           S3_PROTOCOL: http

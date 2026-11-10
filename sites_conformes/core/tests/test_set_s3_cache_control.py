@@ -85,6 +85,7 @@ class SetS3CacheControlCommandTestCase(TestCase):
         mock_client.get_paginator.assert_called_once_with("list_objects_v2")
         mock_client.copy_object.assert_not_called()
 
+    @override_settings(MEDIA_CACHE_CONTROL="public, max-age=86400")
     @patch("sites_conformes.core.management.commands.set_s3_cache_control.boto3")
     @patch.dict("os.environ", S3_ENV)
     def test_updates_missing_cache_control(self, mock_boto3):

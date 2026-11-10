@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Throwaway credentials of the local/CI Garage S3 stack"
+paths = ['''^garage/garage\.toml$''']
+regexes = ['''^GKarageSECRET''']

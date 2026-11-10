@@ -43,7 +43,7 @@ services:
         echo "Use these in your .env:"
         echo "  S3_HOST=garage:3900"
         echo "  S3_KEY_ID=GKarageKEY00000000000000000"
-        echo "  S3_SECRET_KEY=GKarageSECRETe1087f810d44b283bd7a61077c363893"
+        echo "  S3_KEY_SECRET=GKarageSECRETe1087f810d44b283bd7a61077c363893"
         echo "  S3_BUCKET_NAME=sites-conformes-media"
         echo "  S3_BUCKET_REGION=fr"
         echo "  S3_PROTOCOL=http"
@@ -55,7 +55,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgres://${DATABASE_USER}:***@db:${DATABASE_PORT}/${DATABASE_NAME}
+      DATABASE_URL: postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@db:${DATABASE_PORT}/${DATABASE_NAME}
     ports:
       - "${HOST_PORT}:${HOST_PORT}"
     volumes:
