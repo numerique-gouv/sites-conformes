@@ -23,23 +23,12 @@ test.describe("Images", () => {
     })
   }
 
-  test("Les images matricielles passent par la balise picture en AVIF et WebP", async ({
+  test("Les images matricielles passent par la balise picture en WebP", async ({
     page,
   }) => {
     await page.goto("/menu_page/hero_blocks/hero-text-image/")
 
-    const picture = page
-      .locator("picture", { has: page.locator("source") })
-      .first()
-    await expect(picture.locator("img")).toHaveAttribute("alt")
-    await expect(picture.locator("source")).toHaveCount(2)
-    await expect(picture.locator("source").first()).toHaveAttribute(
-      "type",
-      "image/avif",
-    )
-    await expect(picture.locator("source").nth(1)).toHaveAttribute(
-      "type",
-      "image/webp",
-    )
+    const image = page.locator('picture img[src$=".webp"]').first()
+    await expect(image).toHaveAttribute("alt")
   })
 })

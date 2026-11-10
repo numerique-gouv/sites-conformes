@@ -57,7 +57,7 @@
   </div>
   {% if value.image %}
     <div class="fr-card__header">
-      <div class="fr-card__img">{% picture value.image width-1200 format-{avif,webp,jpeg} preserve-svg class="fr-responsive-img" %}</div>
+      <div class="fr-card__img">{% picture value.image width-1200 format-webp preserve-svg class="fr-responsive-img" %}</div>
       {% if value.image_badge %}
         <ul class="fr-badges-group">
           {% for badge in value.image_badge %}

@@ -16,8 +16,8 @@
   </div>
 {% else %}
   {% if alt %}
-    {% picture value.image width-1500 format-{avif,webp,jpeg} preserve-svg class=extra_classes alt=alt %}
+    {% picture value.image width-1500 format-webp preserve-svg class=extra_classes alt=alt %}
   {% else %}
-    {% picture value.image width-1500 format-{avif,webp,jpeg} preserve-svg class=extra_classes %}
+    {% picture value.image width-1500 format-webp preserve-svg class=extra_classes %}
   {% endif %}
 {% endif %}
