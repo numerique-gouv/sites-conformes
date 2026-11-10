@@ -1,4 +1,4 @@
-{% load i18n wagtailcore_tags wagtail_dsfr_tags %}
+{% load i18n wagtailcore_tags wagtail_dsfr_tags wagtailimages_tags %}
 
 <div class="fr-container fr-py-4w cmsfr-block-events-recent-entries">
   {% if value.title %}
@@ -99,7 +99,7 @@
           {% if post.cover %}
             <div class="fr-card__header">
               <div class="fr-card__img">
-                <img class="fr-responsive-img" src="{{ post.cover.file.url }}" alt="">
+                {% picture post.cover width-1200 format-{avif,webp,jpeg} preserve-svg class="fr-responsive-img" alt="" %}
               </div>
             </div>
           {% endif %}
