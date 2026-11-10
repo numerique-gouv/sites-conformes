@@ -74,18 +74,7 @@ récupérer les fichiers médias depuis le S3 ;
 ```sh
 PROD_APP=            # nom de l’app Scalingo, par ex. sites-conformes
 PROD_DB_NAME=        # nom de la base dans Scalingo, par ex. sites_facil_123
-PROD_S3_BUCKET_NAME=
-PROD_S3_LOCATION=
-RCLONE_CONFIG_MYS3_REGION_NAME=
-RCLONE_CONFIG_MYS3_ENDPOINT=
-RCLONE_CONFIG_MYS3_ACCESS_KEY_ID=
-RCLONE_CONFIG_MYS3_SECRET_ACCESS_KEY=
-RCLONE_CONFIG_MYS3_PROVIDER=Other
-RCLONE_CONFIG_MYS3_TYPE="s3"
 ```
-
-Le préfixe `RCLONE_CONFIG_MYS3_*` permet à `rclone` de récupérer automatiquement
-ces paramètres depuis l’environnement.
 
 ## Sauvegarder et restaurer les données locales
 
