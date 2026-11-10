@@ -92,6 +92,9 @@ jobs:
         run: |
           cp .env.test .env
       - name: 🐳 Start Garage cluster
+        env:
+          # compose interpolates the whole file, including the web service ports
+          HOST_PORT: 8000
         run: |
           docker compose up -d garage
           timeout 30 sh -c 'until nc -z localhost 3900; do sleep 1; done'
