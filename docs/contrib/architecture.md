@@ -28,8 +28,11 @@ ou de [Grist](https://grist.numerique.gouv.fr/).
 alternative au S3 pour les PaaS avec filesystem éphémère (cf. {doc}`../donnees/stockage-medias`)
 - **sites_conformes.proconnect** : permet la connexion via [ProConnect](https://www.proconnect.gouv.fr/)
 
-Les fonctions et classes réutilisables de ces applications (modules `utils` et
-`services`) sont présentées dans {doc}`utilitaires`.
+Les fonctions utilitaires génériques, qui ne dépendent pas des modèles du
+projet, vont dans les modules `utils.py` de chaque application (par exemple
+`sites_conformes/core/utils.py`). Celles qui créent ou manipulent des contenus
+(pages, menus, collections) vont dans `sites_conformes/core/services/`, pour
+éviter les imports circulaires.
 
 ## DSFR
 
