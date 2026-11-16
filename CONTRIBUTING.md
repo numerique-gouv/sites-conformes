@@ -10,6 +10,7 @@ cd sites-faciles
 ```
 
 ### Effectuer les tests
+
 Les tests unitaires peuvent être lancés avec `just test`.
 
 Cela lance les tests en parallèle pour gagner du temps, mais en cas d’échec, il est possible de les lancer
@@ -34,6 +35,7 @@ just coverage events
 Avant chaque mise en production, les intervenant·es sont prié·es de [passer cette liste en revue](./DOD.md).
 
 ## Commandes
+
 Le projet utilise [just](https://just.systems/) pour gérer le lancement de séries de commandes spéfiques, appelées recettes.
 
 Il est possible d’avoir une liste des recettes implémentées en tapant simplement `just`.
@@ -43,7 +45,6 @@ Pour les commandes Django spécifiquement, il est possible d’en obtenir la lis
 ```sh
 uv run python manage.py
 ```
-
 
 ## Gestion des dépendances avec uv
 
@@ -61,7 +62,6 @@ Pour installer le projet avec les dépendances de dev :
 ```sh
 just init-dev
 ```
-
 
 Pour installer un nouveau paquet et l’ajouter aux dépendances :
 
@@ -81,8 +81,8 @@ Le projet utilise [django-dotenv](https://github.com/jpadilla/django-dotenv) pou
 
 Typiquement :
 
- * configuration locale spécifique à chaque intervenant·e sur le projet, e.g paramètres de connexion à la base de données ;
- * configuration de production.
+* configuration locale spécifique à chaque intervenant·e sur le projet, e.g paramètres de connexion à la base de données ;
+* configuration de production.
 
 Pour surcharger la configuration locale de développement, il est nécessaire de créer un fichier `.env` à la racine du projet Django.
 Cf. [le fichier .env.example](./src/.env.example) pour l’exemple.
@@ -103,7 +103,6 @@ Ce project utilise le [système de traduction de Django](https://docs.djangoproj
 Le texte dans le code est en anglais et la traduction qui s’affiche sur le site en français, se trouve dans le fichier
 `.po` du dossier `locales`.
 
-
 Pour générer la traduction dans le fichier `.po` :
 
 ```sh
@@ -113,7 +112,7 @@ just makemessages
 Django utilise une version compilée du fichier `.po`, c’est le fichier `.mo` que l’on obtient avec :
 
 ```sh
-uv run  python manage.py compilemessages
+just compilemessages
 ```
 
 Il est recommandé d’utiliser [https://poedit.net/](Poedit) pour les traductions, afin de profiter de sa mémoire de traduction
@@ -130,19 +129,27 @@ Pour vérifier son code, on peut intégrer le linter adapté à son IDE et ou la
 just quality
 ```
 
-Pour s’assurer que cette vérification est faite de manière systématique, nous utilisons des *pre-commit hooks*.
+Pour s’assurer que cette vérification est faite de manière systématique, nous utilisons des *pre-commit hooks*, gérés par [prek](https://prek.j178.dev/) (compatible avec le fichier `.pre-commit-config.yaml`).
 
-Ils doivent être installés via :
-
-```sh
-pre-commit install
-```
-
-Il est possible de faire une passe manuelle sur l’ensemble du code via
+Ils sont installés par `just init-dev`, ou manuellement via :
 
 ```sh
-pre-commit run --all-files
+prek install
 ```
+
+Il est possible de faire une passe manuelle sur l’ensemble du code via `just quality`, ou
+
+```sh
+prek run --all-files
+```
+
+## Audit du code
+
+Quelques recettes du groupe « Code audit » de `just` :
+
+* `just check` lance le [framework de vérification système](https://docs.djangoproject.com/fr/stable/topics/checks/) de Django (il est possible de cibler des applications : `just check blog events`) ;
+* `just cloc` compte les lignes de code par application. Il nécessite [cloc](https://github.com/AlDanial/cloc) (`sudo apt install cloc`) ;
+* `just routes-count` donne une estimation du nombre de routes internes et externes.
 
 ## Déploiement
 

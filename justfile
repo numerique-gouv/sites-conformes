@@ -19,23 +19,52 @@ default:
 collectstatic:
     {{docker_cmd}} {{uv_run}} python manage.py collectstatic --noinput
 
+# Compile the translation files
+[group('Internationalization')]
+compilemessages:
+    {{docker_cmd}} {{uv_run}} python manage.py compilemessages -l fr --ignore=.venv*
+
 alias csu := createsuperuser
 createsuperuser:
     {{docker_cmd}} {{uv_run}} python manage.py createsuperuser
 
 alias first-deploy := deploy
 deploy:
-    just migrate
     just collectstatic
+    just migrate
     {{docker_cmd}} {{uv_run}} python manage.py create_starter_pages
     {{docker_cmd}} {{uv_run}} python manage.py import_page_templates
     just index
+
+# Pass a django command (or list available django commands)
+django +command="":
+    {{docker_cmd}} {{uv_run}} python manage.py {{command}}
 
 import_domain_whitelist:
     {{docker_cmd}} {{uv_run}} python manage.py import_domain_whitelist
 
 index:
     {{docker_cmd}} {{uv_run}} python manage.py update_index
+
+# Create .env from .env.example with a generated SECRET_KEY (never overwrites an existing .env)
+setup-env:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -f .env ]; then
+        echo ".env existe déjà, on n'écrase rien."
+        exit 0
+    fi
+    cp .env.example .env
+    python3 -c "import secrets,pathlib; c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#%^&*(-_=+)'; k=''.join(secrets.choice(c) for _ in range(50)); p=pathlib.Path('.env'); p.write_text('\n'.join('SECRET_KEY='+k if l.startswith('SECRET_KEY=') else l for l in p.read_text().splitlines())+'\n')"
+    echo "✅ .env créé et SECRET_KEY générée."
+
+# Create the PostgreSQL user and database defined in .env (DATABASE_USER / DATABASE_PASSWORD / DATABASE_NAME)
+setup-db:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    psql -U postgres -c "CREATE USER ${DATABASE_USER} WITH CREATEDB LOGIN PASSWORD '${DATABASE_PASSWORD}';"
+    psql -U postgres -c "CREATE DATABASE ${DATABASE_NAME} OWNER ${DATABASE_USER};"
+    echo "✅ Utilisateur et base PostgreSQL créés (${DATABASE_USER} / ${DATABASE_NAME})."
 
 init:
     {{docker_cmd}} uv sync --no-group dev
@@ -44,14 +73,16 @@ init:
 init-dev:
     {{docker_cmd}} uv sync
     just deploy
-    {{docker_cmd}} {{uv_run}} pre-commit install
+    {{docker_cmd}} {{uv_run}} prek install --overwrite
 
 alias messages := makemessages
+# Update the translation files
+[group('Internationalization')]
 makemessages:
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles
-    {{docker_cmd}} {{uv_run}} django-admin makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles
+    {{docker_cmd}} {{uv_run}} python manage.py makemessages -l fr --ignore=manage.py --ignore=config --ignore=medias --ignore=__init__.py --ignore=setup.py --ignore=staticfiles --ignore=docs --ignore=node_modules --no-location
+    {{docker_cmd}} {{uv_run}} python manage.py makemessages -d djangojs -l fr --ignore=config --ignore=medias --ignore=staticfiles --ignore=docs --ignore=node_modules --no-location
 
-alias mm:= makemigrations
+alias mm := makemigrations
 makemigrations app="":
     {{docker_cmd}} {{uv_run}} python manage.py makemigrations {{app}}
 
@@ -78,6 +109,11 @@ run_gunicorn host_url=host_url host_port=host_port script_name=script_name:
 shell:
     {{docker_cmd}} {{uv_run}} python manage.py shell
 
+# Re-vendor the TarteAuCitron JS library from the installed npm package
+sync-tarteaucitron:
+    {{docker_cmd}} npm ci
+    cd scripts && bash sync_tarteaucitron.sh
+
 test app="":
     {{docker_cmd}} {{uv_run}} python manage.py test {{app}} --buffer --parallel --settings config.settings_test
 
@@ -90,8 +126,9 @@ update:
 
 upgrade:
     {{docker_cmd}} uv lock --upgrade
-    {{docker_cmd}} {{uv_run}} pre-commit autoupdate
+    {{docker_cmd}} {{uv_run}} prek update --cooldown-days 7
     {{docker_cmd}} npm update
+    just sync-tarteaucitron
 
 web-prompt:
     {{docker_cmd}} bash
@@ -106,17 +143,27 @@ scalingo-postdeploy:
     python manage.py import_page_templates
     python manage.py update_index
 
+# Roll a Scalingo app back to a DB backup and to the code of a given git ref
+[group('Production')]
+scalingo-rollback app region="-" ref="":
+    cd scripts && bash rollback_scalingo.sh {{app}} {{region}} {{ref}}
+
 #### Audit-related recipes
 
-# Run a global pre-commit
+# Run the Django system check framework
+[group('Code audit')]
+check +apps="":
+    {{docker_cmd}} {{uv_run}} python manage.py check {{apps}}
+
+# Run a global quality check
 [group('Code audit')]
 quality:
-    {{docker_cmd}} {{uv_run}} pre-commit run --all-files
+    {{docker_cmd}} {{uv_run}} prek run --all-files
 
-# Count lines of code per app
+# Count lines of code per app. Requires cloc (see CONTRIBUTING.md).
 [group('Code audit')]
 cloc:
-    @for d in "config" "blog" "content_manager" "dashboard" "events" "forms" "proconnect" "templates" ; do \
+    @for d in "config" "blog" "content_manager" "dashboard" "events" "forms" "numerique_gouv" "proconnect" "templates" ; do \
     (cd "$d" && echo "$d" && cloc --vcs git); \
     done
 
@@ -152,7 +199,7 @@ clear-local-db:
 # Creates a bunch of example pages
 [group('Dev DB and medias management')]
 demo:
-    just init
+    just init-dev
     {{docker_cmd}} {{uv_run}} python manage.py create_demo_pages
 
 # Descend the latest DB backup & media files of the production database
@@ -179,6 +226,7 @@ restore-local:
 [group('Dev DB and medias management')]
 restore-local-db:
     cd scripts && bash restore_local_db.sh
+    {{docker_cmd}} {{uv_run}} python manage.py set_config
 
 # Restore the last local medias backup
 [group('Dev DB and medias management')]
@@ -189,11 +237,13 @@ restore-local-medias:
 [group('Dev DB and medias management')]
 restore-prod:
     cd scripts && bash restore_prod_db.sh && bash restore_prod_medias.sh
+    {{docker_cmd}} {{uv_run}} python manage.py set_config
 
 # Restore the last downloaded backup of the production database
 [group('Dev DB and medias management')]
 restore-prod-db:
     cd scripts && bash restore_prod_db.sh
+    {{docker_cmd}} {{uv_run}} python manage.py set_config
 
 # Restore the last downloaded media files
 [group('Dev DB and medias management')]

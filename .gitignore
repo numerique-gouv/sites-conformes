@@ -149,3 +149,4 @@ dmypy.json
 config.json
 cron.json
 temp.json
+.migration-docs/
