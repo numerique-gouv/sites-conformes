@@ -17,12 +17,6 @@ Please write in French or English, and provide the following:
 - the version(s) affected
 - Any proof-of-concept code (if available)
 
-You can expect:
-
-- An acknowledgement within **48 hours**
-- An initial assessment within **7 days**
-- Coordinated disclosure within **90 days** of confirmation
-
 We appreciate your effort to make our product more secure.
 
 ## Vulnerability disclosure policy
