@@ -22,6 +22,7 @@ installation-locale
 architecture
 guide-contribution
 traductions
+donnees-de-test-multisite
 definition-of-done
 git-blame-ignore-revs
 ```

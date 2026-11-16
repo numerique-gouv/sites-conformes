@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-labelledby="title desc">
+  <title id="title">Mars : déclarer une étoile à l’antenne, les jours pairs</title>
+  <desc id="desc">La planète Mars, surmontée de l’antenne de la direction générale qui émet un signal. À côté, un calendrier où seuls les jours pairs sont mis en évidence.</desc>
+  <rect width="400" height="300" fill="#f5f5fe"/>
+  <!-- Stars -->
+  <g fill="#000091" opacity="0.35">
+    <circle cx="30" cy="40" r="2"/>
+    <circle cx="210" cy="30" r="1.5"/>
+    <circle cx="60" cy="270" r="1.5"/>
+    <circle cx="225" cy="250" r="2"/>
+  </g>
+  <!-- Mars -->
+  <circle cx="125" cy="185" r="90" fill="#c8553d"/>
+  <circle cx="95" cy="200" r="16" fill="#a8432f"/>
+  <circle cx="150" cy="230" r="10" fill="#a8432f"/>
+  <circle cx="160" cy="165" r="7" fill="#a8432f"/>
+  <circle cx="80" cy="150" r="6" fill="#a8432f"/>
+  <!-- Antenna building -->
+  <rect x="103" y="78" width="44" height="22" fill="#ffffff" stroke="#161616" stroke-width="2"/>
+  <polygon points="100,78 125,62 150,78" fill="#000091" stroke="#161616" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="119" y="86" width="12" height="14" fill="#000091"/>
+  <line x1="125" y1="62" x2="125" y2="30" stroke="#161616" stroke-width="3"/>
+  <circle cx="125" cy="28" r="4" fill="#e1000f"/>
+  <g fill="none" stroke="#e1000f" stroke-width="2.5" stroke-linecap="round">
+    <path d="M136 18 a16 16 0 0 1 0 20"/>
+    <path d="M144 10 a28 28 0 0 1 0 36"/>
+    <path d="M114 18 a16 16 0 0 0 0 20"/>
+    <path d="M106 10 a28 28 0 0 0 0 36"/>
+  </g>
+  <!-- Calendar -->
+  <rect x="245" y="70" width="130" height="160" rx="6" fill="#ffffff" stroke="#161616" stroke-width="2"/>
+  <path d="M245 76 a6 6 0 0 1 6 -6 h118 a6 6 0 0 1 6 6 v24 h-130 z" fill="#000091"/>
+  <text x="310" y="91" text-anchor="middle" font-family="Marianne, Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff">Jours pairs</text>
+  <g font-family="Marianne, Arial, sans-serif" font-size="13" text-anchor="middle">
+    <g fill="#929292">
+      <text x="270" y="130">1</text>
+      <text x="350" y="130">3</text>
+      <text x="310" y="166">5</text>
+      <text x="270" y="202">7</text>
+      <text x="350" y="202">9</text>
+    </g>
+    <g fill="#000091">
+      <circle cx="310" cy="125" r="13"/>
+      <circle cx="270" cy="161" r="13"/>
+      <circle cx="350" cy="161" r="13"/>
+      <circle cx="310" cy="197" r="13"/>
+    </g>
+    <g fill="#ffffff" font-weight="bold">
+      <text x="310" y="130">2</text>
+      <text x="270" y="166">4</text>
+      <text x="350" y="166">6</text>
+      <text x="310" y="202">8</text>
+    </g>
+  </g>
+</svg>

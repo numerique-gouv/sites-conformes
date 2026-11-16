@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-labelledby="title desc">
+  <title id="title">Saturne : une étoile vue à travers les anneaux est comptée une seule fois</title>
+  <desc id="desc">La planète Saturne et ses anneaux. Une étoile apparaît à travers les anneaux : un compteur indique qu’elle n’est comptée qu’une fois.</desc>
+  <rect width="400" height="300" fill="#f5f5fe"/>
+  <!-- Back half of the rings -->
+  <path d="M30 160 A150 38 0 0 1 330 160" fill="none" stroke="#b5835a" stroke-width="14" opacity="0.8"/>
+  <path d="M55 160 A125 28 0 0 1 305 160" fill="none" stroke="#e8d2b0" stroke-width="6"/>
+  <!-- Star behind the rings -->
+  <polygon points="300,92 307,110 326,111 311,123 316,141 300,131 284,141 289,123 274,111 293,110" fill="#ffd100" stroke="#161616" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Saturn -->
+  <defs>
+    <clipPath id="saturn">
+      <circle cx="180" cy="160" r="72"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#saturn)">
+    <rect x="100" y="80" width="160" height="160" fill="#e3c98b"/>
+    <rect x="100" y="115" width="160" height="14" fill="#cfae6c"/>
+    <rect x="100" y="185" width="160" height="18" fill="#cfae6c"/>
+  </g>
+  <circle cx="180" cy="160" r="72" fill="none" stroke="#7a5230" stroke-width="2"/>
+  <!-- Front half of the rings -->
+  <path d="M30 160 A150 38 0 0 0 330 160" fill="none" stroke="#b5835a" stroke-width="14" opacity="0.9"/>
+  <path d="M55 160 A125 28 0 0 0 305 160" fill="none" stroke="#e8d2b0" stroke-width="6"/>
+  <!-- Counter -->
+  <line x1="318" y1="100" x2="345" y2="72" stroke="#161616" stroke-width="2"/>
+  <rect x="330" y="40" width="58" height="36" rx="18" fill="#000091"/>
+  <text x="359" y="64" text-anchor="middle" font-family="Marianne, Arial, sans-serif" font-size="18" font-weight="bold" fill="#ffffff">× 1</text>
+  <text x="200" y="270" text-anchor="middle" font-family="Marianne, Arial, sans-serif" font-size="15" font-weight="bold" fill="#161616">Comptée une seule fois</text>
+</svg>

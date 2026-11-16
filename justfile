@@ -11,7 +11,7 @@ script_name := env("FORCE_SCRIPT_NAME", "")
 
 #### Default recipe
 
-# List all recipes
+[private]
 default:
     @just --list
 
@@ -185,7 +185,7 @@ cloc:
 coverage app="":
     {{uv_run}} coverage run --source='.' manage.py test {{app}}
     {{uv_run}} coverage html
-    firefox htmlcov/index.html
+    {{uv_run}} python -m webbrowser "file://{{justfile_directory()}}/htmlcov/index.html"
 
 # Gives a rough estimate of the number of internal and external routes
 [group('Code audit')]
@@ -214,6 +214,31 @@ clear-local-db:
 demo:
     just init-dev
     {{docker_cmd}} {{uv_run}} python manage.py create_demo_pages
+
+# Creates the fictional multisite demo sites (on an empty database)
+[group('Dev DB and medias management')]
+demo-multisite-setup:
+    {{docker_cmd}} {{uv_run}} python manage.py setup_multisite_demo
+
+# Load a fictional reference base (monosite|monosite-b|multisite) into its own database
+[group('Dev DB and medias management')]
+reference-load-db name="":
+    cd scripts && bash reference_db.sh load "{{name}}"
+
+# Run the server on a reference base (monosite|monosite-b|multisite) loaded with reference-load-db
+[group('Dev DB and medias management')]
+reference-runserver name="":
+    cd scripts && bash reference_db.sh runserver "{{name}}"
+
+# Pass a django command (e.g. migrate) to a reference base (monosite|monosite-b|multisite)
+[group('Dev DB and medias management')]
+reference-django name="" *command:
+    cd scripts && bash reference_db.sh django "{{name}}" {{command}}
+
+# Regenerate the fixtures of the reference bases (one per site) from the demo sites
+[group('Dev DB and medias management')]
+reference-export:
+    cd scripts && bash reference_db.sh export
 
 # Descend the latest DB backup & media files of the production database
 [group('Dev DB and medias management')]
