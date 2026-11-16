@@ -80,7 +80,7 @@ créez le template de votre modèle en étendant celui du paquet :
 ```
 
 À noter que vous pouvez, selon vos besoins, fournir un template sur mesure sans
-hériter de celui proposé par Sites Conformes. Cependant cela donnera lieux
+hériter de celui proposé par Sites Conformes. Cependant cela donnera lieu
 sur le long terme à davantage de maintenance.
 
 ## Accéder au modèle depuis votre code
