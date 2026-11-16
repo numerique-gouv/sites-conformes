@@ -10,6 +10,9 @@ def get_user_by_sub_or_email(sub: str, email: str, siret: str):
     """
     Get the user by its sub, and if not found, try by email.
     If the user is then found, create the UserOIDC entry (or update it if the sub has changed)
+
+    Returns the user, or None if no user matches: the account creation is then
+    handled by the authentication backend.
     """
     user_oidc = UserOIDC.objects.select_related("user").filter(sub=sub).first()
     if user_oidc:
@@ -28,7 +31,11 @@ def email_domain_basic_whitelist(user_info: dict) -> dict:
     """
     Example method of a filter for account creation when using ProConnect.
 
-    Checks the email domain and returns True if it is a gov domain.
+    Accepts the emails ending with ".gouv.fr". Returns {"status": "success"} if the
+    domain is allowed, or {"status": "error", "message": ...} otherwise.
+
+    To use it, set the `PROCONNECT_USER_CREATION_FILTER` setting to
+    "sites_conformes.proconnect.utils.email_domain_basic_whitelist".
     """
     email = user_info.get("email")
     if email.endswith(".gouv.fr"):
@@ -43,7 +50,12 @@ def email_domain_db_whitelist(user_info: dict) -> dict:
     """
     Example method of a filter for account creation when using ProConnect.
 
-    Checks the email domain against the database and returns True if it is a gov domain.
+    Accepts the emails whose domain is listed in the `WhitelistedEmailDomain` table
+    (exact match, subdomains are not included). Returns {"status": "success"} if the
+    domain is allowed, or {"status": "error", "message": ...} otherwise.
+
+    To use it, set the `PROCONNECT_USER_CREATION_FILTER` setting to
+    "sites_conformes.proconnect.utils.email_domain_db_whitelist".
     """
     email = user_info.get("email")
     domain = email.split("@")[1]
