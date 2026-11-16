@@ -5,11 +5,9 @@
     <a class="fr-nav__link" href="#" target="_self">{{ self.label }}</a>
   </h5>
 
-    <ul class="fr-menu__list">
+  <ul class="fr-menu__list">
     {% for link in self.links %}
-      <li>
-        {% include_block link %}
-      </li>
+      <li>{% include_block link %}</li>
     {% endfor %}
   </ul>
 </div>

@@ -1,4 +1,5 @@
 {% load i18n %}
+
 {% if page.get_view_restrictions %}
   {% if page.get_view_restrictions.first.restriction_type == "login" %}
     {% translate "Page visibility restricted to logged in users only" as page_visibility %}

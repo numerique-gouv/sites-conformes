@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 12:55+0200\n"
+"POT-Creation-Date: 2026-11-02 19:13+0100\n"
 "PO-Revision-Date: 2026-10-19 12:55+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -85,7 +85,8 @@ msgid "Filter by source"
 msgstr "Filtrer par source"
 
 msgid "The source is the organization of the post author"
-msgstr "La source est l’organisation à laquelle appartient l’auteur de l’article"
+msgstr ""
+"La source est l’organisation à laquelle appartient l’auteur de l’article"
 
 msgid "Show filters"
 msgstr "Afficher les filtres"
@@ -163,14 +164,14 @@ msgstr "Source :"
 msgid "- Page %(current)s / %(total)s"
 msgstr "- Page %(current)s / %(total)s"
 
-msgid "Filters"
-msgstr "Filtres"
-
 msgid "selected"
 msgstr "étiquette sélectionnée"
 
 msgid "unselected"
 msgstr "étiquette non-sélectionnée"
+
+msgid "Filters"
+msgstr "Filtres"
 
 msgid "Posts"
 msgstr "Articles"

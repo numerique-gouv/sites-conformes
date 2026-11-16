@@ -354,6 +354,13 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         )
         self.entry4.save()
 
+    def test_catalog_index_page_tags_list(self):
+        response = self.client.get(self.catalog_index_page.url + "tags/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context["sorted_tags"].keys()), ["T"])
+        self.assertEqual([t.slug for t in response.context["sorted_tags"]["T"]], ["tag-1", "tag-2"])
+
     def test_catalog_index_page_is_renderable(self):
         self.assertPageIsRenderable(self.catalog_index_page)
 
@@ -480,3 +487,46 @@ class ErrorPagesTestCase(TestCase):
             "<title>Erreur 500 — Erreur inattendue</title>",
             response.content.decode(),
         )
+
+
+class FollowBlockAriaLabelTestCase(WagtailPageTestCase):
+    def setUp(self):
+        home_page = Page.objects.get(slug="home")
+        self.content_page = home_page.add_child(instance=ContentPage(title="Page de test", slug="follow-block-test"))
+        self.config = CmsDsfrConfig.objects.get_or_create(site_id=home_page.get_site().id)[0]
+        self.config.newsletter_description = ""
+        self.config.newsletter_url = ""
+        self.config.save()
+
+    def _enable_newsletter(self):
+        self.config.newsletter_description = "Description"
+        self.config.newsletter_url = "https://example.com/newsletter"
+        self.config.save()
+
+    def _enable_social(self):
+        self.config.social_media_items.create(title="Mastodon", url="https://example.com/mastodon")
+        self.config.save()
+
+    def _assert_aria_label(self, label):
+        response = self.client.get(self.content_page.url)
+        self.assertRegex(
+            response.content.decode(),
+            rf'<aside id="cmsfr-block-follow"\s+aria-label="{label}">',
+        )
+
+    def test_label_with_newsletter_and_social(self):
+        self._enable_newsletter()
+        self._enable_social()
+        self._assert_aria_label("Lettre d’information et réseaux sociaux")
+
+    def test_label_with_newsletter_only(self):
+        self._enable_newsletter()
+        self._assert_aria_label("Lettre d’information")
+
+    def test_label_with_social_only(self):
+        self._enable_social()
+        self._assert_aria_label("Réseaux sociaux")
+
+    def test_no_aside_when_block_is_empty(self):
+        response = self.client.get(self.content_page.url)
+        self.assertNotContains(response, "cmsfr-block-follow")

@@ -1,5 +1,7 @@
 {% load i18n dsfr_tags wagtailcore_tags wagtailimages_tags %}
+
 {% image value.bg_image original as bg_img %}
+{# djlint: off H021 #}
 <div class="fr-py-5w {{ value.vertical_margin }} cmsfr-block-full-width-background-with-sidemenu"
      {% if value.bg_color_class or bg_img or value.bg_color %}style="background:{% endif %}
      {% if bg_img %}no-repeat center url({{ bg_img.url }}){% endif %}
@@ -8,9 +10,11 @@
   <div class="fr-container">
     <div class="fr-grid-row fr-grid-row--gutters fr-mb-3w">
       <div class="fr-col fr-col-md-4 fr-col-12">
-        <nav class="fr-sidemenu fr-mb-0-5v"{% if value.sidemenu_title %} aria-labelledby="fr-sidemenu-title-{{ block.id }}"{% else %} aria-label="{% translate "In this section" %}"{% endif %}>
+        <nav class="fr-sidemenu fr-mb-0-5v"
+             {% if value.sidemenu_title %} aria-labelledby="fr-sidemenu-title-{{ block.id }}"{% else %} aria-label="{% translate "In this section" %}"{% endif %}>
           <div class="fr-sidemenu__inner">
             <button class="fr-sidemenu__btn"
+                    type="button"
                     hidden
                     aria-controls="fr-sidemenu-wrapper-{{ block.id }}"
                     aria-expanded="false">{% translate "In this section" %}</button>
@@ -29,3 +33,4 @@
     </div>
   </div>
 </div>
+{# djlint: on #}

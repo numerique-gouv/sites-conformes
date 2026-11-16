@@ -1,4 +1,5 @@
 {% load i18n wagtailimages_tags wagtailcore_tags dsfr_tags wagtail_dsfr_tags %}
+
 <div class="fr-card fr-card--horizontal {% if value.image_ratio %}{{ value.image_ratio }}{% endif %} {% if value.enlarge_link %}fr-enlarge-link{% endif %} {% if value.grey_background %}fr-card--grey{% elif value.no_background %}fr-card--no-background{% endif %} {% if value.no_border %}fr-card--no-border{% endif %} {% if value.shadow %}fr-card--shadow{% endif %} {% if value.document or value.link.document %}fr-card--download{% endif %}">
   <div class="fr-card__body">
     <div class="fr-card__content">

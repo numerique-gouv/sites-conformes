@@ -33,7 +33,9 @@
     {% include "sites_conformes_core/blocks/messages.html" %}
 
     {% translate "Alphabetical" as alphabetical_label %}
-    <nav role="navigation" class="fr-mb-2w" aria-label="{{ alphabetical_label }}">
+    <nav role="navigation"
+         class="fr-mb-2w"
+         aria-label="{{ alphabetical_label }}">
       <ul class="fr-tags-group">
         {% for first_letter in sorted_tags.keys|dictsort:0 %}
           <li>

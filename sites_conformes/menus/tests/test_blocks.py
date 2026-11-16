@@ -169,7 +169,7 @@ class MainMenuSubmenuBlockTestCase(WagtailPageTestCase):
 
         self.assertInHTML(
             '<button aria-expanded="false" aria-controls="collapse-menu-mon-sous-menu"'
-            ' type="menu" class="fr-nav__btn">Mon sous-menu</button>',
+            ' type="button" class="fr-nav__btn">Mon sous-menu</button>',
             html,
         )
 
@@ -194,7 +194,7 @@ class MainMenuSubmenuBlockTestCase(WagtailPageTestCase):
 
         self.assertInHTML(
             '<button aria-current="true" aria-expanded="false" aria-controls="collapse-menu-mon-sous-menu"'
-            ' type="menu" class="fr-nav__btn">Mon sous-menu</button>',
+            ' type="button" class="fr-nav__btn">Mon sous-menu</button>',
             html,
         )
 
@@ -257,7 +257,7 @@ class MainMenuMegamenuBlockTestCase(WagtailPageTestCase):
 
         self.assertInHTML(
             '<button aria-expanded="false" aria-controls="collapse-menu-ma-section"'
-            ' type="menu" class="fr-nav__btn">Ma section</button>',
+            ' type="button" class="fr-nav__btn">Ma section</button>',
             html,
         )
 
@@ -298,7 +298,7 @@ class MainMenuMegamenuBlockTestCase(WagtailPageTestCase):
 
         self.assertInHTML(
             '<button aria-current="true" aria-expanded="false" aria-controls="collapse-menu-ma-section"'
-            ' type="menu" class="fr-nav__btn">Ma section</button>',
+            ' type="button" class="fr-nav__btn">Ma section</button>',
             html,
         )
 
@@ -316,7 +316,7 @@ class MainMenuMegamenuBlockTestCase(WagtailPageTestCase):
         html = response.content.decode()
 
         self.assertInHTML(
-            '<button class="fr-link--close fr-link" aria-controls="collapse-menu-ma-section"'
+            '<button class="fr-link--close fr-link" type="button" aria-controls="collapse-menu-ma-section"'
             ' data-fr-js-collapse-button="true">Fermer</button>',
             html,
         )

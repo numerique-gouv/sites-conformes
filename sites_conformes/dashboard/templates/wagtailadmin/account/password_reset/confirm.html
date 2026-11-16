@@ -1,5 +1,6 @@
 {% extends "sites_conformes_core/base.html" %}
 {% load widget_tweaks wagtailadmin_tags i18n static %}
+
 {% block content %}
   <div class="fr-container fr-container--fluid fr-my-md-14v">
     {% if validlink %}
@@ -38,7 +39,8 @@
       </div>
 
       <div class="form-actions">
-        <a href="{% url 'wagtailadmin_password_reset' %}" class="fr-btn">{% translate "Request a new password reset" %}</a>
+        <a href="{% url 'wagtailadmin_password_reset' %}"
+           class="fr-btn">{% translate "Request a new password reset" %}</a>
       </div>
     {% endif %}
   </div>

@@ -1,0 +1,10 @@
+.demo-annuaire-carte {
+  height: 480px;
+  width: 100%;
+  border: 1px solid var(--border-default-grey);
+}
+
+.demo-annuaire-liste {
+  max-height: 480px;
+  overflow-y: auto;
+}

@@ -13,11 +13,12 @@
       <a class="fr-footer__brand-link"
          href="{% root_url %}"
          title="{{ back_to_home_label }} - {{ settings.sites_conformes_core.CmsDsfrConfig.operator_logo_alt }} - {{ settings.sites_conformes_core.CmsDsfrConfig.footer_brand|default:'république française' }}">
+        {# djlint: off H021 #}
         <img class="fr-footer__logo"
              src="{{ logo_img.url }}"
              alt="{{ settings.sites_conformes_core.CmsDsfrConfig.operator_logo_alt }}"
              {% if settings.sites_conformes_core.CmsDsfrConfig.operator_logo_width >= 1 %}style="max-width:{{ settings.sites_conformes_core.CmsDsfrConfig.operator_logo_width|floatformat:"1u" }}rem;"{% endif %} />
-        {# L’alternative de l’image (attribut alt) doit impérativement être renseignée et reprendre le texte visible dans l’image #}
+        {# djlint: on #}
       </a>
     </div>
   {% else %}
@@ -49,6 +50,7 @@
   {% if settings.sites_conformes_core.CustomScriptsSettings.use_tarteaucitron %}
     <li class="fr-footer__bottom-item">
       <button id="tarteaucitronManager"
+              type="button"
               aria-controls="tarteaucitron"
               data-fr-opened="false"
               class="fr-footer__bottom-link"
@@ -58,6 +60,7 @@
   {% if settings.sites_conformes_core.CmsDsfrConfig.theme_modale_button %}
     <li class="fr-footer__bottom-item">
       <button id="footer__bottom-link__parametres-affichage"
+              type="button"
               aria-controls="fr-theme-modal"
               data-fr-opened="false"
               class="fr-icon-theme-fill fr-link--icon-left fr-footer__bottom-link"

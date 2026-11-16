@@ -1,1 +1,5 @@
-<iframe title="{{ value.title }}" src="{{ value.url }}" height="{{ value.height }}px" width="100%" {% if value.parameters %}{{ value.parameters|safe }}{% endif %}></iframe>
+<iframe title="{{ value.title }}"
+        src="{{ value.url }}"
+        height="{{ value.height }}px"
+        width="100%"
+        {% if value.parameters %}{{ value.parameters|safe }}{% endif %}></iframe>

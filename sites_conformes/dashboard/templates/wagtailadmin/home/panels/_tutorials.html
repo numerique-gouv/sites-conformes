@@ -16,28 +16,28 @@
   <tbody class="sf-tutorials-display">
     {% for tutorial in tutorials %}
       {% if forloop.first or forloop.counter0|divisibleby:3 %}<tr>{% endif %}
-        <td>
-          <div class="sf-card">
-            <a href="{{ tutorial.url }}"
-               title="{{ tutorial.title }}"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="w-body-text">
-              {% if tutorial.image %}
-                <div class="sf-card__wrapper sf-card__wrapper--image">
-                  <img class="sf-card__image" src={{ tutorial.image }} alt="Preview image">
-                </div>
-              {% else %}
-                <div class="sf-card__wrapper sf-card__wrapper--icon">
-                  <img src="{% static 'artwork/video.svg' %}" alt="Video icon">
-                </div>
-              {% endif %}
-              {{ tutorial.title }}
-            </a>
-            <span>{% translate "Tutorial" %} {{ forloop.counter }} {% translate "of" %} {{ tutorials|length }}</span>
-          </div>
-        </td>
-        {% if forloop.counter|divisibleby:3 %}</tr>{% endif %}
+      <td>
+        <div class="sf-card">
+          <a href="{{ tutorial.url }}"
+             title="{{ tutorial.title }}"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="w-body-text">
+            {% if tutorial.image %}
+              <div class="sf-card__wrapper sf-card__wrapper--image">
+                <img class="sf-card__image" src="{{ tutorial.image }}" alt="Preview image">
+              </div>
+            {% else %}
+              <div class="sf-card__wrapper sf-card__wrapper--icon">
+                <img src="{% static 'artwork/video.svg' %}" alt="Video icon">
+              </div>
+            {% endif %}
+            {{ tutorial.title }}
+          </a>
+          <span>{% translate "Tutorial" %} {{ forloop.counter }} {% translate "of" %} {{ tutorials|length }}</span>
+        </div>
+      </td>
+      {% if forloop.counter|divisibleby:3 %}</tr>{% endif %}
     {% endfor %}
   </tbody>
 </table>

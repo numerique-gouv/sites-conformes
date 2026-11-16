@@ -11,6 +11,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "django-debug-toolbar>=6.1.0",
+    "djlint>=1.36.4",
 ]
 
 # Dependency cooldown: keep in sync with [tool.uv] in ../pyproject.toml.
@@ -21,6 +22,15 @@ exclude-newer = "7 days"
 # Bypass cooldown for security fixes (pillow 13.0.0: GHSA-8g5g-8vmr-9782 et al.;
 # certifi 2026.10.19: PYSEC-2026-4320). Remove once both are older than 7 days.
 exclude-newer-package = { pillow = false, certifi = false }
+
+# Keep in sync with [tool.djlint] in ../pyproject.toml: djlint reads its config
+# from the first file of each batch, so this one applies to whole batches.
+[tool.djlint]
+profile = "django"
+max_blank_lines = 1
+blank_line_after_tag = "load"
+ignore = "H030,H031,H006,D018,T003"
+indent = 2
 
 # TODO: remove [tool.uv.sources] once sites-conformes >= 3.2.0rc1 is on PyPI.
 # Until then, this points `uv lock` / `uv sync` at the editable checkout in

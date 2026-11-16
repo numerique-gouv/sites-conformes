@@ -3,6 +3,7 @@
 {% load wagtailadmin_tags i18n %}
 
 {% block branding_logo %}
+  {# djlint: off H021 #}
   <div style="display: none">
     <svg>
       <defs>
@@ -10,6 +11,6 @@
       </defs>
     </svg>
   </div>
-  {# Update the icon name #}
+  {# djlint: on #}
   {% icon name="edit" classname="w-userbar-icon" %}
 {% endblock %}

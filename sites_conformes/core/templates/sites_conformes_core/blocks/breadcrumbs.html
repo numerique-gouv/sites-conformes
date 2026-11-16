@@ -1,10 +1,12 @@
 {% load i18n %}
+
 {% translate "you are here:" as you_are_here %}
 {% if self.get_ancestors|length > 1 %}
   <nav role="navigation"
        class="fr-breadcrumb"
        aria-label="{{ you_are_here }}">
     <button class="fr-breadcrumb__button"
+            type="button"
             aria-expanded="false"
             aria-controls="page-breadcrumb">{% translate "See breadcrumb" %}</button>
     <div class="fr-collapse" id="page-breadcrumb">

@@ -16,3 +16,4 @@
 
 # Example (replace with real commit SHAs when adding formatting commits):
 # abc1234def5678abc1234def5678abc1234def5678  # Apply black formatting (2024-01-01)
+77b6a64132fd904ebc213ab2c71a2286be7f1662 # Global formatting with djlint

@@ -1,4 +1,5 @@
 {% load i18n %}
+
 {# djlint:off #}
 <{% if value.link is not None and value.link.url %}a href="{{ value.link.url }}"{% else %}p{% endif %} class="fr-tag{% if value.is_small %} fr-tag--sm{% endif %}{% if value.color %} fr-tag--{{ value.color }}{% endif %}{% if value.icon_class %} {{ value.icon_class }} fr-tag--icon-left{% endif %}">{{ value.label }}</{% if value.link is not None and value.link.url %}a{% else %}p{% endif %}>
 {# djlint:on #}

@@ -1,14 +1,21 @@
 {% load i18n static dsfr_tags %}
 
 <!DOCTYPE html>
-<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}" data-fr-scheme="light">
+<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}"
+      data-fr-scheme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    {% block title %}
+      <title>
+        {% if title %}{{ title }} —{% endif %}
+      {{ settings.sites_conformes_core.CmsDsfrConfig.site_title }}</title>
+    {% endblock title %}
     {% dsfr_css %}
-    <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
-    {% block extra_css %}{% endblock extra_css %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    {% block extra_css %}
+    {% endblock extra_css %}
   </head>
 
   <body>
@@ -18,6 +25,7 @@
     </main>
 
     {% dsfr_js nonce=request.csp_nonce %}
-    {% block extra_js %}{% endblock extra_js %}
+    {% block extra_js %}
+    {% endblock extra_js %}
   </body>
 </html>

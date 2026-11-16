@@ -5,24 +5,22 @@
 {% if language_selector.is_active %}
   <li class="fr-translate fr-nav">
     <div class="fr-nav__item">
-      <button
-        aria-controls="translate-menu"
-        aria-expanded="false"
-        title="{{ select_language_label }}"
-        type="button"
-        class="fr-translate__btn fr-btn fr-btn--tertiary">
+      <button aria-controls="translate-menu"
+              aria-expanded="false"
+              title="{{ select_language_label }}"
+              type="button"
+              class="fr-translate__btn fr-btn fr-btn--tertiary">
         {{ LANGUAGE_CODE|upper }}<span class="fr-hidden-lg"> – {% get_language_info for LANGUAGE_CODE as current_lang %}{{ current_lang.name_local|capfirst }}</span>
       </button>
       <div class="fr-collapse fr-translate__menu fr-menu" id="translate-menu">
         <ul class="fr-menu__list">
           {% for item in language_selector.items %}
             <li>
-              <a
-                class="fr-translate__language fr-nav__link"
-                hreflang="{{ item.language_code|lower }}"
-                lang="{{ item.language_code|lower }}"
-                href="{{ item.url }}"
-                {% if item.language_code|lower == LANGUAGE_CODE|lower %}aria-current="true"{% endif %}>
+              <a class="fr-translate__language fr-nav__link"
+                 hreflang="{{ item.language_code|lower }}"
+                 lang="{{ item.language_code|lower }}"
+                 href="{{ item.url }}"
+                 {% if item.language_code|lower == LANGUAGE_CODE|lower %}aria-current="true"{% endif %}>
                 {{ item.language_code|upper }} - {{ item.language_name|capfirst }}
               </a>
             </li>

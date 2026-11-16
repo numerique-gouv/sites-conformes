@@ -115,3 +115,4 @@ class IframeTemplateSelectionTestCase(WagtailPageTestCase):
         response = self.client.get(self.content_page.get_url(), HTTP_SEC_FETCH_DEST="iframe")
         self.assertTemplateUsed(response, "sites_conformes_core/iframe.html")
         self.assertTemplateNotUsed(response, "sites_conformes_core/standalone.html")
+        self.assertContains(response, "<title>")

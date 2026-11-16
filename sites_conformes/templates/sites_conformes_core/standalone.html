@@ -24,7 +24,7 @@
     {% dsfr_favicon %}
 
     {% dsfr_css %}
-    <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
 
     {% block extra_css %}
     {% endblock extra_css %}
@@ -62,9 +62,12 @@
 
     {% block follow_newsletter_social_media %}
       {% if settings.sites_conformes_core.CmsDsfrConfig.show_newsletter_and_social_block %}
-        <aside id="cmsfr-block-follow">
-          {% include "sites_conformes_core/blocks/follow.html" %}
-        </aside>
+        {% with config=settings.sites_conformes_core.CmsDsfrConfig %}
+          <aside id="cmsfr-block-follow"
+                 aria-label="{% if config.show_newsletter_block and config.show_social_block %}{% translate "Newsletter and social media" %}{% elif config.show_newsletter_block %}{% translate "Newsletter" %}{% else %}{% translate "Social media" %}{% endif %}">
+            {% include "sites_conformes_core/blocks/follow.html" %}
+          </aside>
+        {% endwith %}
       {% endif %}
     {% endblock follow_newsletter_social_media %}
 

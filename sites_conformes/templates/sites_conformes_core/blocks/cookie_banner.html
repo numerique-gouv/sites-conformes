@@ -1,9 +1,10 @@
 {% load static %}
+
 {% if settings.sites_conformes_core.CustomScriptsSettings.use_tarteaucitron %}
   <script src="{% static 'lib/tarteaucitronjs/tarteaucitron.js' %}"></script>
   <link rel="stylesheet" href="{% static 'css/tac.css' %}">
 
-  <script type="text/javascript">
+  <script>
     tarteaucitron.init({
       "privacyUrl": "", /* Privacy policy url */
       "bodyPosition": "top", /* or top to bring it as first element for accessibility */

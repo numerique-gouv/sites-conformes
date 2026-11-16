@@ -12,7 +12,7 @@
       "template": "%APP%.osc-fr1.scalingo.io"
     },
     "HOST_URL": {
-      "description": "Le nom de domaine principal du site (nom de domaine uniquement, ex : mon-site.gouv.fr). Adapter la région si l’app n’est pas déployée sur osc-fr1.",
+      "description": "Le nom de domaine principal du site (nom de domaine uniquement, ex : mon-site.gouv.fr). Adapter la région si l’app n’est pas déployée sur osc-fr1. À remplacer par le domaine définitif une fois celui-ci branché.",
       "generator": "template",
       "template": "%APP%.osc-fr1.scalingo.io"
     },

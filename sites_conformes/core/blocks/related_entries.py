@@ -75,7 +75,7 @@ class RecentEntriesStructValue(blocks.StructValue):
         """
         Used for the filters section titles
         """
-        heading_tag = self.get("heading_tag")
+        heading_tag = self.get("heading_tag") or "h2"
         if heading_tag == "h2":
             return "h3"
         elif heading_tag == "h3":
@@ -84,6 +84,15 @@ class RecentEntriesStructValue(blocks.StructValue):
             return "h5"
         else:
             return "h6"
+
+    def card_heading_tag(self):
+        """
+        Used for the entry cards titles: one level below the block title,
+        or at the level of the block title if it is not displayed
+        """
+        if self.get("title"):
+            return self.sub_heading_tag()
+        return self.get("heading_tag") or "h2"
 
 
 class BlogRecentEntriesStructValue(RecentEntriesStructValue):
