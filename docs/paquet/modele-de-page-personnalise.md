@@ -15,7 +15,7 @@ bibliothèque [`swapper`](https://github.com/openwisp/django-swappable-models) :
 ```{warning}
 Le réglage doit être défini **avant la première migration** du projet.
 S'il arrivait que des pages soient déjà créées avec le modèle fourni
-par sites Conformes, alors celle-ci ne seront pas converties et il
+par Sites Conformes, alors celles-ci ne seront pas converties et il
 faudra effectuer une migration de données pas forcément évidente.
 ```
 
