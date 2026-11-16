@@ -4,7 +4,6 @@ Les projets utilisant Sites conformes sous forme de paquet peuvent remplacer le
 modèle `ContentPage` par leur propre modèle, pour y ajouter des champs, des
 panneaux d’administration ou un template spécifique.
 C'est la seule solution qui évite de forker le projet.
-  
 Le mécanisme est celui des [modèles de page de base personnalisés de Wagtail 8](https://docs.wagtail.org/en/latest/advanced_topics/customization/custom_base_page_models.html)
 (`WAGTAIL_PAGE_MODEL`), lui-même basé sur `AUTH_USER_MODEL` de Django et la
 bibliothèque [`swapper`](https://github.com/openwisp/django-swappable-models) :
