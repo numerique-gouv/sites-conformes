@@ -145,7 +145,7 @@ scalingo-postdeploy:
 
 # Roll a Scalingo app back to a DB backup and to the code of a given git ref
 [group('Production')]
-scalingo-rollback app region="osc-fr1" ref="":
+scalingo-rollback app region="-" ref="":
     cd scripts && bash rollback_scalingo.sh {{app}} {{region}} {{ref}}
 
 #### Audit-related recipes
