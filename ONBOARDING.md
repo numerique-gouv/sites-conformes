@@ -8,24 +8,18 @@ Dans le cas d’une installation en local, voir la section « Préparation de l
 
 ### Dans tous les cas, copier les variables d’environnement
 
-- Copier le fichier
+- Créer le fichier `.env` à partir de `.env.example`, avec une `SECRET_KEY` générée (un `.env` existant n’est jamais écrasé) :
 
 ```sh
-cp .env.example .env
-```
-
-- Générer la `SECRET_KEY`
-
-```sh
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+just setup-env
 ```
 
 - Mettre les valeurs pertinentes dans le fichier `.env`, notamment :
   - `DEBUG=True`
   - `HOST_PROTO=http`
 
-
 ### En local
+
 #### Variables d’environnement
 
 - mettre la variable d’environnement `USE_UV` à `1` dans le fichier `.env`
@@ -43,7 +37,7 @@ just init-dev
 
 - La commande suivante crée un utilisateur administrateur avec tous les droits:
 
-```
+```sh
 just createsuperuser
 ```
 
@@ -54,6 +48,7 @@ just runserver
 ```
 
 ### via Docker
+
 #### Lancer les containers
 
 ```sh
@@ -61,19 +56,20 @@ docker compose up
 ```
 
 ## Préparation de l’environnement de travail
+
 Procédure testée sous Ubuntu.
 
 ### Prérequis
 
 Installer :
 
-* [Python 3](https://www.python.org/) (normalement déjà installé sur un système moderne)
-* [git](https://git-scm.com/)
-* [pipx](https://pipx.pypa.io/stable/)
-* [uv](https://docs.astral.sh/uv/)
-* [just](https://just.systems/)
-* [npm](https://docs.npmjs.com/)
-* [gettext](https://www.gnu.org/software/gettext/gettext.html)
+- [Python 3](https://www.python.org/) (normalement déjà installé sur un système moderne)
+- [git](https://git-scm.com/)
+- [pipx](https://pipx.pypa.io/stable/)
+- [uv](https://docs.astral.sh/uv/)
+- [just](https://just.systems/)
+- [npm](https://docs.npmjs.com/)
+- [gettext](https://www.gnu.org/software/gettext/gettext.html)
 
 Sous Ubuntu, la commande pour cela est :
 
@@ -102,15 +98,11 @@ cd sites-faciles
 
 Avoir un PostgreSQL qui tourne en local (cf. procédure d’installation sur [Ubuntu](https://documentation.ubuntu.com/server/how-to/databases/install-postgresql/index.html) ou sur [Mac](https://postgresapp.com/).)
 
+Créer l’utilisateur (avec les droits nécessaires aux scripts d’administration) et la base de données (vide pour l’instant) définis par `DATABASE_USER`, `DATABASE_PASSWORD` et `DATABASE_NAME` dans le `.env` :
+
 ```sh
-# créer un utilisateur avec les droits nécessaires aux scripts d’administration
-psql -c "CREATE USER sitesfaciles WITH CREATEDB LOGIN PASSWORD 'votre_mot_de_passe';" -U postgres
-
-
-# créer la base de données (vide pour l’instant)
-psql -c "CREATE DATABASE sitesfaciles OWNER sitesfaciles;" -U postgres
+just setup-db
 ```
-
 
 ## Fonctionnement depuis un sous-répertoire
 
@@ -118,20 +110,20 @@ Lorsque la variable `FORCE_SCRIPT_NAME` est configurée, le site tourne dans un 
 
 Pour tester le fonctionnement en local, il faut donc passer par [gunicorn](https://gunicorn.org/) et [nginx](https://nginx.org/). À cette fin :
 
-* Installer nginx si ce n'est pas déjà fait : https://nginx.org/en/docs/install.html
-* Après avoir configuré les variables d’environnement (cf. ci-dessus), lancer la commande suivante pour générer et mettre en place la configuration nginx :
+- Installer nginx si ce n'est pas déjà fait : <https://nginx.org/en/docs/install.html>
+- Après avoir configuré les variables d’environnement (cf. ci-dessus), lancer la commande suivante pour générer et mettre en place la configuration nginx :
 
 ```sh
 just nginx-generate-config-file
 ```
 
-* Lancer le serveur local via gunicorn avec la commande suivante (à la place de `just runserver` donc) :
+- Lancer le serveur local via gunicorn avec la commande suivante (à la place de `just runserver` donc) :
 
 ```sh
 just run_gunicorn
 ```
 
-* Accéder au site via nginx en ajoutant 1 au port utilisé par gunicorn. Par exemple, si le `.env` contient les valeurs suivantes :
+- Accéder au site via nginx en ajoutant 1 au port utilisé par gunicorn. Par exemple, si le `.env` contient les valeurs suivantes :
 
 ```sh
 DEBUG=False
@@ -143,37 +135,26 @@ ALLOWED_HOSTS=localhost,0.0.0.0,127.0.0.1,.localhost
 CSRF_TRUSTED_ORIGINS="http://127.0.0.1:18000,http://localhost:18000,http://*.localhost:18000"
 ```
 
-* On peut alors accéder au site via http:/sites-faciles.localhost:18000/pages/
+- On peut alors accéder au site via http:/sites-faciles.localhost:18000/pages/
 
 ## Gestion de la base de données et des médias
+
 Un ensemble de scripts pour gérer la base de données et les fichiers médias, que ce soit ceux de la base locale de dev ou ceux de la production.
 
 Ils sont regroupés dans la catégorie « [Dev DB and medias management] » de la commande `just`.
 
 La gestion des sauvegardes locales nécessite de définir la variable `BACKUP_DIR` dans le fichier `.env`, en spécifiant un répertoire situé hors du projet Django pour ne pas risquer de commiter une sauvegarde par erreur.
 
-La gestion des sauvegardes de production nécessite de définir les variables supplémentaires dans le fichier `.env`.
+La gestion des sauvegardes de production nécessite en plus de définir la variable `PROD_APP` (le nom de l’app Scalingo) dans le fichier `.env`.
 
-Il faut aussi installer deux dépendances : d’une part, la CLI de Scalingo, en suivant [la documentation d’installation ](https://doc.scalingo.com/tools/cli/start) et [celle de connexion](https://doc.scalingo.com/tools/cli/introduction), pour pouvoir récupérer la dernière sauvegarde de la base de données.
+Le nom de la base de données et les paramètres du bucket S3 (`S3_BUCKET_NAME`, `S3_LOCATION`, `S3_HOST`, `S3_KEY_ID`, etc.) sont lus directement dans les variables d’environnement de l’app Scalingo : il n’est plus nécessaire de les recopier dans le `.env`, mais il faut être connecté à la CLI Scalingo avec un compte ayant accès à l’app.
+
+Il faut aussi installer deux dépendances : d’une part, la CLI de Scalingo, en suivant [la documentation d’installation](https://doc.scalingo.com/tools/cli/start) et [celle de connexion](https://doc.scalingo.com/tools/cli/introduction), pour pouvoir récupérer la dernière sauvegarde de la base de données et les variables d’environnement de l’app.
 
 D’autre part, le paquet [rclone](https://rclone.org/) (via `apt install rclone`) pour gérer la récupération des fichiers média depuis un S3.
 
-```sh
-PROD_APP= (le nom de l’app Scalingo, par ex sites-faciles)
-PROD_DB_NAME= (le nom de la base de données dans Scalingo, par ex sites_facil_123)
-PROD_S3_BUCKET_NAME=
-PROD_S3_LOCATION=
-RCLONE_CONFIG_MYS3_REGION_NAME=
-RCLONE_CONFIG_MYS3_ENDPOINT=
-RCLONE_CONFIG_MYS3_ACCESS_KEY_ID=
-RCLONE_CONFIG_MYS3_SECRET_ACCESS_KEY=
-RCLONE_CONFIG_MYS3_PROVIDER=Other
-RCLONE_CONFIG_MYS3_TYPE="s3"
-```
+###  Données locales
 
-* Le préfixe `RCLONE_CONFIG_MYS3_*` permet à `rclone` de récupérer automatiquement ces paramètres depuis les variables d’environnement.
-
-### Données locales
 Il est possible de faire une sauvegarde de la base de données et des fichiers médias de l’instance via
 
 ```sh
@@ -182,7 +163,10 @@ just backup-local
 
 Il est fortement recommandé d’en faire un avant de remplacer ces données par celles de production, sinon elles seront perdues !
 
-### Récupération des données de production
+Les fichiers de sauvegarde sont nommés `sites-conformes-local-db-*.sql.gz` et `sites-conformes-local-medias-*.tar.gz`.
+
+###  Récupération des données de production
+
 Pour récupérer la base de données et les fichiers média de production en local, taper la commande suivante :
 
 ```sh
@@ -190,6 +174,7 @@ just descend-prod
 ```
 
 ### Restauration
+
 Il est possible de restaurer les données locales ou de production via, respectivement,
 
 ```sh
@@ -201,3 +186,30 @@ et
 ```sh
 just restore-prod
 ```
+
+Après la restauration d’une base de données, la commande `set_config` est lancée automatiquement pour adapter la configuration du site à l’environnement local.
+
+### Retour arrière d’une app Scalingo
+
+En cas de problème après une mise en production, il est possible de restaurer une sauvegarde de la base de données d’une app Scalingo et de redéployer le code correspondant :
+
+```sh
+just scalingo-rollback <app> [region] [ref]
+```
+
+- `region` vaut `osc-fr1` par défaut (passer `-` pour la garder tout en précisant une `ref`).
+- Par défaut, `ref` est le code du dernier déploiement réussi avant la sauvegarde choisie.
+- La variable `REPO_URL_BASE` doit pointer vers le dépôt de ce projet (`https://github.com/numerique-gouv/numerique-gouv-cms`, cf. `.env.example`), sinon c’est le code de sites-conformes qui sera déployé.
+- Prérequis : la CLI Scalingo, `git`, `curl` et un `postgresql-client` dont la version correspond à celle du serveur.
+
+⚠️ La base de données de l’app est **remplacée** par la sauvegarde. Le script demande de taper le nom de l’app pour confirmer, fait une sauvegarde de sécurité si la dernière date de plus de 6 heures, et arrête les conteneurs web pendant la restauration.
+
+## Mise à jour de TarteAuCitron
+
+La bibliothèque [TarteAuCitron](https://tarteaucitron.io/) est embarquée dans `static/lib/tarteaucitronjs/`. Pour la resynchroniser avec la version du paquet npm (définie dans `package-lock.json`) :
+
+```sh
+just sync-tarteaucitron
+```
+
+Cette recette est aussi lancée par `just upgrade`.

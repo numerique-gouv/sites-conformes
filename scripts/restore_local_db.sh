@@ -16,7 +16,7 @@ fi
 
 cd ${BACKUP_DIR}
 
-BACKUP_FILE=`ls sites-faciles-local-db-*.sql.gz -c | head -1`
+BACKUP_FILE=`ls sites-conformes-local-db-*.sql.gz -c | head -1`
 
 echo "Restoring database ${DATABASE_NAME} with backup ${BACKUP_FILE}"
 

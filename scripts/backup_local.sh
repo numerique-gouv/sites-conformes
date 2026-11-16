@@ -25,11 +25,11 @@ DATE=`date '+%Y%m%d-%H%M'`
 echo "${DATE}"
 
 echo "SQL dump"
-pg_dump --no-privileges --no-owner -U ${DATABASE_USER} -h ${DATABASE_HOST} -p ${DATABASE_PORT} -d ${DATABASE_NAME} -F c -Z 9 -f ${BACKUP_DIR}/sites-faciles-local-db-${DATE}.sql.gz
+pg_dump --no-privileges --no-owner -U ${DATABASE_USER} -h ${DATABASE_HOST} -p ${DATABASE_PORT} -d ${DATABASE_NAME} -F c -Z 9 -f ${BACKUP_DIR}/sites-conformes-local-db-${DATE}.sql.gz
 
 echo "Medias backup"
 cd ${SCRIPT_DIR}/../
-tar cvzf ${BACKUP_DIR}/sites-faciles-local-medias-${DATE}.tar.gz ${MEDIA_ROOT:=medias}/
+tar cvzf ${BACKUP_DIR}/sites-conformes-local-medias-${DATE}.tar.gz ${MEDIA_ROOT:=medias}/
 
 echo "New backup files:"
 ls -hal ${BACKUP_DIR}/*${DATE}*
