@@ -152,11 +152,11 @@ msgstr "Articles"
 msgid "Alphabetical"
 msgstr "Alphabétique"
 
-msgid "Parent category cannot be self."
-msgstr "La catégorie ne peut être sa propre parente."
+#~ msgid "Parent category cannot be self."
+#~ msgstr "La catégorie ne peut être sa propre parente."
 
-msgid "Cannot have circular Parents."
-msgstr "Il est impossible d’avoir des parents circulaires."
+#~ msgid "Cannot have circular Parents."
+#~ msgstr "Il est impossible d’avoir des parents circulaires."
 
 #~ msgid "Rich text"
 #~ msgstr "Texte riche"
