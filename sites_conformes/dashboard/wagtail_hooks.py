@@ -10,7 +10,7 @@ from wagtail.admin.ui.components import Component
 from wagtail.rich_text import LinkHandler
 
 from sites_conformes import __version__
-from sites_conformes.dashboard.views import NotificationPanel, ShortcutsPanel, TutorialsPanel
+from sites_conformes.dashboard.views import NotificationPanel, SendEmailCodeView, ShortcutsPanel, TutorialsPanel
 
 
 @hooks.register("insert_global_admin_css")
@@ -22,6 +22,11 @@ def global_admin_css():
         static("dsfr/dist/component/notice/notice.min.css"),
         static("css/admin.css"),
     )
+
+
+@hooks.register("register_admin_urls")
+def register_2fa_email_code_url():
+    return [path("2fa/email-code/", SendEmailCodeView.as_view(), name="sites_conformes_2fa_email_code")]
 
 
 @hooks.register("construct_help_menu")
