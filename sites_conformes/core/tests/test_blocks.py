@@ -9,8 +9,13 @@ from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category
-from sites_conformes.core.blocks.basics import CenteredImageBlock
-from sites_conformes.core.blocks.heros import HeroBackgroundImageBlock, HeroImageAndTextBlock
+from sites_conformes.core.blocks.basics import CenteredImageBlock, QuoteBlock
+from sites_conformes.core.blocks.heros import HeroBackgroundImageBlock, HeroImageAndTextBlock, OldHero
+from sites_conformes.core.blocks.layout import (
+    FullWidthBackgroundBlock,
+    FullWidthBackgroundWithSidemenuBlock,
+    MultiColumnsWithTitleBlock,
+)
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
@@ -973,3 +978,34 @@ class HeroBackgroundImageFormatTestCase(TestCase):
         hero = self.render_hero("color")
         self.assertNotIn("fr-ratio-16x9", hero["class"])
         self.assertIn("min-height: 650px", hero["style"])
+
+
+class ImageUrlFormatTestCase(TestCase):
+    """Images used through their URL (CSS backgrounds, quote) are converted to WebP, SVGs are kept."""
+
+    def render_all(self, image):
+        image_value = {"image": image.pk, "decorative": True, "alt_text": ""}
+        blocks_and_values = {
+            "full width background": (FullWidthBackgroundBlock(), {"bg_image": image.pk}),
+            "full width background with side menu": (FullWidthBackgroundWithSidemenuBlock(), {"bg_image": image.pk}),
+            "multicolumns": (MultiColumnsWithTitleBlock(), {"bg_image": image.pk}),
+            "background hero": (
+                HeroBackgroundImageBlock(),
+                {"background_color_or_image": "image", "image": {"image": image_value}},
+            ),
+            "old hero": (OldHero(), {"header_image": image_value}),
+            "quote": (QuoteBlock(), {"quote": "Citation", "image": image.pk}),
+        }
+        return {name: block.render(block.to_python(value)) for name, (block, value) in blocks_and_values.items()}
+
+    def test_raster_images_are_converted_to_webp(self):
+        image = import_image("sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png", "png")
+        for name, html in self.render_all(image).items():
+            with self.subTest(name):
+                self.assertRegex(html, r"/images/[^\s\"')]+\.webp")
+
+    def test_svg_images_are_kept(self):
+        image = import_image("sites_conformes/static/artwork/technical-error.svg", "svg")
+        for name, html in self.render_all(image).items():
+            with self.subTest(name):
+                self.assertRegex(html, r"/images/[^\s\"')]+\.svg")
