@@ -169,6 +169,15 @@ class EmailCodeDeviceFormTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(TOTPDevice.objects.get(user=self.user).confirmed)
 
+    @override_settings(WAGTAIL_SITE_NAME="Incubateur du Ministère de l'agriculture")
+    def test_site_name_is_not_escaped_in_the_email(self):
+        self.client.get(self.url)
+        self.request_code()
+
+        site_name = "Incubateur du Ministère de l'agriculture"
+        self.assertIn(site_name, mail.outbox[0].subject)
+        self.assertIn(site_name, mail.outbox[0].body)
+
     def test_codes_cannot_be_requested_too_often(self):
         self.client.get(self.url)
         self.request_code()
