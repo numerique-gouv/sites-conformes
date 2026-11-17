@@ -2,13 +2,14 @@ name: Validate publiccode.yml
 
 on:
   push:
+    branches: [main, production, multisite]
     paths:
       - "publiccode.yml"
-      - ".github/workflows/publiccode.yml"
+      - ".github/workflows/publiccodeyml-check.yml"
   pull_request:
     paths:
       - "publiccode.yml"
-      - ".github/workflows/publiccode.yml"
+      - ".github/workflows/publiccodeyml-check.yml"
 
 permissions: {}
 

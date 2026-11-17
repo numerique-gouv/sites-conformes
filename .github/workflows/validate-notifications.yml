@@ -2,6 +2,7 @@ name: Validate notifications.json
 
 on:
   push:
+    branches: [main, production, multisite]
     paths:
       - "notifications.json"
   pull_request:
