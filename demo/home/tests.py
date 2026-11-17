@@ -129,3 +129,32 @@ class ContentPageTagsCheckTests(WagtailPageTestCase):
         # The shipped ContentPage has no tags once swapped; Django skips swapped models.
         errors = checks.run_checks(tags=[checks.Tags.models])
         self.assertNotIn("sites_conformes_core.E001", [error.id for error in errors])
+
+
+class CustomContentPageAPITests(WagtailPageTestCase):
+    """
+    The pages API serves the swapped-in model, with its own fields.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        home = Site.objects.get(is_default_site=True).root_page
+        cls.page = home.add_child(instance=CustomContentPage(title="Custom", slug="custom", subtitle="sub", live=True))
+        cls.page.tags.add("dsfr")
+        cls.page.save()
+
+    def test_listing_exposes_custom_fields(self):
+        response = self.client.get("/api/v2/pages/?type=home.CustomContentPage&fields=subtitle,tags")
+
+        self.assertEqual(response.status_code, 200)
+        items = response.json()["items"]
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["subtitle"], "sub")
+        self.assertEqual(items[0]["tags"], ["dsfr"])
+
+    def test_detail_serves_the_swapped_model(self):
+        response = self.client.get(f"/api/v2/pages/{self.page.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["meta"]["type"], "home.CustomContentPage")
+        self.assertIn("body", response.json())

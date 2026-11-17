@@ -3,7 +3,9 @@ from modelcluster.fields import ParentalKey
 from modelcluster.tags import ClusterTaggableManager
 from taggit.models import TaggedItemBase
 from wagtail.admin.panels import FieldPanel
+from wagtail.api import APIField
 from wagtail.models import Page
+from wagtail.search import index
 
 from sites_conformes.core.models import AbstractContentPage
 
@@ -25,6 +27,9 @@ class CustomContentPage(AbstractContentPage):
         FieldPanel("tags"),
         FieldPanel("subtitle"),
     ]
+
+    api_fields = AbstractContentPage.api_fields + [APIField("tags"), APIField("subtitle")]
+    search_fields = AbstractContentPage.search_fields + [index.SearchField("subtitle")]
 
 
 class TagCustomContentPage(TaggedItemBase):
