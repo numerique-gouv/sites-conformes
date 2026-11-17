@@ -89,6 +89,8 @@ sites_conformes = [
     "*/templates/**/*",
     "*/static/**/*",
     "*/page_templates/**/*",
+    "locale/*/LC_MESSAGES/*.po",
+    "locale/*/LC_MESSAGES/*.mo",
     "*/locale/*/LC_MESSAGES/*.po",
     "*/locale/*/LC_MESSAGES/*.mo",
 ]

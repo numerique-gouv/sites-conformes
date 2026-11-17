@@ -21,6 +21,7 @@ maxdepth: 1
 installation-locale
 architecture
 guide-contribution
+publier-une-version
 traductions
 definition-of-done
 git-blame-ignore-revs
