@@ -387,10 +387,7 @@ class PictureTagTestCase(WagtailPageTestCase):
         value = {**dict(hero_block.get_default()), "image": self.image_value}
         page = self.home.add_child(instance=ContentPage(title="Hero", slug="hero", hero=[("hero_text_image", value)]))
 
-        # The hero crops in Python (see HeroImageAndTextStructValue), so it renders an <img>, not a <picture>
-        img = self.get_soup(page).select_one(".cmsfr-hero-media img")
-        self.assertTrue(img["src"].endswith(".webp"))
-        self.assertEqual(img["alt"], "Un homme dans les nuages")
+        self.assert_picture(self.get_soup(page).select_one(".cmsfr-hero-media picture"))
 
     def test_grid_section_renders_picture(self):
         grid_block = ContentPage._meta.get_field("body").stream_block.child_blocks["image_text_grid_section"]

@@ -7,6 +7,8 @@ from wagtail import blocks
 from wagtail.admin.telepath import register
 from wagtail.blocks import StructValue
 from wagtail.blocks.struct_block import StructBlockAdapter, StructBlockValidationError
+from wagtail.images.models import Filter, Picture
+from wagtail.images.shortcuts import get_renditions_or_not_found
 
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
@@ -155,29 +157,30 @@ class HeroImageBlockWithMask(HeroImageBlock):
 
 
 class HeroImageAndTextStructValue(StructValue):
-    def image_rendition(self):
+    def image_filter_spec(self):
         """
         Crop the image to the chosen format around its focal point, or keep its original proportions.
         """
+        image_format = self.get("image_format")
+        if not image_format:
+            return "max-1200x1200"
+
+        # Formats are DSFR classes ending with the ratio, e.g. "fr-responsive-img--16x9"
+        ratio_width, ratio_height = (int(n) for n in image_format.rsplit("--", 1)[1].split("x"))
+        if ratio_width >= ratio_height:
+            return f"fill-1200x{round(1200 * ratio_height / ratio_width)}"
+        return f"fill-{round(1200 * ratio_width / ratio_height)}x1200"
+
+    def image_picture(self):
         image = self.get("image")
         if not image:
             return None
 
+        # The {% picture %} tag doesn't accept a dynamic filter spec, so build the Picture here
+        filter_specs = Filter.expand_spec(f"{self.image_filter_spec()}|format-webp|preserve-svg")
         image_format = self.get("image_format")
-        if not image_format:
-            spec = "max-1200x1200"
-        else:
-            # Formats are DSFR classes ending with the ratio, e.g. "fr-responsive-img--16x9"
-            ratio_width, ratio_height = (int(n) for n in image_format.rsplit("--", 1)[1].split("x"))
-            if ratio_width >= ratio_height:
-                spec = f"fill-1200x{round(1200 * ratio_height / ratio_width)}"
-            else:
-                spec = f"fill-{round(1200 * ratio_width / ratio_height)}x1200"
-
-        # WebP like the {% picture %} tag used elsewhere: the crop varies per image, which that tag can't do
-        if not image.is_svg():
-            spec += "|format-webp"
-        return image.get_rendition(spec)
+        css_class = f"fr-responsive-img {image_format}" if image_format else "cmsfr-hero-img"
+        return Picture(get_renditions_or_not_found(image, filter_specs), attrs={"class": css_class})
 
 
 class HeroImageAndTextBlock(blocks.StructBlock):

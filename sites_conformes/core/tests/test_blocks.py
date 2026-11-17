@@ -903,42 +903,45 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
         )
 
     def render_image(self, value):
-        return BeautifulSoup(self.block.render(value), "html.parser").find("img")
+        picture = BeautifulSoup(self.block.render(value), "html.parser").find("picture")
+        self.assertTrue(picture.img["src"].endswith(".webp"))
+        return picture.img
 
     def test_existing_heroes_stay_square(self):
         # Heroes saved before the format and size options existed
         value = self.get_value()
 
-        self.assertEqual(value.image_rendition().filter_spec, "fill-1200x1200|format-webp")
+        self.assertEqual(value.image_filter_spec(), "fill-1200x1200")
         img = self.render_image(value)
         self.assertEqual(img["class"], ["fr-responsive-img", "fr-responsive-img--1x1"])
         self.assertEqual(img["alt"], "Hero alt")
-        self.assertEqual(img.parent["class"], ["cmsfr-hero-media"])
+        self.assertEqual(img.find_parent("div")["class"], ["cmsfr-hero-media"])
 
     def test_ratio_formats_crop_around_the_focal_point(self):
         expected_specs = {
-            "fr-responsive-img--16x9": "fill-1200x675|format-webp",
-            "fr-responsive-img--32x9": "fill-1200x338|format-webp",
-            "fr-responsive-img--3x4": "fill-900x1200|format-webp",
-            "fr-responsive-img--2x3": "fill-800x1200|format-webp",
+            "fr-responsive-img--16x9": "fill-1200x675",
+            "fr-responsive-img--32x9": "fill-1200x338",
+            "fr-responsive-img--3x4": "fill-900x1200",
+            "fr-responsive-img--2x3": "fill-800x1200",
         }
         for image_format, filter_spec in expected_specs.items():
             with self.subTest(image_format=image_format):
                 value = self.get_value(image_format=image_format)
-                self.assertEqual(value.image_rendition().filter_spec, filter_spec)
+                self.assertEqual(value.image_filter_spec(), filter_spec)
 
     def test_original_proportions_are_not_cropped(self):
         value = self.get_value(image_format="", image_size="sm")
 
-        self.assertEqual(value.image_rendition().filter_spec, "max-1200x1200|format-webp")
+        self.assertEqual(value.image_filter_spec(), "max-1200x1200")
         img = self.render_image(value)
         self.assertEqual(img["class"], ["cmsfr-hero-img"])
-        self.assertEqual(img.parent["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])
+        self.assertEqual(img.find_parent("div")["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])
 
     def test_svg_images_are_not_converted(self):
         self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "Hero svg")
 
-        self.assertEqual(self.get_value().image_rendition().filter_spec, "fill-1200x1200")
+        img = BeautifulSoup(self.block.render(self.get_value()), "html.parser").select_one("picture img")
+        self.assertTrue(img["src"].endswith(".svg"))
 
 
 class HeroBackgroundImageFormatTestCase(TestCase):
