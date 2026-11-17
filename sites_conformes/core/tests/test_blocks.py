@@ -909,7 +909,7 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
         # Heroes saved before the format and size options existed
         value = self.get_value()
 
-        self.assertEqual(value.image_rendition().filter_spec, "fill-1200x1200")
+        self.assertEqual(value.image_rendition().filter_spec, "fill-1200x1200|format-webp")
         img = self.render_image(value)
         self.assertEqual(img["class"], ["fr-responsive-img", "fr-responsive-img--1x1"])
         self.assertEqual(img["alt"], "Hero alt")
@@ -917,10 +917,10 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
 
     def test_ratio_formats_crop_around_the_focal_point(self):
         expected_specs = {
-            "fr-responsive-img--16x9": "fill-1200x675",
-            "fr-responsive-img--32x9": "fill-1200x338",
-            "fr-responsive-img--3x4": "fill-900x1200",
-            "fr-responsive-img--2x3": "fill-800x1200",
+            "fr-responsive-img--16x9": "fill-1200x675|format-webp",
+            "fr-responsive-img--32x9": "fill-1200x338|format-webp",
+            "fr-responsive-img--3x4": "fill-900x1200|format-webp",
+            "fr-responsive-img--2x3": "fill-800x1200|format-webp",
         }
         for image_format, filter_spec in expected_specs.items():
             with self.subTest(image_format=image_format):
@@ -930,10 +930,15 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
     def test_original_proportions_are_not_cropped(self):
         value = self.get_value(image_format="", image_size="sm")
 
-        self.assertEqual(value.image_rendition().filter_spec, "max-1200x1200")
+        self.assertEqual(value.image_rendition().filter_spec, "max-1200x1200|format-webp")
         img = self.render_image(value)
         self.assertEqual(img["class"], ["cmsfr-hero-img"])
         self.assertEqual(img.parent["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])
+
+    def test_svg_images_are_not_converted(self):
+        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "Hero svg")
+
+        self.assertEqual(self.get_value().image_rendition().filter_spec, "fill-1200x1200")
 
 
 class HeroBackgroundImageFormatTestCase(TestCase):

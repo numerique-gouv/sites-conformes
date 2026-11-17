@@ -165,13 +165,19 @@ class HeroImageAndTextStructValue(StructValue):
 
         image_format = self.get("image_format")
         if not image_format:
-            return image.get_rendition("max-1200x1200")
+            spec = "max-1200x1200"
+        else:
+            # Formats are DSFR classes ending with the ratio, e.g. "fr-responsive-img--16x9"
+            ratio_width, ratio_height = (int(n) for n in image_format.rsplit("--", 1)[1].split("x"))
+            if ratio_width >= ratio_height:
+                spec = f"fill-1200x{round(1200 * ratio_height / ratio_width)}"
+            else:
+                spec = f"fill-{round(1200 * ratio_width / ratio_height)}x1200"
 
-        # Formats are DSFR classes ending with the ratio, e.g. "fr-responsive-img--16x9"
-        ratio_width, ratio_height = (int(n) for n in image_format.rsplit("--", 1)[1].split("x"))
-        if ratio_width >= ratio_height:
-            return image.get_rendition(f"fill-1200x{round(1200 * ratio_height / ratio_width)}")
-        return image.get_rendition(f"fill-{round(1200 * ratio_width / ratio_height)}x1200")
+        # WebP like the {% picture %} tag used elsewhere: the crop varies per image, which that tag can't do
+        if not image.is_svg():
+            spec += "|format-webp"
+        return image.get_rendition(spec)
 
 
 class HeroImageAndTextBlock(blocks.StructBlock):
