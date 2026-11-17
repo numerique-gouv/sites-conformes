@@ -24,10 +24,15 @@ faudra effectuer une migration de données pas forcément évidente.
    votre projet.
 
 2. Déclarez votre modèle hérité de `AbstractContentPage`. Le champ `tags`
-   et son modèle intermédiaire doivent être déclarés sur votre modèle, car
-   celui-ci est requis par Sites Conformes pour bien fonctionner. Le modèle
+   et son modèle intermédiaire sont **obligatoires** : ils sont utilisés par
+   les pages d’étiquettes de Sites Conformes, et une vérification système
+   (`sites_conformes_core.E001`) échoue s’ils manquent. Le modèle
    intermédiaire du paquet (`TagContentPage`) et sa table ne sont pas créés
-   lorsque le modèle est remplacé.
+   lorsque le modèle est remplacé. Le champ `subtitle` est en revanche un
+   exemple de personnalisation.
+
+   Les nouveaux champs ne sont exposés dans l’API et l’index de recherche que
+   s’ils sont ajoutés à `api_fields` et `search_fields`.
 
    ```python
    from django.db import models
@@ -35,6 +40,8 @@ faudra effectuer une migration de données pas forcément évidente.
    from modelcluster.tags import ClusterTaggableManager
    from taggit.models import TaggedItemBase
    from wagtail.admin.panels import FieldPanel
+   from wagtail.api import APIField
+   from wagtail.search import index
 
    from sites_conformes.core.models import AbstractContentPage
 
@@ -47,6 +54,9 @@ faudra effectuer une migration de données pas forcément évidente.
            FieldPanel("tags"),
            FieldPanel("subtitle"),
        ]
+
+       api_fields = AbstractContentPage.api_fields + [APIField("tags"), APIField("subtitle")]
+       search_fields = AbstractContentPage.search_fields + [index.SearchField("subtitle")]
 
 
    class TagCustomContentPage(TaggedItemBase):
@@ -66,6 +76,18 @@ faudra effectuer une migration de données pas forcément évidente.
    python manage.py makemigrations my_app
    python manage.py migrate
    ```
+
+## Mettre à jour Sites Conformes
+
+Les migrations de schéma du paquet ne s’appliquent pas à un modèle remplacé.
+Après chaque mise à jour de Sites Conformes, générez et appliquez les
+migrations de votre app pour que les nouveaux champs d’`AbstractContentPage`
+soient ajoutés à votre table :
+
+```sh
+python manage.py makemigrations my_app
+python manage.py migrate
+```
 
 ## Template
 
