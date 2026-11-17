@@ -441,7 +441,9 @@ just scalingo-rollback mon-site - v4.2.0
 
 La version est un tag, une branche ou un commit du dépôt. Par défaut, c’est le code
 du dernier déploiement réussi avant la sauvegarde choisie : un code plus ancien
-peut ne pas savoir lire le contenu de la sauvegarde. La région est par défaut `osc-fr1`,
+peut ne pas savoir lire le contenu de la sauvegarde. La région est par défaut
+celle de la variable `PROD_REGION` si elle est définie, `osc-fr1` sinon
+(`osc-secnum-fr1` pour la région SecNumCloud) ;
 `-` permet de garder cette valeur par défaut tout en précisant une version.
 
 Le script, qui nécessite la CLI Scalingo, `psql`, `pg_restore`

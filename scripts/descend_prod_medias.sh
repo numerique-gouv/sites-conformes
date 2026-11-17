@@ -19,8 +19,10 @@ if [[ -z "$PROD_APP" ]]; then
     exit 1
 fi
 
-# NAME=value lines from `scalingo --app "$PROD_APP" env`. Values may contain "=".
-scalingo_env="$(scalingo --app "${PROD_APP}" env)" || exit 1
+PROD_REGION=${PROD_REGION:-osc-fr1}
+
+# NAME=value lines from `scalingo --region "$PROD_REGION" --app "$PROD_APP" env`. Values may contain "=".
+scalingo_env="$(scalingo --region "${PROD_REGION}" --app "${PROD_APP}" env)" || exit 1
 
 # Print the value of one Scalingo variable. Return 1 when it is absent.
 scalingo_var() {
@@ -33,7 +35,7 @@ scalingo_var() {
 require_scalingo_var() {
     local value
     if ! value="$(scalingo_var "$1")" || [[ -z "$value" ]]; then
-        echo "Missing ${1} in Scalingo env for ${PROD_APP}" >&2
+        echo "Missing ${1} in Scalingo env for ${PROD_APP} (${PROD_REGION})" >&2
         return 1
     fi
     printf '%s' "$value"

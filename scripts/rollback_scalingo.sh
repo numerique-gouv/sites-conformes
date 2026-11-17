@@ -2,7 +2,9 @@
 
 # Roll a Scalingo app back to a database backup and to the code of a given git ref
 #
-# Usage: rollback_scalingo.sh APP [REGION=osc-fr1] [REF]
+# Usage: rollback_scalingo.sh APP [REGION] [REF]
+#
+# REGION defaults to $PROD_REGION, or to osc-fr1 when it is not set.
 #
 # REGION can be "-" to use the default region while passing a REF.
 #
@@ -24,9 +26,9 @@ set +a
 set -euo pipefail
 
 APP=${1:-}
-REGION=${2:-osc-fr1}
+REGION=${2:--}
 if [[ "$REGION" == "-" ]]; then
-    REGION=osc-fr1
+    REGION=${PROD_REGION:-osc-fr1}
 fi
 REF=${3:-}
 TUNNEL_PORT=${TUNNEL_PORT:-10000}
@@ -36,7 +38,7 @@ REPO_URL_BASE=${REPO_URL_BASE%/}
 REPO_URL="${REPO_URL_BASE}.git"
 
 if [[ -z "$APP" ]]; then
-    echo "Usage: $0 APP [REGION=osc-fr1] [REF]" 1>&2
+    echo "Usage: $0 APP [REGION=${PROD_REGION:-osc-fr1}] [REF]" 1>&2
     exit 1
 fi
 
