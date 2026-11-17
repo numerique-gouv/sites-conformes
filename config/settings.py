@@ -381,6 +381,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # https://docs.wagtail.org/en/stable/reference/settings.html
 
 WAGTAIL_SITE_NAME = os.getenv("SITE_NAME", "Sites Conformes")
+SF_META_GENERATOR_NAME = os.getenv("SF_META_GENERATOR_NAME", "Sites Conformes")
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash

@@ -118,9 +118,6 @@ msgstr "Paramètres d’affichage"
 msgid "Opens a new window"
 msgstr "Ouvre une nouvelle fenêtre"
 
-msgid "This website is made with"
-msgstr "Ce site est fait avec"
-
 msgid "Home page"
 msgstr "Accueil"
 

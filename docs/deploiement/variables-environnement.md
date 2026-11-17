@@ -142,6 +142,7 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | `SF_DISABLE_TUTORIALS` | Masque le panneau de tutoriels dans le back-office. | `False` | ⚪ |
 | `SF_SCHEME_DEPENDENT_SVGS` | Adapte les SVG au thème clair/sombre. | `False` | ⚪ |
 | `SF_NOINDEX` | Demande aux moteurs de recherche de ne pas indexer le site (en-tête `X-Robots-Tag: noindex, nofollow`). | `False` | ⚪ |
+| `SF_META_GENERATOR_NAME` | Valeur de la balise `<meta name="generator">`. Une valeur vide supprime la balise. | `Sites Conformes` | ⚪ |
 | `SF_PUBLIC_CACHE_MAX_AGE` | Durée (en secondes) pendant laquelle le navigateur et le CDN peuvent mettre en cache les pages vues par les visiteurs anonymes (en-tête `Cache-Control: public, max-age=…`, sans `Vary: Cookie`). Les réponses qui déposent un cookie (formulaires) et l’administration ne sont jamais mises en cache ; les visiteurs connectés reçoivent `Cache-Control: private`, mais peuvent voir la version anonyme servie par le CDN pendant cette durée. `0` désactive. | `0` | ⚪ |
 | `WAGTAILDOCS_MAX_UPLOAD_SIZE` | Taille maximale des documents téléversés (en octets). | `10485760` (10 Mo) | ⚪ |
 | `WAGTAILDOCS_EXTENSIONS` | Extensions de documents autorisées au téléversement, séparées par des virgules, sans point. La valeur remplace toute la liste. | `pdf,docx,odt,xlsx,ods,pptx,odp,csv,txt` | ⚪ |
