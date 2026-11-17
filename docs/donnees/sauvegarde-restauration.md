@@ -73,6 +73,8 @@ récupérer les fichiers médias depuis le S3 ;
 
 ```sh
 PROD_APP=            # nom de l’app Scalingo, par ex. sites-conformes
+PROD_REGION=         # région Scalingo de l’app, par défaut osc-fr1
+                     # (osc-secnum-fr1 pour la région SecNumCloud)
 ```
 
 ## Sauvegarder et restaurer les données locales

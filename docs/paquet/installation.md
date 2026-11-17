@@ -90,7 +90,6 @@ if PROCONNECT_ACTIVATED:
 TEMPLATES[0]["OPTIONS"]["context_processors"].extend([
     "wagtailmenus.context_processors.wagtailmenus",
     "sites_conformes.core.context_processors.skiplinks",
-    "sites_conformes.core.context_processors.mega_menus",
 ])
 ```
 
