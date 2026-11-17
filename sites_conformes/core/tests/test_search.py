@@ -4,9 +4,10 @@ from django.urls import reverse
 from django.utils.translation import override
 from wagtail.models import Locale, Page, Site
 from wagtail.rich_text import RichText
+from wagtail.search import index
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.core.models import CmsDsfrConfig, ContentPage
+from sites_conformes.core.models import Category, CmsDsfrConfig, ContentPage
 from sites_conformes.core.services.accessors import get_or_create_content_page
 
 User = get_user_model()
@@ -80,6 +81,21 @@ class SearchResultsTestCase(WagtailPageTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Page de contenu publique")
+
+    def test_search_finds_a_content_page_by_category_name(self):
+        category = Category.objects.create(name="Zorglub", slug="zorglub", locale=self.public_content_page.locale)
+        self.public_content_page.categories.add(category)
+        self.public_content_page.save()
+        # The categories are saved after the page, once it is already indexed: index it again.
+        index.insert_or_update_object(self.public_content_page)
+        search_url = reverse("cms_search")
+
+        response = self.client.get(f"{search_url}?q=Zorglub")
+        self.assertContains(response, "Page de contenu publique")
+
+        # The category names are indexed, not the repr of a queryset.
+        response = self.client.get(f"{search_url}?q=QuerySet")
+        self.assertNotContains(response, "Page de contenu publique")
 
     def test_search_private_content_page_is_not_found_if_anonymous(self):
         search_url = reverse("cms_search")
