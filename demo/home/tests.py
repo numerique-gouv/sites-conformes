@@ -1,7 +1,16 @@
-from wagtail.models import Page, Site
+from unittest import mock
+
+import swapper
+from django.core import checks
+from django.core.exceptions import FieldDoesNotExist
+from django.db import connection
+from wagtail.models import Page, Site, get_page_models
 from wagtail.test.utils import WagtailPageTestCase
 
-from home.models import HomePage
+from home.models import CustomContentPage, HomePage
+from sites_conformes.core import models as core_models
+from sites_conformes.core.models import CatalogIndexPage, ContentPage, Tag
+from sites_conformes.core.services.accessors import get_or_create_content_page
 
 
 class HomeSetUpTests(WagtailPageTestCase):
@@ -40,3 +49,112 @@ class HomeTests(WagtailPageTestCase):
     def test_homepage_template_used(self):
         response = self.client.get(self.homepage.url)
         self.assertTemplateUsed(response, "home/home_page.html")
+
+
+class CustomContentPageTests(WagtailPageTestCase):
+    """
+    The shipped ContentPage is swapped for home.CustomContentPage (SF_CONTENTPAGE_MODEL).
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.home = Site.objects.get(is_default_site=True).root_page
+
+    def test_setting_swaps_the_model(self):
+        self.assertIs(swapper.load_model("sites_conformes_core", "ContentPage"), CustomContentPage)
+        self.assertEqual(ContentPage._meta.swapped, "home.CustomContentPage")
+
+    def test_default_model_is_hidden_from_wagtail(self):
+        self.assertNotIn(ContentPage, get_page_models())
+        self.assertIn(CustomContentPage, get_page_models())
+        self.assertCanCreateAt(CatalogIndexPage, CustomContentPage)
+        self.assertCanNotCreateAt(CatalogIndexPage, ContentPage)
+
+    def test_create_tag_and_render(self):
+        page = self.home.add_child(instance=CustomContentPage(title="Custom", slug="custom", subtitle="sub"))
+        page.tags.add("dsfr")
+        page.save()
+
+        self.assertEqual(list(CustomContentPage.objects.filter(tags__name="dsfr")), [page])
+        self.assertPageIsRenderable(page)
+
+    def test_shipped_tag_through_model_is_not_declared(self):
+        self.assertFalse(hasattr(core_models, "TagContentPage"))
+        self.assertFalse(hasattr(ContentPage, "tags"))
+        tables = connection.introspection.table_names()
+        self.assertNotIn("sites_conformes_core_contentpage", tables)
+        self.assertNotIn("sites_conformes_core_tagcontentpage", tables)
+
+    def test_tags_with_usecount_follows_the_swapped_through_model(self):
+        page = self.home.add_child(instance=CustomContentPage(title="Tagged", slug="tagged", live=True))
+        page.tags.add("dsfr")
+        page.save()
+
+        self.assertEqual([tag.name for tag in Tag.objects.tags_with_usecount(1)], ["dsfr"])
+
+    def test_catalog_lists_custom_pages(self):
+        catalog = self.home.add_child(instance=CatalogIndexPage(title="Catalogue", slug="catalogue"))
+        child = catalog.add_child(instance=CustomContentPage(title="Entry", slug="entry", live=True))
+
+        self.assertEqual(list(catalog.entries), [child])
+
+    def test_accessor_creates_the_swapped_model(self):
+        page = get_or_create_content_page(slug="via-accessor", title="Via accessor", body=[])
+        self.assertIsInstance(page, CustomContentPage)
+
+
+class ContentPageTagsCheckTests(WagtailPageTestCase):
+    """
+    The tag pages of Sites Conformes need a ``tags`` field on the swapped-in model.
+    """
+
+    def check_ids(self, model):
+        return [error.id for error in model.check()]
+
+    def test_check_passes_with_tags(self):
+        self.assertNotIn("sites_conformes_core.E001", self.check_ids(CustomContentPage))
+
+    def test_check_fails_without_tags(self):
+        get_field = CustomContentPage._meta.get_field
+
+        def get_field_without_tags(name, *args, **kwargs):
+            if name == "tags":
+                raise FieldDoesNotExist(name)
+            return get_field(name, *args, **kwargs)
+
+        with mock.patch.object(CustomContentPage._meta, "get_field", side_effect=get_field_without_tags):
+            self.assertIn("sites_conformes_core.E001", self.check_ids(CustomContentPage))
+
+    def test_swapped_out_model_is_not_checked_for_tags(self):
+        # The shipped ContentPage has no tags once swapped; Django skips swapped models.
+        errors = checks.run_checks(tags=[checks.Tags.models])
+        self.assertNotIn("sites_conformes_core.E001", [error.id for error in errors])
+
+
+class CustomContentPageAPITests(WagtailPageTestCase):
+    """
+    The pages API serves the swapped-in model, with its own fields.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        home = Site.objects.get(is_default_site=True).root_page
+        cls.page = home.add_child(instance=CustomContentPage(title="Custom", slug="custom", subtitle="sub", live=True))
+        cls.page.tags.add("dsfr")
+        cls.page.save()
+
+    def test_listing_exposes_custom_fields(self):
+        response = self.client.get("/api/v2/pages/?type=home.CustomContentPage&fields=subtitle,tags")
+
+        self.assertEqual(response.status_code, 200)
+        items = response.json()["items"]
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["subtitle"], "sub")
+        self.assertEqual(items[0]["tags"], ["dsfr"])
+
+    def test_detail_serves_the_swapped_model(self):
+        response = self.client.get(f"/api/v2/pages/{self.page.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["meta"]["type"], "home.CustomContentPage")
+        self.assertIn("body", response.json())
