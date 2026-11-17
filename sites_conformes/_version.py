@@ -3,4 +3,4 @@
 # Bump this by hand and commit it before cutting the matching GitHub Release;
 # source-based deployments (Scalingo, internal server, Docker) read it straight
 # from here.
-__version__ = "4.3.1"
+__version__ = "4.4.0"
