@@ -1,7 +1,9 @@
+from time import perf_counter
 from urllib.parse import urlsplit
 
 from django.core.management.base import BaseCommand
 from django.test import Client, override_settings
+from wagtail.images import get_image_model
 from wagtail.models import Page
 
 
@@ -15,6 +17,9 @@ class Command(BaseCommand):
         # their renditions are generated on the first visit
         client = Client(raise_request_exception=False)
         rendered = errors = 0
+        Rendition = get_image_model().get_rendition_model()
+        renditions_before = Rendition.objects.count()
+        start = perf_counter()
         for page in Page.objects.live().public().exclude(depth=1).iterator():
             url = urlsplit(page.full_url or "")
             if not url.netloc:
@@ -26,4 +31,8 @@ class Command(BaseCommand):
                 errors += 1
                 self.stderr.write(f"{response.status_code} {page.full_url}")
 
-        self.stdout.write(f"Image renditions warmed: {rendered} pages rendered, {errors} errors")
+        created = Rendition.objects.count() - renditions_before
+        self.stdout.write(
+            f"Image renditions warmed: {rendered} pages rendered, {errors} errors, "
+            f"{created} renditions created in {perf_counter() - start:.1f} s"
+        )
