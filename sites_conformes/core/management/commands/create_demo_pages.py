@@ -3,12 +3,14 @@ import os
 import swapper
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from faker import Faker
 from taggit.models import slugify
 from wagtail.images import get_image_model
 from wagtail.rich_text import RichText
 
-from sites_conformes.blog.models import BlogIndexPage
+from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
+from sites_conformes.core.models import CatalogIndexPage, Category
 from sites_conformes.core.services.accessors import (
     get_or_create_catalog_index_page,
     get_or_create_content_page,
@@ -19,7 +21,32 @@ from sites_conformes.forms.models import FormField, FormPage
 
 ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
 
-ALL_ALLOWED_SLUGS = ["blog_index", "publications", "menu_page", "form", "common_blocks", "hero_blocks"]
+ALL_ALLOWED_SLUGS = ["blog_index", "publications", "menu_page", "form", "common_blocks", "hero_blocks", "categories"]
+
+# (name, slug, parent slug)
+DEMO_CATEGORIES = [
+    ("Régions", "regions", None),
+    ("Bretagne", "bretagne", "regions"),
+    ("Finistère", "finistere", "bretagne"),
+    ("Morbihan", "morbihan", "bretagne"),
+    ("Alsace", "alsace", "regions"),
+    ("Secteurs", "secteurs", None),
+    ("BTP", "btp", "secteurs"),
+    ("Santé", "sante", "secteurs"),
+]
+
+# (title, slug, category slugs)
+DEMO_GUIDES = [
+    ("Protéger un chantier à Quimper", "chantier-quimper", ["finistere", "btp"]),
+    ("Aménager les horaires à Vannes", "horaires-vannes", ["morbihan", "btp"]),
+    ("Prévenir les coups de chaleur à Rennes", "coups-de-chaleur-rennes", ["bretagne", "sante"]),
+    ("Accueillir les patients à Strasbourg", "patients-strasbourg", ["alsace", "sante"]),
+    ("Choisir ses équipements de chantier", "equipements-chantier", ["btp"]),
+]
+DEMO_POSTS = [
+    ("Un plan canicule pour la Bretagne", "plan-canicule-bretagne", ["bretagne"]),
+    ("Les hôpitaux alsaciens s’équipent", "hopitaux-alsaciens", ["alsace", "sante"]),
+]
 
 fake = Faker("fr_FR")
 
@@ -89,6 +116,9 @@ class Command(BaseCommand):
                 menu_page = ContentPage.objects.get(slug="menu_page", locale=locale)
                 self.create_hero_blocks_page(home_page=home_page, parent_page=menu_page)
 
+            elif slug == "categories":
+                self.create_categorized_pages(home_page)
+
             else:
                 raise ValueError(f"Valeur inconnue : {slug}")
 
@@ -132,6 +162,36 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Blog index page created with id {blog_index.id}"))
 
         return blog_index
+
+    def create_categorized_pages(self, home_page) -> None:
+        """
+        A category tree, then a catalog and blog posts that use it.
+        """
+        categories = {}
+        for name, slug, parent_slug in DEMO_CATEGORIES:
+            categories[slug], _ = Category.objects.get_or_create(
+                slug=slug,
+                defaults={"name": name, "parent": categories.get(parent_slug), "locale": home_page.locale},
+            )
+
+        guides = get_or_create_catalog_index_page(slug="guides", title="Guides pratiques", body=[])
+        guides.filter_selection = CatalogIndexPage.MULTIPLE_FILTERS
+        guides.save()
+        for title, slug, category_slugs in DEMO_GUIDES:
+            body = [("paragraph", RichText(f"<p>{fake.paragraph()}</p>"))]
+            page = get_or_create_content_page(slug=slug, title=title, body=body, parent_page=guides)
+            page.categories.add(*[categories[category_slug] for category_slug in category_slugs])
+            page.save()
+
+        blog_index = self.create_blog_index(home_page)
+        blog_index.filter_categories.set([categories["regions"], categories["secteurs"]])
+        blog_index.save()
+        for title, slug, category_slugs in DEMO_POSTS:
+            page = BlogEntryPage.objects.filter(slug=slug).first()
+            if page is None:
+                page = blog_index.add_child(instance=BlogEntryPage(title=title, slug=slug, date=timezone.now()))
+            page.categories.add(*[categories[category_slug] for category_slug in category_slugs])
+            page.save()
 
     def create_publication_pages(self, site, main_menu):
         slug = "publications"

@@ -94,6 +94,7 @@ jobs:
         run: |
           just init
           uv run python manage.py create_demo_pages
+          uv run python manage.py createsuperuser --noinput
 
       - name: Setup E2E tools
         uses: ./.github/actions/setup-e2e

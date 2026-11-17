@@ -17,9 +17,10 @@ from django.test import SimpleTestCase
 from wagtail.models import Site
 from wagtail.test.utils import WagtailPageTestCase
 
+from sites_conformes.blog.models import BlogEntryPage
 from sites_conformes.core.blocks.core import HERO_STREAMFIELD_BLOCKS, STREAMFIELD_COMMON_BLOCKS
 from sites_conformes.core.blocks.utils import block_to_sample_dict
-from sites_conformes.core.models import ContentPage
+from sites_conformes.core.models import CatalogIndexPage, ContentPage
 from sites_conformes.menus.models import MainMenu
 
 
@@ -71,6 +72,13 @@ class CreateDemoPagesCommandTestCase(WagtailPageTestCase):
     # ------------------------------------------------------------------
     # common_blocks page
     # ------------------------------------------------------------------
+
+    def test_the_categorized_pages_are_filterable(self):
+        catalog = CatalogIndexPage.objects.get(slug="guides")
+        response = self.client.get(f"{catalog.url}?category=bretagne")
+
+        self.assertEqual(len(response.context["entries"]), 3)
+        self.assertEqual(BlogEntryPage.objects.filter(categories__slug="bretagne").count(), 1)
 
     def test_common_blocks_page_is_renderable(self):
         page = ContentPage.objects.get(slug="common_blocks")
