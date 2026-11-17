@@ -7,8 +7,8 @@ from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
-from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category
-from sites_conformes.core.models import ContentPage
+from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
+from sites_conformes.core.models import Category, ContentPage
 from sites_conformes.core.utils import import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
 
