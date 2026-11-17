@@ -19,22 +19,22 @@ logger = logging.getLogger(__name__)
 Image = get_image_model()
 
 
-def _build_image_name(full_file_path: str, content: bytes) -> str:
+def _build_image_name(full_file_path: str, title: str, content: bytes) -> str:
     """
-    Build the stored filename for an imported image, ensuring it keeps a usable
+    Build the stored filename for an imported image from its title (exports detect
+    pictograms by "Pictogrammes_DSFR" in it), ensuring it keeps a usable
     extension. Wagtail's rendition generation (and the ``{% picture %}`` tag)
     chokes on files stored without an extension, so we sniff one when missing
     and log loudly when detection fails rather than silently creating a broken,
     extension-less image.
     """
-    path = Path(full_file_path)
     ext = guess_extension(full_file_path, content)
     if not ext:
         logger.warning(
             "Could not determine an extension for image %r; storing it without " "one may break rendition generation.",
             full_file_path,
         )
-    return f"{path.stem}{ext}"
+    return f"{title}{ext}"
 
 
 def guess_extension(filename: str, file_content: bytes) -> str:
@@ -73,7 +73,7 @@ def import_image(full_file_path: str, title: str) -> Image:
     use `overwrite_image` to update an existing one.
     """
     content = Path(full_file_path).read_bytes()
-    name = _build_image_name(full_file_path, content)
+    name = _build_image_name(full_file_path, title, content)
     image = Image(
         file=ImageFile(BytesIO(content), name=name),
         title=title,
@@ -88,7 +88,7 @@ def overwrite_image(image, full_file_path: str, title: str) -> Image:
     keeping the same database record and ID.
     """
     content = Path(full_file_path).read_bytes()
-    name = _build_image_name(full_file_path, content)
+    name = _build_image_name(full_file_path, title, content)
     image.file = ImageFile(BytesIO(content), name=name)
     image.save()
     return image

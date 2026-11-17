@@ -14,3 +14,11 @@ class UtilsTestCase(WagtailPageTestCase):
         assert isinstance(image, Image)
         assert image.title == "Sample image"
         assert image.file.name.endswith(".svg")
+
+    def test_import_image_names_the_file_after_its_title(self):
+        # Exports detect pictograms by "Pictogrammes_DSFR" in their file name
+        image = import_image(
+            "sites_conformes/static/artwork/technical-error.svg", "Pictogrammes DSFR — System — Technical Error"
+        )
+
+        self.assertRegex(image.file.name, r"^original_images/Pictogrammes_DSFR__System__Technical_Error[^/]*\.svg$")
