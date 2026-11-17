@@ -62,8 +62,20 @@ jobs:
       - name: Build package
         run: uv build
 
+      # Every versioned .po must ship with its compiled .mo, so that a locale
+      # directory missed by [tool.setuptools.package-data] fails the build.
       - name: Check that the translation files are in the wheel
-        run: unzip -l dist/*.whl | grep -q 'sites_conformes/locale/fr/LC_MESSAGES/django.mo'
+        run: |
+          CONTENTS="$(unzip -Z1 dist/*.whl)"
+          MISSING=0
+          for PO in $(git ls-files 'sites_conformes/*.po'); do
+            MO="${PO%.po}.mo"
+            if ! grep -qxF "${MO}" <<< "${CONTENTS}"; then
+              echo "::error::${MO} is missing from the wheel"
+              MISSING=1
+            fi
+          done
+          exit "${MISSING}"
 
       - name: Upload dist
         uses: actions/upload-artifact@v7
