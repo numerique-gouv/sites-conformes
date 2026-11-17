@@ -1,7 +1,8 @@
 from typing import Union
 
 import swapper
-from django.core.exceptions import ValidationError
+from django.core import checks
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -45,6 +46,25 @@ class AbstractContentPage(SitesFacilesBasePage):
 
     class Meta:
         abstract = True
+
+    @classmethod
+    def check(cls, **kwargs):
+        errors = super().check(**kwargs)
+        if cls._meta.abstract or cls._meta.swapped:
+            return errors
+        try:
+            cls._meta.get_field("tags")
+        except FieldDoesNotExist:
+            errors.append(
+                checks.Error(
+                    f"{cls._meta.label} must declare a `tags` field.",
+                    hint="Add a ClusterTaggableManager with its own through model, "
+                    "see docs/paquet/modele-de-page-personnalise.md.",
+                    obj=cls,
+                    id="sites_conformes_core.E001",
+                )
+            )
+        return errors
 
     def get_template(self, request, *args, **kwargs):
         # Wagtail derives ``template`` from the concrete model's app label;
