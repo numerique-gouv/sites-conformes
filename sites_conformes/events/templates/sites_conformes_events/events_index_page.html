@@ -97,7 +97,9 @@
               <form method="get"
                     action="{% pageurl page %}#posts-list"
                     id="events-filters-form">
-                {% for name, value in preserved_filters %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+                {% for name, value in preserved_filters %}
+                  <input type="hidden" name="{{ name }}" value="{{ value }}">
+                {% endfor %}
                 <fieldset class="fr-fieldset" aria-labelledby="events-period-legend">
                   <legend class="fr-fieldset__legend fr-fieldset__legend--regular"
                           id="events-period-legend">
