@@ -28,6 +28,19 @@ Les chemins d’import changent en conséquence :
 - le template `sites_conformes_blog/blocks/contact_card.html` devient
   `sites_conformes_core/blocks/contact_card.html` : déplacez vos surcharges.
 
+Les champs de catégories et de pagination portent désormais le même nom sur
+toutes les pages. La migration renomme les colonnes et met à jour les brouillons,
+et l’API garde ses clés `blog_categories` et `event_categories` :
+
+- `BlogEntryPage.blog_categories` et `EventEntryPage.event_categories` deviennent
+  `categories`. Les anciens noms restent lisibles avec un `DeprecationWarning`
+  jusqu’à la prochaine version majeure, vos templates surchargés continuent donc
+  de fonctionner ;
+- `filter(blog_categories=…)` et `BlogEntryPage(blog_categories=…)` ne passent
+  plus par ces alias et doivent utiliser `categories`, tout comme les références
+  à ces champs dans vos migrations de données ;
+- `CatalogIndexPage.entries_per_page` devient `posts_per_page`, sans alias.
+
 ## v4.0.0 - Packagification
 
 Cette version transforme `sites-conformes` en package Python distribué sur

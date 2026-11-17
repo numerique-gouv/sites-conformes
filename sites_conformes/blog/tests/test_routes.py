@@ -29,7 +29,7 @@ class BlogIndexRoutesTestCase(WagtailPageTestCase):
             )
         )
         self.category = CategoryFactory(name="Presse")
-        self.blog_post.blog_categories.add(self.category)
+        self.blog_post.categories.add(self.category)
         self.blog_post.tags.add(Tag.objects.create(name="Écrits", slug="ecrits"))
         self.blog_post.save_revision().publish()
 

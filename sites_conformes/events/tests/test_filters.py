@@ -22,7 +22,7 @@ class EventsFiltersTestCase(WagtailPageTestCase):
         self.category = CategoryFactory(name="Ateliers")
 
         self.workshop = self.add_event("Atelier d’écriture")
-        self.workshop.event_categories.add(self.category)
+        self.workshop.categories.add(self.category)
         self.workshop.authors.add(self.author)
         self.workshop.save_revision().publish()
 
