@@ -1,6 +1,9 @@
 name: 🔮 CI - Quality checks
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, production, multisite]
+  pull_request:
 
 permissions:
   contents: read
