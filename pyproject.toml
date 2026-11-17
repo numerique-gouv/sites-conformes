@@ -50,7 +50,11 @@ dependencies = [
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
     "swapper>=1.4,<2",
+    "questionary>=2.1",
 ]
+
+[project.scripts]
+sites-conformes = "sites_conformes.cli:main"
 
 [dependency-groups]
 dev = [
@@ -89,6 +93,8 @@ sites_conformes = [
     "*/templates/**/*",
     "*/static/**/*",
     "*/page_templates/**/*",
+    "project_template/**/*",
+    "project_template/.gitignore",
     "locale/*/LC_MESSAGES/*.po",
     "locale/*/LC_MESSAGES/*.mo",
     "*/locale/*/LC_MESSAGES/*.po",

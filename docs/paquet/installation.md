@@ -9,6 +9,38 @@ Ce guide explique comment ajouter `sites-conformes` à un projet Django existant
 - Wagtail 7.2 ou supérieur
 - PostgreSQL
 
+## Créer un nouveau projet
+
+Pour partir d’un projet vide, la commande `start` crée un projet
+Django/Wagtail minimal déjà configuré, sur le modèle de `wagtail start` :
+
+```sh
+uvx sites-conformes start monsite
+cd monsite
+uv run python manage.py migrate
+uv run python manage.py collectstatic --noinput
+uv run python manage.py create_starter_pages
+uv run python manage.py createsuperuser
+uv run python manage.py runserver
+```
+
+La commande pose quelques questions : titre et sous-titre du site, intitulé
+officiel, base de données, puis les fonctionnalités à activer. Le
+`config/settings.py` généré ne contient que les réglages des fonctionnalités
+choisies :
+
+- connexion à l’administration avec ProConnect ;
+- double authentification obligatoire ;
+- stockage des médias : fichiers locaux, base de données ou S3 ;
+- langues en plus du français ;
+- suivi des erreurs avec Sentry.
+
+`--no-input` passe les questions et crée le projet le plus simple : SQLite,
+fichiers locaux, aucune de ces fonctionnalités. Le blog, les événements, les
+formulaires et les menus sont toujours présents : le cœur du paquet en dépend.
+
+La suite de ce guide décrit la même configuration, pour l’ajouter à un projet existant.
+
 ## Installation via uv
 
 ```sh
