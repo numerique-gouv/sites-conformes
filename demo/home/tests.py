@@ -1,4 +1,8 @@
+from unittest import mock
+
 import swapper
+from django.core import checks
+from django.core.exceptions import FieldDoesNotExist
 from django.db import connection
 from wagtail.models import Page, Site, get_page_models
 from wagtail.test.utils import WagtailPageTestCase
@@ -97,3 +101,31 @@ class CustomContentPageTests(WagtailPageTestCase):
     def test_accessor_creates_the_swapped_model(self):
         page = get_or_create_content_page(slug="via-accessor", title="Via accessor", body=[])
         self.assertIsInstance(page, CustomContentPage)
+
+
+class ContentPageTagsCheckTests(WagtailPageTestCase):
+    """
+    The tag pages of Sites Conformes need a ``tags`` field on the swapped-in model.
+    """
+
+    def check_ids(self, model):
+        return [error.id for error in model.check()]
+
+    def test_check_passes_with_tags(self):
+        self.assertNotIn("sites_conformes_core.E001", self.check_ids(CustomContentPage))
+
+    def test_check_fails_without_tags(self):
+        get_field = CustomContentPage._meta.get_field
+
+        def get_field_without_tags(name, *args, **kwargs):
+            if name == "tags":
+                raise FieldDoesNotExist(name)
+            return get_field(name, *args, **kwargs)
+
+        with mock.patch.object(CustomContentPage._meta, "get_field", side_effect=get_field_without_tags):
+            self.assertIn("sites_conformes_core.E001", self.check_ids(CustomContentPage))
+
+    def test_swapped_out_model_is_not_checked_for_tags(self):
+        # The shipped ContentPage has no tags once swapped; Django skips swapped models.
+        errors = checks.run_checks(tags=[checks.Tags.models])
+        self.assertNotIn("sites_conformes_core.E001", [error.id for error in errors])
