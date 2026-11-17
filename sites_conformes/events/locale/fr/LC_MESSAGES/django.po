@@ -169,9 +169,6 @@ msgctxt "submit button"
 msgid "Filter"
 msgstr "Filtrer"
 
-msgid "Filter by category"
-msgstr "Filtrer par catégorie"
-
 msgid "Filter by tag"
 msgstr "Filtrer par étiquette"
 
@@ -195,6 +192,9 @@ msgid "%(counter)s event found"
 msgid_plural "%(counter)s events found"
 msgstr[0] "%(counter)s événement trouvé"
 msgstr[1] "%(counter)s événements trouvés"
+
+#~ msgid "Filter by category"
+#~ msgstr "Filtrer par catégorie"
 
 #~ msgid "Filter by date"
 #~ msgstr "Filtrer par date"

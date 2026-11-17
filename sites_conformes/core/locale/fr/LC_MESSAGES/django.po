@@ -91,6 +91,15 @@ msgstr "Entrées par page"
 msgid "Filter by tag"
 msgstr "Filtrer par étiquette"
 
+msgid "Category groups"
+msgstr "Groupes de catégories"
+
+msgid "Top-level categories whose subcategories are shown as filter groups. Leave empty to use every category in use."
+msgstr "Catégories de premier niveau dont les sous-catégories sont affichées comme groupes de filtres. Laissez vide pour utiliser toutes les catégories utilisées."
+
+msgid "Filter by category"
+msgstr "Filtrer par catégorie"
+
 msgid "New"
 msgstr "Nouveau"
 
@@ -828,9 +837,6 @@ msgstr "Blog"
 
 msgid "Number of entries"
 msgstr "Nombre d’articles"
-
-msgid "Filter by category"
-msgstr "Filtrer par catégorie"
 
 msgid "Filter by author"
 msgstr "Filtrer par auteur"
