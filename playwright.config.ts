@@ -19,6 +19,11 @@ expand(dotenv.config({ path: path.resolve(__dirname, ".env") }))
 
 const PORT = 8000
 const BASE_URL = `http://127.0.0.1:${PORT}`
+// The e2e server runs with DEBUG=False, where Django doesn't serve the media
+// files: a plain static server serves them, so pages load their images.
+const MEDIA_PORT = 8090
+const MEDIA_URL = `http://127.0.0.1:${MEDIA_PORT}/`
+const MEDIA_ROOT = path.resolve(__dirname, process.env.MEDIA_ROOT || "medias")
 
 export const config: PlaywrightTestConfig = {
   testDir: "./e2e",
@@ -34,20 +39,28 @@ export const config: PlaywrightTestConfig = {
   // Start the Django dev server for the test run, or reuse one already running
   // on PORT. Locally (reuseExistingServer) it picks up a server you started by
   // hand; in CI it launches its own with the env injected below.
-  webServer: {
-    command: `uv run python manage.py runserver 127.0.0.1:${PORT}`,
-    url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-    cwd: path.resolve(__dirname),
-    env: {
-      ...(process.env as Record<string, string>),
-      DATABASE_URL: process.env.DATABASE_URL!,
-      SECRET_KEY: process.env.SECRET_KEY!,
-      DEBUG: process.env.DEBUG ?? "True",
-      BASE_URL,
+  webServer: [
+    {
+      command: `uv run python manage.py runserver 127.0.0.1:${PORT}`,
+      url: BASE_URL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+      cwd: path.resolve(__dirname),
+      env: {
+        ...(process.env as Record<string, string>),
+        DATABASE_URL: process.env.DATABASE_URL!,
+        SECRET_KEY: process.env.SECRET_KEY!,
+        DEBUG: process.env.DEBUG ?? "True",
+        BASE_URL,
+        MEDIA_URL,
+      },
     },
-  },
+    {
+      command: `mkdir -p "${MEDIA_ROOT}" && python3 -m http.server ${MEDIA_PORT} --bind 127.0.0.1 --directory "${MEDIA_ROOT}"`,
+      url: MEDIA_URL,
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
   use: {
     baseURL: BASE_URL,
     screenshot: "only-on-failure",
