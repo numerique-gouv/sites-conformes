@@ -1,41 +1,61 @@
-{% load i18n wagtailcore_tags %}
+{% load i18n static wagtailcore_tags %}
 
-<div class="fr-container">
+{% comment %}
+  CSS carousel (scroll-snap): without JavaScript, slides scroll by touch, trackpad
+  or keyboard. static/js/slider.js adds the buttons and markers.
+{% endcomment %}
+<div class="fr-container ng-slider" data-ng-slider>
   {% if value.title %}
     <div class="fr-grid-row">
       <div class="fr-col-12 fr-mt-3w">
-        <{{ value.heading_tag|default:"h2" }} class="fr-{{ value.title_heading_size|default:"h2" }}">{{ value.title }}</{{ value.heading_tag|default:"h2" }}>
+        <{{ value.title_heading_tag|default:"h2" }} class="fr-{{ value.title_heading_size|default:"h2" }}">{{ value.title }}</{{ value.title_heading_tag|default:"h2" }}>
       </div>
     </div>
   {% endif %}
-  <div class="swiper">
-    <div class="swiper-wrapper">
-      {% for block in value.blocks %}
-        <div class="swiper-slide">
-          {% include_block block %}
-        </div>
-      {% endfor %}
-    </div>
-    <div class="fr-container fr-my-2w">
-      <div class="fr-slider-footer">
-        <nav role="navigation" class="fr-pagination" aria-label="Pagination">
-          <ul class="fr-pagination__list">
-            <li>
-              <button class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label fr-text--sm fr-mb-0"
-                      id="fr-slideshow-prev" title="{% translate "View previous slide" %}" aria-label="{% translate "Previous slide" %}">
-                {% translate "Previous" %}
-              </button>
-            </li>
-            <li class="fr-slide-stepper swiper-pagination-bullets swiper-pagination-horizontal"></li>
-            <li>
-              <button class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label fr-text--sm fr-mb-0"
-                      id="fr-slideshow-next" title="{% translate "View next slide" %}" aria-label="{% translate "Next slide" %}">
-                {% translate "next" %}
-              </button>
-            </li>
-          </ul>
-        </nav>
+  <div class="ng-slider__track"
+       role="region"
+       aria-roledescription="{% translate "carousel" %}"
+       aria-label="{{ value.title|default:_("Slider") }}"
+       tabindex="0">
+    {% for block in value.blocks %}
+      <div class="ng-slider__slide"
+           role="group"
+           aria-roledescription="{% translate "slide" %}"
+           aria-label="{% blocktranslate with number=forloop.counter total=value.blocks|length %}{{ number }} of {{ total }}{% endblocktranslate %}">
+        {% include_block block %}
       </div>
-    </div>
+    {% endfor %}
   </div>
+  {% if value.blocks|length > 1 %}
+    <div class="ng-slider__controls fr-pagination fr-my-2w" hidden>
+      <ul class="fr-pagination__list">
+        <li>
+          <button type="button"
+                  class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label fr-text--sm fr-mb-0"
+                  data-ng-slider-prev
+                  aria-label="{% translate "Previous slide" %}">
+            {% translate "Previous" %}
+          </button>
+        </li>
+        <li class="ng-slider__markers">
+          {% for block in value.blocks %}
+            <button type="button"
+                    class="ng-slider__marker"
+                    data-ng-slider-goto="{{ forloop.counter0 }}"
+                    aria-label="{% blocktranslate with number=forloop.counter %}Go to slide {{ number }}{% endblocktranslate %}">
+            </button>
+          {% endfor %}
+        </li>
+        <li>
+          <button type="button"
+                  class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label fr-text--sm fr-mb-0"
+                  data-ng-slider-next
+                  aria-label="{% translate "Next slide" %}">
+            {% translate "Next" %}
+          </button>
+        </li>
+      </ul>
+    </div>
+    <script src="{% static 'js/slider.js' %}" defer></script>
+  {% endif %}
 </div>

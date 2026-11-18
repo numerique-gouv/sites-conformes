@@ -709,29 +709,39 @@ msgstr "Découvrir le service"
 msgid "Open a new window"
 msgstr "Ouvre une nouvel fenêtre"
 
-#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:25
-msgid "View previous slide"
-msgstr "Voir la diapositive précédente"
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:17
+msgid "carousel"
+msgstr "carrousel"
 
-#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:25
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:23
+msgid "slide"
+msgstr "diapositive"
+
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:24
+#, python-format
+msgid "%(number)s of %(total)s"
+msgstr "%(number)s sur %(total)s"
+
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:36
 msgid "Previous slide"
 msgstr "Diapositive précédente"
 
-#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:26
-msgid "Previous"
-msgstr "Précédent"
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:44
+#, python-format
+msgid "Go to slide %(number)s"
+msgstr "Aller à la diapositive %(number)s"
 
-#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:32
-msgid "View next slide"
-msgstr "Voir la diapositive suivante"
-
-#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:32
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:52
 msgid "Next slide"
 msgstr "Diapositive suivante"
 
-#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:33
-msgid "next"
-msgstr "suivant"
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:38
+msgid "Previous"
+msgstr "Précédent"
+
+#: numerique_gouv/templates/numerique_gouv/blocks/slider.html:55
+msgid "Next"
+msgstr "Suivant"
 
 #: numerique_gouv/templates/numerique_gouv/blog_entry_page.html:45
 msgid "Themes :"
