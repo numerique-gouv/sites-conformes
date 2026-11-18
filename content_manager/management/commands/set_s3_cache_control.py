@@ -1,10 +1,15 @@
 """
 Set or update Cache-Control headers (and optionally public-read ACLs on images)
-on all existing objects of the S3 media bucket.
+on the S3 objects of all files known to Wagtail (images, renditions, documents).
 
 This is a backfill command for objects uploaded before
 ``object_parameters["CacheControl"]`` and ``PublicImagesS3Storage`` were added
 to ``config/settings.py``. It is idempotent and can be run several times.
+
+It only needs the permissions the app already has (``s3:GetObject``,
+``s3:PutObject``, ``s3:PutObjectAcl``): object keys are read from the database
+instead of listing the bucket (no ``s3:ListBucket``), and whether an object is
+public is checked with an anonymous HEAD request (no ``s3:GetObjectAcl``).
 
 Usage::
 
@@ -26,17 +31,28 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand, CommandError
 from storages.backends.s3 import S3Storage
+from storages.utils import clean_name
+from wagtail.documents import get_document_model
+from wagtail.images import get_image_model
 
 from content_manager.storages import PUBLIC_ACL, PublicImagesS3Storage, is_public_key
-
-ALL_USERS_URI = "http://acs.amazonaws.com/groups/global/AllUsers"
 
 # Metadata that copy_object(MetadataDirective="REPLACE") would drop if not passed again.
 PRESERVED_HEADERS = ("ContentType", "ContentDisposition", "ContentEncoding", "ContentLanguage")
 
+ACCESS_DENIED_CODES = ("403", "AccessDenied")
+NOT_FOUND_CODES = ("404", "NoSuchKey", "NotFound")
+
+
+def error_code(error: ClientError) -> str:
+    return str(error.response.get("Error", {}).get("Code", ""))
+
 
 class Command(BaseCommand):
-    help = "Set Cache-Control headers (and optionally public-read ACLs on images) on existing S3 media objects."
+    help = (
+        "Set Cache-Control headers (and optionally public-read ACLs on images) "
+        "on the S3 objects of Wagtail images, renditions and documents."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -69,60 +85,68 @@ class Command(BaseCommand):
         public_read = options["public_read"] or isinstance(storage, PublicImagesS3Storage)
 
         client = storage.connection.meta.client
+        anonymous_client = storage.unsigned_connection.meta.client
         bucket = storage.bucket_name
         location = storage.location.strip("/")
-        prefix = f"{location}/" if location else ""
 
         self.stdout.write(f"S3 endpoint: {storage.endpoint_url}")
         self.stdout.write(f"S3 bucket: {bucket}")
-        self.stdout.write(f"S3 location prefix: {prefix or '(none)'}")
+        self.stdout.write(f"S3 location prefix: {location or '(none)'}")
         self.stdout.write(f"Cache-Control value: {header_value}")
         self.stdout.write(f"Public-read on images: {'yes' if public_read else 'no'}")
         self.stdout.write("")
 
-        updated = skipped = errors = 0
-        paginator = client.get_paginator("list_objects_v2")
+        updated = skipped = missing = errors = 0
 
-        try:
-            for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
-                for obj in page.get("Contents", []):
-                    key = obj["Key"]
-                    make_public = public_read and is_public_key(key, location)
+        for key in self._iter_keys(storage):
+            make_public = public_read and is_public_key(key, location)
 
-                    try:
-                        head = client.head_object(Bucket=bucket, Key=key)
-                        is_public = self._is_public(client, bucket, key) if make_public else None
-                    except ClientError as e:
-                        errors += 1
-                        self.stderr.write(self.style.ERROR(f"  Error reading {key}: {e}"))
-                        continue
+            try:
+                head = client.head_object(Bucket=bucket, Key=key)
+            except ClientError as e:
+                code = error_code(e)
+                if code in NOT_FOUND_CODES:
+                    missing += 1
+                    self.stdout.write(self.style.WARNING(f"  Missing from the bucket: {key}"))
+                    continue
+                if code in ACCESS_DENIED_CODES:
+                    raise CommandError(f"Access denied reading {key}: the S3 user needs s3:GetObject.")
+                errors += 1
+                self.stderr.write(self.style.ERROR(f"  Error reading {key}: {e}"))
+                continue
 
-                    current_cc = head.get("CacheControl", "")
-                    if current_cc == header_value and (not make_public or is_public):
-                        skipped += 1
-                        continue
+            is_public = self._is_public(anonymous_client, bucket, key) if make_public else None
+            current_cc = head.get("CacheControl", "")
+            if current_cc == header_value and (not make_public or is_public):
+                skipped += 1
+                continue
 
-                    if dry_run:
-                        details = f"current Cache-Control: {current_cc or 'none'}"
-                        if make_public:
-                            details += f", public: {'yes' if is_public else 'no'}"
-                        self.stdout.write(f"  [DRY RUN] Would update: {key}  ({details})")
-                        updated += 1
-                        continue
+            if dry_run:
+                details = f"current Cache-Control: {current_cc or 'none'}"
+                if make_public:
+                    details += f", public: {'yes' if is_public else 'no'}"
+                self.stdout.write(f"  [DRY RUN] Would update: {key}  ({details})")
+                updated += 1
+                continue
 
-                    try:
-                        self._update_object(client, bucket, key, head, header_value, make_public, public_read)
-                        updated += 1
-                        self.stdout.write(f"  Updated: {key}")
-                    except ClientError as e:
-                        errors += 1
-                        self.stderr.write(self.style.ERROR(f"  Error updating {key}: {e}"))
-        except ClientError as e:
-            raise CommandError(f"Failed to list objects: {e}")
+            try:
+                self._update_object(client, bucket, key, head, header_value, make_public, public_read)
+            except ClientError as e:
+                if error_code(e) in ACCESS_DENIED_CODES:
+                    raise CommandError(
+                        f"Access denied updating {key}: the S3 user needs s3:PutObject"
+                        + (" and s3:PutObjectAcl." if public_read else ".")
+                    )
+                errors += 1
+                self.stderr.write(self.style.ERROR(f"  Error updating {key}: {e}"))
+                continue
+
+            updated += 1
+            self.stdout.write(f"  Updated: {key}")
 
         self.stdout.write("")
         verb = "[DRY RUN] Would update" if dry_run else "Updated"
-        summary = f"{verb} {updated} object(s), {skipped} already up to date."
+        summary = f"{verb} {updated} object(s), {skipped} already up to date, {missing} missing."
         if errors:
             summary += f" {errors} error(s)."
         self.stdout.write(self.style.SUCCESS(summary) if not errors else self.style.WARNING(summary))
@@ -130,13 +154,28 @@ class Command(BaseCommand):
         if errors:
             raise CommandError(f"{errors} object(s) could not be processed.")
 
-    def _is_public(self, client, bucket, key) -> bool:
-        acl = client.get_object_acl(Bucket=bucket, Key=key)
-        return any(
-            grant.get("Grantee", {}).get("URI") == ALL_USERS_URI
-            and grant.get("Permission") in ("READ", "FULL_CONTROL")
-            for grant in acl.get("Grants", [])
-        )
+    def _iter_keys(self, storage):
+        """Yield the S3 keys of all Wagtail images, renditions and documents, without duplicates."""
+        image_model = get_image_model()
+        models = (image_model, image_model.get_rendition_model(), get_document_model())
+        seen = set()
+        for model in models:
+            for name in model.objects.values_list("file", flat=True).iterator():
+                if not name:
+                    continue
+                key = storage._normalize_name(clean_name(name))
+                if key in seen:
+                    continue
+                seen.add(key)
+                yield key
+
+    def _is_public(self, anonymous_client, bucket, key) -> bool:
+        """An anonymous HEAD request only succeeds on publicly readable objects."""
+        try:
+            anonymous_client.head_object(Bucket=bucket, Key=key)
+        except ClientError:
+            return False
+        return True
 
     def _update_object(self, client, bucket, key, head, header_value, make_public, public_read):
         """Copy the object onto itself with the new Cache-Control, keeping its metadata."""

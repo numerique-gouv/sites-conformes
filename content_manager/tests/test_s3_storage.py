@@ -9,16 +9,13 @@ from django.core.management.base import CommandError
 from django.test import SimpleTestCase, TestCase, override_settings
 from storages.backends.s3 import S3Storage
 from wagtail.documents import get_document_model
+from wagtail.images import get_image_model
 from wagtail.models import Collection, CollectionViewRestriction
 
-from content_manager.management.commands.set_s3_cache_control import ALL_USERS_URI
 from content_manager.storages import PublicImagesS3Storage, is_public_key
 
 COMMAND_MODULE = "content_manager.management.commands.set_s3_cache_control"
 CACHE_CONTROL = "public, max-age=600"
-
-PUBLIC_GRANTS = {"Grants": [{"Grantee": {"Type": "Group", "URI": ALL_USERS_URI}, "Permission": "READ"}]}
-PRIVATE_GRANTS = {"Grants": [{"Grantee": {"Type": "CanonicalUser", "ID": "owner"}, "Permission": "FULL_CONTROL"}]}
 
 
 def make_storage(**options):
@@ -85,17 +82,26 @@ class PublicImagesS3StorageTestCase(SimpleTestCase):
         self.assertNotIn("X-Amz-Signature", url)
 
 
-class SetS3CacheControlTestCase(SimpleTestCase):
+class SetS3CacheControlTestCase(TestCase):
     def setUp(self):
         self.client_mock = MagicMock()
+        self.anonymous_mock = MagicMock()
+        # Signed HEAD responses, by key. A missing key raises a 404.
         self.objects = {}
-        self.acls = {}
-        self.client_mock.get_paginator.return_value.paginate.side_effect = self._paginate
-        self.client_mock.head_object.side_effect = lambda Bucket, Key: self.objects[Key]
-        self.client_mock.get_object_acl.side_effect = lambda Bucket, Key: self.acls[Key]
+        # Keys readable by an anonymous HEAD request.
+        self.public_keys = set()
+        self.client_mock.head_object.side_effect = self._head
+        self.anonymous_mock.head_object.side_effect = self._anonymous_head
 
-    def _paginate(self, Bucket, Prefix):
-        return [{"Contents": [{"Key": key} for key in self.objects if key.startswith(Prefix)]}]
+    def _head(self, Bucket, Key):
+        if Key not in self.objects:
+            raise ClientError({"Error": {"Code": "404"}}, "HeadObject")
+        return self.objects[Key]
+
+    def _anonymous_head(self, Bucket, Key):
+        if Key not in self.public_keys:
+            raise ClientError({"Error": {"Code": "403"}}, "HeadObject")
+        return {}
 
     def _storage(self, cls=S3Storage, location=""):
         storage = MagicMock(spec=cls)
@@ -103,6 +109,8 @@ class SetS3CacheControlTestCase(SimpleTestCase):
         storage.location = location
         storage.endpoint_url = "https://s3.example.org"
         storage.connection.meta.client = self.client_mock
+        storage.unsigned_connection.meta.client = self.anonymous_mock
+        storage._normalize_name.side_effect = lambda name: f"{location}/{name}" if location else name
         return storage
 
     def _call(self, storage, *args):
@@ -114,25 +122,58 @@ class SetS3CacheControlTestCase(SimpleTestCase):
     def _copied_keys(self):
         return {c.kwargs["Key"]: c.kwargs for c in self.client_mock.copy_object.call_args_list}
 
+    def _create_image(self, name="photo.jpg"):
+        return get_image_model().objects.create(title=name, file=f"original_images/{name}", width=100, height=100)
+
+    def _create_rendition(self, image, name="photo.width-50.jpg"):
+        return image.renditions.create(filter_spec="width-50", file=f"images/{name}", width=50, height=50)
+
+    def _create_document(self, name="report.pdf"):
+        return get_document_model().objects.create(title=name, file=f"documents/{name}")
+
     def test_requires_s3_storage(self):
         with patch(f"{COMMAND_MODULE}.default_storage", MagicMock()):
             with self.assertRaises(CommandError):
                 call_command("set_s3_cache_control", stdout=StringIO())
 
+    def test_keys_come_from_the_database(self):
+        image = self._create_image()
+        self._create_rendition(image)
+        self._create_document()
+        # Same file referenced twice: processed once.
+        self._create_image()
+        self.objects = {
+            "site/original_images/photo.jpg": {},
+            "site/images/photo.width-50.jpg": {},
+            "site/documents/report.pdf": {},
+            "site/images/orphan.jpg": {},
+        }
+        self._call(self._storage(location="site"))
+        self.assertEqual(
+            sorted(c.kwargs["Key"] for c in self.client_mock.copy_object.call_args_list),
+            ["site/documents/report.pdf", "site/images/photo.width-50.jpg", "site/original_images/photo.jpg"],
+        )
+        self.client_mock.list_objects_v2.assert_not_called()
+        self.client_mock.get_paginator.assert_not_called()
+        self.client_mock.get_object_acl.assert_not_called()
+
     def test_dry_run_does_not_copy(self):
-        self.objects = {"images/a.jpg": {"ContentType": "image/jpeg"}}
+        self._create_image()
+        self.objects = {"original_images/photo.jpg": {"ContentType": "image/jpeg"}}
         output = self._call(self._storage(), "--dry-run")
         self.client_mock.copy_object.assert_not_called()
-        self.assertIn("[DRY RUN] Would update: images/a.jpg", output)
+        self.assertIn("[DRY RUN] Would update: original_images/photo.jpg", output)
 
     def test_updates_cache_control_and_keeps_metadata(self):
+        self._create_document()
+        self._create_image("up-to-date.jpg")
         self.objects = {
             "documents/report.pdf": {
                 "ContentType": "application/pdf",
                 "ContentDisposition": "attachment",
                 "Metadata": {"foo": "bar"},
             },
-            "images/up-to-date.jpg": {"ContentType": "image/jpeg", "CacheControl": CACHE_CONTROL},
+            "original_images/up-to-date.jpg": {"ContentType": "image/jpeg", "CacheControl": CACHE_CONTROL},
         }
         self._call(self._storage())
         copied = self._copied_keys()
@@ -144,43 +185,65 @@ class SetS3CacheControlTestCase(SimpleTestCase):
         self.assertEqual(params["ContentDisposition"], "attachment")
         self.assertEqual(params["Metadata"], {"foo": "bar"})
         self.assertNotIn("ACL", params)
-        self.client_mock.get_object_acl.assert_not_called()
-
-    def test_location_prefix(self):
-        self.objects = {"site/images/a.jpg": {}, "other/images/b.jpg": {}}
-        self._call(self._storage(location="site"))
-        self.assertEqual(set(self._copied_keys()), {"site/images/a.jpg"})
+        self.anonymous_mock.head_object.assert_not_called()
 
     def test_public_read_sets_acls(self):
+        self._create_image()
+        self._create_document()
         self.objects = {
-            "images/a.jpg": {"ContentType": "image/jpeg"},
+            "original_images/photo.jpg": {"ContentType": "image/jpeg"},
             "documents/report.pdf": {"ContentType": "application/pdf"},
         }
-        self.acls = {"images/a.jpg": PRIVATE_GRANTS}
         self._call(self._storage(), "--public-read")
         copied = self._copied_keys()
-        self.assertEqual(copied["images/a.jpg"]["ACL"], "public-read")
+        self.assertEqual(copied["original_images/photo.jpg"]["ACL"], "public-read")
         self.assertEqual(copied["documents/report.pdf"]["ACL"], "private")
 
     def test_public_read_does_not_skip_private_images(self):
+        self._create_image("private.jpg")
+        self._create_image("public.jpg")
         self.objects = {
-            "images/private.jpg": {"CacheControl": CACHE_CONTROL},
-            "images/public.jpg": {"CacheControl": CACHE_CONTROL},
+            "original_images/private.jpg": {"CacheControl": CACHE_CONTROL},
+            "original_images/public.jpg": {"CacheControl": CACHE_CONTROL},
         }
-        self.acls = {"images/private.jpg": PRIVATE_GRANTS, "images/public.jpg": PUBLIC_GRANTS}
+        self.public_keys = {"original_images/public.jpg"}
         self._call(self._storage(), "--public-read")
-        self.assertEqual(set(self._copied_keys()), {"images/private.jpg"})
+        self.assertEqual(set(self._copied_keys()), {"original_images/private.jpg"})
 
     def test_public_storage_implies_public_read(self):
-        self.objects = {"images/a.jpg": {}}
-        self.acls = {"images/a.jpg": PUBLIC_GRANTS}
+        self._create_image()
+        self.objects = {"original_images/photo.jpg": {}}
+        self.public_keys = {"original_images/photo.jpg"}
         self._call(self._storage(cls=PublicImagesS3Storage))
-        self.assertEqual(self._copied_keys()["images/a.jpg"]["ACL"], "public-read")
+        self.assertEqual(self._copied_keys()["original_images/photo.jpg"]["ACL"], "public-read")
 
-    def test_errors_make_the_command_fail(self):
-        self.objects = {"images/a.jpg": {}}
+    def test_missing_objects_are_reported_without_failing(self):
+        self._create_image()
+        output = self._call(self._storage())
+        self.assertIn("Missing from the bucket: original_images/photo.jpg", output)
+        self.assertIn("1 missing", output)
+        self.client_mock.copy_object.assert_not_called()
+
+    def test_access_denied_on_copy_stops_with_permission_name(self):
+        self._create_image("a.jpg")
+        self._create_image("b.jpg")
+        self.objects = {"original_images/a.jpg": {}, "original_images/b.jpg": {}}
         self.client_mock.copy_object.side_effect = ClientError({"Error": {"Code": "AccessDenied"}}, "CopyObject")
-        with self.assertRaises(CommandError):
+        with self.assertRaisesMessage(CommandError, "s3:PutObjectAcl"):
+            self._call(self._storage(), "--public-read")
+        self.assertEqual(self.client_mock.copy_object.call_count, 1)
+
+    def test_access_denied_on_head_stops_with_permission_name(self):
+        self._create_image()
+        self.client_mock.head_object.side_effect = ClientError({"Error": {"Code": "403"}}, "HeadObject")
+        with self.assertRaisesMessage(CommandError, "s3:GetObject"):
+            self._call(self._storage())
+
+    def test_other_errors_make_the_command_fail(self):
+        self._create_image()
+        self.objects = {"original_images/photo.jpg": {}}
+        self.client_mock.copy_object.side_effect = ClientError({"Error": {"Code": "InternalError"}}, "CopyObject")
+        with self.assertRaisesMessage(CommandError, "1 object(s) could not be processed"):
             self._call(self._storage())
 
 
