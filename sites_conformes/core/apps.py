@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.core import checks
 
 
 class ContentManagerConfig(AppConfig):
@@ -19,3 +20,7 @@ class ContentManagerConfig(AppConfig):
         from wagtail.models import PAGE_MODEL_CLASSES
 
         PAGE_MODEL_CLASSES[:] = [model for model in PAGE_MODEL_CLASSES if not model._meta.swapped]
+
+        from .multisite_isolation import check_multisite_isolation_setting
+
+        checks.register(check_multisite_isolation_setting, checks.Tags.database)
