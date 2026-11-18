@@ -219,6 +219,15 @@ class SetS3CacheControlTestCase(TestCase):
         self._call(self._storage(cls=PublicImagesS3Storage))
         self.assertEqual(self._copied_keys()["original_images/photo.jpg"]["ACL"], "public-read")
 
+    def test_rejected_anonymous_request_fails_with_addressing_hint(self):
+        # OVHcloud answers 400 to anonymous path-style requests.
+        self._create_image()
+        self.objects = {"original_images/photo.jpg": {}}
+        self.anonymous_mock.head_object.side_effect = ClientError({"Error": {"Code": "400"}}, "HeadObject")
+        with self.assertRaisesMessage(CommandError, "S3_ADDRESSING_STYLE"):
+            self._call(self._storage(), "--public-read")
+        self.client_mock.copy_object.assert_not_called()
+
     def test_missing_objects_are_reported_without_failing(self):
         self._create_image()
         output = self._call(self._storage())

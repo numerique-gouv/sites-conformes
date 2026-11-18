@@ -189,8 +189,14 @@ class Command(BaseCommand):
         """An anonymous HEAD request only succeeds on publicly readable objects."""
         try:
             anonymous_client.head_object(Bucket=bucket, Key=key)
-        except ClientError:
-            return False
+        except ClientError as e:
+            if error_code(e) in ACCESS_DENIED_CODES + NOT_FOUND_CODES:
+                return False
+            # e.g. OVHcloud answers 400 to anonymous path-style requests.
+            raise CommandError(
+                f"Anonymous request on {key} rejected ({error_code(e)}): check S3_ADDRESSING_STYLE "
+                "(OVHcloud requires 'virtual')."
+            )
         return True
 
     def _update_object(self, client, bucket, key, head, header_value, make_public, public_read):
