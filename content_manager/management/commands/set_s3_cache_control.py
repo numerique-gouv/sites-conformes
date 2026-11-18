@@ -96,7 +96,11 @@ class Command(BaseCommand):
         self.stdout.write(f"Public-read on images: {'yes' if public_read else 'no'}")
         self.stdout.write("")
 
-        updated = skipped = missing = errors = 0
+        updated = 0
+        skipped = 0
+        missing = 0
+        unreadable = 0
+        errors = 0
 
         for key in self._iter_keys(storage):
             make_public = public_read and is_public_key(key, location)
@@ -110,7 +114,11 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.WARNING(f"  Missing from the bucket: {key}"))
                     continue
                 if code in ACCESS_DENIED_CODES:
-                    raise CommandError(f"Access denied reading {key}: the S3 user needs s3:GetObject.")
+                    # Without s3:ListBucket, S3 answers 403 instead of 404 for missing
+                    # objects, so a missing file and a real denial look the same.
+                    unreadable += 1
+                    self.stdout.write(self.style.WARNING(f"  Unreadable (missing or access denied): {key}"))
+                    continue
                 errors += 1
                 self.stderr.write(self.style.ERROR(f"  Error reading {key}: {e}"))
                 continue
@@ -146,11 +154,19 @@ class Command(BaseCommand):
 
         self.stdout.write("")
         verb = "[DRY RUN] Would update" if dry_run else "Updated"
-        summary = f"{verb} {updated} object(s), {skipped} already up to date, {missing} missing."
+        summary = (
+            f"{verb} {updated} object(s), {skipped} already up to date, {missing} missing, "
+            f"{unreadable} unreadable (missing or access denied)."
+        )
         if errors:
             summary += f" {errors} error(s)."
         self.stdout.write(self.style.SUCCESS(summary) if not errors else self.style.WARNING(summary))
 
+        if unreadable and not (updated or skipped):
+            raise CommandError(
+                "No object could be read. Check that the S3 user has s3:GetObject on this bucket, "
+                "and that the files listed in the database exist in it."
+            )
         if errors:
             raise CommandError(f"{errors} object(s) could not be processed.")
 

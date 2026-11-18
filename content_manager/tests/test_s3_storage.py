@@ -90,12 +90,14 @@ class SetS3CacheControlTestCase(TestCase):
         self.objects = {}
         # Keys readable by an anonymous HEAD request.
         self.public_keys = set()
+        # Error code of a signed HEAD on a missing key (403 without s3:ListBucket).
+        self.missing_code = "404"
         self.client_mock.head_object.side_effect = self._head
         self.anonymous_mock.head_object.side_effect = self._anonymous_head
 
     def _head(self, Bucket, Key):
         if Key not in self.objects:
-            raise ClientError({"Error": {"Code": "404"}}, "HeadObject")
+            raise ClientError({"Error": {"Code": self.missing_code}}, "HeadObject")
         return self.objects[Key]
 
     def _anonymous_head(self, Bucket, Key):
@@ -233,7 +235,18 @@ class SetS3CacheControlTestCase(TestCase):
             self._call(self._storage(), "--public-read")
         self.assertEqual(self.client_mock.copy_object.call_count, 1)
 
-    def test_access_denied_on_head_stops_with_permission_name(self):
+    def test_unreadable_objects_are_skipped(self):
+        # Without s3:ListBucket, a missing object answers 403 instead of 404.
+        self._create_image("gone.jpg")
+        self._create_image("here.jpg")
+        self.objects = {"original_images/here.jpg": {}}
+        self.missing_code = "403"
+        output = self._call(self._storage())
+        self.assertIn("Unreadable (missing or access denied): original_images/gone.jpg", output)
+        self.assertIn("1 unreadable", output)
+        self.assertEqual(set(self._copied_keys()), {"original_images/here.jpg"})
+
+    def test_access_denied_on_every_head_fails_with_permission_name(self):
         self._create_image()
         self.client_mock.head_object.side_effect = ClientError({"Error": {"Code": "403"}}, "HeadObject")
         with self.assertRaisesMessage(CommandError, "s3:GetObject"):
