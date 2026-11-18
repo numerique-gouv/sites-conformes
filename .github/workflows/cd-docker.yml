@@ -29,14 +29,20 @@ jobs:
           password: ${{ github.token }}
       - name: Extract tag without leading v
         if: startsWith(github.ref, 'refs/tags/v')
-        run: echo "TAG_NO_V=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+        run: |
+          TAG_NO_V="${GITHUB_REF_NAME#v}"
+          echo "TAG_NO_V=${TAG_NO_V}" >> $GITHUB_ENV
+          # Pre-releases (e.g. 4.4.0rc1, 4.4.0b1) must not move the latest tag
+          if [[ "${TAG_NO_V}" =~ (a|b|rc)[0-9]+$ ]]; then
+            echo "IS_PRERELEASE=true" >> $GITHUB_ENV
+          fi
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
           push: true
           tags: |
             ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/sites-conformes:${{ env.GITHUB_REF_SLUG }}
-            ${{ env.TAG_NO_V && format('ghcr.io/{0}/sites-conformes:latest', env.GITHUB_REPOSITORY_OWNER_PART_SLUG) || '' }}
+            ${{ env.TAG_NO_V && !env.IS_PRERELEASE && format('ghcr.io/{0}/sites-conformes:latest', env.GITHUB_REPOSITORY_OWNER_PART_SLUG) || '' }}
             ${{ env.TAG_NO_V && format('ghcr.io/{0}/sites-conformes:{1}', env.GITHUB_REPOSITORY_OWNER_PART_SLUG, env.TAG_NO_V) || '' }}
           cache-from: type=registry,ref=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/sites-conformes:${{ env.GITHUB_REF_SLUG }}
           cache-to: type=inline

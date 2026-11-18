@@ -21,6 +21,7 @@ maxdepth: 1
 installation-locale
 architecture
 guide-contribution
+publier-une-version
 traductions
 donnees-de-test-multisite
 definition-of-done

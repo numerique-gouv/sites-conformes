@@ -201,7 +201,6 @@ TEMPLATES[0]["OPTIONS"]["context_processors"].extend(
     [
         "wagtailmenus.context_processors.wagtailmenus",
         "sites_conformes.core.context_processors.skiplinks",
-        "sites_conformes.core.context_processors.mega_menus",
     ]
 )
 
@@ -222,6 +221,10 @@ INSTALLED_APPS.extend(
         "sites_conformes.proconnect",
     ]
 )
+# Custom content page model, set before the first migration
+# (see docs/paquet/modele-de-page-personnalise.md).
+SF_CONTENTPAGE_MODEL = "home.CustomContentPage"
+
 WAGTAILADMIN_PATH = "admin/"
 WAGTAILIMAGES_IMAGE_MODEL = "sites_conformes_customimages.CustomImage"
 TESTING = False

@@ -2,9 +2,13 @@
 
 # Roll a Scalingo app back to a database backup and to the code of a given git ref
 #
-# Usage: rollback_scalingo.sh APP [REGION=osc-fr1] [REF]
+# Usage: rollback_scalingo.sh APP [REGION] [REF]
+#
+# REGION defaults to $PROD_REGION, or to osc-fr1 when it is not set.
 #
 # REGION can be "-" to use the default region while passing a REF.
+#
+# REPO_URL_BASE (default: https://github.com/numerique-gouv/sites-conformes) can point to a fork.
 #
 # By default, REF is the code of the last successful deployment before the backup:
 # the content of the backup may not be readable by older code.
@@ -22,16 +26,19 @@ set +a
 set -euo pipefail
 
 APP=${1:-}
-REGION=${2:-osc-fr1}
+REGION=${2:--}
 if [[ "$REGION" == "-" ]]; then
-    REGION=osc-fr1
+    REGION=${PROD_REGION:-osc-fr1}
 fi
 REF=${3:-}
 TUNNEL_PORT=${TUNNEL_PORT:-10000}
-REPO_URL="https://github.com/numerique-gouv/sites-conformes.git"
+
+REPO_URL_BASE=${REPO_URL_BASE:-https://github.com/numerique-gouv/sites-conformes}
+REPO_URL_BASE=${REPO_URL_BASE%/}
+REPO_URL="${REPO_URL_BASE}.git"
 
 if [[ -z "$APP" ]]; then
-    echo "Usage: $0 APP [REGION=osc-fr1] [REF]" 1>&2
+    echo "Usage: $0 APP [REGION=${PROD_REGION:-osc-fr1}] [REF]" 1>&2
     exit 1
 fi
 
@@ -154,9 +161,9 @@ if [[ -z "$REF" ]]; then
     REF=${BACKUP_REF}
 fi
 
-REPO_ARCHIVE_URL="https://github.com/numerique-gouv/sites-conformes/archive/${REF}.tar.gz"
+REPO_ARCHIVE_URL="${REPO_URL_BASE}/archive/${REF}.tar.gz"
 if ! curl -sfIL -o /dev/null ${REPO_ARCHIVE_URL}; then
-    echo "Git ref ${REF} not found on GitHub (${REPO_ARCHIVE_URL})" 1>&2
+    echo "Git ref ${REF} not found (${REPO_ARCHIVE_URL})" 1>&2
     exit 1
 fi
 

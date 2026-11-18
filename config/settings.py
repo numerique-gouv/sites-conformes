@@ -34,6 +34,10 @@ def getenv_bool(key: str, default: bool):
     return value.casefold() in ["1", "true"]
 
 
+def getenv_list(key: str, default: str) -> list[str]:
+    return os.getenv(key, default).replace(" ", "").split(",")
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -43,7 +47,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv_bool("DEBUG", False)
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,.localhost").replace(" ", "").split(",")
+ALLOWED_HOSTS = getenv_list("ALLOWED_HOSTS", "127.0.0.1,.localhost")
 USE_X_FORWARDED_HOST = getenv_bool("USE_X_FORWARDED_HOST", False)
 
 HOST_PROTO = os.getenv("HOST_PROTO", "https")
@@ -205,7 +209,6 @@ TEMPLATES = [
                 "wagtail.contrib.settings.context_processors.settings",
                 "wagtailmenus.context_processors.wagtailmenus",
                 "sites_conformes.core.context_processors.skiplinks",
-                "sites_conformes.core.context_processors.mega_menus",
                 "sites_conformes.core.context_processors.iframe",
             ],
         },
@@ -467,7 +470,7 @@ WAGTAILDOCS_MAX_UPLOAD_SIZE = int(os.getenv("WAGTAILDOCS_MAX_UPLOAD_SIZE", 10 * 
 
 WAGTAILIMAGES_IMAGE_MODEL = "sites_conformes_customimages.CustomImage"
 WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
-WAGTAILDOCS_EXTENSIONS = ["pdf", "docx", "odt", "xlsx", "ods", "pptx", "odp", "csv", "txt"]
+WAGTAILDOCS_EXTENSIONS = getenv_list("WAGTAILDOCS_EXTENSIONS", "pdf,docx,odt,xlsx,ods,pptx,odp,csv,txt")
 SF_SCHEME_DEPENDENT_SVGS = getenv_bool("SF_SCHEME_DEPENDENT_SVGS", False)
 
 # Allows for complex Streamfields without completely removing checks
@@ -499,6 +502,9 @@ DSFR_MARK_OPTIONAL_FIELDS = getenv_bool("DSFR_MARK_OPTIONAL_FIELDS", True)
 # See https://wagtail-2fa.readthedocs.io/en/stable/
 WAGTAIL_2FA_REQUIRED = getenv_bool("WAGTAIL_2FA_REQUIRED", False)
 WAGTAIL_2FA_OTP_TOTP_NAME = os.getenv("WAGTAIL_2FA_OTP_TOTP_NAME", WAGTAIL_SITE_NAME)
+# Duration of the confirmation code sent by email to add a 2FA device after a ProConnect login
+SF_2FA_EMAIL_CODE_VALIDITY_DURATION = int(os.getenv("SF_2FA_EMAIL_CODE_VALIDITY_DURATION", 15 * 60))
+SF_2FA_EMAIL_CODE_MAX_ATTEMPTS = int(os.getenv("SF_2FA_EMAIL_CODE_MAX_ATTEMPTS", 3))
 
 # (Optional) ProConnect settings
 PROCONNECT_ACTIVATED = getenv_bool("PROCONNECT_ACTIVATED", False)
@@ -531,10 +537,17 @@ if PROCONNECT_ACTIVATED:
         "sites_conformes.proconnect",
     ]
 
-    AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.ModelBackend",
-        "sites_conformes.proconnect.backends.OIDCAuthenticationBackend",
-    ]
+    if SF_DISABLE_LOCAL_LOGIN:
+        AUTHENTICATION_BACKENDS = []
+        WAGTAIL_PASSWORD_RESET_ENABLED = False
+        WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+        WAGTAILUSERS_PASSWORD_ENABLED = False
+    else:
+        AUTHENTICATION_BACKENDS = [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+    AUTHENTICATION_BACKENDS.append("sites_conformes.proconnect.backends.OIDCAuthenticationBackend")
 
     LOGOUT_URL = f"{FORCE_SCRIPT_NAME}/oidc/logout/"
 

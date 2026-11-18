@@ -8,7 +8,7 @@ pour montrer comment l’intégrer dans un site existant. Pas destiné à être 
 | Dossier      | Rôle                                                                                    |
 | ------------ | --------------------------------------------------------------------------------------- |
 | `demo/`      | Configuration Django (settings, urls, wsgi) du projet de démo.                          |
-| `home/`      | App Wagtail minimale avec une `HomePage`.                                               |
+| `home/`      | App Wagtail minimale : `HomePage`, et `CustomContentPage` qui remplace `ContentPage`.   |
 | `search/`    | Vue de recherche Wagtail standard.                                                      |
 | `annuaire/`  | App d’exemple : annuaire de psychologues affiché sur une carte Carte Facile + API REST. |
 
@@ -23,6 +23,10 @@ just setup            # uv sync + migrate + seed (6 psychologues + page publiée
 just createsuperuser  # crée le compte admin Wagtail (optionnel pour visiter le site)
 just runserver        # http://localhost:8000
 ```
+
+Une base `db.sqlite3` créée avant l’ajout de `CustomContentPage` n’est pas
+compatible (le modèle de page de contenu doit être choisi avant la première
+migration) : supprimez-la et relancez `just setup`.
 
 La page d’annuaire est publiée à <http://localhost:8000/annuaire/>. Pour
 éditer le contenu, créer ou supprimer des psychologues, passez par l’admin

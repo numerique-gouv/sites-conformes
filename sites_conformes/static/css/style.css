@@ -205,6 +205,48 @@ input[data-whf_name] {
     object-position: bottom;
 }
 
+/* Image of the "image and text" hero: its width within the column is set by the
+   "Image size" option (Large, the default, fills the column). */
+.cmsfr-hero-media {
+    margin: 0 auto;
+}
+
+.cmsfr-hero-media--md {
+    width: 75%;
+}
+
+.cmsfr-hero-media--sm {
+    width: 50%;
+}
+
+/* Same hero, image at its original proportions: never enlarged nor cropped, centered,
+   and no taller than the 600 px square it replaces. */
+.cmsfr-hero-img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 600px;
+}
+
+/* Centered image at its original proportions: cancel the 16/9 aspect-ratio that
+   DSFR forces on responsive images inside .fr-content-media, so the image keeps
+   its own proportions (never cropped) while still being sized by the width option
+   (Small/Medium/Large, like the ratio modes). !important is required to beat the
+   DSFR rule (specificity 0,2,0, no !important). */
+img.cmsfr-image-original {
+    aspect-ratio: auto !important;
+}
+
+/* Centered image at its exact pixel size ("Actual size" width + original
+   proportions): natural size, centered, capped to the column, ratio preserved. */
+img.cmsfr-image-natural {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
 /* Custom styling for multi-select filter tags */
 /* Override DSFR default behavior: pressed tags should appear active (colored) */
 label.fr-tag[aria-pressed="true"] {

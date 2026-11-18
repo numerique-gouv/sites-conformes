@@ -49,6 +49,7 @@ dependencies = [
     "django-otp>=1.7.0",
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
+    "swapper>=1.4,<2",
 ]
 
 [dependency-groups]
@@ -88,6 +89,8 @@ sites_conformes = [
     "*/templates/**/*",
     "*/static/**/*",
     "*/page_templates/**/*",
+    "locale/*/LC_MESSAGES/*.po",
+    "locale/*/LC_MESSAGES/*.mo",
     "*/locale/*/LC_MESSAGES/*.po",
     "*/locale/*/LC_MESSAGES/*.mo",
 ]

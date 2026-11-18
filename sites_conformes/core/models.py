@@ -1,6 +1,8 @@
 from typing import Union
 
-from django.core.exceptions import ValidationError
+import swapper
+from django.core import checks
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -31,23 +33,68 @@ from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-class ContentPage(SitesFacilesBasePage):
-    tags = ClusterTaggableManager(through="TagContentPage", blank=True)
+class AbstractContentPage(SitesFacilesBasePage):
+    """
+    Base class for the swappable content page model.
+
+    To use your own model, subclass this and point ``SF_CONTENTPAGE_MODEL`` at it,
+    the way Wagtail 8 handles ``WAGTAIL_PAGE_MODEL`` (both rely on ``swapper``).
+    Declare ``tags`` and its through model on the concrete subclass: a through model
+    shipped by this app would point at your model, so this app's migrations would
+    depend on yours while yours depend on it.
+    """
 
     class Meta:
+        abstract = True
+
+    @classmethod
+    def check(cls, **kwargs):
+        errors = super().check(**kwargs)
+        if cls._meta.abstract or cls._meta.swapped:
+            return errors
+        try:
+            cls._meta.get_field("tags")
+        except FieldDoesNotExist:
+            errors.append(
+                checks.Error(
+                    f"{cls._meta.label} must declare a `tags` field.",
+                    hint="Add a ClusterTaggableManager with its own through model, "
+                    "see docs/paquet/modele-de-page-personnalise.md.",
+                    obj=cls,
+                    id="sites_conformes_core.E001",
+                )
+            )
+        return errors
+
+    def get_template(self, request, *args, **kwargs):
+        # Wagtail derives ``template`` from the concrete model's app label;
+        # fall back to the shipped template when the subclass app has none.
+        return [self.template, "sites_conformes_core/content_page.html"]
+
+
+class ContentPage(AbstractContentPage):
+    class Meta:
         verbose_name = _("Content page")
+        swappable = swapper.swappable_setting("sites_conformes_core", "ContentPage")
 
-    content_panels = SitesFacilesBasePage.content_panels + [
-        FieldPanel("tags"),
-    ]
+    if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
+        # A swapped project declares its own tags and through model (see AbstractContentPage);
+        # declaring ours against the swapped-in model would register a phantom child relation on it.
+        tags = ClusterTaggableManager(through="TagContentPage", blank=True)
 
-    api_fields = SitesFacilesBasePage.api_fields + [
-        APIField("tags"),
-    ]
+        content_panels = AbstractContentPage.content_panels + [
+            FieldPanel("tags"),
+        ]
+
+        api_fields = AbstractContentPage.api_fields + [
+            APIField("tags"),
+        ]
 
 
-class TagContentPage(TaggedItemBase):
-    content_object = ParentalKey("ContentPage", related_name="contentpage_tags")  # type: ignore
+if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
+
+    class TagContentPage(TaggedItemBase):
+        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
 
 
 class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
@@ -98,7 +145,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    subpage_types = ["sites_conformes_core.ContentPage"]
+    subpage_types = [swapper.get_model_name("sites_conformes_core", "ContentPage")]
 
     class Meta:
         verbose_name = _("Catalog index page")
@@ -106,6 +153,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
     @property
     def entries(self):
         # Get a list of live content pages that are children of this page
+        ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
         return ContentPage.objects.child_of(self).live().specific().prefetch_related("tags")
 
     def get_context(self, request, *args, **kwargs):
@@ -793,48 +841,3 @@ class SocialMediaItem(Orderable):
     class Meta:
         verbose_name = _("Social media item")
         verbose_name_plural = _("Social media items")
-
-
-# Mega-Menus
-# Obsolete, to be removed in a future version (replaced by the "menus" apps)
-class MegaMenuCategory(Orderable):
-    mega_menu = ParentalKey("sites_conformes_core.MegaMenu", related_name="categories", on_delete=models.CASCADE)
-    category = models.ForeignKey("wagtailmenus.FlatMenu", on_delete=models.CASCADE, verbose_name=_("Category"))
-
-    class Meta:
-        verbose_name = _("Mega menu category")
-        verbose_name_plural = _("Mega menu categories")
-
-
-# Obsolete, to be removed in a future version (replaced by the "menus" apps)
-class MegaMenu(ClusterableModel):
-    name = models.CharField(_("Name"), max_length=255)
-    parent_menu_item = models.ForeignKey(
-        "wagtailmenus.MainMenuItem", on_delete=models.CASCADE, related_name="megamenu_parent_menu_items"
-    )
-    description = models.TextField(_("Description"), blank=True)
-    main_link = models.URLField(
-        _("Main link"), help_text=_("Max length: 2000 characters."), max_length=2000, blank=True, null=True
-    )
-
-    panels = [
-        FieldPanel("name"),
-        FieldPanel("parent_menu_item"),
-        FieldPanel("description"),
-        FieldPanel("main_link"),
-        InlinePanel(
-            "categories",
-            max_num=4,
-            heading=_("Categories"),
-            help_text=_("Maximum 4 categories, each with maximum 8 links."),
-        ),
-    ]
-
-    def __str__(self):  # type: ignore
-        return self.name
-
-    def get_categories(self):
-        return self.categories.order_by("sort_order")
-
-    class Meta:
-        verbose_name = _("Mega menu")

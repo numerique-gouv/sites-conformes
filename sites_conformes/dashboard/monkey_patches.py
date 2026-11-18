@@ -114,6 +114,83 @@ def patch_wagtail_2fa_device_form_field_order():
     DeviceForm.__init__ = __init__
 
 
+def patch_wagtail_2fa_device_form_password_check():
+    """
+    Ask for a code sent by email instead of the current password in the add/edit device form
+    when the user logged in through ProConnect.
+
+    ``DeviceForm`` (wagtail-2fa) checks the password with ``authenticate()``, which always
+    fails when the local login is disabled (PROCONNECT_ACTIVATED and SF_DISABLE_LOCAL_LOGIN:
+    ModelBackend is removed from AUTHENTICATION_BACKENDS) or when the user has no password
+    (accounts created through ProConnect). With WAGTAIL_2FA_REQUIRED=True, such a user would
+    be redirected to the add-device form on every admin page without any way to submit it.
+
+    If no email can be sent (DEFAULT_FROM_EMAIL not set, or user without email address),
+    adding a device is blocked: it must not be possible without any confirmation.
+    """
+
+    from wagtail_2fa.forms import DeviceForm
+
+    from sites_conformes.dashboard.services.email_code import (
+        check_email_code,
+        consume_email_code,
+        email_code_available,
+        password_check_available,
+    )
+
+    original_init = DeviceForm.__init__
+    original_clean = DeviceForm.clean
+    original_clean_otp_token = DeviceForm.clean_otp_token
+    original_save = DeviceForm.save
+
+    def __init__(self, request, **kwargs):
+        original_init(self, request, **kwargs)
+        self.email_code_unavailable = False
+        if password_check_available(request):
+            return
+
+        del self.fields["password"]
+        if email_code_available(request.user):
+            self.fields["email_code"] = forms.CharField(
+                label=_("Code received by email"),
+                max_length=6,
+                widget=forms.TextInput(attrs={"autocomplete": "one-time-code", "inputmode": "numeric"}),
+            )
+            self.order_fields(["name", "email_code", "otp_token"])
+        else:
+            self.email_code_unavailable = True
+
+    def clean_email_code(self):
+        code = self.cleaned_data.get("email_code")
+        if not check_email_code(self.request, code):
+            raise forms.ValidationError(_("Invalid or expired code. Please request a new one."))
+        return code
+
+    def clean_otp_token(self):
+        # Verifying a TOTP token consumes it: don't do it when the form is already invalid,
+        # so that the user can submit the same token again with the right confirmation.
+        if self.has_error("email_code") or self.has_error("password"):
+            return self.cleaned_data.get("otp_token")
+        return original_clean_otp_token(self)
+
+    def clean(self):
+        if self.email_code_unavailable:
+            raise forms.ValidationError(_("Two-factor authentication can't be set up without sending an email."))
+        return original_clean(self)
+
+    def save(self):
+        result = original_save(self)
+        if "email_code" in self.fields:
+            consume_email_code(self.request)
+        return result
+
+    DeviceForm.__init__ = __init__
+    DeviceForm.save = save
+    DeviceForm.clean_email_code = clean_email_code
+    DeviceForm.clean_otp_token = clean_otp_token
+    DeviceForm.clean = clean
+
+
 def patch_wagtail_2fa_token_form_device_selection():
     """
     Fix "invalid 2FA code" errors on login with django-otp >= 1.7.4.
