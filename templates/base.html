@@ -30,10 +30,6 @@
         <link href="{% static 'css/numerique_gouv.css' %}"
               rel="stylesheet"
               type="text/css" />
-        <link
-            rel="stylesheet"
-            href="{% static 'lib/swiperjs/swiper-bundle.min.css' %}"
-        />
       {% endblock extra_css %}
 
     {% block cookie_banner %}
@@ -83,8 +79,6 @@
 
     {%dsfr_js nonce=request.csp_nonce %}
       {% block extra_js %}
-        <script src="{% static 'lib/swiperjs/swiper.js' %}"></script>
-        <script src="{% static 'js/swiper.js' %}"></script>
       {% endblock extra_js %}
 
     {% block body_tracking_scripts %}

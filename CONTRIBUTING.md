@@ -1,13 +1,15 @@
-# Contribuer à Sites-Faciles
+# Contribuer au site numerique.gouv.fr
 
 ## Installation
 
 Une documentation détaillée de l’installation en local est disponible sur [ONBOARDING.md](./ONBOARDING.md).
 
 ```sh
-git clone https://github.com/numerique-gouv/sites-faciles
-cd sites-faciles
+git clone https://github.com/numerique-gouv/numerique-gouv-cms
+cd numerique-gouv-cms
 ```
+
+Tant que ce dépôt reste un fork de [Sites Conformes](https://github.com/numerique-gouv/sites-conformes), ajouter aussi le remote `upstream` (voir [ONBOARDING.md](./ONBOARDING.md#ajouter-le-remote-upstream)).
 
 ### Effectuer les tests
 
