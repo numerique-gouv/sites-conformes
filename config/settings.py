@@ -289,14 +289,19 @@ if os.getenv("S3_HOST"):
 
     if public_host:
         # Unsigned, stable URLs so that browsers and proxies can cache media.
-        # The bucket is appended to custom_domain to produce path-style URLs.
         # Images get a public-read ACL on upload (see content_manager/storages.py);
         # documents stay private and are served by Wagtail (see below).
-        options["custom_domain"] = f"{public_host}/{bucket_name}"
+        if os.getenv("S3_ADDRESSING_STYLE", "path") == "virtual":
+            # bucket.host/key: required by OVHcloud, which rejects anonymous
+            # path-style requests ("Not S3 request").
+            options["custom_domain"] = f"{bucket_name}.{public_host}"
+        else:
+            # host/bucket/key: path-style URLs, e.g. for MinIO (upstream default).
+            options["custom_domain"] = f"{public_host}/{bucket_name}"
         options["url_protocol"] = f"{protocol}:"
         options["querystring_auth"] = False
         storage_backend = "content_manager.storages.PublicImagesS3Storage"
-        public_endpoint = f"{protocol}://{public_host}"
+        public_endpoint = f"{protocol}://{options['custom_domain'].split('/')[0]}"
     else:
         storage_backend = "storages.backends.s3.S3Storage"
         public_endpoint = endpoint_url

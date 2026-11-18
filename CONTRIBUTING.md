@@ -176,7 +176,7 @@ Sans la variable `S3_PUBLIC_HOST`, les URLs des médias sont signées (`X-Amz-Si
 
 Si `S3_PUBLIC_HOST` est définie (en général avec la même valeur que `S3_HOST`) :
 
-* les URLs ne sont plus signées et restent stables ;
+* les URLs ne sont plus signées et restent stables. Chez OVHcloud, il faut aussi définir `S3_ADDRESSING_STYLE=virtual` (URLs `bucket.hôte/clé`) : OVHcloud refuse les requêtes anonymes au format `hôte/bucket/clé` (erreur 400 « Not S3 request »), qui est la valeur par défaut (`path`) ;
 * les images (`original_images/` et `images/`) sont envoyées avec une ACL `public-read`, objet par objet. OVHcloud ne gère pas les politiques de bucket, et une ACL publique sur le bucket permettrait d’en lister le contenu : le bucket reste donc privé ;
 * les documents restent privés sur S3. Ils sont servis par Wagtail (`WAGTAILDOCS_SERVE_METHOD = "serve_view"`), qui vérifie les restrictions des collections privées avant d’envoyer le fichier.
 
@@ -197,7 +197,7 @@ Pour passer un environnement en URLs publiques, dans cet ordre :
 
 1. déployer, avec `S3_CACHE_CONTROL` défini ;
 2. lancer `set_s3_cache_control --public-read` (voir ci-dessus) ;
-3. définir `S3_PUBLIC_HOST` ;
+3. définir `S3_PUBLIC_HOST` (et `S3_ADDRESSING_STYLE=virtual` chez OVHcloud) ;
 4. relancer la commande, pour les images envoyées entre les étapes 2 et 3.
 
 #### Stockage local
