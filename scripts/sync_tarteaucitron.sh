@@ -9,7 +9,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 REPO_ROOT="$(dirname "${SCRIPT_DIR}")"
 
 SRC="${REPO_ROOT}/node_modules/tarteaucitronjs/"
-DEST="${REPO_ROOT}/sites_conformes/static/lib/tarteaucitronjs/"
+DEST="${REPO_ROOT}/static/lib/tarteaucitronjs/"
 
 if [ ! -d "${SRC}" ]; then
     echo "node_modules/tarteaucitronjs not found. Run 'npm ci' first." 1>&2
