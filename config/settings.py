@@ -332,6 +332,15 @@ if os.getenv("S3_HOST"):
         "OPTIONS": options,
     }
 
+    # Opt-in: image renditions are stored public-read and served unsigned, so their URLs never expire
+    # (social media previews, long-lived caches). Original images and documents stay private.
+    if getenv_bool("S3_PUBLIC_RENDITIONS", False):
+        STORAGES["renditions"] = {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": {**options, "default_acl": "public-read", "querystring_auth": False},
+        }
+        WAGTAILIMAGES_RENDITION_STORAGE = "renditions"
+
     MEDIA_URL = f"{public_endpoint}/"
 elif SF_USE_DB_STORAGE:
     STORAGES["default"] = {
