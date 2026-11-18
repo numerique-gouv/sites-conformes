@@ -82,16 +82,32 @@ pipx install uv
 ### Cloner le dépôt
 
 ```sh
-git clone https://github.com/numerique-gouv/sites-faciles.git
+git clone https://github.com/numerique-gouv/numerique-gouv-cms.git
 
 # ou en ssh
-git clone git@github.com:numerique-gouv/sites-faciles.git
+git clone git@github.com:numerique-gouv/numerique-gouv-cms.git
 ```
 
 Et rentrer dans le dossier du dépôt
 
 ```sh
-cd sites-faciles
+cd numerique-gouv-cms
+```
+
+### Ajouter le remote `upstream`
+
+Ce dépôt est un fork de [Sites Conformes](https://github.com/numerique-gouv/sites-conformes) (anciennement Sites Faciles). Pour récupérer les évolutions d’upstream, ajouter son dépôt comme remote `upstream` :
+
+```sh
+git remote add upstream git@github.com:numerique-gouv/sites-conformes.git
+git fetch upstream
+```
+
+Si le remote `upstream` d’un clone existant pointe encore vers l’ancien dépôt `sites-faciles`, mettre son URL à jour :
+
+```sh
+git remote set-url upstream git@github.com:numerique-gouv/sites-conformes.git
+git fetch upstream --prune
 ```
 
 ### PostgreSQL (base de données)
