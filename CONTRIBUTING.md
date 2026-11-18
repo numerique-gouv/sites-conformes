@@ -191,6 +191,8 @@ python manage.py set_s3_cache_control --public-read            # application
 
 L’option `--public-read` rend les images publiques. Elle est automatique quand `S3_PUBLIC_HOST` est définie.
 
+La commande ne traite que les fichiers connus de Wagtail (images, renditions, documents) : elle lit leurs noms dans la base au lieu de lister le bucket. Elle vérifie qu’une image est publique avec une requête anonyme, au lieu de lire son ACL. Elle n’a donc besoin que des droits que l’utilisateur S3 de l’app doit avoir de toute façon : `s3:GetObject`, `s3:PutObject` et, pour les images publiques, `s3:PutObjectAcl` (aussi requis à chaque envoi d’image quand `S3_PUBLIC_HOST` est définie). `s3:ListBucket` et `s3:GetObjectAcl` ne sont pas nécessaires.
+
 Pour passer un environnement en URLs publiques, dans cet ordre :
 
 1. déployer, avec `S3_CACHE_CONTROL` défini ;
