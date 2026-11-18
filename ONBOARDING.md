@@ -96,7 +96,7 @@ cd numerique-gouv-cms
 
 ### Ajouter le remote `upstream`
 
-Ce dépôt est un fork de [Sites Conformes](https://github.com/numerique-gouv/sites-conformes) (anciennement Sites Faciles). Pour récupérer les évolutions d’upstream, ajouter son dépôt comme remote `upstream` :
+Ce dépôt est pour l’instant un fork de [Sites Conformes](https://github.com/numerique-gouv/sites-conformes) (anciennement Sites Faciles). En attendant son passage à une dépendance au paquet `sites-conformes`, ajouter le dépôt d’origine comme remote `upstream`, pour comparer le code et suivre ses évolutions :
 
 ```sh
 git remote add upstream git@github.com:numerique-gouv/sites-conformes.git

@@ -9,12 +9,7 @@ git clone https://github.com/numerique-gouv/numerique-gouv-cms
 cd numerique-gouv-cms
 ```
 
-Ce dépôt est un fork de [Sites Conformes](https://github.com/numerique-gouv/sites-conformes). Pour suivre ses évolutions, ajouter le remote `upstream` (voir [ONBOARDING.md](./ONBOARDING.md#ajouter-le-remote-upstream)) :
-
-```sh
-git remote add upstream git@github.com:numerique-gouv/sites-conformes.git
-git fetch upstream
-```
+Tant que ce dépôt reste un fork de [Sites Conformes](https://github.com/numerique-gouv/sites-conformes), ajouter aussi le remote `upstream` (voir [ONBOARDING.md](./ONBOARDING.md#ajouter-le-remote-upstream)).
 
 ### Effectuer les tests
 
