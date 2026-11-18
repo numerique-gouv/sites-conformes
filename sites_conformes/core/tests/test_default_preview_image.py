@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from wagtail.images import get_image_model
-from wagtail.images.tests.utils import get_test_image_file
+from wagtail.images.tests.utils import get_test_image_file, get_test_image_file_svg, get_test_image_file_webp
 from wagtail.models import Page, Site
 from wagtail.test.utils import WagtailPageTestCase
 
@@ -51,3 +51,30 @@ class DefaultPreviewImageTestCase(WagtailPageTestCase):
         rendition = page_image.get_rendition("fill-1200x630")
         self.assertInHTML(f'<meta property="og:image" content="{rendition.full_url}" />', content)
         self.assertNotIn(self.default_image.get_rendition("fill-1200x630").url, content)
+
+    def test_svg_page_image_falls_back_to_the_default(self):
+        self.set_default_preview_image()
+        self.page.preview_image = Image.objects.create(title="SVG", file=get_test_image_file_svg())
+        self.page.save_revision().publish()
+
+        content = self.get_meta()
+
+        rendition = self.default_image.get_rendition("fill-1200x630")
+        self.assertInHTML(f'<meta property="og:image" content="{rendition.full_url}" />', content)
+
+    def test_svg_default_image_is_ignored(self):
+        self.config.default_preview_image = Image.objects.create(title="SVG", file=get_test_image_file_svg())
+        self.config.save()
+
+        content = self.get_meta()
+
+        self.assertInHTML('<meta name="twitter:card" content="summary" />', content)
+        self.assertNotIn('property="og:image"', content)
+
+    def test_webp_image_is_rendered_as_png(self):
+        self.config.default_preview_image = Image.objects.create(title="WebP", file=get_test_image_file_webp())
+        self.config.save()
+
+        content = self.get_meta()
+
+        self.assertRegex(content, r'property="og:image" content="[^"]+\.png"')
