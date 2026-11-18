@@ -4,6 +4,8 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext
 from wagtail.blocks.struct_block import StructBlockValidationError
+from wagtail.images import get_image_model
+from wagtail.images.tests.utils import get_test_image_file
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
@@ -876,6 +878,16 @@ class CenteredImageBlockTestCase(TestCase):
     def test_actual_size_shows_the_image_at_its_natural_size(self):
         value = self.get_value(width="natural", image_ratio="original")
         self.assertEqual(value.extra_classes(), "cmsfr-image-natural")
+
+    def test_images_are_not_resized(self):
+        # Like before the <picture> tag (#597): only the format changes, so "Actual size" keeps its pixel size
+        self.image = get_image_model().objects.create(title="Large", file=get_test_image_file(size=(2000, 1000)))
+
+        img = BeautifulSoup(self.block.render(self.get_value(width="natural")), "html.parser").select_one(
+            "picture img"
+        )
+        self.assertTrue(img["src"].endswith(".webp"))
+        self.assertEqual((img["width"], img["height"]), ("2000", "1000"))
 
     def test_new_blocks_keep_original_proportions_by_default(self):
         self.assertEqual(self.block.get_default()["image_ratio"], "original")

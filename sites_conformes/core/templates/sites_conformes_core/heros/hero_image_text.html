@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags wagtailimages_tags %}
+{% load static wagtailcore_tags sites_conformes_images %}
 
 {# djlint: off H021 #}
 <div style="{% if value.layout.background_color %}background-color: var(--background-alt-{{ value.layout.background_color }});
@@ -10,13 +10,11 @@
         {% include "sites_conformes_core/heros/_hero_buttons.html" %}
       </div>
       <div class="fr-col-md-6">
-        {% with header_picture=value.image_picture %}
-          {% if header_picture %}
-            <div class="cmsfr-hero-media{% if value.image_size %} cmsfr-hero-media--{{ value.image_size }}{% endif %}">
-              {{ header_picture }}
-            </div>
-          {% endif %}
-        {% endwith %}
+        {% if value.image %}
+          <div class="cmsfr-hero-media{% if value.image_size %} cmsfr-hero-media--{{ value.image_size }}{% endif %}">
+            {% picture value.image spec=value.image_filter_spec format-webp preserve-svg class=value.image_css_class %}
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>

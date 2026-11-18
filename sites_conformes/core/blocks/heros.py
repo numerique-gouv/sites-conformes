@@ -7,8 +7,6 @@ from wagtail import blocks
 from wagtail.admin.telepath import register
 from wagtail.blocks import StructValue
 from wagtail.blocks.struct_block import StructBlockAdapter, StructBlockValidationError
-from wagtail.images.models import Filter, Picture
-from wagtail.images.shortcuts import get_renditions_or_not_found
 
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
@@ -171,16 +169,9 @@ class HeroImageAndTextStructValue(StructValue):
             return f"fill-1200x{round(1200 * ratio_height / ratio_width)}"
         return f"fill-{round(1200 * ratio_width / ratio_height)}x1200"
 
-    def image_picture(self):
-        image = self.get("image")
-        if not image:
-            return None
-
-        # The {% picture %} tag doesn't accept a dynamic filter spec, so build the Picture here
-        filter_specs = Filter.expand_spec(f"{self.image_filter_spec()}|format-webp|preserve-svg")
+    def image_css_class(self):
         image_format = self.get("image_format")
-        css_class = f"fr-responsive-img {image_format}" if image_format else "cmsfr-hero-img"
-        return Picture(get_renditions_or_not_found(image, filter_specs), attrs={"class": css_class})
+        return f"fr-responsive-img {image_format}" if image_format else "cmsfr-hero-img"
 
 
 class HeroImageAndTextBlock(blocks.StructBlock):
