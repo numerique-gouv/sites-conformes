@@ -220,26 +220,6 @@ just scalingo-rollback <app> [region] [ref]
 
 ⚠️ La base de données de l’app est **remplacée** par la sauvegarde. Le script demande de taper le nom de l’app pour confirmer, fait une sauvegarde de sécurité si la dernière date de plus de 6 heures, et arrête les conteneurs web pendant la restauration.
 
-### Copie de la production vers la staging
-
-Pour remplacer la base de données et les fichiers médias de l’app de staging par ceux de la production :
-
-```sh
-just descend-prod-to-staging
-```
-
-- Les variables `PROD_APP`, `STAGING_APP` (nom de l’app Scalingo de staging) et `BACKUP_DIR` doivent être définies dans le `.env`, sinon le script s’arrête immédiatement.
-- Les régions valent `osc-fr1` par défaut ; elles peuvent être changées via `PROD_REGION` et `STAGING_REGION` (qui vaut `PROD_REGION` par défaut).
-- Les secrets (URL de la base de staging, paramètres S3 des deux apps) sont lus dans les variables d’environnement Scalingo de chaque app.
-- La base vient de la **dernière sauvegarde** Scalingo de la production (elle peut donc dater de quelques heures) ; le dump est conservé dans `BACKUP_DIR/prod-to-staging-<date>`.
-- Après la restauration, `migrate` et `set_config` sont lancés sur la staging, pour appliquer ses migrations et lui redonner son nom d’hôte.
-- Les médias sont synchronisés du bucket S3 de production vers celui de staging avec `rclone sync` : les fichiers présents uniquement sur la staging sont supprimés.
-- Prérequis : la CLI Scalingo, `rclone` et un `postgresql-client` dont la version correspond à celle du serveur.
-- Avant toute modification, le script vérifie les versions de PostgreSQL : les deux bases doivent être au moins en version 18, la staging ne doit pas être plus ancienne que la prod, et le `pg_restore` local doit pouvoir lire le dump. Un avertissement s’affiche si le `pg_restore` local est plus récent que le serveur de staging.
-- La version de la prod est lue dans sa dernière sauvegarde : après une mise à jour de PostgreSQL sur la prod, il faut créer une nouvelle sauvegarde (le script indique la commande) ou attendre la suivante.
-
-⚠️ Toutes les tables de la base de staging sont supprimées avant la restauration. Le script demande de taper le nom de l’app de staging pour confirmer, refuse de tourner si `PROD_APP` et `STAGING_APP` sont identiques ou si les deux apps partagent le même emplacement S3, et arrête les conteneurs web de la staging pendant la restauration.
-
 ## Mise à jour de TarteAuCitron
 
 La bibliothèque [TarteAuCitron](https://tarteaucitron.io/) est embarquée dans `static/lib/tarteaucitronjs/`. Pour la resynchroniser avec la version du paquet npm (définie dans `package-lock.json`) :
