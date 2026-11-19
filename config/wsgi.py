@@ -16,7 +16,9 @@ from django.core.wsgi import get_wsgi_application
 
 application = get_wsgi_application()
 
-if not settings.DEBUG:
+# When WhiteNoise is enabled, it serves static files itself: wrapping the app with Cling
+# would intercept /static/ requests before they reach WhiteNoiseMiddleware.
+if not settings.DEBUG and not settings.SF_USE_WHITENOISE:
     from dj_static import Cling
 
     application = Cling(application)

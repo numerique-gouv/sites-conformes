@@ -68,7 +68,6 @@ du dépôt fournit un modèle complet et commenté.
 | `MEDIA_URL` | Préfixe d’URL des médias. | `medias/` (ou `db-storage/`) | ⚪ |
 | `STATIC_URL` | Préfixe d’URL des fichiers statiques. | `static/` | ⚪ |
 | `SF_USE_WHITENOISE` | Sert les fichiers statiques via WhiteNoise (pratique sans serveur web dédié). | `False` | 🟠 |
-| `SF_PROD_SERVE_STATIC` | Autorise Django à servir les statiques même en production. | `False` | ⚪ |
 | `SF_USE_DB_STORAGE` | Stocke les médias dans la base PostgreSQL (utile sur PaaS sans disque ; déconseillé au-delà d’1 Go). Voir {doc}`../donnees/stockage-medias`. | `False` | 🟠 |
 | `DATA_UPLOAD_MAX_MEMORY_SIZE` | Taille maximale des données de requête (formulaires, etc.), en octets. | `10485760` (10 Mo) | ⚪ |
 | `FILE_UPLOAD_MAX_MEMORY_SIZE` | Taille au-delà de laquelle un fichier téléversé est écrit sur disque plutôt que gardé en mémoire, en octets. | `2621440` (2,5 Mo) | ⚪ |
