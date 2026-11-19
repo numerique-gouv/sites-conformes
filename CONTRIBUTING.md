@@ -193,12 +193,53 @@ L’option `--public-read` rend les images publiques. Elle est automatique quand
 
 La commande ne traite que les fichiers connus de Wagtail (images, renditions, documents) : elle lit leurs noms dans la base au lieu de lister le bucket. Elle vérifie qu’une image est publique avec une requête anonyme, au lieu de lire son ACL. Elle n’a donc besoin que des droits que l’utilisateur S3 de l’app doit avoir de toute façon : `s3:GetObject`, `s3:PutObject` et, pour les images publiques, `s3:PutObjectAcl` (aussi requis à chaque envoi d’image quand `S3_PUBLIC_HOST` est définie). `s3:ListBucket` et `s3:GetObjectAcl` ne sont pas nécessaires.
 
+#### Droits de l’utilisateur S3 (OVHcloud)
+
+Politique à importer pour l’utilisateur S3 de l’app (espace client OVHcloud → Public Cloud → Object Storage → *Utilisateurs S3* → *Importer une politique (JSON)*), via un fichier `userPolicy.json` ayant le contenu suivant, en remplaçant `<S3_BUCKET_NAME>` par le nom du bucket :
+
+```json
+{
+  "Statement": [
+    {
+      "Sid": "MediaObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:DeleteObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<S3_BUCKET_NAME>/*"
+      ]
+    }
+  ]
+}
+```
+
+| Droit | Utilisé pour |
+| --- | --- |
+| `s3:GetObject` | lecture des médias, `HEAD` de la commande `set_s3_cache_control` |
+| `s3:PutObject` | envoi de fichiers, copie faite par la commande |
+| `s3:PutObjectAcl` | images publiques, à l’envoi et dans la commande |
+| `s3:DeleteObject` | suppression d’images et de documents dans Wagtail |
+| `s3:AbortMultipartUpload`, `s3:ListMultipartUploadParts` | envoi de gros fichiers, que boto3 découpe en plusieurs morceaux |
+
+L’import **remplace** la politique existante : téléchargez-la d’abord, et reportez dans ce modèle les droits à conserver (par exemple sur d’autres buckets).
+
+L’utilisateur n’a pas `s3:ListBucket` : le bucket ne peut pas être listé, même avec les clés de l’app. En contrepartie, S3 répond 403 au lieu de 404 pour un objet absent. La commande compte donc ces objets comme « unreadable (missing or access denied) ».
+
+Un changement de politique peut mettre quelques minutes à s’appliquer chez OVHcloud : attendez avant de relancer la commande.
+
 Pour passer un environnement en URLs publiques, dans cet ordre :
 
-1. déployer, avec `S3_CACHE_CONTROL` défini ;
-2. lancer `set_s3_cache_control --public-read` (voir ci-dessus) ;
-3. définir `S3_PUBLIC_HOST` (et `S3_ADDRESSING_STYLE=virtual` chez OVHcloud) ;
-4. relancer la commande, pour les images envoyées entre les étapes 2 et 3.
+1. mettre à jour la politique de l’utilisateur S3 (voir ci-dessus) ;
+2. déployer, avec `S3_CACHE_CONTROL` défini ;
+3. lancer `set_s3_cache_control --public-read` (voir ci-dessus) ;
+4. définir `S3_PUBLIC_HOST` (et `S3_ADDRESSING_STYLE=virtual` chez OVHcloud) ;
+5. relancer la commande, pour les images envoyées entre les étapes 3 et 4.
 
 #### Stockage local
 
