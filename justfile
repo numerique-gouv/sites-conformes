@@ -104,6 +104,8 @@ scalingo-postdeploy:
     python manage.py migrate
     python manage.py create_starter_pages
     python manage.py import_page_templates
+    # Synchro beta.gouv.fr de la Fabrique ; le « - » évite qu'une panne de beta.gouv.fr bloque le déploiement.
+    -python manage.py sync_betagouv
     python manage.py update_index
 
 #### Audit-related recipes

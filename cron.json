@@ -1,0 +1,10 @@
+{
+  "jobs": [
+    {
+      "command": "0 3 * * SUN python manage.py update_index"
+    },
+    {
+      "command": "17 4 * * * python manage.py sync_betagouv"
+    }
+  ]
+}

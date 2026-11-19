@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% load static wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}
+  <title>{{ page.seo_title|default:page.title }} — {{ settings.content_manager.CmsDsfrConfig.site_title }}</title>
+{% endblock title %}
+
+{% block description %}
+  {% if page.search_description %}<meta name="description" content="{{ page.search_description }}" />{% endif %}
+{% endblock description %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'fabrique/fabrique.css' %}" />
+{% endblock extra_css %}
+
+{% block content %}
+  <div class="fr-container fr-pt-4w">
+    {% include "content_manager/blocks/breadcrumbs.html" %}
+    <h1>{{ page.title }}</h1>
+  </div>
+  {% include "content_manager/blocks/messages.html" %}
+
+  <div class="fabrique-intro">
+    {% include "content_manager/blocks/blocks_stream.html" with stream=page.body %}
+  </div>
+
+  <div class="fr-container fr-pb-8w" id="produits">
+    {% if phases|length > 1 %}
+      <nav aria-label="Filtrer les produits par phase" class="fr-mb-4w">
+        <ul class="fr-tags-group">
+          <li>
+            <a class="fr-tag" href="{% pageurl page %}#produits" aria-pressed="{% if not phase_courante %}true{% else %}false{% endif %}">
+              Tous les produits
+            </a>
+          </li>
+          {% for phase in phases %}
+            <li>
+              <a class="fr-tag"
+                 href="{% pageurl page %}?phase={{ phase.slug }}#produits"
+                 aria-pressed="{% if phase.slug == phase_courante %}true{% else %}false{% endif %}">
+                {{ phase.label }} ({{ phase.count }})
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+
+    <ul class="fr-grid-row fr-grid-row--gutters fabrique-catalogue">
+      {% for produit in produits %}
+        <li class="fr-col-12 fr-col-md-6 fr-col-lg-4">
+          <div class="fr-card fr-enlarge-link">
+            <div class="fr-card__body">
+              <div class="fr-card__content">
+                <h2 class="fr-card__title">
+                  <a href="{% pageurl produit %}">{{ produit.title }}</a>
+                </h2>
+                <p class="fr-card__desc">{{ produit.pitch }}</p>
+                <div class="fr-card__start">
+                  <ul class="fr-badges-group">
+                    <li>
+                      <p class="fr-badge fr-badge--sm fr-badge--{{ produit.phase_color|default:'grey' }} fr-badge--no-icon">
+                        {{ produit.phase_label }}
+                      </p>
+                    </li>
+                  </ul>
+                </div>
+                {% if produit.membres %}
+                  <div class="fr-card__end">
+                    <p class="fr-card__detail fr-icon-team-line">
+                      {{ produit.membres|length }} membre{{ produit.membres|length|pluralize }} dans l'équipe
+                    </p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="fr-card__header">
+              <div class="fr-card__img">
+                {% if produit.capture %}
+                  {% image produit.capture fill-640x360-c0 class="fr-responsive-img" alt="" %}
+                {% elif produit.header_image %}
+                  {% image produit.header_image fill-640x360-c0 class="fr-responsive-img" alt="" %}
+                {% else %}
+                  <span class="fabrique-catalogue__sans-image" aria-hidden="true">{{ produit.title|slice:":1" }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </li>
+      {% empty %}
+        <li class="fr-col-12"><p>Aucun produit pour cette phase.</p></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock content %}

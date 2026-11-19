@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% load static wagtailcore_tags wagtailimages_tags wagtailmarkdown %}
+
+{% block title %}
+  <title>{{ page.seo_title|default:page.title }} — {{ settings.content_manager.CmsDsfrConfig.site_title }}</title>
+{% endblock title %}
+
+{% block description %}
+  {% if page.search_description %}<meta name="description" content="{{ page.search_description }}" />{% endif %}
+{% endblock description %}
+
+{% block social_media %}
+  <meta property="og:title" content="{{ page.seo_title|default:page.title }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="{{ page.search_description }}" />
+  {% if page.capture %}
+    {% image page.capture fill-1200x630 as og_image %}
+    <meta property="og:image" content="{{ og_image.full_url }}" />
+  {% endif %}
+{% endblock social_media %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'fabrique/fabrique.css' %}" />
+{% endblock extra_css %}
+
+{% block content %}
+  {# En-tête : nom, phase, mission, lien et capture d'écran, comme sur beta.gouv.fr #}
+  <div class="fr-container fr-pt-4w">
+    {% include "content_manager/blocks/breadcrumbs.html" %}
+  </div>
+  {% include "content_manager/blocks/messages.html" %}
+
+  <section class="fr-container fr-pb-6w">
+    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
+      <div class="fr-col-12 {% if page.capture %}fr-col-md-6{% else %}fr-col-md-8{% endif %}">
+        <h1 class="fr-mb-2w">{{ page.title }}</h1>
+        <ul class="fr-badges-group fr-mb-3w">
+          <li>
+            <p class="fr-badge fr-badge--{{ page.phase_color|default:'grey' }} fr-badge--no-icon">{{ page.phase_label }}</p>
+          </li>
+        </ul>
+        {% if page.pitch %}<p class="fr-h4 fabrique-pitch">{{ page.pitch }}</p>{% endif %}
+        {% if page.lien_site %}
+          <p>
+            <a class="fr-link fr-icon-external-link-line fr-link--icon-right"
+               href="{{ page.lien_site }}"
+               target="_blank"
+               rel="noopener">
+              {{ page.lien_site_court }}
+              <span class="fr-sr-only">(nouvelle fenêtre)</span>
+            </a>
+          </p>
+        {% endif %}
+      </div>
+      {% if page.capture %}
+        <div class="fr-col-12 fr-col-md-6">
+          {% image page.capture width-800 class="fr-responsive-img fabrique-capture" alt="" %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {# Présentation et encadré « À propos » #}
+  <div class="fr-container fr-pb-6w">
+    <div class="fr-grid-row fr-grid-row--gutters">
+      <div class="fr-col-12 fr-col-md-8 fabrique-presentation">
+        {% if page.a_un_corps %}
+          {% include "content_manager/blocks/blocks_stream.html" with stream=page.body %}
+        {% elif page.description_betagouv %}
+          {{ page.description_betagouv|markdown }}
+        {% else %}
+          <p>La présentation de ce produit n'a pas encore été rédigée.</p>
+        {% endif %}
+      </div>
+
+      <aside class="fr-col-12 fr-col-md-4">
+        <div class="fabrique-apropos fr-p-3w">
+          <h2 class="fr-h4">À propos</h2>
+          <p>
+            <b>{{ page.title }}</b> est accompagné par
+            <a href="{% pageurl catalogue.get_parent.specific %}">la Fabrique de la donnée territoriale</a>.
+          </p>
+          {% if page.porteurs %}
+            <p class="fr-mb-1w"><b>Porteurs :</b></p>
+            <ul class="fr-tags-group fr-mb-2w">
+              {% for porteur in page.porteurs %}
+                <li><p class="fr-tag fr-tag--sm">{{ porteur }}</p></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          {% if page.contact %}
+            <p>
+              <a class="fr-link fr-icon-mail-line fr-link--icon-left" href="mailto:{{ page.contact }}">Contacter l'équipe</a>
+            </p>
+          {% endif %}
+
+          {% with ressources=page.ressources %}
+            {% if ressources %}
+              <h3 class="fr-h6 fr-mt-3w fr-mb-1w">Transparence</h3>
+              <ul class="fabrique-liens">
+                {% for r in ressources %}
+                  <li>
+                    <a class="fr-link {{ r.icon }} fr-link--icon-left" href="{{ r.url }}" target="_blank" rel="noopener">
+                      {{ r.label }} <span class="fr-sr-only">(nouvelle fenêtre)</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+
+          {% if page.technos %}
+            <p class="fr-text--sm fr-mt-2w fr-mb-0">
+              <span class="fr-icon-computer-line fr-icon--sm" aria-hidden="true"></span>
+              Technologies : {{ page.technos|join:" · " }}
+            </p>
+          {% endif %}
+
+          <p class="fr-text--xs fr-mt-3w fr-mb-0 fabrique-source">
+            Informations issues de
+            <a href="https://beta.gouv.fr/startups/{{ page.betagouv_id }}.html" target="_blank" rel="noopener">la fiche beta.gouv.fr
+              <span class="fr-sr-only">(nouvelle fenêtre)</span></a>, mises à jour chaque nuit.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  {# Frise des phases #}
+  {% with frise=page.frise_phases %}
+    {% if frise %}
+      <section class="fr-container fr-pb-6w">
+        <h2>En quelques dates</h2>
+        <ol class="fabrique-frise">
+          {% for etape in frise %}
+            <li class="{% if etape.courante %}fabrique-frise__etape--courante{% endif %}"
+                {% if etape.courante %}aria-current="step"{% endif %}>
+              <p class="fr-text--bold fr-mb-0">{{ etape.label }}</p>
+              <p class="fr-text--sm fr-mb-0">{{ etape.date }}</p>
+            </li>
+          {% endfor %}
+        </ol>
+      </section>
+    {% endif %}
+  {% endwith %}
+
+  {# Équipe #}
+  {% with equipe=page.equipe %}
+    {% if equipe %}
+      <section class="fabrique-equipe fr-py-6w">
+        <div class="fr-container">
+          <h2 class="fabrique-equipe__titre">L'équipe</h2>
+          <ul class="fr-grid-row fr-grid-row--gutters fabrique-equipe__liste">
+            {% for membre in equipe %}
+              <li class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
+                <div class="fr-card fabrique-membre">
+                  <div class="fr-card__body">
+                    <div class="fr-card__content">
+                      <h3 class="fr-card__title">{{ membre.nom }}</h3>
+                      <p class="fr-card__desc">{{ membre.role }}</p>
+                      {% if membre.employeur %}
+                        <div class="fr-card__end">
+                          <p class="fr-card__detail">{{ membre.employeur }}</p>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="fr-card__header fabrique-membre__photo">
+                    {% if membre.image %}
+                      {% image membre.image fill-240x240 class="fabrique-avatar" alt="" %}
+                    {% else %}
+                      <span class="fabrique-avatar fabrique-avatar--initiales" aria-hidden="true">{{ membre.nom|slice:":1" }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endif %}
+  {% endwith %}
+
+  {# Actualités du produit (catégorie du blog) #}
+  {% with actus=page.actualites %}
+    {% if actus %}
+      <section class="fr-container fr-py-6w">
+        <h2>Actualités</h2>
+        <ul class="fr-grid-row fr-grid-row--gutters fabrique-catalogue">
+          {% for entree in actus.entrees %}
+            <li class="fr-col-12 fr-col-md-4">
+              <div class="fr-card fr-enlarge-link fr-card--sm">
+                <div class="fr-card__body">
+                  <div class="fr-card__content">
+                    <h3 class="fr-card__title"><a href="{% pageurl entree %}">{{ entree.title }}</a></h3>
+                    {% if entree.search_description %}<p class="fr-card__desc">{{ entree.search_description|truncatewords:24 }}</p>{% endif %}
+                    <div class="fr-card__end">
+                      <p class="fr-card__detail fr-icon-calendar-line">{{ entree.date|date:"j F Y" }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+        {% if actus.tout %}
+          <p class="fr-mt-3w">
+            <a class="fr-link fr-icon-arrow-right-line fr-link--icon-right" href="{{ actus.tout }}">Toutes les actualités du produit</a>
+          </p>
+        {% endif %}
+      </section>
+    {% endif %}
+  {% endwith %}
+
+  <div class="fr-container fr-my-4w">
+    <a class="fr-link fr-icon-arrow-left-line fr-link--icon-left" href="{% pageurl catalogue %}">Tous les produits</a>
+  </div>
+{% endblock content %}
