@@ -6,8 +6,9 @@ from django.core.management import call_command
 from django.test import TestCase
 from wagtail.models import Page, Site
 
-from content_manager.models import CatalogIndexPage, ContentPage
-from fabrique import betagouv, sync
+from content_manager.models import ContentPage
+from fabrique import betagouv, images, sync
+from fabrique.models import ImageImportee, ProduitPage, ProduitsIndexPage
 
 TODAY = date(2026, 11, 19)
 
@@ -74,6 +75,31 @@ AUTHORS = [
 ]
 
 
+STARTUP_HTML = """
+<img src="https://espace-membre.example/startups/bat-id/shot.jpg?v=2026111916" alt="">
+<div class="fr-col-3"><div class="fr-card fr-card--grey"><div class="fr-card__body">
+  <h3 class="fr-card__title"><a href="https://exemple.fr">Nicolas KOKLA</a></h3></div>
+  <div class="fr-card__header"><img class="lozad avatar-rounded"
+    data-src="https://espace-membre.example/members/nicolas.kokla/avatar.jpg"
+    src="data:image/gif;base64,R0" alt=""/></div>
+</div></div>
+<div class="fr-card fr-card--grey"><h3 class="fr-card__title">Alice Ainsa</h3>
+  <img class="lozad" data-src="/img/logo-generique-startup-carre-2019.jpg" src="data:image/gif;base64,R0"></div>
+<div class="fr-card fr-card--grey"><h3 class="fr-card__title">Félix Veith</h3>
+  <img class="lozad" data-src="/img/authors/felix-veith.jpg?v=1" src="data:image/gif;base64,R0"></div>
+"""
+
+
+def png_bytes(color=(0, 0, 145)) -> bytes:
+    from io import BytesIO
+
+    from PIL import Image
+
+    buffer = BytesIO()
+    Image.new("RGB", (40, 40), color).save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
 class ParseTests(TestCase):
     def test_parse_garde_les_produits_actifs_de_l_incubateur(self):
         products, inactive = betagouv.parse(STARTUPS, AUTHORS, "fab-geocommuns", TODAY)
@@ -91,6 +117,17 @@ class ParseTests(TestCase):
         self.assertEqual(betagouv.normalize_name("Thomas DOS ANJOS"), "Thomas Dos Anjos")
         self.assertEqual(betagouv.normalize_name("Jean-Luc Acquitter"), "Jean-Luc Acquitter")
 
+    def test_parse_startup_page(self):
+        shot, photos = betagouv.parse_startup_page(STARTUP_HTML)
+        self.assertEqual(shot, "https://espace-membre.example/startups/bat-id/shot.jpg")
+        self.assertEqual(
+            photos,
+            {
+                "nicolas kokla": "https://espace-membre.example/members/nicolas.kokla/avatar.jpg",
+                "felix veith": "https://beta.gouv.fr/img/authors/felix-veith.jpg",
+            },
+        )
+
 
 class SyncTests(TestCase):
     def setUp(self):
@@ -102,83 +139,125 @@ class SyncTests(TestCase):
         )
         self.root.add_child(instance=self.team)
         self.team.save_revision().publish()
+        self.downloads = []
+        self.image_bytes = {}
 
-    def run_sync(self, startups=STARTUPS, authors=AUTHORS):
-        products, inactive = betagouv.parse(startups, authors, "fab-geocommuns", TODAY)
-        return sync.run(products, inactive, "produits", "equipe")
+    def fake_download(self, url):
+        self.downloads.append(url)
+        return self.image_bytes.get(url, png_bytes())
 
-    def product_page(self, product_id):
-        return ContentPage.objects.get(source_url=f"https://beta.gouv.fr/startups/{product_id}.html")
+    def options(self, pages=None):
+        pages = (
+            pages
+            if pages is not None
+            else {
+                "bat-id": (
+                    "https://espace-membre.example/startups/bat-id/shot.png",
+                    {"nicolas kokla": "https://espace-membre.example/members/nicolas.kokla/avatar.png"},
+                )
+            }
+        )
+        return sync.Options(
+            load_images=lambda product_id: pages.get(product_id, ("", {})),
+            import_image=lambda url, title: images.import_image(url, title, downloader=self.fake_download),
+        )
 
-    def test_premiere_synchro_cree_les_pages(self):
+    def run_sync(self, startups=STARTUPS, authors=AUTHORS, options=None):
+        products, _ = betagouv.parse(startups, authors, "fab-geocommuns", TODAY)
+        return sync.run(products, "produits", "equipe", options or self.options())
+
+    def fiche(self, product_id):
+        return ProduitPage.objects.get(betagouv_id=product_id)
+
+    def test_premiere_synchro_cree_catalogue_et_fiches(self):
         report = self.run_sync()
-        index = CatalogIndexPage.objects.get(slug="produits")
+        index = ProduitsIndexPage.objects.get(slug="produits")
         self.assertTrue(index.live)
         self.assertEqual(
             report.created,
             ["Page Les produits de la Fabrique", "Nouveau produit", "RNB, le Référentiel National des Bâtiments"],
         )
-
-        rnb = self.product_page("bat-id")
+        rnb = self.fiche("bat-id")
         self.assertTrue(rnb.live)
         self.assertEqual(rnb.get_parent().id, index.id)
         self.assertEqual(rnb.slug, "bat-id")
-        self.assertEqual([t.name for t in rnb.tags.all()], ["En consolidation"])
-        ids = [b["id"] for b in rnb.body.raw_data]
-        self.assertEqual(
-            ids,
-            [
-                "betagouv-phase",
-                "betagouv-mission",
-                "presentation",
-                "betagouv-liens",
-                "betagouv-equipe-titre",
-                "betagouv-equipe",
-            ],
-        )
-        self.assertEqual(self.product_page("nouveau.produit").slug, "nouveau-produit")
-        # Pas de présentation rédigée pour ce produit : on reprend le texte de la fiche beta.gouv.
-        self.assertEqual(self.product_page("nouveau.produit").body.raw_data[2]["type"], "markdown")
+        self.assertEqual(rnb.phase, "consolidation")
+        self.assertEqual(rnb.porteurs, ["IGN"])
+        self.assertEqual(rnb.description_betagouv, "## Problème\n\nUn texte.")
+        self.assertEqual([m["nom"] for m in rnb.membres], ["Alice Ainsa", "Nicolas Kokla"])
+        self.assertIsNotNone(rnb.capture)
+        alice, nicolas = rnb.equipe()
+        self.assertIsNone(alice["image"])
+        self.assertEqual(nicolas["image"].title, "Nicolas Kokla")
+        self.assertEqual(self.fiche("nouveau.produit").slug, "nouveau-produit")
 
         team = Page.objects.get(id=self.team.id).specific
-        team_ids = [b["id"] for b in team.body.raw_data]
-        self.assertEqual(team_ids, ["manuel", "betagouv-equipes-titre", "betagouv-equipes"])
+        self.assertEqual(
+            [b["id"] for b in team.body.raw_data], ["manuel", "betagouv-equipes-titre", "betagouv-equipes"]
+        )
         cards = team.body.raw_data[2]["value"]["items"]
         self.assertEqual([c["value"]["name"] for c in cards], ["Alice Ainsa", "Nicolas Kokla"])
+        self.assertEqual(cards[1]["value"]["image"], nicolas["image"].id)
         alice_tags = cards[0]["value"]["tags"]
-        self.assertEqual(
-            [t["value"]["link"]["page"] for t in alice_tags], [self.product_page("nouveau.produit").id, rnb.id]
-        )
+        self.assertEqual([t["value"]["link"]["page"] for t in alice_tags], [self.fiche("nouveau.produit").id, rnb.id])
 
-    def test_deuxieme_synchro_sans_changement_ne_cree_pas_de_revision(self):
+    def test_deuxieme_synchro_sans_changement(self):
         self.run_sync()
-        rnb = self.product_page("bat-id")
-        revisions = rnb.revisions.count()
+        revisions = self.fiche("bat-id").revisions.count()
+        images_count = ImageImportee.objects.count()
         report = self.run_sync()
         self.assertEqual(report.created, [])
         self.assertEqual(report.updated, [])
-        self.assertEqual(self.product_page("bat-id").revisions.count(), revisions)
+        self.assertEqual(self.fiche("bat-id").revisions.count(), revisions)
+        self.assertEqual(ImageImportee.objects.count(), images_count)
 
-    def test_les_modifications_manuelles_sont_conservees(self):
+    def test_photo_changee_a_la_source_remplacee(self):
         self.run_sync()
-        rnb = self.product_page("bat-id")
-        body = list(rnb.body.raw_data)
-        body[2]["value"] = "<p>Présentation réécrite par un éditeur</p>"
-        body.insert(0, {"type": "paragraph", "id": "ajout", "value": "<p>Bloc ajouté en tête</p>"})
-        rnb.body = body
-        rnb.save_revision().publish()
+        old_id = self.fiche("bat-id").membres[1]["photo"]
+        self.image_bytes["https://espace-membre.example/members/nicolas.kokla/avatar.png"] = png_bytes((200, 0, 0))
+        report = self.run_sync()
+        self.assertIn("RNB, le Référentiel National des Bâtiments", report.updated)
+        self.assertNotEqual(self.fiche("bat-id").membres[1]["photo"], old_id)
 
+    def test_page_beta_gouv_inaccessible_garde_les_photos(self):
+        self.run_sync()
+        before = self.fiche("bat-id")
+        options = self.options()
+        options.load_images = lambda product_id: None
+        self.run_sync(options=options)
+        after = self.fiche("bat-id")
+        self.assertEqual(after.membres, before.membres)
+        self.assertEqual(after.capture_id, before.capture_id)
+
+    def test_corps_de_page_conserve(self):
+        self.run_sync()
+        rnb = self.fiche("bat-id")
+        rnb.body = [{"type": "paragraph", "id": "edito", "value": "<p>Présentation rédigée dans Wagtail</p>"}]
+        rnb.save_revision().publish()
         startups = copy.deepcopy(STARTUPS)
         startups["data"][0]["attributes"]["pitch"] = "Nouvelle mission"
         report = self.run_sync(startups)
-
-        rnb = self.product_page("bat-id")
+        rnb = self.fiche("bat-id")
         self.assertIn("RNB, le Référentiel National des Bâtiments", report.updated)
-        raw = list(rnb.body.raw_data)
-        self.assertEqual(raw[0]["value"], "<p>Bloc ajouté en tête</p>")
-        self.assertEqual(raw[3]["value"], "<p>Présentation réécrite par un éditeur</p>")
-        self.assertIn("Nouvelle mission", raw[2]["value"])
+        self.assertEqual(rnb.pitch, "Nouvelle mission")
         self.assertEqual(rnb.search_description, "Nouvelle mission")
+        self.assertEqual(list(rnb.body.raw_data)[0]["value"], "<p>Présentation rédigée dans Wagtail</p>")
+
+    def test_blocs_manuels_de_la_page_equipe_conserves(self):
+        self.run_sync()
+        team = Page.objects.get(id=self.team.id).specific
+        body = list(team.body.raw_data)
+        body.append({"type": "paragraph", "id": "apres", "value": "<p>Nous rejoindre</p>"})
+        team.body = body
+        team.save_revision().publish()
+        authors = copy.deepcopy(AUTHORS)
+        authors[1]["missions"][0]["end"] = "2026-11-01"
+        self.run_sync(authors=authors)
+        team = Page.objects.get(id=self.team.id).specific
+        ids = [b["id"] for b in team.body.raw_data]
+        self.assertEqual(ids, ["manuel", "betagouv-equipes-titre", "betagouv-equipes", "apres"])
+        cards = team.body.raw_data[2]["value"]["items"]
+        self.assertEqual([c["value"]["name"] for c in cards], ["Alice Ainsa"])
 
     def test_produit_abandonne_depublie(self):
         self.run_sync()
@@ -186,37 +265,41 @@ class SyncTests(TestCase):
         startups["data"][1]["attributes"]["phases"].append({"name": "abandon-investigation", "start": "2026-11-01"})
         report = self.run_sync(startups)
         self.assertEqual(report.unpublished, ["Nouveau produit"])
-        self.assertFalse(self.product_page("nouveau.produit").live)
-
-    def test_membre_parti_retire_de_l_equipe(self):
-        self.run_sync()
-        authors = copy.deepcopy(AUTHORS)
-        authors[1]["missions"][0]["end"] = "2026-11-01"
-        self.run_sync(authors=authors)
-        rnb = self.product_page("bat-id")
-        cards = next(b for b in rnb.body.raw_data if b["id"] == "betagouv-equipe")["value"]["items"]
-        self.assertEqual([c["value"]["name"] for c in cards], ["Alice Ainsa"])
+        self.assertFalse(self.fiche("nouveau.produit").live)
 
     def test_brouillon_en_cours_non_modifie(self):
         self.run_sync()
-        rnb = self.product_page("bat-id")
+        rnb = self.fiche("bat-id")
         rnb.title = "Titre en cours de rédaction"
-        rnb.save_revision()  # brouillon non publié
+        rnb.save_revision()
         startups = copy.deepcopy(STARTUPS)
         startups["data"][0]["attributes"]["pitch"] = "Nouvelle mission"
         report = self.run_sync(startups)
         self.assertEqual(report.skipped_drafts, ["RNB, le Référentiel National des Bâtiments"])
-        self.assertNotEqual(self.product_page("bat-id").search_description, "Nouvelle mission")
+        self.assertNotEqual(self.fiche("bat-id").pitch, "Nouvelle mission")
 
     def test_les_pages_s_affichent(self):
         self.run_sync()
-        for url in ["/produits/", "/produits/bat-id/", "/equipe/"]:
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200, url)
-        html = self.client.get("/equipe/").content.decode()
-        self.assertIn("Nicolas Kokla", html)
-        self.assertIn("Lead dev</p>", html)  # pas de tiret quand l'employeur est vide
-        self.assertIn("En consolidation", self.client.get("/produits/").content.decode())
+        catalogue = self.client.get("/produits/")
+        self.assertEqual(catalogue.status_code, 200)
+        html = catalogue.content.decode()
+        self.assertIn("En consolidation (1)", html)
+        self.assertIn("/produits/bat-id/", html)
+        filtre = self.client.get("/produits/?phase=en-investigation").content.decode()
+        self.assertIn("Nouveau produit", filtre)
+        self.assertNotIn("/produits/bat-id/", filtre)
+
+        fiche = self.client.get("/produits/bat-id/")
+        self.assertEqual(fiche.status_code, 200)
+        html = fiche.content.decode()
+        self.assertIn("Mission de RNB", html)
+        self.assertIn("<h2>Problème</h2>", html)
+        self.assertIn("En quelques dates", html)
+        self.assertIn("bat-id.example.gouv.fr", html)
+        self.assertIn("fabrique-avatar--initiales", html)  # Alice n'a pas de photo
+
+        equipe = self.client.get("/equipe/").content.decode()
+        self.assertIn("Lead dev</p>", equipe)  # pas de tiret quand l'employeur est vide
 
 
 class CommandTests(TestCase):
@@ -225,8 +308,12 @@ class CommandTests(TestCase):
             call_command("sync_betagouv", stdout=mock.MagicMock(), stderr=mock.MagicMock())
         run.assert_not_called()
 
-    def test_dry_run_n_enregistre_rien(self):
+    def test_dry_run_n_enregistre_rien_et_ne_telecharge_rien(self):
         products, inactive = betagouv.parse(STARTUPS, AUTHORS, "fab-geocommuns", TODAY)
-        with mock.patch.object(betagouv, "load", return_value=(products, inactive)):
+        with (
+            mock.patch.object(betagouv, "load", return_value=(products, inactive)),
+            mock.patch.object(betagouv, "load_startup_images") as load_images,
+        ):
             call_command("sync_betagouv", "--dry-run", stdout=mock.MagicMock())
-        self.assertFalse(CatalogIndexPage.objects.filter(slug="produits").exists())
+        load_images.assert_not_called()
+        self.assertFalse(ProduitsIndexPage.objects.filter(slug="produits").exists())

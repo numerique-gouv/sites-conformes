@@ -10,7 +10,7 @@ from fabrique import betagouv, sync
 class Command(BaseCommand):
     help = (
         "Synchronise les produits et les équipes de l'incubateur depuis beta.gouv.fr : "
-        "page Produits, une page par produit actif, section « Les équipes produits » de la page Équipe."
+        "catalogue des produits, une fiche par produit actif, section « Les équipes produits » de la page Équipe."
     )
 
     def add_arguments(self, parser):
@@ -20,20 +20,26 @@ class Command(BaseCommand):
         parser.add_argument("--api", default=os.getenv("BETAGOUV_API_BASE", betagouv.DEFAULT_API_BASE))
         parser.add_argument("--products-slug", default=os.getenv("FABRIQUE_PRODUCTS_SLUG", "produits"))
         parser.add_argument("--team-slug", default=os.getenv("FABRIQUE_TEAM_SLUG", "equipe"))
-        parser.add_argument("--dry-run", action="store_true", help="Affiche ce qui changerait sans rien enregistrer")
+        parser.add_argument("--sans-images", action="store_true", help="Ne pas importer photos et captures d'écran")
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Affiche ce qui changerait sans rien enregistrer (et sans importer d'images)",
+        )
 
     def handle(self, *args, **options):
-        products, inactive = betagouv.load(options["api"], options["incubator"], date.today())
+        products, _inactive = betagouv.load(options["api"], options["incubator"], date.today())
         self.stdout.write(f"{len(products)} produits actifs sur beta.gouv.fr pour « {options['incubator']} » :")
         for p in products:
             self.stdout.write(f"  - {p.name} ({p.phase_label}, {len(p.members)} membres)")
         if not products:
-            # Garde-fou : une réponse vide de l'API ne doit pas dépublier toutes les pages.
+            # Garde-fou : une réponse vide de l'API ne doit pas dépublier toutes les fiches.
             self.stderr.write("Aucun produit actif trouvé : synchronisation annulée.")
             return
 
+        sync_options = sync.Options(with_images=not (options["sans_images"] or options["dry_run"]))
         with transaction.atomic():
-            report = sync.run(products, inactive, options["products_slug"], options["team_slug"])
+            report = sync.run(products, options["products_slug"], options["team_slug"], sync_options)
             if options["dry_run"]:
                 transaction.set_rollback(True)
 

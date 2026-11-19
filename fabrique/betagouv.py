@@ -6,9 +6,12 @@ fiches content/_startups/*.md et authors.json les fiches content/_authors/*.md.
 On la lit plutôt que le dépôt pour n'avoir que deux requêtes à faire.
 """
 
+import html
 import json
 import logging
+import re
 import time
+import unicodedata
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
@@ -53,6 +56,11 @@ class Product:
     markdown: str
     sponsors: list[str] = field(default_factory=list)
     members: list[Member] = field(default_factory=list)
+    phases: list[dict] = field(default_factory=list)
+    stats_url: str = ""
+    budget_url: str = ""
+    impact_url: str = ""
+    technos: list[str] = field(default_factory=list)
 
     @property
     def source_url(self) -> str:
@@ -151,6 +159,15 @@ def parse(startups_json: dict, authors_json: list, incubator: str, today: date) 
             phase=phase,
             markdown=urllib.parse.unquote(attrs.get("content_url_encoded_markdown") or "").strip(),
             sponsors=[s.rstrip("/").split("/")[-1].upper() for s in attrs.get("sponsors") or [] if s],
+            phases=[
+                {"name": p["name"], "start": str(p.get("start") or "")[:10]}
+                for p in attrs.get("phases") or []
+                if p.get("name")
+            ],
+            stats_url=(attrs.get("stats_url") or "").strip(),
+            budget_url=(attrs.get("budget_url") or "").strip(),
+            impact_url=(attrs.get("impact_url") or "").strip(),
+            technos=[t for t in (attrs.get("technos") or attrs.get("techno") or []) if t],
         )
 
     for author in authors_json:
@@ -182,3 +199,66 @@ def load(api_base: str, incubator: str, today: date) -> tuple[list[Product], set
     startups = fetch_json(f"{api_base.rstrip('/')}/startups.json")
     authors = fetch_json(f"{api_base.rstrip('/')}/authors.json")
     return parse(startups, authors, incubator, today)
+
+
+# ---------------------------------------------------------------------------
+# Images : capture d'écran et photos des membres
+# ---------------------------------------------------------------------------
+# L'API ne donne pas les photos : beta.gouv.fr les choisit au moment de construire
+# la page (photo déposée dans l'espace membre, sinon avatar GitHub, sinon ancienne
+# photo du dépôt). On lit donc la page publique du produit, qui affiche la capture
+# d'écran et une carte par membre.
+
+BETAGOUV_SITE = "https://beta.gouv.fr"
+GENERIC_IMAGE_MARKERS = ("logo-generique",)
+
+
+def fetch_text(url: str, timeout: int = 60) -> str:
+    request = urllib.request.Request(url, headers={"User-Agent": "fabrique-site-facile/sync"})
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
+        return response.read().decode("utf-8", errors="replace")
+
+
+def name_key(name: str) -> str:
+    """Clé de comparaison des noms : sans accents, sans casse, espaces normalisés."""
+    decomposed = unicodedata.normalize("NFD", name)
+    ascii_name = "".join(c for c in decomposed if unicodedata.category(c) != "Mn")
+    return " ".join(ascii_name.casefold().split())
+
+
+def _absolute(url: str) -> str:
+    url = html.unescape(url.strip())
+    if url.startswith("//"):
+        url = "https:" + url
+    elif url.startswith("/"):
+        url = BETAGOUV_SITE + url
+    return url.split("?")[0]
+
+
+def parse_startup_page(page_html: str) -> tuple[str, dict[str, str]]:
+    """Renvoie (adresse de la capture d'écran, {clé du nom: adresse de la photo}) depuis la page publique."""
+    shot = ""
+    match = re.search(r"""["'(]([^"'()\s]*/shot\.(?:jpg|jpeg|png|webp)[^"'()\s]*)""", page_html)
+    if match:
+        shot = _absolute(match.group(1))
+
+    photos: dict[str, str] = {}
+    for card in page_html.split('class="fr-card fr-card--grey"')[1:]:
+        title = re.search(r"<h3[^>]*>(.*?)</h3>", card, re.S)
+        src = re.search(r'data-src="([^"]+)"', card) or re.search(r'<img[^>]+src="(?!data:)([^"]+)"', card)
+        if not title or not src:
+            continue
+        name = html.unescape(re.sub(r"<[^>]+>", "", title.group(1))).strip()
+        url = _absolute(src.group(1))
+        if name and not any(marker in url for marker in GENERIC_IMAGE_MARKERS):
+            photos.setdefault(name_key(name), url)
+    return shot, photos
+
+
+def load_startup_images(product_id: str) -> tuple[str, dict[str, str]] | None:
+    """Capture et photos d'un produit, ou None si la page publique est inaccessible."""
+    try:
+        return parse_startup_page(fetch_text(STARTUP_PAGE_URL.format(id=product_id)))
+    except Exception as e:  # noqa: BLE001
+        logger.warning("Page beta.gouv.fr de %s inaccessible, images conservées : %s", product_id, e)
+        return None
