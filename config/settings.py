@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     "forms",
     "wagtail_honeypot",
     "dashboard",
+    "fabrique",
     "wagtail.admin",
 ]
 
