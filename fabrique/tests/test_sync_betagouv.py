@@ -319,6 +319,8 @@ class SyncTests(TestCase):
         self.assertEqual(catalogue.status_code, 200)
         html = catalogue.content.decode()
         self.assertIn("En consolidation (1)", html)
+        self.assertIn("Équipe :", html)  # visages de l'équipe, avec les noms pour les lecteurs d'écran
+        self.assertIn("fabrique-visages__photo", html)
         self.assertIn("/produits/bat-id/", html)
         # Les produits les plus avancés d'abord : RNB (consolidation) avant le produit en investigation.
         self.assertLess(html.index("/produits/bat-id/"), html.index("/produits/nouveau-produit/"))

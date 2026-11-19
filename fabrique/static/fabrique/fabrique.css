@@ -111,3 +111,35 @@
 .fabrique-frise li::before {
   content: none;
 }
+
+/* Visages de l'équipe sur les cartes du catalogue */
+.fabrique-visages {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.fabrique-visages__photo,
+.fabrique-visages__reste {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--background-default-grey);
+  background-color: var(--background-default-grey);
+  object-fit: cover;
+}
+
+.fabrique-visages__photo + .fabrique-visages__photo,
+.fabrique-visages__photo + .fabrique-visages__reste {
+  margin-left: -0.6rem;
+}
+
+.fabrique-visages__reste {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background-contrast-blue-france);
+  color: var(--text-action-high-blue-france);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
