@@ -66,10 +66,21 @@
                     </li>
                   </ul>
                 </div>
-                {% if produit.membres %}
+                {% if produit.visages %}
                   <div class="fr-card__end">
-                    <p class="fr-card__detail fr-icon-team-line">
-                      {{ produit.membres|length }} membre{{ produit.membres|length|pluralize }} dans l'équipe
+                    <p class="fabrique-visages">
+                      <span class="fr-sr-only">Équipe :
+                        {% for v in produit.visages %}{{ v.nom }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if produit.visages_reste %} et {{ produit.visages_reste }} autre{{ produit.visages_reste|pluralize }}{% endif %}</span>
+                      {% for v in produit.visages %}
+                        {% if v.image %}
+                          {% image v.image fill-80x80 class="fabrique-visages__photo" alt="" title=v.nom %}
+                        {% else %}
+                          <img class="fabrique-visages__photo" src="{% static 'fabrique/avatar-defaut.png' %}" alt="" title="{{ v.nom }}" />
+                        {% endif %}
+                      {% endfor %}
+                      {% if produit.visages_reste %}
+                        <span class="fabrique-visages__reste" aria-hidden="true">+{{ produit.visages_reste }}</span>
+                      {% endif %}
                     </p>
                   </div>
                 {% endif %}

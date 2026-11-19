@@ -56,6 +56,17 @@ class ProduitsIndexPage(SitesFacilesBasePage):
         # Les plus avancés en premier (pérennisés, consolidation…), par ordre alphabétique dans une phase.
         return sorted(pages, key=lambda p: (-p.phase_order, p.title.lower()))
 
+    @staticmethod
+    def _ajouter_visages(produits) -> None:
+        """Ajoute à chaque produit les premiers visages de son équipe (photos chargées en une requête)."""
+        ids = {m.get("photo") for p in produits for m in p.membres[:VISAGES_MAX] if m.get("photo")}
+        images = {img.id: img for img in get_image_model().objects.filter(id__in=ids)}
+        for produit in produits:
+            produit.visages = [
+                {"nom": m.get("nom", ""), "image": images.get(m.get("photo"))} for m in produit.membres[:VISAGES_MAX]
+            ]
+            produit.visages_reste = max(0, len(produit.membres) - VISAGES_MAX)
+
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         produits = self.produits()
@@ -68,8 +79,12 @@ class ProduitsIndexPage(SitesFacilesBasePage):
             produits = [p for p in produits if p.phase_slug == current]
         else:
             current = ""
+        self._ajouter_visages(produits)
         context.update({"produits": produits, "phases": list(phases.values()), "phase_courante": current})
         return context
+
+
+VISAGES_MAX = 5
 
 
 class ProduitPage(SitesFacilesBasePage):
