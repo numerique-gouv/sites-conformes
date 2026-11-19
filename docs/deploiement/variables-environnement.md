@@ -137,7 +137,7 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 
 | Variable | Rôle | Défaut | Niveau |
 | --- | --- | --- | --- |
-| `SF_MULTISITE_ISOLATION_ENABLED` | Sur une instance à plusieurs sites, limite chaque contributeur aux sites de ses groupes. Un groupe donne accès à un site quand l’un de ses droits de page porte sur la page d’accueil du site, l’une de ses traductions, une page parente ou une sous-page. Le superadmin a accès à tous les sites. Un groupe sans droit de page n’a accès à aucun site, même sur une instance à un seul site. Si l’instance a plusieurs sites et que la variable est désactivée, `migrate` affiche un avertissement (`sites_conformes_core.W001`). | `False` | 🟠 |
+| `SF_MULTISITE_ISOLATION_ENABLED` | Sur une instance à plusieurs sites, limite chaque contributeur aux sites de ses groupes. Voir {doc}`../fonctionnalites/multisite`. | `False` | 🟠 |
 
 ## Affichage et divers
 
