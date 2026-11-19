@@ -120,6 +120,15 @@ Créer l’utilisateur (avec les droits nécessaires aux scripts d’administrat
 just setup-db
 ```
 
+## Fichiers statiques
+
+Les fichiers statiques sont servis par [WhiteNoise](https://whitenoise.readthedocs.io/), activé par défaut. Il peut être désactivé avec `SF_USE_WHITENOISE=0`, par exemple si un serveur web dédié sert le dossier `staticfiles`.
+
+- Avec `DEBUG=False`, les fichiers sont collectés par `collectstatic` (lancé par `just deploy`), puis servis avec un nom hashé, compressés en gzip et en brotli, et mis en cache pour une durée illimitée.
+- Avec `DEBUG=True`, WhiteNoise sert directement les fichiers des apps et les recharge à chaque modification : pas besoin de relancer `collectstatic`.
+
+Si WhiteNoise est désactivé et `DEBUG=False`, c’est `dj-static` (cf. `config/wsgi.py`) qui sert les statiques, sans brotli ni cache long. La variable `SF_PROD_SERVE_STATIC`, héritée de sites-faciles, n’est plus utilisée.
+
 ## Fonctionnement depuis un sous-répertoire
 
 Lorsque la variable `FORCE_SCRIPT_NAME` est configurée, le site tourne dans un sous-répertoire, fonctionnalité qui n’est pas gérée par le serveur de développement de base de Django (`runserver`).

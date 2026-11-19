@@ -26,6 +26,18 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def getenv_bool(key: str, default: bool):
+    try:
+        value = os.environ[key]
+    except KeyError:
+        return default
+    return value.casefold() in ["1", "true"]
+
+
+def getenv_list(key: str, default: str) -> list[str]:
+    return os.getenv(key, default).replace(" ", "").split(",")
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -46,8 +58,8 @@ HOST_PORT = os.getenv("HOST_PORT", "")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#force-script-name
 FORCE_SCRIPT_NAME = os.getenv("FORCE_SCRIPT_NAME", "").rstrip("/")
 
-# Allow enabling WhiteNoise via an environment variable (disabled by default)
-SF_USE_WHITENOISE = True if os.getenv("SF_USE_WHITENOISE", False) in ["1", "True"] else False
+# Allow disabling WhiteNoise via an environment variable (enabled by default)
+SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", True)
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -123,7 +135,11 @@ MIDDLEWARE = [
 ]
 
 if SF_USE_WHITENOISE:
-    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    # WhiteNoise must come right after SecurityMiddleware so static files skip the rest of the stack
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+        "whitenoise.middleware.WhiteNoiseMiddleware",
+    )
 
 # Only add this on a dev machine, outside of tests
 if not TESTING and DEBUG and "localhost" in HOST_URL:
@@ -294,17 +310,6 @@ STATIC_URL = os.getenv("STATIC_URL", "static/")
 
 if FORCE_SCRIPT_NAME and not STATIC_URL.startswith(FORCE_SCRIPT_NAME):
     STATIC_URL = f"{FORCE_SCRIPT_NAME}/{STATIC_URL}"
-
-
-# Allow Django to serve statics even in production if needed
-SF_PROD_SERVE_STATIC = True if os.getenv("SF_PROD_SERVE_STATIC", False) in ["1", "True"] else False
-if SF_PROD_SERVE_STATIC:
-    import mimetypes
-
-    mimetypes.add_type("application/javascript", ".js", True)
-    mimetypes.add_type("text/css", ".css", True)
-
-    WHITENOISE_STATIC_PREFIX = STATIC_URL
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
