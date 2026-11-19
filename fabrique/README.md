@@ -52,3 +52,47 @@ Une correction faite dans Wagtail sur un bloc synchronisé serait écrasée la n
 
 **Variables d'environnement facultatives** : `BETAGOUV_INCUBATOR`, `BETAGOUV_API_BASE`, `FABRIQUE_PRODUCTS_SLUG`,
 `FABRIQUE_TEAM_SLUG`.
+
+## Synchronisation de l'agenda Grist
+
+```sh
+python manage.py sync_agenda_grist            # synchronise
+python manage.py sync_agenda_grist --dry-run  # affiche ce qui changerait, sans rien enregistrer
+```
+
+La commande lit la table `Evenements` du document Grist
+[« Agenda »](https://grist.numerique.gouv.fr/o/fab-donnee-territoriale/habcH4ftoLRf/Agenda), construit sur le modèle de
+l'agenda du site mode produit (mêmes colonnes). Elle tourne toutes les 15 minutes sur Scalingo (`cron.json`).
+
+**Variable d'environnement obligatoire** : `GRIST_API_KEY`, la clé API d'un compte qui a accès au document
+(Grist → Paramètres du profil → Clé API). Sur Scalingo, elle se règle dans l'onglet *Environment* de l'application.
+Le mieux est d'utiliser un compte qui n'a que l'accès en lecture au document.
+
+**Types de page** : ceux de l'app `events` de Sites Faciles.
+- **Agenda** (`EventsIndexPage`, `/agenda/`) : événements à venir, archives, filtre par étiquette, export iCal. Créée
+  si elle n'existe pas. Le corps de la page sert d'introduction.
+- **Événement** (`EventEntryPage`) : une page par événement publié dans Grist.
+
+**Ce qui est mis à jour depuis Grist**
+- Le titre (précédé de « Annulé : » si l'événement est annulé), les dates de début et de fin, le lieu (« En ligne »
+  s'il n'y a qu'un lien de visio) et le lien d'inscription.
+- Les étiquettes : type, équipes et séries de l'événement.
+- Dans le corps, les blocs dont l'identifiant commence par `grist-` : alerte d'annulation, public et places restantes,
+  description (markdown) et boutons (s'inscrire, rejoindre la visio, page de l'événement, ajouter à Outlook).
+
+**Ce qu'elle ne touche jamais**
+- Les autres blocs du corps, ni leur emplacement. On peut par exemple ajouter une vidéo ou un programme détaillé
+  sous les blocs synchronisés.
+- L'image d'en-tête, les réglages des pages et les événements créés à la main dans Wagtail.
+
+**Publication**
+- Seuls les événements dont la case « Publié » est cochée dans Grist arrivent sur le site.
+- Un événement décoché ou supprimé dans Grist est dépublié. Sa page reste dans Wagtail et revient en ligne s'il est
+  republié.
+- Les événements passés restent en ligne : ils passent dans les archives de l'agenda.
+- Une page qui a un brouillon non publié est ignorée jusqu'à ce que le brouillon soit publié.
+- Garde-fou : si la table Grist est entièrement vide alors que des événements sont en ligne, la synchronisation
+  s'arrête sans rien changer. Pour retirer un événement, décochez « Publié ».
+
+**Variables d'environnement facultatives** : `GRIST_BASE_URL`, `GRIST_AGENDA_ORG`, `GRIST_AGENDA_DOC_ID`,
+`FABRIQUE_AGENDA_SLUG`.
