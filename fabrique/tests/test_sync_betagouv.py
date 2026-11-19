@@ -267,6 +267,38 @@ class SyncTests(TestCase):
         self.assertEqual(report.unpublished, ["Nouveau produit"])
         self.assertFalse(self.fiche("nouveau.produit").live)
 
+    def test_actualites_du_produit_sur_la_fiche(self):
+        from blog.models import BlogEntryPage, BlogIndexPage, Category
+
+        category = Category.objects.create(
+            name="Référentiel national du bâtiment", slug="referentiel-national-du-batiment"
+        )
+        blog = BlogIndexPage(title="Actualités", slug="actualites")
+        self.root.add_child(instance=blog)
+        for day in (1, 2, 3, 4):
+            entry = BlogEntryPage(title=f"Actus du RNB {day}", slug=f"actus-{day}", date=f"2026-0{day}-01T10:00Z")
+            blog.add_child(instance=entry)
+            entry.blog_categories.add(category)
+            entry.save_revision().publish()
+
+        self.run_sync()
+        rnb = self.fiche("bat-id")
+        self.assertEqual(rnb.categorie_actualites, category)
+        self.assertIsNone(self.fiche("nouveau.produit").categorie_actualites)
+        actus = rnb.actualites()
+        self.assertEqual([e.title for e in actus["entrees"]], ["Actus du RNB 4", "Actus du RNB 3", "Actus du RNB 2"])
+        self.assertEqual(actus["tout"], "/actualites/?category=referentiel-national-du-batiment")
+        html = self.client.get("/produits/bat-id/").content.decode()
+        self.assertIn("Toutes les actualités du produit", html)
+        self.assertIn("Actus du RNB 4", html)
+
+        # Choix d'un éditeur respecté aux synchros suivantes.
+        autre = Category.objects.create(name="Autre", slug="autre")
+        rnb.categorie_actualites = autre
+        rnb.save_revision().publish()
+        self.run_sync()
+        self.assertEqual(self.fiche("bat-id").categorie_actualites, autre)
+
     def test_brouillon_en_cours_non_modifie(self):
         self.run_sync()
         rnb = self.fiche("bat-id")

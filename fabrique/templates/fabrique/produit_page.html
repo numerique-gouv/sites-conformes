@@ -182,6 +182,37 @@
     {% endif %}
   {% endwith %}
 
+  {# Actualités du produit (catégorie du blog) #}
+  {% with actus=page.actualites %}
+    {% if actus %}
+      <section class="fr-container fr-py-6w">
+        <h2>Actualités</h2>
+        <ul class="fr-grid-row fr-grid-row--gutters fabrique-catalogue">
+          {% for entree in actus.entrees %}
+            <li class="fr-col-12 fr-col-md-4">
+              <div class="fr-card fr-enlarge-link fr-card--sm">
+                <div class="fr-card__body">
+                  <div class="fr-card__content">
+                    <h3 class="fr-card__title"><a href="{% pageurl entree %}">{{ entree.title }}</a></h3>
+                    {% if entree.search_description %}<p class="fr-card__desc">{{ entree.search_description|truncatewords:24 }}</p>{% endif %}
+                    <div class="fr-card__end">
+                      <p class="fr-card__detail fr-icon-calendar-line">{{ entree.date|date:"j F Y" }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+        {% if actus.tout %}
+          <p class="fr-mt-3w">
+            <a class="fr-link fr-icon-arrow-right-line fr-link--icon-right" href="{{ actus.tout }}">Toutes les actualités du produit</a>
+          </p>
+        {% endif %}
+      </section>
+    {% endif %}
+  {% endwith %}
+
   <div class="fr-container fr-my-4w">
     <a class="fr-link fr-icon-arrow-left-line fr-link--icon-left" href="{% pageurl catalogue %}">Tous les produits</a>
   </div>

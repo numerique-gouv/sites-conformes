@@ -101,12 +101,23 @@ class ProduitPage(SitesFacilesBasePage):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    categorie_actualites = models.ForeignKey(
+        "blog.Category",
+        verbose_name="Catégorie des actualités",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Les dernières actualités de cette catégorie s'affichent sur la fiche. "
+        "Renseignée automatiquement à la création quand une catégorie correspond au produit.",
+    )
 
     parent_page_types = ["fabrique.ProduitsIndexPage"]
     subpage_types = []
     template = "fabrique/produit_page.html"
 
     content_panels = SitesFacilesBasePage.content_panels + [
+        FieldPanel("categorie_actualites"),
         MultiFieldPanel(
             [
                 HelpPanel(content=f"<p>{SYNC_HELP}</p>"),
@@ -184,6 +195,24 @@ class ProduitPage(SitesFacilesBasePage):
             ("Mesure de l'impact", self.impact_url, "fr-icon-line-chart-line"),
         ]
         return [{"label": label, "url": url, "icon": icon} for label, url, icon in liens if url]
+
+    def actualites(self, limit: int = 3) -> dict | None:
+        """Dernières actualités de la catégorie du produit, et lien vers toutes ses actualités."""
+        if not self.categorie_actualites_id:
+            return None
+        from blog.models import BlogEntryPage, BlogIndexPage
+
+        entries = list(
+            BlogEntryPage.objects.live()
+            .public()
+            .filter(blog_categories=self.categorie_actualites_id)
+            .order_by("-date")[:limit]
+        )
+        if not entries:
+            return None
+        index = BlogIndexPage.objects.live().ancestor_of(entries[0]).first()
+        tout = f"{index.url}?category={self.categorie_actualites.slug}" if index else ""
+        return {"entrees": entries, "tout": tout}
 
     def a_un_corps(self) -> bool:
         return bool(self.body and len(self.body))

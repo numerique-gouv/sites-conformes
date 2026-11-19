@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 from django.utils.text import slugify
 from wagtail.models import Page, Site
 
+from blog.models import Category
 from fabrique import betagouv, images
 from fabrique.betagouv import Product
 from fabrique.models import ProduitPage, ProduitsIndexPage
@@ -79,6 +80,23 @@ def merge_owned_blocks(existing: list[dict], owned: list[dict]) -> list[dict]:
         merged.append(block)
     merged.extend(b for b in owned if b["id"] not in seen)
     return merged
+
+
+# Catégories d'actualités du site qui ne se déduisent pas du nom du produit.
+NEWS_CATEGORIES = {
+    "bat-id": "referentiel-national-du-batiment",
+    "vues-immersives-libres": "panoramax",
+    "ban": "base-adresse-nationale",
+}
+
+
+def guess_news_category(product: Product) -> Category | None:
+    candidates = [NEWS_CATEGORIES.get(product.id), slugify(product.short_name), slugify(product.name), product.id]
+    for slug in filter(None, candidates):
+        category = Category.objects.filter(slug=slug).first()
+        if category:
+            return category
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -171,6 +189,11 @@ def sync_products(index: ProduitsIndexPage, products: list[Product], report: Rep
             continue
 
         values = product_values(product, page, options)
+        if page is None or page.categorie_actualites_id is None:
+            # Seulement tant qu'elle est vide : un éditeur peut ensuite la changer librement.
+            category = guess_news_category(product)
+            if category:
+                values["categorie_actualites"] = category
         if page is None:
             page = ProduitPage(betagouv_id=product.id, slug=_unique_slug(index, slugify(product.id.replace(".", "-"))))
             for name, value in values.items():
