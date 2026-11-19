@@ -112,6 +112,11 @@ def normalize_name(name: str) -> str:
     return " ".join(fix(w) for w in name.split())
 
 
+def clean(value) -> str:
+    """Texte de l'API : celle-ci renvoie certains champs déjà encodés en HTML (« BAN &amp; RNB »)."""
+    return html.unescape(str(value or "")).strip()
+
+
 def _parse_date(value) -> date | None:
     if not value:
         return None
@@ -151,11 +156,11 @@ def parse(startups_json: dict, authors_json: list, incubator: str, today: date) 
             continue
         products[item["id"]] = Product(
             id=item["id"],
-            name=(attrs.get("name") or item["id"]).strip(),
-            pitch=(attrs.get("pitch") or "").strip(),
-            link=(attrs.get("link") or "").strip(),
-            repository=(attrs.get("repository") or "").strip(),
-            contact=(attrs.get("contact") or "").strip(),
+            name=clean(attrs.get("name")) or item["id"],
+            pitch=clean(attrs.get("pitch")),
+            link=clean(attrs.get("link")),
+            repository=clean(attrs.get("repository")),
+            contact=clean(attrs.get("contact")),
             phase=phase,
             markdown=urllib.parse.unquote(attrs.get("content_url_encoded_markdown") or "").strip(),
             sponsors=[s.rstrip("/").split("/")[-1].upper() for s in attrs.get("sponsors") or [] if s],
@@ -182,9 +187,9 @@ def parse(startups_json: dict, authors_json: list, incubator: str, today: date) 
                 product.members.append(
                     Member(
                         id=author["id"],
-                        fullname=normalize_name(author.get("fullname") or author["id"]),
-                        role=(author.get("role") or "").strip(),
-                        employer=(mission.get("employer") or "").strip(),
+                        fullname=normalize_name(clean(author.get("fullname")) or author["id"]),
+                        role=clean(author.get("role")),
+                        employer=clean(mission.get("employer")),
                     )
                 )
 

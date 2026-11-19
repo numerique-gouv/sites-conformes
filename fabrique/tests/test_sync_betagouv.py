@@ -57,7 +57,7 @@ AUTHORS = [
     {
         "id": "nicolas.kokla",
         "fullname": "Nicolas KOKLA",
-        "role": "Lead dev",
+        "role": "Lead dev BAN &amp; RNB",
         "missions": [{"start": "2025-01-01", "end": "2027-01-01", "employer": "", "startups": ["bat-id"]}],
     },
     {
@@ -111,6 +111,7 @@ class ParseTests(TestCase):
         self.assertEqual(rnb.sponsors, ["IGN"])
         self.assertEqual(rnb.markdown, "## Problème\n\nUn texte.")
         self.assertEqual([m.fullname for m in rnb.members], ["Alice Ainsa", "Nicolas Kokla"])
+        self.assertEqual(rnb.members[1].role, "Lead dev BAN & RNB")  # entités HTML de l'API décodées
 
     def test_normalize_name(self):
         self.assertEqual(betagouv.normalize_name("VINCENT SAGNIEZ"), "Vincent Sagniez")
@@ -333,7 +334,7 @@ class SyncTests(TestCase):
         self.assertIn("fabrique-avatar--initiales", html)  # Alice n'a pas de photo
 
         equipe = self.client.get("/equipe/").content.decode()
-        self.assertIn("Lead dev</p>", equipe)  # pas de tiret quand l'employeur est vide
+        self.assertIn("Lead dev BAN &amp; RNB</p>", equipe)  # pas de tiret quand l'employeur est vide
 
 
 class CommandTests(TestCase):
