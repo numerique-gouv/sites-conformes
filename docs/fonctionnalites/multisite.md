@@ -20,7 +20,8 @@ SF_MULTISITE_ISOLATION_ENABLED=True
 ```
 
 Seule cette variable compte : le cloisonnement ne s’active pas tout seul quand
-un deuxième site est créé.
+un deuxième site est créé. Une instance peut avoir plusieurs sites sans
+cloisonnement, par exemple quand la même équipe gère tous les sites.
 
 :::{important}
 Avant d’activer le cloisonnement, vérifiez que chaque groupe a des droits de
@@ -47,17 +48,22 @@ Ces règles ne remplacent pas les droits de page de Wagtail : elles définissent
 le périmètre d’un contributeur, et ses droits de page continuent de dire ce
 qu’il peut faire sur chaque page.
 
-## Avertissement au déploiement
+## Message au déploiement
 
 Si l’instance a plusieurs sites et que la variable est désactivée, Django
-affiche un avertissement lors de `migrate`, donc à chaque déploiement :
+affiche un message d’information lors de `migrate`, donc à chaque
+déploiement :
 
 ```text
-?: (sites_conformes_core.W001) L’instance a plusieurs sites, mais le cloisonnement multisite est désactivé : les contributeurs ne sont pas limités aux sites de leurs groupes.
-    HINT: Activez la variable d’environnement SF_MULTISITE_ISOLATION_ENABLED.
+INFOS:
+?: (sites_conformes_core.I001) L’instance a plusieurs sites et le cloisonnement multisite est désactivé : les contributeurs ne sont pas limités aux sites de leurs groupes.
+    HINT: Pour les y limiter, activez la variable d’environnement SF_MULTISITE_ISOLATION_ENABLED.
 ```
 
-Pour le vérifier à tout moment :
+Ce message ne bloque rien. Il n’appelle aucune action si l’absence de
+cloisonnement est voulue.
+
+Pour l’afficher à tout moment :
 
 ```sh
 python manage.py check --database default
