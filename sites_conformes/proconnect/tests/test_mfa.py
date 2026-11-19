@@ -1,10 +1,11 @@
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth import get_user_model, login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase
 
-from sites_conformes.proconnect.mfa import PROCONNECT_MFA_SESSION_KEY, is_mfa_acr
+from sites_conformes.proconnect.mfa import PROCONNECT_MFA_SESSION_KEY, is_mfa_acr, is_session_verified_by_proconnect
 from sites_conformes.proconnect.tests import requires_proconnect
 
 User = get_user_model()
@@ -23,6 +24,28 @@ class IsMfaAcrTest(TestCase):
         for payload in [{"acr": "eidas1"}, {"acr": ""}, {}, None]:
             with self.subTest(payload=payload):
                 self.assertFalse(is_mfa_acr(payload))
+
+    def test_default_acr_values_when_setting_is_missing(self):
+        with self.settings():
+            del settings.PROCONNECT_MFA_ACR_VALUES
+            self.assertTrue(is_mfa_acr({"acr": "eidas1-mfa"}))
+            self.assertFalse(is_mfa_acr({"acr": "eidas1"}))
+
+
+class MissingSettingsTest(TestCase):
+    """A host project of the package may define none of the ProConnect settings."""
+
+    def test_session_is_not_verified_when_settings_are_missing(self):
+        user = User.objects.create_user("bob", "bob@example.com", "pass")
+        request = RequestFactory().get("/cms-admin/")
+        SessionMiddleware(get_response=lambda r: None).process_request(request)
+        request.user = user
+        request.session[PROCONNECT_MFA_SESSION_KEY] = str(user.pk)
+
+        with self.settings():
+            del settings.PROCONNECT_ACTIVATED
+            del settings.PROCONNECT_DELEGATE_2FA
+            self.assertFalse(is_session_verified_by_proconnect(request))
 
 
 @requires_proconnect

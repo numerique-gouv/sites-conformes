@@ -191,13 +191,46 @@ temporairement la connexion par mot de passe :
    ouvertes par mot de passe sont fermées.
 
 Si la 2FA est activée, le code de l’appareil est demandé après la connexion. Si
-le compte n’a pas encore d’appareil, l’ajout est à confirme avec le mot de passe
+le compte n’a pas encore d’appareil, l’ajout est à confirmer avec le mot de passe
 défini ci-dessus.
 
 :::{warning}
 Pendant cette opération, la connexion par mot de passe est rétablie pour **tous**
 les comptes qui en ont un.
 :::
+
+(proconnect-delegate-2fa)=
+
+## PROCONNECT_DELEGATE_2FA
+
+Délègue la double authentification (2FA) à ProConnect : ProConnect est tenu
+d’exiger une double authentification, et le code 2FA local n’est plus demandé
+après une connexion ProConnect qui la confirme. Désactivé par défaut. Voir
+{doc}`../fonctionnalites/2fa`.
+
+Le package lit ce réglage, mais c’est au projet hôte de demander la double
+authentification à ProConnect, via le paramètre `claims` de la requête
+d’autorisation :
+
+```python
+import json
+
+PROCONNECT_DELEGATE_2FA = getenv_bool("PROCONNECT_DELEGATE_2FA", False)
+# Facultatif, valeurs par défaut :
+PROCONNECT_MFA_ACR_VALUES = ["eidas0-mfa", "eidas1-mfa", "eidas2", "eidas3"]
+
+if PROCONNECT_DELEGATE_2FA:
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
+        "claims": json.dumps({"id_token": {"acr": {"essential": True, "values": PROCONNECT_MFA_ACR_VALUES}}})
+    }
+else:
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS = {"acr_values": "eidas1"}
+```
+
+`PROCONNECT_MFA_ACR_VALUES` liste les niveaux (claim `acr` de l’ID token)
+considérés comme une double authentification. Ce claim est toujours vérifié :
+si `OIDC_AUTH_REQUEST_EXTRA_PARAMS` ne demande pas la double authentification,
+ProConnect ne l’impose pas et le code 2FA local reste demandé.
 
 :::{seealso}
 Pour les réglages Django et Wagtail, référez-vous à leurs documentations

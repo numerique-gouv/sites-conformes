@@ -12,17 +12,23 @@ a confirmed MFA still goes through the local 2FA.
 See https://partenaires.proconnect.gouv.fr/docs/fournisseur-service/double_authentification
 
 This module must not import any model: the dashboard middleware imports it even
-when the ProConnect app is not installed.
+when the ProConnect app is not installed. For the same reason, the settings are
+read with a default value: a host project may not define them.
 """
 
 from django.conf import settings
 
 PROCONNECT_MFA_SESSION_KEY = "proconnect_mfa_user_id"
 
+# ProConnect "acr" values asserting a multi-factor authentication.
+# Can be overridden with the PROCONNECT_MFA_ACR_VALUES setting.
+DEFAULT_MFA_ACR_VALUES = ["eidas0-mfa", "eidas1-mfa", "eidas2", "eidas3"]
+
 
 def is_mfa_acr(id_token_payload) -> bool:
     """Whether the ID token claims assert a multi-factor authentication."""
-    return (id_token_payload or {}).get("acr") in settings.PROCONNECT_MFA_ACR_VALUES
+    acr_values = getattr(settings, "PROCONNECT_MFA_ACR_VALUES", DEFAULT_MFA_ACR_VALUES)
+    return (id_token_payload or {}).get("acr") in acr_values
 
 
 def record_proconnect_mfa(sender, request, user, **kwargs):
@@ -51,7 +57,7 @@ def is_session_verified_by_proconnect(request) -> bool:
     Also checks PROCONNECT_ACTIVATED, so that turning ProConnect off makes
     sessions opened through it ask for the local 2FA code again.
     """
-    if not (settings.PROCONNECT_ACTIVATED and settings.PROCONNECT_DELEGATE_2FA):
+    if not (getattr(settings, "PROCONNECT_ACTIVATED", False) and getattr(settings, "PROCONNECT_DELEGATE_2FA", False)):
         return False
 
     session = getattr(request, "session", None)
