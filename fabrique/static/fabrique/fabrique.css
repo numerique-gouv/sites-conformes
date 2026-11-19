@@ -83,7 +83,6 @@
   object-fit: cover;
 }
 
-.fabrique-avatar--initiales,
 .fabrique-catalogue__sans-image {
   display: flex;
   align-items: center;

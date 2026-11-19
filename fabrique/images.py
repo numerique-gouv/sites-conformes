@@ -12,6 +12,7 @@ from io import BytesIO
 from pathlib import PurePosixPath
 from urllib.parse import urlparse
 
+from django.contrib.staticfiles import finders
 from django.core.files.images import ImageFile
 from wagtail.images import get_image_model
 from wagtail.models import Collection
@@ -74,3 +75,18 @@ def import_image(url: str, title: str, downloader=download):
     else:
         ImageImportee.objects.create(url=url, empreinte=digest, image=image)
     return image
+
+
+DEFAULT_AVATAR_STATIC = "fabrique/avatar-defaut.png"
+
+
+def default_avatar():
+    """Pictogramme de la Fabrique, utilisé pour les membres sans photo (copié une fois dans la médiathèque)."""
+    path = finders.find(DEFAULT_AVATAR_STATIC)
+    if not path:
+        return None
+    with open(path, "rb") as f:
+        data = f.read()
+    return import_image(
+        f"static:{DEFAULT_AVATAR_STATIC}", "Membre sans photo — pictogramme de la Fabrique", downloader=lambda _: data
+    )

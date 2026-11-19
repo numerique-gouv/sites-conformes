@@ -42,6 +42,7 @@ class Options:
     with_images: bool = True
     load_images: callable = betagouv.load_startup_images
     import_image: callable = images.import_image
+    default_avatar: callable = images.default_avatar
 
 
 # ---------------------------------------------------------------------------
@@ -226,7 +227,9 @@ def sync_products(index: ProduitsIndexPage, products: list[Product], report: Rep
 # ---------------------------------------------------------------------------
 
 
-def team_owned_blocks(products: list[Product], pages: dict[str, ProduitPage]) -> list[dict]:
+def team_owned_blocks(
+    products: list[Product], pages: dict[str, ProduitPage], default_photo: int | None = None
+) -> list[dict]:
     """Section « Les équipes produits » : une carte par personne (photo, rôle, structure), produits en étiquettes."""
     people: dict[str, dict] = {}
     for product in products:
@@ -266,7 +269,7 @@ def team_owned_blocks(products: list[Product], pages: dict[str, ProduitPage]) ->
                     "role": m.role,
                     "organization": m.employer,
                     "contact_info": "",
-                    "image": person["photo"],
+                    "image": person["photo"] or default_photo,
                     "tags": tags,
                 },
             }
@@ -289,7 +292,14 @@ def team_owned_blocks(products: list[Product], pages: dict[str, ProduitPage]) ->
     ]
 
 
-def sync_team_page(root: Page, slug: str, products: list[Product], pages: dict[str, ProduitPage], report: Report):
+def sync_team_page(
+    root: Page,
+    slug: str,
+    products: list[Product],
+    pages: dict[str, ProduitPage],
+    report: Report,
+    default_photo: int | None = None,
+):
     page = Page.objects.child_of(root).filter(slug=slug).specific().first()
     if page is None or not hasattr(page, "body"):
         logger.warning("Page Équipe « %s » introuvable : section des équipes produits non mise à jour.", slug)
@@ -301,7 +311,9 @@ def sync_team_page(root: Page, slug: str, products: list[Product], pages: dict[s
         return
     stream_block = page.body.stream_block
     existing = _normalize(stream_block, list(page.body.raw_data))
-    new_body = _normalize(stream_block, merge_owned_blocks(existing, team_owned_blocks(products, pages)))
+    new_body = _normalize(
+        stream_block, merge_owned_blocks(existing, team_owned_blocks(products, pages, default_photo))
+    )
     if new_body == existing:
         report.unchanged.append(label)
         return
@@ -316,5 +328,6 @@ def run(products: list[Product], products_slug: str, team_slug: str, options: Op
     root = Site.objects.get(is_default_site=True).root_page.specific
     index = get_or_create_products_index(root, products_slug, report)
     pages = sync_products(index, products, report, options)
-    sync_team_page(root, team_slug, products, pages, report)
+    avatar = options.default_avatar() if options.with_images else None
+    sync_team_page(root, team_slug, products, pages, report, avatar.id if avatar else None)
     return report
