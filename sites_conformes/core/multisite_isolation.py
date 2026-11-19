@@ -108,7 +108,8 @@ def get_objects_for_page_form(queryset: QuerySet, site: Site | None, current_val
 
 def check_multisite_isolation_setting(app_configs=None, databases=None, **kwargs) -> list:
     """
-    Warns when the instance has several sites while the isolation is disabled.
+    Informs that the instance has several sites while the isolation is disabled.
+    Only a piece of information: an instance may have several sites without isolation.
 
     Registered with the database tag: Django runs it with ``migrate`` and
     ``check --database default``, not with every command.
@@ -126,10 +127,10 @@ def check_multisite_isolation_setting(app_configs=None, databases=None, **kwargs
         return []
 
     return [
-        checks.Warning(
-            "L’instance a plusieurs sites, mais le cloisonnement multisite est désactivé : "
+        checks.Info(
+            "L’instance a plusieurs sites et le cloisonnement multisite est désactivé : "
             "les contributeurs ne sont pas limités aux sites de leurs groupes.",
-            hint="Activez la variable d’environnement SF_MULTISITE_ISOLATION_ENABLED.",
-            id="sites_conformes_core.W001",
+            hint="Pour les y limiter, activez la variable d’environnement SF_MULTISITE_ISOLATION_ENABLED.",
+            id="sites_conformes_core.I001",
         )
     ]

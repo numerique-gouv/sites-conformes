@@ -145,19 +145,19 @@ class MultisiteIsolationTestsMixin:
 
     # System check
 
-    def get_isolation_warnings(self):
+    def get_isolation_messages(self):
         return [
             message
             for message in checks.run_checks(tags=[checks.Tags.database], databases=["default"])
-            if message.id == "sites_conformes_core.W001"
+            if message.id == "sites_conformes_core.I001"
         ]
 
     @override_settings(SF_MULTISITE_ISOLATION_ENABLED=True)
-    def test_no_warning_when_the_isolation_is_enabled(self):
-        self.assertEqual(self.get_isolation_warnings(), [])
+    def test_no_message_when_the_isolation_is_enabled(self):
+        self.assertEqual(self.get_isolation_messages(), [])
 
     @override_settings(SF_MULTISITE_ISOLATION_ENABLED=False)
-    def test_no_warning_without_database(self):
+    def test_no_message_without_database(self):
         # The check counts the sites, so it only runs with the commands that use the database
         self.assertEqual(check_multisite_isolation_setting(databases=None), [])
 
@@ -166,9 +166,9 @@ class MonositeIsolationTestCase(MultisiteIsolationTestsMixin, MonositeTestCase):
     def test_isolation_is_inactive(self):
         self.assertFalse(is_multisite_isolation_active())
 
-    def test_no_warning_with_a_single_site(self):
+    def test_no_message_with_a_single_site(self):
         self.assertEqual(Site.objects.count(), 1)
-        self.assertEqual(self.get_isolation_warnings(), [])
+        self.assertEqual(self.get_isolation_messages(), [])
 
 
 class MultisiteIsolationTestCase(MultisiteIsolationTestsMixin, MultisiteTestCase):
@@ -227,9 +227,10 @@ class MultisiteIsolationTestCase(MultisiteIsolationTestsMixin, MultisiteTestCase
                 self.assertNotIn(without_site, objects)
 
     @override_settings(SF_MULTISITE_ISOLATION_ENABLED=False)
-    def test_warning_with_several_sites_and_the_isolation_disabled(self):
+    def test_information_with_several_sites_and_the_isolation_disabled(self):
         self.assertFalse(is_multisite_isolation_active())
-        warnings = self.get_isolation_warnings()
-        self.assertEqual(len(warnings), 1)
-        self.assertEqual(warnings[0].level, checks.WARNING)
-        self.assertIn("SF_MULTISITE_ISOLATION_ENABLED", warnings[0].hint)
+        messages = self.get_isolation_messages()
+        self.assertEqual(len(messages), 1)
+        # Only informative: an instance may have several sites without isolation
+        self.assertEqual(messages[0].level, checks.INFO)
+        self.assertIn("SF_MULTISITE_ISOLATION_ENABLED", messages[0].hint)
