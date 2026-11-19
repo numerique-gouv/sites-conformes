@@ -19,6 +19,9 @@ class VerifyUserStaticFilesMiddleware(VerifyUserMiddleware):
     bounce this callback straight back to the 2FA code-entry screen, so auth.logout() would
     never run and the user would appear stuck on that screen after clicking "Sign out".
 
+    Also allows the view sending a confirmation code by email to a user without 2FA device,
+    as it is used by the add-device form (see sites_conformes.dashboard.services.email_code).
+
     Also, unlike the base middleware, still requires verification for a user who already
     has a confirmed 2FA device even when WAGTAIL_2FA_REQUIRED=False: 2FA being optional
     should only mean that users who never opted in aren't forced through it, not that users
@@ -26,6 +29,9 @@ class VerifyUserStaticFilesMiddleware(VerifyUserMiddleware):
     """
 
     _allowed_url_names = VerifyUserMiddleware._allowed_url_names + ["oidc_logout_callback"]
+    _allowed_url_names_no_device = VerifyUserMiddleware._allowed_url_names_no_device + [
+        "sites_conformes_2fa_email_code"
+    ]
 
     def _require_verified_user(self, request):
         static_url = settings.STATIC_URL.lstrip("/")

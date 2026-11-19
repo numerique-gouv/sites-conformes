@@ -42,6 +42,7 @@ def getenv_bool(key: str, default: bool) -> bool:
 SF_USE_DB_STORAGE = getenv_bool("SF_USE_DB_STORAGE", False)
 SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 PROCONNECT_ACTIVATED = os.getenv("PROCONNECT_ACTIVATED", "") in ("1", "True")
+SF_DISABLE_LOCAL_LOGIN = getenv_bool("SF_DISABLE_LOCAL_LOGIN", False)
 ```
 
 ### INSTALLED_APPS
@@ -78,10 +79,19 @@ if PROCONNECT_ACTIVATED:
         "mozilla_django_oidc",
         "sites_conformes.proconnect",
     ]
-    AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.ModelBackend",
-        "sites_conformes.proconnect.backends.OIDCAuthenticationBackend",
-    ]
+    # Avec SF_DISABLE_LOCAL_LOGIN, on retire ModelBackend pour que la connexion
+    # par mot de passe soit réellement impossible (masquer le formulaire ne suffit pas)
+    if SF_DISABLE_LOCAL_LOGIN:
+        AUTHENTICATION_BACKENDS = []
+        WAGTAIL_PASSWORD_RESET_ENABLED = False
+        WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+        WAGTAILUSERS_PASSWORD_ENABLED = False
+    else:
+        AUTHENTICATION_BACKENDS = [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+    AUTHENTICATION_BACKENDS.append("sites_conformes.proconnect.backends.OIDCAuthenticationBackend")
 ```
 
 ### Context processors

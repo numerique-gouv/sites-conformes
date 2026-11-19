@@ -1,3 +1,7 @@
+from pathlib import Path
+from unittest.mock import patch
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -39,6 +43,18 @@ class ContentPageTestCase(WagtailPageTestCase):
 
     def test_content_page_is_renderable(self):
         self.assertPageIsRenderable(self.public_content_page)
+
+    def test_a_site_template_can_fill_the_after_body_block(self):
+        # A site extends the content page template instead of copying it.
+        templates = settings.TEMPLATES[0]
+        test_templates = Path(__file__).parent / "templates"
+        with (
+            self.settings(TEMPLATES=[{**templates, "DIRS": [*templates["DIRS"], test_templates]}]),
+            patch.object(ContentPage, "template", "content_page_after_body.html"),
+        ):
+            response = self.client.get(self.public_content_page.url)
+
+        self.assertContains(response, "<p>coucou</p>", html=True)
 
     def test_content_page_has_minimal_content(self):
         response = self.client.get(self.public_content_page.url)

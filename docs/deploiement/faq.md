@@ -145,6 +145,14 @@ Pensez à y mettre **tous** les domaines par lesquels le site est joignable
 À l’adresse de votre site suivie de **`/cms-admin/`** par défaut. Ce chemin est
 configurable via la variable `WAGTAILADMIN_PATH`.
 
+### Je ne peux plus me connecter à l’administration avec ProConnect
+
+Lorsque `SF_DISABLE_LOCAL_LOGIN` est activé, ProConnect est le seul moyen de
+se connecter. Si ProConnect est indisponible, ou si plus aucun compte n’a les
+droits nécessaires, une personne ayant accès au serveur peut rétablir
+temporairement la connexion par mot de passe : voir
+l’{ref}`accès de secours <acces-de-secours>`.
+
 ### À quoi sert le panneau de notifications de l’administration ?
 
 Le tableau de bord de l’administration peut afficher un **panneau d’information**

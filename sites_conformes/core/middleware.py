@@ -143,7 +143,15 @@ class IframeMiddleware:
                     exc_info=True,
                 )
 
-        response.headers["Content-Security-Policy"] = f"frame-ancestors {value}"
+        directive = f"frame-ancestors {value}"
+        # Keep a policy already set by the view (e.g. Wagtail's document serve view
+        # sends "default-src 'none'" to block scripts in uploaded files)
+        existing = response.headers.get("Content-Security-Policy")
+        if existing and "frame-ancestors" not in existing:
+            directive = f"{existing.rstrip('; ')}; {directive}"
+        elif existing:
+            return
+        response.headers["Content-Security-Policy"] = directive
 
     @staticmethod
     def _is_admin_request(request: HttpRequest) -> bool:

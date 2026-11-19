@@ -183,4 +183,5 @@ Elle nécessite l’outil [`cloc`](https://github.com/AlDanial/cloc).
 ### test-release
 
 La recette `just test-release` contient des tests supplémentaires, particulièrement
-gourmands en mémoire. Il faut la lancer manuellement avant une release.
+gourmands en mémoire. Il faut la lancer manuellement avant une release (voir
+{doc}`publier-une-version`).
