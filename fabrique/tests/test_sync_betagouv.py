@@ -285,6 +285,8 @@ class SyncTests(TestCase):
         html = catalogue.content.decode()
         self.assertIn("En consolidation (1)", html)
         self.assertIn("/produits/bat-id/", html)
+        # Les produits les plus avancés d'abord : RNB (consolidation) avant le produit en investigation.
+        self.assertLess(html.index("/produits/bat-id/"), html.index("/produits/nouveau-produit/"))
         filtre = self.client.get("/produits/?phase=en-investigation").content.decode()
         self.assertIn("Nouveau produit", filtre)
         self.assertNotIn("/produits/bat-id/", filtre)

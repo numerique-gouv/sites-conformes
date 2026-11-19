@@ -53,7 +53,8 @@ class ProduitsIndexPage(SitesFacilesBasePage):
 
     def produits(self):
         pages = ProduitPage.objects.child_of(self).live().public().specific().select_related("capture")
-        return sorted(pages, key=lambda p: (p.phase_order, p.title.lower()))
+        # Les plus avancés en premier (pérennisés, consolidation…), par ordre alphabétique dans une phase.
+        return sorted(pages, key=lambda p: (-p.phase_order, p.title.lower()))
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
@@ -142,7 +143,8 @@ class ProduitPage(SitesFacilesBasePage):
 
     @property
     def phase_order(self) -> int:
-        return PHASES.get(self.phase, ("", "", 99))[2]
+        # Phase inconnue : 0, pour apparaître en fin de catalogue.
+        return PHASES.get(self.phase, ("", "", 0))[2]
 
     @property
     def lien_site_court(self) -> str:
