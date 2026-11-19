@@ -170,7 +170,7 @@
                     {% if membre.image %}
                       {% image membre.image fill-240x240 class="fabrique-avatar" alt="" %}
                     {% else %}
-                      <span class="fabrique-avatar fabrique-avatar--initiales" aria-hidden="true">{{ membre.nom|slice:":1" }}</span>
+                      <img class="fabrique-avatar" src="{% static 'fabrique/avatar-defaut.png' %}" alt="" />
                     {% endif %}
                   </div>
                 </div>

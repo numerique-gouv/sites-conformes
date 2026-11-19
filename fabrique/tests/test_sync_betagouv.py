@@ -199,6 +199,8 @@ class SyncTests(TestCase):
         cards = team.body.raw_data[2]["value"]["items"]
         self.assertEqual([c["value"]["name"] for c in cards], ["Alice Ainsa", "Nicolas Kokla"])
         self.assertEqual(cards[1]["value"]["image"], nicolas["image"].id)
+        avatar = ImageImportee.objects.get(url="static:fabrique/avatar-defaut.png").image
+        self.assertEqual(cards[0]["value"]["image"], avatar.id)  # Alice : pictogramme de la Fabrique
         alice_tags = cards[0]["value"]["tags"]
         self.assertEqual([t["value"]["link"]["page"] for t in alice_tags], [self.fiche("nouveau.produit").id, rnb.id])
 
@@ -331,7 +333,7 @@ class SyncTests(TestCase):
         self.assertIn("<h2>Problème</h2>", html)
         self.assertIn("En quelques dates", html)
         self.assertIn("bat-id.example.gouv.fr", html)
-        self.assertIn("fabrique-avatar--initiales", html)  # Alice n'a pas de photo
+        self.assertIn("fabrique/avatar-defaut", html)  # Alice n'a pas de photo : pictogramme de la Fabrique
 
         equipe = self.client.get("/equipe/").content.decode()
         self.assertIn("Lead dev BAN &amp; RNB</p>", equipe)  # pas de tiret quand l'employeur est vide
