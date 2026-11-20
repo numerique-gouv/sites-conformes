@@ -9,8 +9,8 @@ jobs:
       DJANGO_SETTINGS_MODULE: config.settings_test
     strategy:
       matrix:
-        python-version: ["3.13"]
-        postgresql-version: [15, 17]
+        python-version: ["3.14"]
+        postgresql-version: [15, 18]
     services:
       postgres:
         image: postgres:${{ matrix.postgresql-version }}-alpine

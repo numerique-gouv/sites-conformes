@@ -1,7 +1,7 @@
 [project]
-name = "sites-faciles"
-version = "2.1.0"
-description = "Gestionnaire de contenu permettant de créer et gérer un site internet basé sur le Système de design de l’État, accessible et responsive"
+name = "numerique-gouv"
+version = "3.0rc1"
+description = "Site numerique.gouv.fr"
 authors = [
     { name = "Sébastien Reuiller", email = "sebastien.reuiller@beta.gouv.fr" },
     { name = "Sylvain Boissel", email = "sylvain.boissel@beta.gouv.fr" },
@@ -10,11 +10,10 @@ authors = [
 ]
 maintainers = [
     { name = "Sylvain Boissel", email = "sylvain.boissel@beta.gouv.fr" },
-    { name = "Lucien Mollard", email = "lucien.mollard@beta.gouv.fr" },
     { name = "Lucie Laporte", email = "lucie.laporte@beta.gouv.fr" },
 ]
 readme = "README.md"
-requires-python = "<4.0,>=3.11"
+requires-python = "<4.0,>=3.12"
 dependencies = [
     "django-dsfr>=2.4.0",
     "django>=5.2.3",
@@ -38,7 +37,8 @@ dependencies = [
     "faker>=37.4.0",
     "rust-just>=1.40.0",
     "mozilla-django-oidc>=4.0.1",
-    "wagtail-honeypot @ git+https://github.com/Luzzzi/wagtail-honeypot@feature/i18n-required-honeypot",
+    "wagtail-honeypot>=1.3.1",
+    "sites-conformes>=4.3.1",
 ]
 
 [dependency-groups]
