@@ -191,7 +191,7 @@ python manage.py set_s3_cache_control --public-read            # application
 
 L’option `--public-read` rend les images publiques. Elle est automatique quand `S3_PUBLIC_HOST` est définie.
 
-La commande ne traite que les fichiers connus de Wagtail (images, renditions, documents) : elle lit leurs noms dans la base au lieu de lister le bucket. Elle vérifie qu’une image est publique avec une requête anonyme, au lieu de lire son ACL. Elle n’a donc besoin que des droits que l’utilisateur S3 de l’app doit avoir de toute façon : `s3:GetObject`, `s3:PutObject` et, pour les images publiques, `s3:PutObjectAcl` (aussi requis à chaque envoi d’image quand `S3_PUBLIC_HOST` est définie). `s3:ListBucket` et `s3:GetObjectAcl` ne sont pas nécessaires.
+La commande ne traite que les fichiers connus de Wagtail (images, renditions, documents) : elle lit leurs noms dans la base au lieu de lister le bucket. Elle vérifie qu’une image est publique avec une requête anonyme, au lieu de lire son ACL. Elle n’a donc besoin que des droits que l’utilisateur S3 de l’app doit avoir de toute façon : `s3:GetObject`, `s3:PutObject` et, pour les images publiques, `s3:PutObjectAcl` (aussi requis à chaque envoi d’image quand `S3_PUBLIC_HOST` est définie). `s3:ListBucket` et `s3:GetObjectAcl` ne lui sont pas nécessaires.
 
 #### Droits de l’utilisateur S3 (OVHcloud)
 
@@ -214,10 +214,18 @@ Politique à importer pour l’utilisateur S3 de l’app (espace client OVHcloud
       "Resource": [
         "arn:aws:s3:::<S3_BUCKET_NAME>/*"
       ]
+    },
+    {
+      "Sid": "ListMediaBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::<S3_BUCKET_NAME>"]
     }
   ]
 }
 ```
+
+`s3:ListBucket` porte sur le bucket lui-même : sa ressource est `arn:aws:s3:::<S3_BUCKET_NAME>`, sans `/*`.
 
 | Droit | Utilisé pour |
 | --- | --- |
@@ -226,10 +234,11 @@ Politique à importer pour l’utilisateur S3 de l’app (espace client OVHcloud
 | `s3:PutObjectAcl` | images publiques, à l’envoi et dans la commande |
 | `s3:DeleteObject` | suppression d’images et de documents dans Wagtail |
 | `s3:AbortMultipartUpload`, `s3:ListMultipartUploadParts` | envoi de gros fichiers, que boto3 découpe en plusieurs morceaux |
+| `s3:ListBucket` | listage du bucket par `rclone` (`just descend-prod-medias`, `just descend-prod-to-staging`) |
 
 L’import **remplace** la politique existante : téléchargez-la d’abord, et reportez dans ce modèle les droits à conserver (par exemple sur d’autres buckets).
 
-L’utilisateur n’a pas `s3:ListBucket` : le bucket ne peut pas être listé, même avec les clés de l’app. En contrepartie, S3 répond 403 au lieu de 404 pour un objet absent. La commande compte donc ces objets comme « unreadable (missing or access denied) ».
+`s3:ListBucket` permet de lister le bucket avec les clés de l’app uniquement : il reste privé pour les requêtes anonymes. Avec ce droit, S3 répond 404 pour un objet absent, et la commande `set_s3_cache_control` le compte comme « missing ». Sans ce droit (la commande n’en a pas besoin), S3 répond 403, et la commande compte l’objet comme « unreadable (missing or access denied) ».
 
 Un changement de politique peut mettre quelques minutes à s’appliquer chez OVHcloud : attendez avant de relancer la commande.
 

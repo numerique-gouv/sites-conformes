@@ -6,7 +6,9 @@
 #
 # The database comes from the latest Scalingo backup of the production app, so that the
 # production database is not loaded. The media files are synchronized from the production
-# S3 bucket to the staging one. The secrets of both apps are read from their Scalingo env.
+# S3 bucket to the staging one (the S3 user of staging needs s3:ListBucket), then the ACLs and
+# Cache-Control headers of the copied files are set by the set_s3_cache_control command of the
+# staging app. The secrets of both apps are read from their Scalingo env.
 #
 # PROD_REGION defaults to osc-fr1, STAGING_REGION defaults to PROD_REGION.
 #
@@ -419,6 +421,14 @@ restore_db() {
 sync_medias() {
     echo "Synchronizing ${PROD_S3_PATH} to ${STAGING_S3_PATH}"
     rclone sync prod:${PROD_S3_PATH} staging:${STAGING_S3_PATH} --progress
+
+    # rclone uploads the copied files as private and without Cache-Control: set them with the
+    # command of the app, which reads the file names in the staging database (public-read on
+    # images when S3_PUBLIC_HOST is set on staging). Its self-copies keep the metadata, including
+    # the modification time stored by rclone, so the next sync does not upload these files again.
+    # (not retried: a timeout of the CLI does not mean that the command did not run)
+    echo "Setting the ACLs and Cache-Control headers of the staging media files"
+    scalingo --region ${STAGING_REGION} --app ${STAGING_APP} run python manage.py set_s3_cache_control
 }
 
 #### Main
