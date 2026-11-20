@@ -163,10 +163,16 @@ Chapô, Corps (markdown), Lien (version web), Image, Identifiant source, Modifi�
 - L'image d'en-tête, à partir de la colonne Image (mêmes règles que pour l'agenda), rangée dans la collection
   « Actualités ».
 - Dans le corps, les blocs dont l'identifiant commence par `grist-` : chapô, texte (markdown) et bouton vers le lien
-  (« Lire la newsletter » ou « En savoir plus »).
+  (« Voir la version e-mail » pour une infolettre affichée en entier, « Lire la newsletter » si elle n'a pas de texte,
+  « En savoir plus » pour un communiqué).
 
 **Ce qu'elle ne touche jamais** : les autres blocs du corps, les réglages des pages, les articles écrits à la main
-dans Wagtail.
+dans Wagtail, sauf les doublons d'infolettres ci-dessous.
+
+**Doublons d'infolettres saisies à la main** : un article écrit dans Wagtail qui reprend une infolettre importée (même
+catégorie d'équipe, publié le même jour à un jour près, et qui contient les mêmes images, ou à défaut un mot du titre
+en commun) est **dépublié**, pas supprimé. Son ancienne adresse redirige vers la page de l'infolettre (redirection
+permanente, visible dans *Paramètres → Redirections*). Les communiqués ne sont jamais concernés.
 
 **Publication** : mêmes règles que l'agenda. Seules les actus dont la case « Publié » est cochée arrivent sur le
 site ; une actu décochée ou supprimée dans Grist est dépubliée ; une page avec un brouillon en cours est ignorée ;
@@ -183,11 +189,19 @@ envoient depuis leur propre compte Brevo. Les équipes ne changent rien à leurs
 - **Nouvelle infolettre** : ajoutée au Grist, **publiée**, avec l'équipe du compte, la source « Newsletter Brevo »,
   le lien vers la version web et l'aperçu Brevo comme chapô. Le titre est l'objet, complété du mois d'envoi s'il ne
   le contient pas (« Info Voies locales en commun — novembre 2026 »).
-- **Infolettre déjà importée** : plus jamais modifiée. Titre, chapô, image, équipe et case *Publié* sont aux éditeurs
-  du Grist. Pour la retirer du site, décochez *Publié* : une ligne supprimée serait recréée au passage suivant.
+- **Contenu** : le HTML de l'e-mail est converti en markdown dans la colonne *Corps* (`fabrique/infolettre_html.py`),
+  pour s'afficher sur le site avec les styles DSFR : intertitres, paragraphes, gras, listes, liens et images. L'en-tête
+  de l'e-mail (logo, titre, date), son pied (réseaux sociaux, adresse, désinscription), les pixels de suivi et les
+  balises Brevo (`{{ contact.PRENOM }}`…) sont retirés. Le résultat se relit et se corrige dans Grist, avec l'aperçu.
+  Les images restent hébergées par Brevo (img.mailinblue.com).
+- **Infolettre déjà importée** : plus modifiée. Titre, chapô, texte, image, équipe et case *Publié* sont aux éditeurs
+  du Grist. Seule exception : un *Corps* vide est rempli avec le contenu converti (pour les infolettres importées avant
+  la conversion). Pour retirer une infolettre du site, décochez *Publié* : une ligne supprimée serait recréée.
 - **Renvoi correctif** (même objet, même jour) : seule la dernière campagne est gardée ; la première est dépubliée si
   elle avait déjà été importée.
-- **Compte illisible** (clé absente ou refusée) : rien n'est modifié pour ce compte ; les autres continuent.
+- **Compte illisible** (clé absente ou refusée) : rien n'est modifié pour ce compte ; les autres continuent. Le
+  message de Brevo est affiché (« Key not found » : clé SMTP au lieu d'une clé API ; « unrecognised IP address » :
+  adresse de Scalingo à autoriser dans le compte Brevo).
 - Campagnes lues : celles des 365 derniers jours (`--jours` pour changer). `--sans-newsletters` saute l'import.
 
 **Comptes** : par défaut Panoramax (objet « Info Panoramax », clé dans `BREVO_CLE_PANORAMAX`) et Voies locales

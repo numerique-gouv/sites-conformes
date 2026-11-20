@@ -157,8 +157,15 @@ def _request(
                 return response.read()
         except urllib.error.HTTPError as e:
             last_error = e
-            # Clé refusée, document ou table introuvable : inutile de réessayer.
+            # Clé refusée, document ou table introuvable : inutile de réessayer. Le message du service
+            # (« Key not found », « unrecognised IP address »…) dit pourquoi ; il ne contient pas la clé.
             if e.code < 500 and e.code != 429:
+                try:
+                    detail = " ".join(e.read(300).decode("utf-8", "replace").split())
+                except Exception:  # noqa: BLE001
+                    detail = ""
+                if detail:
+                    last_error = RuntimeError(f"{e} — {detail}")
                 break
         except Exception as e:  # noqa: BLE001
             last_error = e
