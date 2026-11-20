@@ -180,8 +180,8 @@ def construire(index, request, aujourdhui: date | None = None) -> dict:
         "url_suivant": url_avec(request, mois=suivant.strftime("%Y-%m"), date_from=None, date_to=None),
         "titre_precedent": f"{MOIS[precedent.month - 1]} {precedent.year}",
         "titre_suivant": f"{MOIS[suivant.month - 1]} {suivant.year}",
-        "url_aujourdhui": url_avec(request, mois=None, date_from=None, date_to=None)
-        if premier != aujourdhui.replace(day=1)
-        else "",
+        "url_aujourdhui": (
+            url_avec(request, mois=None, date_from=None, date_to=None) if premier != aujourdhui.replace(day=1) else ""
+        ),
         "legende": [(nom, couleur) for nom, couleur in EQUIPES if nom in equipes_presentes],
     }

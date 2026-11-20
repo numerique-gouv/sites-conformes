@@ -32,3 +32,16 @@ def bascule_agenda(context, vue: str) -> dict:
 @register.inclusion_tag("fabrique/agenda/calendrier.html", takes_context=True)
 def calendrier_agenda(context) -> dict:
     return calendrier.construire(context["page"], context["request"])
+
+
+@register.inclusion_tag("fabrique/agenda/filtres_etiquettes.html", takes_context=True)
+def filtres_etiquettes_agenda(context) -> dict:
+    """Filtre par étiquette de la page Agenda, en trois groupes (voir fabrique/filtres.py)."""
+    from fabrique.filtres import grouper
+
+    return {
+        "groupes": grouper(context.get("tags") or [], context["page"]),
+        "page": context["page"],
+        "request": context["request"],
+        "current_tag": context.get("current_tag"),
+    }

@@ -1,0 +1,19 @@
+{% load wagtailcore_tags wagtail_dsfr_tags %}
+{# Filtre par étiquette de la page Agenda, en groupes (fabrique/filtres.py). Un clic active ou retire le filtre. #}
+{% for groupe in groupes %}
+  <div class="fr-my-3w">
+    <h3 class="fr-h6">{{ groupe.titre }}</h3>
+    <ul class="fr-tags-group fr-mt-1w">
+      {% for tag, classe in groupe.etiquettes %}
+        <li>
+          <a type="button"
+             class="fr-tag{% if classe %} {{ classe }}{% endif %}"
+             href="{% pageurl page %}{% toggle_url_filter tag=tag %}#posts-list"
+             {% if tag.id == current_tag.id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+            {{ tag }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endfor %}
