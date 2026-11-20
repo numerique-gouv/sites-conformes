@@ -163,8 +163,8 @@ Chapô, Corps (markdown), Lien (version web), Image, Identifiant source, Modifi�
 - L'image d'en-tête, à partir de la colonne Image (mêmes règles que pour l'agenda), rangée dans la collection
   « Actualités ».
 - Dans le corps, les blocs dont l'identifiant commence par `grist-` : chapô, texte (markdown) et bouton vers le lien
-  (« Voir la version e-mail » pour une infolettre affichée en entier, « Lire la newsletter » si elle n'a pas de texte,
-  « En savoir plus » pour un communiqué).
+  (« Voir la version e-mail » en haut de l'article pour une infolettre affichée en entier ; en bas, « Lire la
+  newsletter » si elle n'a pas de texte, « En savoir plus » pour un communiqué).
 
 **Ce qu'elle ne touche jamais** : les autres blocs du corps, les réglages des pages, les articles écrits à la main
 dans Wagtail, sauf les doublons d'infolettres ci-dessous.
