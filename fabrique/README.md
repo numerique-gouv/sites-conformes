@@ -101,3 +101,28 @@ Le mieux est d'utiliser un compte qui n'a que l'accès en lecture au document.
 
 **Variables d'environnement facultatives** : `GRIST_BASE_URL`, `GRIST_AGENDA_ORG`, `GRIST_AGENDA_DOC_ID`,
 `FABRIQUE_AGENDA_SLUG`.
+
+### Import de calendriers iCal (Framagenda…)
+
+Avant de lire le Grist, `sync_agenda_grist` importe dans la table `Evenements` les calendriers iCal publics des
+équipes qui tiennent déjà leur propre agenda. Par défaut : le Framagenda de Panoramax. Les équipes continuent
+d'utiliser leur calendrier ; les événements arrivent dans le Grist, puis sur le site dans le même passage.
+
+- **Nouvel événement** : ajouté au Grist, **publié**, avec l'équipe du calendrier et la colonne *Source*
+  (ex. « Framagenda Panoramax »).
+- **Événement déjà importé** : le titre, le début, la fin, le lieu, le lien visio, la page de l'événement, la
+  description et l'annulation suivent le calendrier (une modification faite dans Grist sur ces champs est écrasée).
+  Le type, l'image, la série, les inscriptions et la case *Publié* restent aux éditeurs du Grist.
+- **Lieu** : un lien devient le lien visio ; un lieu comme « Jitsi », « Visio » ou « Webinaire » prend le premier lien
+  de la description comme lien visio.
+- **Événement retiré du calendrier** : décoché *Publié* dans le Grist, donc dépublié du site.
+- **Calendrier injoignable ou vide** : rien n'est modifié pour cette source ; les autres continuent.
+- `--dry-run` affiche ce qui serait importé sans écrire dans le Grist ; `--sans-calendriers` saute l'import.
+
+La clé `GRIST_API_KEY` doit avoir le droit de modifier le document.
+
+**Liste des calendriers** : variable `AGENDA_CALENDRIERS`, une ligne (ou un `;`) par calendrier, de la forme
+`Source | Équipe | URL iCal`. Absente : le Framagenda de Panoramax. Vide : aucun import. Pour un Framagenda,
+l'URL iCal d'un calendrier public est `https://framagenda.org/remote.php/dav/public-calendars/<jeton>/?export`, où
+`<jeton>` est l'identifiant de son lien de partage public. Pensez à ajouter la nouvelle source aux choix de la
+colonne *Source* dans le Grist.

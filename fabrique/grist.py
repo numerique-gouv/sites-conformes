@@ -126,11 +126,28 @@ def parse(records: list[dict]) -> list[Evenement]:
     return sorted(evenements, key=lambda e: (e.debut, e.id))
 
 
-def _get(url: str, api_key: str, timeout: int = 60, attempts: int = 3) -> bytes:
-    """Corps de la réponse à une requête GET authentifiée. Lève une RuntimeError après les essais."""
-    request = urllib.request.Request(
-        url, headers={"Authorization": f"Bearer {api_key}", "User-Agent": "fabrique-site-facile/sync"}
-    )
+def _request(
+    url: str,
+    api_key: str | None = None,
+    method: str = "GET",
+    payload: dict | None = None,
+    timeout: int = 60,
+    attempts: int = 3,
+) -> bytes:
+    """Corps de la réponse. Lève une RuntimeError après les essais.
+
+    Sans clé, la requête est anonyme (calendrier iCal public). Un ajout (POST) n'est jamais retenté, pour ne
+    pas créer de doublons si la première requête a abouti malgré l'erreur."""
+    headers = {"User-Agent": "fabrique-site-facile/sync"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    data = None
+    if payload is not None:
+        data = json.dumps(payload).encode()
+        headers["Content-Type"] = "application/json"
+    request = urllib.request.Request(url, data=data, headers=headers, method=method)
+    if method == "POST":
+        attempts = 1
     last_error: Exception | None = None
     for attempt in range(attempts):
         try:
@@ -143,9 +160,14 @@ def _get(url: str, api_key: str, timeout: int = 60, attempts: int = 3) -> bytes:
                 break
         except Exception as e:  # noqa: BLE001
             last_error = e
-        logger.warning("Lecture de %s impossible (essai %s/%s) : %s", url, attempt + 1, attempts, last_error)
-        time.sleep(3 * (attempt + 1))
-    raise RuntimeError(f"Lecture de l'agenda Grist impossible ({url}) : {last_error}")
+        logger.warning("%s %s impossible (essai %s/%s) : %s", method, url, attempt + 1, attempts, last_error)
+        if attempt + 1 < attempts:
+            time.sleep(3 * (attempt + 1))
+    raise RuntimeError(f"{method} {url} impossible : {last_error}")
+
+
+def _get(url: str, api_key: str | None = None) -> bytes:
+    return _request(url, api_key)
 
 
 def _api(base_url: str, doc_id: str) -> str:
@@ -155,6 +177,20 @@ def _api(base_url: str, doc_id: str) -> str:
 def fetch_records(base_url: str, doc_id: str, api_key: str) -> list[dict]:
     """Toutes les lignes de la table Evenements. Lève une erreur si le document est illisible."""
     return json.loads(_get(f"{_api(base_url, doc_id)}/tables/{TABLE}/records", api_key))["records"]
+
+
+def add_records(base_url: str, doc_id: str, api_key: str, fields: list[dict], lot: int = 100) -> None:
+    """Ajoute des lignes à la table Evenements, par lots."""
+    url = f"{_api(base_url, doc_id)}/tables/{TABLE}/records"
+    for i in range(0, len(fields), lot):
+        _request(url, api_key, "POST", {"records": [{"fields": f} for f in fields[i : i + lot]]})
+
+
+def update_records(base_url: str, doc_id: str, api_key: str, records: list[dict], lot: int = 100) -> None:
+    """Modifie des lignes de la table Evenements : [{"id": …, "fields": {…}}, …], par lots."""
+    url = f"{_api(base_url, doc_id)}/tables/{TABLE}/records"
+    for i in range(0, len(records), lot):
+        _request(url, api_key, "PATCH", {"records": records[i : i + lot]})
 
 
 class PiecesJointes:
