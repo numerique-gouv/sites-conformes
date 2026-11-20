@@ -148,10 +148,10 @@ scalingo-postdeploy:
 scalingo-rollback app region="-" ref="":
     cd scripts && bash rollback_scalingo.sh {{app}} {{region}} {{ref}}
 
-# Copy the latest DB backup & the media files of the production app to the staging app
+# Copy the latest DB backup & the media files of the production app to the staging app (options: --db-only, --medias-only)
 [group('Production')]
-descend-prod-to-staging:
-    cd scripts && bash descend_prod_to_staging.sh
+descend-prod-to-staging *options:
+    cd scripts && bash descend_prod_to_staging.sh {{options}}
 
 #### Audit-related recipes
 
