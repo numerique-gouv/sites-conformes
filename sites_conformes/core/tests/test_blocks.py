@@ -4,13 +4,20 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext
 from wagtail.blocks.struct_block import StructBlockValidationError
+from wagtail.images import get_image_model
+from wagtail.images.tests.utils import get_test_image_file
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category
-from sites_conformes.core.blocks.basics import CenteredImageBlock
-from sites_conformes.core.blocks.heros import HeroBackgroundImageBlock, HeroImageAndTextBlock
+from sites_conformes.core.blocks.basics import CenteredImageBlock, QuoteBlock
+from sites_conformes.core.blocks.heros import HeroBackgroundImageBlock, HeroImageAndTextBlock, OldHero
+from sites_conformes.core.blocks.layout import (
+    FullWidthBackgroundBlock,
+    FullWidthBackgroundWithSidemenuBlock,
+    MultiColumnsWithTitleBlock,
+)
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
@@ -872,6 +879,16 @@ class CenteredImageBlockTestCase(TestCase):
         value = self.get_value(width="natural", image_ratio="original")
         self.assertEqual(value.extra_classes(), "cmsfr-image-natural")
 
+    def test_images_are_not_resized(self):
+        # Like before the <picture> tag (#597): only the format changes, so "Actual size" keeps its pixel size
+        self.image = get_image_model().objects.create(title="Large", file=get_test_image_file(size=(2000, 1000)))
+
+        img = BeautifulSoup(self.block.render(self.get_value(width="natural")), "html.parser").select_one(
+            "picture img"
+        )
+        self.assertTrue(img["src"].endswith(".webp"))
+        self.assertEqual((img["width"], img["height"]), ("2000", "1000"))
+
     def test_new_blocks_keep_original_proportions_by_default(self):
         self.assertEqual(self.block.get_default()["image_ratio"], "original")
 
@@ -903,17 +920,19 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
         )
 
     def render_image(self, value):
-        return BeautifulSoup(self.block.render(value), "html.parser").find("img")
+        picture = BeautifulSoup(self.block.render(value), "html.parser").find("picture")
+        self.assertTrue(picture.img["src"].endswith(".webp"))
+        return picture.img
 
     def test_existing_heroes_stay_square(self):
         # Heroes saved before the format and size options existed
         value = self.get_value()
 
-        self.assertEqual(value.image_rendition().filter_spec, "fill-1200x1200")
+        self.assertEqual(value.image_filter_spec(), "fill-1200x1200")
         img = self.render_image(value)
         self.assertEqual(img["class"], ["fr-responsive-img", "fr-responsive-img--1x1"])
         self.assertEqual(img["alt"], "Hero alt")
-        self.assertEqual(img.parent["class"], ["cmsfr-hero-media"])
+        self.assertEqual(img.find_parent("div")["class"], ["cmsfr-hero-media"])
 
     def test_ratio_formats_crop_around_the_focal_point(self):
         expected_specs = {
@@ -925,15 +944,21 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
         for image_format, filter_spec in expected_specs.items():
             with self.subTest(image_format=image_format):
                 value = self.get_value(image_format=image_format)
-                self.assertEqual(value.image_rendition().filter_spec, filter_spec)
+                self.assertEqual(value.image_filter_spec(), filter_spec)
 
     def test_original_proportions_are_not_cropped(self):
         value = self.get_value(image_format="", image_size="sm")
 
-        self.assertEqual(value.image_rendition().filter_spec, "max-1200x1200")
+        self.assertEqual(value.image_filter_spec(), "max-1200x1200")
         img = self.render_image(value)
         self.assertEqual(img["class"], ["cmsfr-hero-img"])
-        self.assertEqual(img.parent["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])
+        self.assertEqual(img.find_parent("div")["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])
+
+    def test_svg_images_are_not_converted(self):
+        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "Hero svg")
+
+        img = BeautifulSoup(self.block.render(self.get_value()), "html.parser").select_one("picture img")
+        self.assertTrue(img["src"].endswith(".svg"))
 
 
 class HeroBackgroundImageFormatTestCase(TestCase):
@@ -965,3 +990,34 @@ class HeroBackgroundImageFormatTestCase(TestCase):
         hero = self.render_hero("color")
         self.assertNotIn("fr-ratio-16x9", hero["class"])
         self.assertIn("min-height: 650px", hero["style"])
+
+
+class ImageUrlFormatTestCase(TestCase):
+    """Images used through their URL (CSS backgrounds, quote) are converted to WebP, SVGs are kept."""
+
+    def render_all(self, image):
+        image_value = {"image": image.pk, "decorative": True, "alt_text": ""}
+        blocks_and_values = {
+            "full width background": (FullWidthBackgroundBlock(), {"bg_image": image.pk}),
+            "full width background with side menu": (FullWidthBackgroundWithSidemenuBlock(), {"bg_image": image.pk}),
+            "multicolumns": (MultiColumnsWithTitleBlock(), {"bg_image": image.pk}),
+            "background hero": (
+                HeroBackgroundImageBlock(),
+                {"background_color_or_image": "image", "image": {"image": image_value}},
+            ),
+            "old hero": (OldHero(), {"header_image": image_value}),
+            "quote": (QuoteBlock(), {"quote": "Citation", "image": image.pk}),
+        }
+        return {name: block.render(block.to_python(value)) for name, (block, value) in blocks_and_values.items()}
+
+    def test_raster_images_are_converted_to_webp(self):
+        image = import_image("sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png", "png")
+        for name, html in self.render_all(image).items():
+            with self.subTest(name):
+                self.assertRegex(html, r"/images/[^\s\"')]+\.webp")
+
+    def test_svg_images_are_kept(self):
+        image = import_image("sites_conformes/static/artwork/technical-error.svg", "svg")
+        for name, html in self.render_all(image).items():
+            with self.subTest(name):
+                self.assertRegex(html, r"/images/[^\s\"')]+\.svg")

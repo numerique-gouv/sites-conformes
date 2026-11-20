@@ -226,6 +226,8 @@ input[data-whf_name] {
     margin: 0 auto;
     max-width: 100%;
     max-height: 600px;
+    /* The <picture> sets width/height attributes: keep the ratio when max-width shrinks the image */
+    height: auto;
 }
 
 /* Centered image at its original proportions: cancel the 16/9 aspect-ratio that
