@@ -258,7 +258,7 @@ class RenduTests(TestCase):
         for texte in ("Rejoindre la visio", "Ajouter à Outlook", "Au programme", "Agents des collectivités"):
             self.assertIn(texte, contenu)
 
-        reponse = self.client.get(index.url)
+        reponse = self.client.get(index.url + "?vue=liste")
         self.assertEqual(reponse.status_code, 200)
         contenu = reponse.content.decode()
         self.assertIn("Atelier adresses", contenu)
@@ -337,7 +337,7 @@ class ImageTests(TestCase):
         self.assertEqual(self.grist.telechargements, [7])
 
         # Liste : vignette réduite et entière, pas le fichier original.
-        contenu = self.client.get(EventsIndexPage.objects.get(slug="agenda").url).content.decode()
+        contenu = self.client.get(EventsIndexPage.objects.get(slug="agenda").url + "?vue=liste").content.decode()
         self.assertIn("fabrique-vignette", contenu)
         self.assertIn("fabrique/agenda.css", contenu)
         self.assertNotIn(image.file.url, contenu)

@@ -221,3 +221,17 @@ d'environnement Scalingo.
 
 **Variables d'environnement facultatives** : `FABRIQUE_ACTUS_SLUG`, `NEWSLETTERS_BREVO`, et celles de l'agenda pour
 le document Grist (`GRIST_BASE_URL`, `GRIST_AGENDA_ORG`, `GRIST_AGENDA_DOC_ID`).
+
+### Vue calendrier de la page Agenda
+
+La page `/agenda/` s'ouvre sur un calendrier du mois (`fabrique/calendrier.py`, gabarit
+`fabrique/templates/fabrique/agenda/calendrier.html`, styles dans `fabrique/static/fabrique/agenda.css`). La liste de
+cartes de Sites Faciles reste disponible avec le bouton « Liste » (`?vue=liste`) ; les archives restent en liste.
+
+- `?mois=AAAA-MM` choisit le mois ; les filtres par étiquette et par catégorie s'appliquent aussi au calendrier.
+- Couleur de chaque événement d'après son équipe dans Grist (Panoramax, RNB, BAN, Voies locales, Fabrique, dans cet
+  ordre de priorité) ; gris sinon. Événements annulés barrés ; événements sur plusieurs jours répétés chaque jour.
+- Au-delà de 3 événements dans une journée : « + N autres », vers la liste de ce jour.
+- Petit écran : la grille est remplacée par la liste des jours qui ont des événements.
+- Point d'entrée : `templates/events/blocks/events_index_posts_list.html` (copie du gabarit de Sites Faciles), qui
+  affiche le calendrier ou les cartes selon la vue.

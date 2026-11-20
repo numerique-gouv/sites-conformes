@@ -1,0 +1,86 @@
+{% comment %}
+  Vue calendrier (mois) de l'agenda : grille sur grand écran, liste des jours sur petit écran.
+  Contexte : fabrique.calendrier.construire. Styles : fabrique/static/fabrique/agenda.css.
+{% endcomment %}
+<div class="fabrique-calendrier">
+  <div class="fabrique-calendrier__nav">
+    <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--icon-left fr-icon-arrow-left-s-line"
+       href="{{ url_precedent }}#posts-list"
+       title="Mois précédent : {{ titre_precedent }}">Précédent</a>
+    <p class="fr-h5 fr-mb-0" aria-live="polite">{{ titre_mois }}</p>
+    <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--icon-right fr-icon-arrow-right-s-line"
+       href="{{ url_suivant }}#posts-list"
+       title="Mois suivant : {{ titre_suivant }}">Suivant</a>
+  </div>
+  {% if url_aujourdhui %}
+    <p class="fr-text--sm fr-mb-1w"><a class="fr-link" href="{{ url_aujourdhui }}#posts-list">Revenir au mois en cours</a></p>
+  {% endif %}
+
+  <table class="fabrique-calendrier__grille">
+    <caption class="fr-sr-only">Événements de {{ titre_mois }}</caption>
+    <thead>
+      <tr>
+        {% for court, long in entetes %}<th scope="col"><abbr title="{{ long }}">{{ court }}</abbr></th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for semaine in semaines %}
+        <tr>
+          {% for jour in semaine %}
+            <td class="{% if not jour.dans_le_mois %}fabrique-calendrier__hors-mois{% endif %}{% if jour.aujourdhui %} fabrique-calendrier__aujourdhui{% endif %}">
+              {% if jour.dans_le_mois %}
+                <span class="fabrique-calendrier__numero"{% if jour.aujourdhui %} aria-current="date"{% endif %}><span class="fr-sr-only">{{ jour.libelle }}{% if jour.aujourdhui %}, aujourd'hui{% endif %}</span><span aria-hidden="true">{{ jour.date.day }}</span></span>
+                {% if jour.cases or jour.autres %}
+                  <ul class="fabrique-calendrier__evenements">
+                    {% for case in jour.cases %}
+                      <li>
+                        <a class="fabrique-cal fabrique-cal--{{ case.couleur }}{% if case.annule %} fabrique-cal--annule{% endif %}"
+                           href="{{ case.url }}" title="{{ case.titre }}{% if case.equipe %} ({{ case.equipe }}){% endif %}">
+                          {% if case.heure %}<span class="fabrique-cal__heure">{{ case.heure }}</span> {% endif %}{{ case.titre }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                    {% if jour.autres %}
+                      <li><a class="fabrique-calendrier__autres" href="{{ jour.url_autres }}#posts-list">+ {{ jour.autres }} autres<span class="fr-sr-only"> le {{ jour.libelle }}</span></a></li>
+                    {% endif %}
+                  </ul>
+                {% endif %}
+              {% else %}
+                <span class="fabrique-calendrier__numero" aria-hidden="true">{{ jour.date.day }}</span>
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# Petit écran : la grille est remplacée par la liste des jours qui ont des événements. #}
+  <div class="fabrique-calendrier__jours">
+    {% for jour in jours_du_mois_avec_evenements %}
+      <h3 class="fr-h6 fr-mt-3w fr-mb-1w">{{ jour.libelle|capfirst }}</h3>
+      <ul class="fabrique-calendrier__evenements">
+        {% for case in jour.cases %}
+          <li>
+            <a class="fabrique-cal fabrique-cal--{{ case.couleur }}{% if case.annule %} fabrique-cal--annule{% endif %}" href="{{ case.url }}">
+              {% if case.heure %}<span class="fabrique-cal__heure">{{ case.heure }}</span> {% endif %}{{ case.titre }}
+            </a>
+          </li>
+        {% endfor %}
+        {% if jour.autres %}
+          <li><a class="fabrique-calendrier__autres" href="{{ jour.url_autres }}#posts-list">+ {{ jour.autres }} autres</a></li>
+        {% endif %}
+      </ul>
+    {% empty %}
+      <p>Aucun événement ce mois-ci.</p>
+    {% endfor %}
+  </div>
+
+  {% if legende %}
+    <ul class="fabrique-calendrier__legende" aria-label="Couleurs des équipes">
+      {% for nom, couleur in legende %}
+        <li><span class="fabrique-cal fabrique-cal--{{ couleur }} fabrique-calendrier__pastille" aria-hidden="true"></span>{{ nom }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
