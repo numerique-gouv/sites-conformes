@@ -594,3 +594,70 @@ class DoublonsTests(TestCase):
         self.assertTrue(BlogEntryPage.objects.get(pk=page.pk).live)
         actualites.run(actualites.parse([self.lettre()]), "les-actualites")
         self.assertTrue(BlogEntryPage.objects.get(pk=page.pk).live)
+
+
+class ImagesDuTexteTests(TestCase):
+    """Les images des infolettres sont rapatriées dans la médiathèque : aucune image hébergée chez un tiers."""
+
+    def setUp(self):
+        from wagtail.images import get_image_model
+        from wagtail.images.tests.utils import get_test_image_file
+
+        from fabrique.models import ImageImportee
+
+        self.appels = []
+
+        def importer(url, titre, collection_name=None):
+            self.appels.append((url, collection_name))
+            image = get_image_model().objects.create(title=titre, file=get_test_image_file())
+            ImageImportee.objects.create(url=url, empreinte="x", image=image)
+            return image
+
+        self.importer = importer
+        corps = (
+            "Intro\n\n"
+            "[![Fondation](https://img.mailinblue.com/1/fondation.png)](https://forum.example/t/1)\n\n"
+            "Texte avec ![une icône](https://img.mailinblue.com/1/icone.png) au milieu.\n\n"
+            "![](https://img.mailinblue.com/1/carte.png)"
+        )
+        self.records = [
+            actu(
+                2, "Info Panoramax octobre 2026", Equipe=["L", "Panoramax"], Source="Newsletter Brevo", Chapo="",
+                Corps=corps, Lien="https://r.brevo.example/65.html",
+            )
+        ]  # fmt: skip
+
+    def run_sync(self, telecharger=True):
+        corps = actualites.ImagesCorps(telecharger=telecharger, importer=self.importer)
+        return actualites.run(actualites.parse(copy.deepcopy(self.records)), "actualites", images_corps=corps)
+
+    def test_images_en_blocs_de_la_mediatheque(self):
+        self.run_sync()
+        page = BlogEntryPage.objects.get(title="Info Panoramax octobre 2026")
+        self.assertEqual([b.block_type for b in page.body], ["markdown", "image", "markdown", "image", "buttons_list"])
+        image = page.body[1].value
+        self.assertEqual((image["alt"], image["url"]), ("Fondation", "https://forum.example/t/1"))
+        self.assertEqual(image["width"], "fr-content-media--sm")
+        self.assertEqual(page.body[2].value, "Texte avec une icône au milieu.")
+        self.assertEqual([c for _, c in self.appels], ["Actualités", "Actualités"])
+
+        contenu = self.client.get(page.url).content.decode()
+        self.assertNotIn("mailinblue", contenu)
+        self.assertIn("fr-content-media--sm", contenu)
+        self.assertIn("fr-responsive-img", contenu)
+
+    def test_image_deja_importee_non_retelechargee(self):
+        self.run_sync()
+        revisions = BlogEntryPage.objects.get(title="Info Panoramax octobre 2026").revisions.count()
+        report = self.run_sync()
+        self.assertEqual(len(self.appels), 2)
+        self.assertEqual(report.unchanged, ["Info Panoramax octobre 2026"])
+        page = BlogEntryPage.objects.get(title="Info Panoramax octobre 2026")
+        self.assertEqual(page.revisions.count(), revisions)
+
+    def test_simulation_sans_telechargement(self):
+        self.run_sync(telecharger=False)
+        self.assertEqual(self.appels, [])
+        page = BlogEntryPage.objects.get(title="Info Panoramax octobre 2026")
+        self.assertEqual([b.block_type for b in page.body], ["markdown", "markdown", "buttons_list"])
+        self.assertNotIn("mailinblue", self.client.get(page.url).content.decode())

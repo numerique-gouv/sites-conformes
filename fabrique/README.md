@@ -193,7 +193,11 @@ envoient depuis leur propre compte Brevo. Les équipes ne changent rien à leurs
   pour s'afficher sur le site avec les styles DSFR : intertitres, paragraphes, gras, listes, liens et images. L'en-tête
   de l'e-mail (logo, titre, date), son pied (réseaux sociaux, adresse, désinscription), les pixels de suivi et les
   balises Brevo (`{{ contact.PRENOM }}`…) sont retirés. Le résultat se relit et se corrige dans Grist, avec l'aperçu.
-  Les images restent hébergées par Brevo (img.mailinblue.com).
+- **Images** : sur le site, chaque image seule dans son paragraphe devient un bloc « Image » (largeur « petite »,
+  avec son lien), et le fichier est rapatrié dans la médiathèque, collection « Actualités ». Le site ne charge ainsi
+  aucune image hébergée chez Brevo (règle « pas de requête vers un autre domaine » de `DOD.md`). Une image déjà
+  importée n'est pas retéléchargée ; une image en échec est omise et retentée au passage suivant ; une image au milieu
+  d'un paragraphe est retirée (son texte alternatif reste). Dans Grist, le *Corps* garde les adresses Brevo.
 - **Infolettre déjà importée** : plus modifiée. Titre, chapô, texte, image, équipe et case *Publié* sont aux éditeurs
   du Grist. Seule exception : un *Corps* vide est rempli avec le contenu converti (pour les infolettres importées avant
   la conversion). Pour retirer une infolettre du site, décochez *Publié* : une ligne supprimée serait recréée.

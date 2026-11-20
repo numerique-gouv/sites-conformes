@@ -26,10 +26,10 @@ MAX_BYTES = 8 * 1024 * 1024
 ALLOWED_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 
 
-def _collection() -> Collection:
+def _collection(name: str = COLLECTION_NAME) -> Collection:
     root = Collection.get_first_root_node()
-    existing = root.get_children().filter(name=COLLECTION_NAME).first()
-    return existing or root.add_child(name=COLLECTION_NAME)
+    existing = root.get_children().filter(name=name).first()
+    return existing or root.add_child(name=name)
 
 
 def download(url: str, timeout: int = 60) -> bytes:
@@ -41,7 +41,7 @@ def download(url: str, timeout: int = 60) -> bytes:
     return data
 
 
-def import_image(url: str, title: str, downloader=download):
+def import_image(url: str, title: str, downloader=download, collection_name: str = COLLECTION_NAME):
     """Renvoie l'image Wagtail correspondant à l'adresse, téléchargée si besoin. None en cas d'échec."""
     if not url:
         return None
@@ -61,7 +61,9 @@ def import_image(url: str, title: str, downloader=download):
         suffix = ".jpg"
     filename = f"{PurePosixPath(urlparse(url).path).parent.name or 'image'}{suffix}"
     try:
-        image = get_image_model()(title=title, collection=_collection(), file=ImageFile(BytesIO(data), name=filename))
+        image = get_image_model()(
+            title=title, collection=_collection(collection_name), file=ImageFile(BytesIO(data), name=filename)
+        )
         image.save()
     except Exception as e:  # noqa: BLE001 (fichier qui n'est pas une image valide)
         logger.warning("Image %s illisible : %s", url, e)
