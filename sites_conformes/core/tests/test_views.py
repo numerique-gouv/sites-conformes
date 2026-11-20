@@ -527,11 +527,16 @@ class CatalogIndexPageTestCase(WagtailPageTestCase):
         _, entries = self.get_entries("?category=bretagne&category=btp")
         self.assertEqual(entries, ["Entrée 1", "Entrée 3", "Entrée 4"])
 
-    def test_and_operator_matches_every_ticked_category(self):
+    def test_and_operator_matches_every_group_and_any_category_within_a_group(self):
         self.make_category_tree(operator=CatalogIndexPage.AND_OPERATOR)
 
+        # Two regions: either one, a page is rarely in both.
         _, entries = self.get_entries("?category=bretagne&category=alsace")
-        self.assertEqual(entries, [])
+        self.assertEqual(entries, ["Entrée 1", "Entrée 2", "Entrée 4"])
+
+        # ... narrowed by the sector, the other group.
+        _, entries = self.get_entries("?category=bretagne&category=alsace&category=btp")
+        self.assertEqual(entries, ["Entrée 1"])
 
         response, entries = self.get_entries("?category=bretagne&category=btp")
 

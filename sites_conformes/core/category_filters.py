@@ -21,7 +21,9 @@ class CategoryFilters:
     The groups are the parent categories chosen on the page, or else every root category in use
     that has subcategories in use; root categories without any are offered together in a last group.
     Like the tags, they follow the selection mode of the page: one category at a time, or several
-    combined with its operator (match any, or match all).
+    combined with its operator: match any, or match all. Matching all works like facets: a page must
+    match every group that has a ticked category, and any of the categories ticked within a group,
+    so ticking a second sector widens the results instead of emptying them.
     Ticking a category matches the pages of its whole branch and shows its own subcategories,
     so the choice can be narrowed: a ticked subcategory then replaces its parent in the filter.
     """
@@ -97,15 +99,18 @@ class CategoryFilters:
         return [c for c in self.selected if not any(child.pk in self.selected_ids for child in self.children[c.pk])]
 
     def filter(self, entries: models.QuerySet) -> models.QuerySet:
-        branches = [{c.pk for c in self.walk([category])} for category in self.current]
-        if not branches:
+        # The branches ticked in each group, keyed by its heading (None: the root categories on their own).
+        groups = defaultdict(set)
+        for category in self.current:
+            groups[self.group_of(category)].update(c.pk for c in self.walk([category]))
+        if not groups:
             return entries
         if self.match_all:
-            for ids in branches:
-                # One join per category: chained filters on a many-to-many are ANDed.
+            for ids in groups.values():
+                # One join per group: chained filters on a many-to-many are ANDed.
                 entries = entries.filter(categories__in=ids)
         else:
-            entries = entries.filter(categories__in=set().union(*branches))
+            entries = entries.filter(categories__in=set().union(*groups.values()))
         return entries.distinct()
 
     def chips(self, categories) -> list[FilterChip]:
