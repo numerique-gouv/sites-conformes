@@ -2,6 +2,8 @@
 {% comment %}
   Copie du gabarit de Sites Faciles (events) : vignette réduite et entière (max-480x270, classe fabrique-vignette)
   au lieu du fichier original recadré en 16:9. Voir fabrique/static/fabrique/agenda.css.
+  Étiquettes : type de l'événement et équipes concernées, lus dans Grist (fabrique.EtiquettesEvenement) ;
+  pour un événement saisi à la main, ses catégories comme dans Sites Faciles.
 {% endcomment %}
 {% for post in posts %}
   <div class="fr-col fr-col-md-6">
@@ -22,17 +24,37 @@
               {{ post.event_date_start.date }} – {{ post.event_date_end.date }}
             {% endif %}
           </p>
-          {% if post.event_categories.all %}
-            <div class="fr-card__start">
-              <ul class="fr-tags-group">
-                {% for cat in post.event_categories.all %}
-                  <li>
-                    <p class="fr-tag">{{ cat.name }}</p>
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
-          {% endif %}
+          {% with etiquettes=post.etiquettes_grist %}
+            {% if etiquettes.type or etiquettes.equipes %}
+              {# Événement venu de Grist : son type et les équipes concernées (étiquettes non cliquables : carte cliquable). #}
+              <div class="fr-card__start">
+                <ul class="fr-tags-group">
+                  {% if etiquettes.type %}
+                    <li>
+                      <p class="fr-tag fr-tag--sm fabrique-tag-type"><span class="fr-sr-only">Type : </span>{{ etiquettes.type }}</p>
+                    </li>
+                  {% endif %}
+                  {% for equipe in etiquettes.equipes %}
+                    <li>
+                      <p class="fr-tag fr-tag--sm fr-tag--icon-left fr-icon-team-line">
+                        <span class="fr-sr-only">Équipe : </span>{{ equipe }}
+                      </p>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% elif post.event_categories.all %}
+              <div class="fr-card__start">
+                <ul class="fr-tags-group">
+                  {% for cat in post.event_categories.all %}
+                    <li>
+                      <p class="fr-tag">{{ cat.name }}</p>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          {% endwith %}
         </div>
       </div>
       {% if post.header_image %}

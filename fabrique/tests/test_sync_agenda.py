@@ -10,6 +10,7 @@ from wagtail.models import Site
 from content_manager.models import ContentPage
 from events.models import EventEntryPage, EventsIndexPage
 from fabrique import agenda, grist
+from fabrique.models import EtiquettesEvenement
 
 DOC = "habcH4ftoLRf"
 # Dans trois semaines, à l'heure pile : les événements restent « à venir » quel que soit le jour du test.
@@ -128,6 +129,29 @@ class SyncTests(TestCase):
         self.assertEqual(report.unchanged, ["Démo du RNB", "Atelier adresses"])
         self.assertEqual(self.page(1).revisions.count(), revisions)
 
+    def test_type_et_equipes_gardes_pour_les_cartes(self):
+        self.run_sync()
+        atelier = EtiquettesEvenement.objects.get(page=self.page(2))
+        self.assertEqual(atelier.type, "Atelier")
+        self.assertEqual(atelier.equipes, ["BAN", "Fabrique de la donnée territoriale"])
+
+        # Équipes changées dans Grist : étiquettes à jour.
+        records = copy.deepcopy(RECORDS)
+        records[1]["fields"].update(Type="Webinaire", Equipe=["L", "BAN"])
+        self.run_sync(records)
+        atelier.refresh_from_db()
+        self.assertEqual((atelier.type, atelier.equipes), ("Webinaire", ["BAN"]))
+
+    def test_etiquettes_ajoutees_sans_republier(self):
+        # Pages synchronisées avant l'ajout des étiquettes sur les cartes : rattrapées sans nouvelle révision.
+        self.run_sync()
+        EtiquettesEvenement.objects.all().delete()
+        revisions = self.page(1).revisions.count()
+        report = self.run_sync()
+        self.assertEqual(report.unchanged, ["Démo du RNB", "Atelier adresses"])
+        self.assertEqual(self.page(1).revisions.count(), revisions)
+        self.assertEqual(EtiquettesEvenement.objects.get(page=self.page(1)).equipes, ["RNB"])
+
     def test_mise_a_jour_annulation_et_blocs_manuels(self):
         self.run_sync()
         demo = self.page(1)
@@ -236,7 +260,18 @@ class RenduTests(TestCase):
 
         reponse = self.client.get(index.url)
         self.assertEqual(reponse.status_code, 200)
-        self.assertIn("Atelier adresses", reponse.content.decode())
+        contenu = reponse.content.decode()
+        self.assertIn("Atelier adresses", contenu)
+        # Sur chaque carte : le type de l'événement et les équipes concernées (pas les séries).
+        cartes = contenu.split('class="fr-card fr-enlarge-link"')[1:]
+        self.assertEqual(len(cartes), 2)
+        demo_carte, atelier_carte = cartes
+        self.assertIn('<span class="fr-sr-only">Type : </span>Démo', demo_carte)
+        self.assertIn('<span class="fr-sr-only">Équipe : </span>RNB', demo_carte)
+        self.assertIn('<span class="fr-sr-only">Type : </span>Atelier', atelier_carte)
+        self.assertIn('<span class="fr-sr-only">Équipe : </span>BAN', atelier_carte)
+        self.assertIn("Fabrique de la donnée territoriale", atelier_carte)
+        self.assertNotIn("Forum de la donnée territoriale", atelier_carte.split("fr-card__header")[0])
 
         ical = self.client.get(index.url + "ical/")
         self.assertEqual(ical.status_code, 200)

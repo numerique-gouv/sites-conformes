@@ -19,3 +19,10 @@
   aspect-ratio: auto;
   object-fit: contain;
 }
+
+/* Étiquette du type d'événement sur les cartes : couleur d'accent pour la distinguer des équipes.
+   Le DSFR ne colore que les étiquettes cliquables ; celles des cartes ne le sont pas (carte entièrement cliquable). */
+.fr-card p.fr-tag.fabrique-tag-type {
+  background-color: var(--background-contrast-blue-ecume);
+  color: var(--text-label-blue-ecume);
+}
