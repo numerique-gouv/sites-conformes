@@ -5,6 +5,9 @@
     },
     {
       "command": "17 4 * * * python manage.py sync_betagouv"
+    },
+    {
+      "command": "*/15 * * * * python manage.py sync_agenda_grist"
     }
   ]
 }
