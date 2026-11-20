@@ -307,10 +307,12 @@ class ImageTests(TestCase):
         self.assertIn("fabrique/agenda.css", contenu)
         self.assertNotIn(image.file.url, contenu)
         self.assertIn(image.get_rendition("max-480x270").url, contenu)
+        self.assertNotIn("{#", contenu)  # aucun commentaire de gabarit affiché
 
         # Page de l'événement : feuille de style qui retire le bandeau.
         contenu = self.client.get(self.demo().url).content.decode()
         self.assertIn("fabrique/agenda-evenement.css", contenu)
+        self.assertNotIn("{#", contenu)
 
     def test_image_changee_puis_retiree(self):
         self.sync(7)
