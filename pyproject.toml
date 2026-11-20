@@ -203,8 +203,9 @@ exclude-newer-package = { pillow = false, certifi = false }
 # Migrations only re-import what the corresponding models.py already imports.
 # Per-app tests/ directories aren't matched by deptry's default "tests" exclude
 # (which only matches a top-level tests/ dir), so dev-only imports there (e.g.
-# wagtail_factories) would otherwise be flagged as misplaced (DEP004).
-extend_exclude = ["^demo/", ".*/migrations/", ".*/tests/"]
+# wagtail_factories) would otherwise be flagged as misplaced (DEP004). Same for
+# the e2e/ fixtures (e.g. Pillow, only installed through Wagtail).
+extend_exclude = ["^demo/", ".*/migrations/", ".*/tests/", "^e2e/"]
 
 [tool.deptry.package_module_name_map]
 # Packages whose distributed module name doesn't match deptry's default guess
