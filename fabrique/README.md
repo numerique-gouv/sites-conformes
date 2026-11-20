@@ -130,3 +130,74 @@ La clé `GRIST_API_KEY` doit avoir le droit de modifier le document.
 l'URL iCal d'un calendrier public est `https://framagenda.org/remote.php/dav/public-calendars/<jeton>/?export`, où
 `<jeton>` est l'identifiant de son lien de partage public. Pensez à ajouter la nouvelle source aux choix de la
 colonne *Source* dans le Grist.
+
+## Synchronisation des actualités (Grist + infolettres Brevo)
+
+```sh
+python manage.py sync_actualites_grist            # importe les infolettres, puis synchronise
+python manage.py sync_actualites_grist --dry-run  # affiche ce qui changerait, sans rien enregistrer
+python manage.py sync_actualites_grist --lister   # affiche les campagnes Brevo gardées ou écartées, sans rien écrire
+```
+
+Les actualités du site se gèrent dans la table `Actus` du document Grist
+[« Actus et Agenda »](https://grist.numerique.gouv.fr/o/fab-donnee-territoriale/habcH4ftoLRf/Actus-et-Agenda/p/4),
+plutôt que dans l'administration Wagtail. La commande tourne toutes les 15 minutes sur Scalingo (`cron.json`). Elle
+utilise la même clé `GRIST_API_KEY` que l'agenda, qui doit pouvoir modifier le document.
+
+**Colonnes de la table `Actus`** : Titre, Date, Équipe, Source (« Communiqué » ou « Newsletter Brevo »), Publié,
+Chapô, Corps (markdown), Lien (version web), Image, Identifiant source, Modifié le.
+
+**Types de page** : ceux de l'app `blog` de Sites Faciles.
+- **Actualités** (`BlogIndexPage`) : la page à l'adresse `FABRIQUE_ACTUS_SLUG` (`actualites` par défaut). Si elle
+  n'existe pas mais que le site a une seule page d'actualités, c'est celle-là qui est utilisée ; s'il n'en a aucune,
+  elle est créée.
+- **Article** (`BlogEntryPage`) : un par actu publiée dans Grist.
+
+**Ce qui est mis à jour depuis Grist**
+- Le titre, la date et la description (chapô, ou début du texte).
+- Les catégories : une par équipe (RNB → « Référentiel National des Bâtiments », BAN → « Base Adresse Nationale »,
+  Panoramax ; les autres sont créées si besoin). L'actu remonte ainsi sur la fiche du produit.
+- L'étiquette « Newsletter » pour les infolettres, qui permet de les filtrer dans la liste des actualités.
+- L'image d'en-tête, à partir de la colonne Image (mêmes règles que pour l'agenda), rangée dans la collection
+  « Actualités ».
+- Dans le corps, les blocs dont l'identifiant commence par `grist-` : chapô, texte (markdown) et bouton vers le lien
+  (« Lire la newsletter » ou « En savoir plus »).
+
+**Ce qu'elle ne touche jamais** : les autres blocs du corps, les réglages des pages, les articles écrits à la main
+dans Wagtail.
+
+**Publication** : mêmes règles que l'agenda. Seules les actus dont la case « Publié » est cochée arrivent sur le
+site ; une actu décochée ou supprimée dans Grist est dépubliée ; une page avec un brouillon en cours est ignorée ;
+une table entièrement vide n'efface rien.
+
+### Import des infolettres Brevo
+
+Avant de lire le Grist, `sync_actualites_grist` importe dans la table `Actus` les infolettres que les équipes
+envoient depuis leur propre compte Brevo. Les équipes ne changent rien à leurs habitudes.
+
+- **Seulement les infolettres** : pour chaque compte, on garde les campagnes envoyées dont l'objet commence par un
+  texte donné (« Info Panoramax »), ou dont le nom contient un texte donné. Les invitations, alertes aux utilisateurs,
+  messages d'accueil ou annonces d'événement sont écartés. `--lister` montre le tri campagne par campagne.
+- **Nouvelle infolettre** : ajoutée au Grist, **publiée**, avec l'équipe du compte, la source « Newsletter Brevo »,
+  le lien vers la version web et l'aperçu Brevo comme chapô. Le titre est l'objet, complété du mois d'envoi s'il ne
+  le contient pas (« Info Voies locales en commun — novembre 2026 »).
+- **Infolettre déjà importée** : plus jamais modifiée. Titre, chapô, image, équipe et case *Publié* sont aux éditeurs
+  du Grist. Pour la retirer du site, décochez *Publié* : une ligne supprimée serait recréée au passage suivant.
+- **Renvoi correctif** (même objet, même jour) : seule la dernière campagne est gardée ; la première est dépubliée si
+  elle avait déjà été importée.
+- **Compte illisible** (clé absente ou refusée) : rien n'est modifié pour ce compte ; les autres continuent.
+- Campagnes lues : celles des 365 derniers jours (`--jours` pour changer). `--sans-newsletters` saute l'import.
+
+**Comptes** : par défaut Panoramax (objet « Info Panoramax », clé dans `BREVO_CLE_PANORAMAX`) et Voies locales
+(objet « Info Voies locales », clé dans `BREVO_CLE_VOIES_LOCALES`). Pour en changer, variable `NEWSLETTERS_BREVO`,
+une ligne (ou un `;`) par compte, de la forme `Équipe | VARIABLE_DE_LA_CLE | objet: texte` ou
+`… | nom: texte`. Exemple pour la BAN, dont le site filtre déjà sur le nom :
+`BAN | BREVO_CLE_BAN | nom: adresse.data.gouv.fr`. L'équipe doit figurer dans les choix de la colonne *Équipe* du
+Grist.
+
+**Clé API Brevo** : dans Brevo, menu du compte → *SMTP et API* → *Clés API* → *Générer une nouvelle clé*. Une clé
+Brevo donne accès à tout le compte : créez-en une dédiée au site, et mettez-la seulement dans les variables
+d'environnement Scalingo.
+
+**Variables d'environnement facultatives** : `FABRIQUE_ACTUS_SLUG`, `NEWSLETTERS_BREVO`, et celles de l'agenda pour
+le document Grist (`GRIST_BASE_URL`, `GRIST_AGENDA_ORG`, `GRIST_AGENDA_DOC_ID`).
