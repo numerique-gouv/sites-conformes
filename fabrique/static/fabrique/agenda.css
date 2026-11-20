@@ -7,10 +7,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  height: 11rem; /* 9rem d'image + marges : bandeaux de même hauteur, titres alignés d'une carte à l'autre */
   padding: 1rem;
   background-color: var(--background-alt-grey);
 }
 
+/* La largeur est fixée dans le gabarit (filtre largeur_vignette) pour une surface égale d'une image à l'autre ;
+   width: auto ne sert que si elle manque. */
 .fr-card .fr-card__img.fabrique-vignette img {
   width: auto;
   max-width: 100%;
