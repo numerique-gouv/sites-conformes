@@ -439,3 +439,158 @@ class RenduTests(TestCase):
         contenu = self.client.get(index.url + "?category=panoramax").content.decode()
         self.assertIn("Info Panoramax octobre 2026", contenu)
         self.assertNotIn("Le RNB atteint 50 millions", contenu)
+
+
+# ---------------------------------------------------------------------------
+# Contenu des infolettres et doublons saisis à la main
+# ---------------------------------------------------------------------------
+
+from wagtail.contrib.redirects.models import Redirect  # noqa: E402
+
+from fabrique.infolettre_html import en_markdown  # noqa: E402
+
+IMAGE = "https://img.mailinblue.com/1/images/content_library/original/fondation.png"
+HTML_INFOLETTRE = f"""<html><head><style>#outlook a {{ padding:0; }}</style></head><body>
+<div style="display:none;mso-hide:all">Texte d'aperçu caché</div>
+<table><tr><td><a href="{{{{ mirror }}}}">Voir la version en ligne</a></td></tr>
+<tr><td><a href="https://panoramax.fr/"><img src="https://img.mailinblue.com/1/logo.png" width="50"></a></td></tr>
+<tr><td><p><strong>Panoramax</strong></p><p><strong>L'alternative libre</strong></p>
+<h1 style="font-weight:700"><span>Info Panoramax&nbsp;</span></h1><p><span>Avril 2026</span></p></td></tr>
+<tr><td><p>Bonjour {{{{ contact.PRENOM }}}}, rendez-vous le <strong>lundi 13 avril&nbsp;</strong>et
+<a href="https://peertube.example/v">son enregistrement&nbsp;</a>sur Peertube.</p><p><br></p></td></tr>
+<tr><td><h2><span>[ <span>🚀&nbsp;Visio Fondation le 18 mai ]</span></span></h2>
+<a href="https://forum.example/t/1"><img src="{IMAGE}" width="233"></a>
+<p>Deux voies <strong>possibles</strong><strong> :</strong></p>
+<ol><li>une association</li><li>un projet au sein de la <b>fondation INRIA</b></li></ol>
+<ul><li><a href="https://forum.example/t/2">Lidar et Panoramax ?</a></li></ul>
+<p>✔ Le <a href="https://forum.example">Forum</a><br>✔ Les <a href="https://docs.example">Docs</a></p></td></tr>
+<tr><td><a href="https://www.linkedin.com/company/x"><img
+  src="https://creative-assets.mailinblue.com/editor/social-icons/rounded_colored/linkedin_48px.png" width="48"></a>
+<a href="https://mapstodon.space/@panoramax">
+<img src="https://img.mailinblue.com/1/masto.png" width="48"></a></td></tr>
+<tr><td><a href="https://panoramax.fr"><img src="https://img.mailinblue.com/1/logo.png" width="86"></a></td></tr>
+<tr><td>Panoramax<br>73 avenue de Paris<br>94160 Saint Mandé</td></tr>
+<tr><td><a href="mailto:contact@panoramax.fr">contact@panoramax.fr</a></td></tr>
+<tr><td><center>Si vous souhaitez vous désinscrire de notre newsletter, cliquez <a href="{{{{ unsubscribe }}}}">ici</a>
+</center></td></tr></table><img src="https://r.brevo.example/o.gif" width="1" height="1"></body></html>"""
+
+MARKDOWN_ATTENDU = f"""Bonjour, rendez-vous le **lundi 13 avril** et [son enregistrement](https://peertube.example/v) \
+sur Peertube.
+
+## 🚀 Visio Fondation le 18 mai
+
+[![]({IMAGE})](https://forum.example/t/1)
+
+Deux voies **possibles** **:**
+
+1. une association
+2. un projet au sein de la **fondation INRIA**
+
+- [Lidar et Panoramax ?](https://forum.example/t/2)
+
+✔ Le [Forum](https://forum.example)
+
+✔ Les [Docs](https://docs.example)"""
+
+
+class InfolettreHtmlTests(SimpleTestCase):
+    def test_conversion(self):
+        self.assertEqual(en_markdown(HTML_INFOLETTRE, "Info Panoramax avril 2026"), MARKDOWN_ATTENDU)
+
+    def test_sans_titre_reconnu_l_entete_est_garde(self):
+        md = en_markdown(HTML_INFOLETTRE, "Autre chose")
+        self.assertTrue(md.startswith("**Panoramax**"))
+
+    def test_html_vide(self):
+        self.assertEqual(en_markdown("", "x"), "")
+        self.assertEqual(en_markdown("<html><body><img src='https://x/p.gif' width='1'></body></html>", "x"), "")
+
+
+class CorpsNewslettersTests(SimpleTestCase):
+    def test_import_avec_le_contenu(self):
+        lettre = campagne(32, "202604 Infolettre avril", "Info Panoramax avril 2026", "2026-04-28T09:00:00Z",
+                          htmlContent=HTML_INFOLETTRE)  # fmt: skip
+        plan = newsletters.planifier(PANORAMAX, newsletters.trier(PANORAMAX, [lettre]), [])
+        self.assertEqual(plan.ajouts[0]["Corps"], MARKDOWN_ATTENDU)
+
+    def test_corps_vide_complete_corps_retouche_garde(self):
+        lettres = [
+            campagne(
+                32, "Infolettre", "Info Panoramax avril 2026", "2026-04-28T09:00:00Z", htmlContent=HTML_INFOLETTRE
+            ),
+            campagne(39, "Infolettre", "Info Panoramax mai 2026", "2026-05-28T09:00:00Z", htmlContent=HTML_INFOLETTRE),
+        ]
+        records = [
+            {"id": 4, "fields": {"Source": "Newsletter Brevo", "Source_uid": "brevo:panoramax:32",
+                                 "Titre": "Info Panoramax avril 2026", "Corps": ""}},
+            {"id": 5, "fields": {"Source": "Newsletter Brevo", "Source_uid": "brevo:panoramax:39",
+                                 "Titre": "Info Panoramax mai 2026", "Corps": "Texte retouché"}},
+        ]  # fmt: skip
+        plan = newsletters.planifier(PANORAMAX, newsletters.trier(PANORAMAX, lettres), records)
+        self.assertEqual(plan.ajouts, [])
+        self.assertEqual(plan.completions, [{"id": 4, "fields": {"Corps": MARKDOWN_ATTENDU}}])
+
+
+class DoublonsTests(TestCase):
+    def setUp(self):
+        self.index = BlogIndexPage(title="Les actualités", slug="les-actualites")
+        Site.objects.get(is_default_site=True).root_page.add_child(instance=self.index)
+        self.panoramax = Category.objects.create(name="Panoramax", slug="panoramax")
+
+    def manuel(self, titre, slug, jour, contenu, categorie=None):
+        page = BlogEntryPage(
+            title=titre, slug=slug, date=datetime(2026, 4, jour, 8, tzinfo=timezone.utc),
+            body=[{"type": "html", "id": "colle", "value": contenu}],
+        )  # fmt: skip
+        actualites._set_categories(page, [(categorie or self.panoramax).id])
+        self.index.add_child(instance=page)
+        page.save_revision().publish()
+        return page
+
+    def lettre(self, corps=f"Intro\n\n![]({IMAGE})"):
+        return actu(
+            7, "Info Panoramax avril 2026", Date=datetime(2026, 4, 28, 9, tzinfo=timezone.utc).timestamp(),
+            Equipe=["L", "Panoramax"], Source="Newsletter Brevo", Chapo="", Corps=corps,
+            Lien="https://r.brevo.example/32.html",
+        )  # fmt: skip
+
+    def test_article_manuel_depublie_et_redirige(self):
+        doublon = self.manuel("Info Panoramax - 28/04/2026", "info-panoramax-28042026", 28, f'<img src="{IMAGE}">')
+        autre_jour = self.manuel("Info Panoramax - 13/02/2026", "info-panoramax-autre", 13, f'<img src="{IMAGE}">')
+        autre_sujet = self.manuel("Panoramax au salon", "salon", 28, "<p>Un autre article</p>")
+        report = actualites.run(actualites.parse([self.lettre()]), "les-actualites")
+
+        self.assertEqual(
+            report.unpublished, ["Info Panoramax - 28/04/2026 (doublon de « Info Panoramax avril 2026 »)"]
+        )
+        doublon.refresh_from_db()
+        self.assertFalse(doublon.live)
+        self.assertTrue(BlogEntryPage.objects.get(pk=autre_jour.pk).live)
+        self.assertTrue(BlogEntryPage.objects.get(pk=autre_sujet.pk).live)
+
+        nouvelle = BlogEntryPage.objects.get(title="Info Panoramax avril 2026")
+        redirection = Redirect.objects.get(old_path="/les-actualites/info-panoramax-28042026")
+        self.assertEqual(redirection.redirect_page_id, nouvelle.pk)
+        reponse = self.client.get("/les-actualites/info-panoramax-28042026/")
+        self.assertRedirects(reponse, nouvelle.url, status_code=301, fetch_redirect_response=False)
+        self.assertEqual(self.client.get(nouvelle.url).status_code, 200)
+
+        # Au passage suivant, plus rien à faire.
+        report = actualites.run(actualites.parse([self.lettre()]), "les-actualites")
+        self.assertEqual(report.unpublished, [])
+
+    def test_sans_image_le_titre_suffit(self):
+        doublon = self.manuel("Info Panoramax - 28/04/2026", "manuel", 28, "<p>Copie</p>")
+        actualites.run(actualites.parse([self.lettre(corps="")]), "les-actualites")
+        doublon.refresh_from_db()
+        self.assertFalse(doublon.live)
+
+    def test_autre_equipe_et_communique_non_concernes(self):
+        rnb = Category.objects.create(name="RNB", slug="referentiel-national-du-batiment")
+        page = self.manuel("Info Panoramax - 28/04/2026", "rnb", 28, f'<img src="{IMAGE}">', categorie=rnb)
+        communique = self.lettre()
+        communique["fields"]["Source"] = "Communiqué"
+        actualites.run(actualites.parse([communique]), "les-actualites")
+        self.assertTrue(BlogEntryPage.objects.get(pk=page.pk).live)
+        actualites.run(actualites.parse([self.lettre()]), "les-actualites")
+        self.assertTrue(BlogEntryPage.objects.get(pk=page.pk).live)

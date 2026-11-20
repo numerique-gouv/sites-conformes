@@ -13,23 +13,30 @@
   produit de l'équipe (champ « Catégorie des actualités »).
 - Une page dont l'actu a été dépubliée ou supprimée dans Grist est dépubliée,
   mais reste dans Wagtail.
+- Doublons : un article saisi à la main qui reprend une infolettre importée
+  (même équipe, même jour, mêmes images) est dépublié, et son adresse redirige
+  vers la page de l'infolettre.
 
 Une page qui a un brouillon non publié n'est pas modifiée, pour ne pas publier
 par erreur le travail en cours d'un éditeur.
 """
 
 import html
+import json
 import logging
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from django.utils import timezone
 from django.utils.text import slugify
+from wagtail.contrib.redirects.models import Redirect
 from wagtail.models import Locale, Page, Site
 
 from blog.models import BlogEntryPage, BlogIndexPage, Category, CategoryEntryPage
 from fabrique import grist
 from fabrique.agenda import Images, _bouton, merge_owned_group
+from fabrique.infolettre_html import MOIS
 from fabrique.newsletters import SOURCE as SOURCE_NEWSLETTER
 from fabrique.sync import Report, _normalize, _publish, _unique_slug
 
@@ -119,7 +126,11 @@ def owned_blocks(actu: Actu) -> list[dict]:
     if actu.corps:
         blocks.append({"type": "markdown", "id": f"{OWNED_PREFIX}corps", "value": actu.corps})
     if actu.lien:
-        texte = "Lire la newsletter" if actu.newsletter else "En savoir plus"
+        if actu.newsletter:
+            # Contenu affiché en entier : le bouton mène à l'original ; sinon c'est le seul accès au contenu.
+            texte = "Voir la version e-mail" if actu.corps else "Lire la newsletter"
+        else:
+            texte = "En savoir plus"
         bouton = _bouton("lien", texte, actu.lien, "fr-btn", "fr-icon-external-link-line")
         blocks.append(
             {"type": "buttons_list", "id": f"{OWNED_PREFIX}liens", "value": {"buttons": [bouton], "position": ""}}
@@ -228,17 +239,70 @@ def get_or_create_index(root: Page, slug: str, report: Report) -> BlogIndexPage:
     return index
 
 
+def _jour(moment: datetime):
+    return timezone.localtime(moment).date() if timezone.is_aware(moment) else moment.date()
+
+
+def _images_markdown(texte: str) -> set[str]:
+    return set(re.findall(r"!\[[^\]]*\]\((\S+?)\)", texte or ""))
+
+
+def _mots(texte: str) -> set[str]:
+    sans_dates = re.sub(rf"\b({MOIS})\b|\d+", " ", texte.casefold())
+    return {m for m in re.findall(r"\w{4,}", sans_dates)} - {"info", "infos", "actus", "newsletter", "infolettre"}
+
+
+def doublons(actu: Actu, category_ids: list[int], manuelles: list[BlogEntryPage]) -> list[BlogEntryPage]:
+    """Articles saisis à la main dans Wagtail qui reprennent la même infolettre.
+
+    Même équipe (catégorie), publiés le même jour (à un jour près), et qui contiennent les mêmes images, ou à
+    défaut d'images, dont le titre a un mot en commun avec celui de l'infolettre."""
+    if not actu.newsletter:
+        return []
+    jour, images, mots = _jour(actu.date), _images_markdown(actu.corps), _mots(actu.titre)
+    trouves = []
+    for page in manuelles:
+        if not page.live or page.date is None or abs((_jour(page.date) - jour).days) > 1:
+            continue
+        if not set(_categories(page)) & set(category_ids):
+            continue
+        if images:
+            contenu = json.dumps(list(page.body.raw_data), ensure_ascii=False)
+            if not any(url in contenu for url in images):
+                continue
+        elif not mots & _mots(page.title):
+            continue
+        trouves.append(page)
+    return trouves
+
+
+def _rediriger(ancienne: Page, nouvelle: Page) -> None:
+    """L'adresse de l'article retiré mène désormais à la page de l'infolettre (liens déjà partagés)."""
+    site_id, _, chemin = ancienne.get_url_parts() or (None, None, None)
+    if not chemin:
+        return
+    Redirect.objects.update_or_create(
+        old_path=Redirect.normalise_path(chemin),
+        site_id=site_id,
+        defaults={"redirect_page": nouvelle, "redirect_link": "", "is_permanent": True},
+    )
+
+
 def sync_actus(index: BlogIndexPage, actus: list[Actu], source: Source, report: Report, images: Images) -> None:
     pages: dict[int, BlogEntryPage] = {}
+    manuelles: list[BlogEntryPage] = []
     for page in BlogEntryPage.objects.child_of(index):
         row_id = source.row_id(page)
         if row_id is not None:
             pages[row_id] = page
+        else:
+            manuelles.append(page)
 
     categories = Categories(report)
     for actu in actus:
         page = pages.get(actu.id)
         label = actu.titre
+        category_ids = categories.ids(actu)
         # Une page hors ligne a toujours des « modifications non publiées » (la dépublication en est une) :
         # seul le brouillon d'une page en ligne est le signe d'un travail en cours.
         if page is not None and page.live and page.has_unpublished_changes:
@@ -248,7 +312,6 @@ def sync_actus(index: BlogIndexPage, actus: list[Actu], source: Source, report: 
 
         values = actu_values(actu, source)
         values["header_image"] = images.resolve(actu, page.header_image if page is not None else None)
-        category_ids = categories.ids(actu)
         tags = [ETIQUETTE_NEWSLETTER] if actu.newsletter else []
         if page is None:
             page = BlogEntryPage(slug=_unique_slug(index, slugify(actu.titre)[:80] or "actualite"), **values)
@@ -258,28 +321,34 @@ def sync_actus(index: BlogIndexPage, actus: list[Actu], source: Source, report: 
             index.add_child(instance=page)
             _publish(page)
             report.created.append(label)
-            continue
-
-        stream_block = page.body.stream_block
-        existing = _normalize(stream_block, list(page.body.raw_data))
-        new_body = _normalize(stream_block, merge_owned_group(existing, owned_blocks(actu)))
-        changed = [name for name, value in values.items() if getattr(page, name) != value]
-        body_changed = new_body != existing
-        categories_changed = _categories(page) != category_ids
-        tags_changed = _tags(page) != tags
-        if changed or body_changed or categories_changed or tags_changed or not page.live:
-            for name in changed:
-                setattr(page, name, values[name])
-            if body_changed:
-                page.body = new_body
-            if categories_changed:
-                _set_categories(page, category_ids)
-            if tags_changed:
-                page.tags.set(tags)
-            _publish(page)
-            report.updated.append(label)
         else:
-            report.unchanged.append(label)
+            stream_block = page.body.stream_block
+            existing = _normalize(stream_block, list(page.body.raw_data))
+            new_body = _normalize(stream_block, merge_owned_group(existing, owned_blocks(actu)))
+            changed = [name for name, value in values.items() if getattr(page, name) != value]
+            body_changed = new_body != existing
+            categories_changed = _categories(page) != category_ids
+            tags_changed = _tags(page) != tags
+            if changed or body_changed or categories_changed or tags_changed or not page.live:
+                for name in changed:
+                    setattr(page, name, values[name])
+                if body_changed:
+                    page.body = new_body
+                if categories_changed:
+                    _set_categories(page, category_ids)
+                if tags_changed:
+                    page.tags.set(tags)
+                _publish(page)
+                report.updated.append(label)
+            else:
+                report.unchanged.append(label)
+
+        # Infolettre déjà saisie à la main sur le site : l'article manuel est dépublié (pas supprimé) et son
+        # adresse redirigée vers la page de l'infolettre.
+        for doublon in doublons(actu, category_ids, manuelles):
+            doublon.unpublish(log_action=True)
+            _rediriger(doublon, page)
+            report.unpublished.append(f"{doublon.title} (doublon de « {label} »)")
 
     publiees = {a.id for a in actus}
     for row_id, page in pages.items():

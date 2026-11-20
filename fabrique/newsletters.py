@@ -11,9 +11,12 @@ Les invitations, alertes aux utilisateurs, messages d'accueil… sont écartés.
 
 - Une infolettre nouvelle est ajoutée au Grist, publiée, avec l'équipe du
   compte, la source « Newsletter Brevo » et l'identifiant de la campagne.
-- Une infolettre déjà importée n'est plus jamais modifiée : titre, chapô,
-  image, équipe et case Publié appartiennent aux éditeurs du Grist. Pour la
-  retirer du site, on décoche « Publié » (une ligne supprimée serait recréée).
+- Le contenu de l'infolettre (HTML de l'e-mail) est converti en Markdown dans
+  la colonne Corps : il s'affiche sur le site comme un article ordinaire.
+- Une infolettre déjà importée n'est plus modifiée : titre, chapô, texte,
+  image, équipe et case Publié appartiennent aux éditeurs du Grist. Seule
+  exception : un Corps vide est rempli. Pour la retirer du site, on décoche
+  « Publié » (une ligne supprimée serait recréée).
 - Renvoi correctif : quand deux campagnes ont le même objet le même jour, seule
   la dernière est gardée ; si la première avait déjà été importée, elle est
   dépubliée.
@@ -39,6 +42,7 @@ from zoneinfo import ZoneInfo
 from django.utils.text import slugify
 
 from fabrique import grist
+from fabrique.infolettre_html import en_markdown
 
 logger = logging.getLogger(__name__)
 
@@ -210,26 +214,38 @@ def trier(compte: Compte, campagnes: list[dict]) -> Tri:
 class Plan:
     ajouts: list[dict] = field(default_factory=list)  # champs des lignes à créer
     depublications: list[dict] = field(default_factory=list)  # {"id": …, "fields": {"Publie": False}}
+    completions: list[dict] = field(default_factory=list)  # {"id": …, "fields": {"Corps": …}} (Corps vide)
 
     def __bool__(self):
-        return bool(self.ajouts or self.depublications)
+        return bool(self.ajouts or self.depublications or self.completions)
+
+
+def corps(campagne: dict, titre_actu: str) -> str:
+    """Contenu de l'infolettre en Markdown, à partir du HTML de l'e-mail."""
+    try:
+        return en_markdown(str(campagne.get("htmlContent") or ""), titre_actu)
+    except Exception as e:  # noqa: BLE001 — un e-mail mal formé ne doit pas bloquer l'import
+        logger.warning("Infolettre « %s » non convertie : %s", campagne.get("name"), e)
+        return ""
 
 
 def ligne(compte: Compte, campagne: dict) -> dict:
     envoi = date_envoi(campagne)
+    titre_actu = titre(campagne, envoi)
     lien = str(campagne.get("shareLink") or "").strip()
     if not lien:
         logger.warning(
             "%s : campagne « %s » sans version web, importée non publiée.", compte.equipe, campagne.get("name")
         )
     return {
-        "Titre": titre(campagne, envoi),
+        "Titre": titre_actu,
         "Date": envoi.timestamp(),
         "Equipe": ["L", compte.equipe],
         "Source": SOURCE,
         "Source_uid": compte.uid(campagne),
         "Publie": bool(lien),
         "Chapo": " ".join(str(campagne.get("previewText") or "").split()),
+        "Corps": corps(campagne, titre_actu),
         "Lien": lien,
     }
 
@@ -242,8 +258,14 @@ def planifier(compte: Compte, tri: Tri, records: list[dict]) -> Plan:
         if r["fields"].get("Source") == SOURCE and r["fields"].get("Source_uid")
     }
     for campagne in tri.gardees:
-        if compte.uid(campagne) not in existants:
+        record = existants.get(compte.uid(campagne))
+        if record is None:
             plan.ajouts.append(ligne(compte, campagne))
+        elif not str(record["fields"].get("Corps") or "").strip():
+            # Importée avant la conversion du contenu, ou Corps vidé : on le remplit.
+            texte = corps(campagne, str(record["fields"].get("Titre") or "") or titre(campagne, date_envoi(campagne)))
+            if texte:
+                plan.completions.append({"id": record["id"], "fields": {"Corps": texte}})
     for campagne in tri.remplacees:
         record = existants.get(compte.uid(campagne))
         if record is not None and record["fields"].get("Publie"):
@@ -268,6 +290,7 @@ class Resultat:
             return f"{self.compte.equipe} : non importé ({self.erreur})"
         return (
             f"{self.compte.equipe} : {len(self.tri.gardees)} infolettres, {len(self.plan.ajouts)} ajoutées, "
+            f"{len(self.plan.completions)} complétées (texte), "
             f"{len(self.plan.depublications)} dépubliées (renvoi correctif), "
             f"{len(self.tri.ecartees)} autres campagnes écartées"
         )
@@ -302,8 +325,9 @@ def importer(
             try:
                 if plan.ajouts:
                     grist.add_records(base_url, doc_id, api_key, plan.ajouts, table=grist.TABLE_ACTUS)
-                if plan.depublications:
-                    grist.update_records(base_url, doc_id, api_key, plan.depublications, table=grist.TABLE_ACTUS)
+                if plan.depublications or plan.completions:
+                    modifications = plan.depublications + plan.completions
+                    grist.update_records(base_url, doc_id, api_key, modifications, table=grist.TABLE_ACTUS)
             except RuntimeError as e:
                 logger.warning("Écriture dans Grist impossible pour %s : %s", compte.equipe, e)
                 resultats.append(Resultat(compte, tri, plan, erreur=f"écriture Grist : {e}"))
