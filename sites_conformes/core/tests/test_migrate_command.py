@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import tempfile
 from io import StringIO
 from unittest import mock, skipUnless
 from urllib.parse import quote
@@ -154,6 +155,22 @@ class MigrateCommandTestCase(SimpleTestCase):
 
         self.assertNotIn(migration_block.definition_prefix, blocks.Block.definition_registry)
         self.assertIs(blocks.Block.definition_registry[existing_block.definition_prefix], existing_block)
+
+
+class MigrateSqliteTestCase(SimpleTestCase):
+    def test_migrations_run_on_sqlite(self):
+        # The tests run on PostgreSQL, but projects installing the package may use SQLite,
+        # which rejects some of the SQL that PostgreSQL accepts in a RunSQL operation
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, "manage.py", "migrate", "--verbosity", "0"],
+                cwd=settings.BASE_DIR,
+                env={**os.environ, "DATABASE_URL": f"sqlite:///{directory}/db.sqlite3"},
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 # Memory of the containers running the postdeploy hook on Scalingo (size M)

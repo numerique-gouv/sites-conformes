@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
         # Set locale for existing rows from their parent FormPage's locale
         migrations.RunSQL(
             sql="""
-                UPDATE sites_conformes_forms_formfield ff
+                UPDATE sites_conformes_forms_formfield AS ff
                 SET locale_id = wp.locale_id
                 FROM sites_conformes_forms_formpage fp
                 JOIN wagtailcore_page wp ON wp.id = fp.page_ptr_id
