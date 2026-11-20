@@ -1,0 +1,21 @@
+/* Agenda de la Fabrique — images d'événements entières et petites, jamais recadrées.
+   Chargé par les gabarits surchargés dans templates/events/. */
+
+/* Vignettes des cartes de la liste de l'agenda et des archives :
+   le DSFR recadre en 16:9 (object-fit: cover) ; on affiche l'image entière sur un fond neutre. */
+.fr-card .fr-card__img.fabrique-vignette {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--background-alt-grey);
+}
+
+.fr-card .fr-card__img.fabrique-vignette img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 9rem;
+  aspect-ratio: auto;
+  object-fit: contain;
+}

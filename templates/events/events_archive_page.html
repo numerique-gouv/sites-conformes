@@ -1,0 +1,8 @@
+{% extends "events/events_archive_page.html" %}
+{% load static %}
+{# Agenda de la Fabrique : vignettes entières dans la liste. Le reste vient de Sites Faciles. #}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'fabrique/agenda.css' %}" />
+{% endblock extra_css %}

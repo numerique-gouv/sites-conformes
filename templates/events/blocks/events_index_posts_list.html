@@ -1,0 +1,50 @@
+{% load i18n wagtailimages_tags %}
+{# Copie du gabarit de Sites Faciles (events) : vignette réduite et entière (max-480x270, classe fabrique-vignette)
+   au lieu du fichier original recadré en 16:9. Voir fabrique/static/fabrique/agenda.css. #}
+{% for post in posts %}
+  <div class="fr-col fr-col-md-6">
+    <div class="fr-card fr-enlarge-link">
+      <div class="fr-card__body">
+        <div class="fr-card__content">
+          <h3 class="fr-card__title">
+            <a href="{{ post.url }}">{{ post.title }}</a>
+          </h3>
+          <p class="fr-card__desc fr-icon-calendar-event-fill">
+            {% if post.event_date_start.date == post.event_date_end.date %}
+              {{ post.event_date_start.date }}
+            {% elif post.event_date_start.year == post.event_date_end.year and post.event_date_start.month == post.event_date_end.month %}
+              {{ post.event_date_start.day }} – {{ post.event_date_end.date }}
+            {% elif post.event_date_start.year == post.event_date_end.year %}
+              {{ post.event_date_start|date:"j F" }} – {{ post.event_date_end|date:"j F Y" }}
+            {% else %}
+              {{ post.event_date_start.date }} – {{ post.event_date_end.date }}
+            {% endif %}
+          </p>
+          {% if post.event_categories.all %}
+            <div class="fr-card__start">
+              <ul class="fr-tags-group">
+                {% for cat in post.event_categories.all %}
+                  <li>
+                    <p class="fr-tag">{{ cat.name }}</p>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {% if post.header_image %}
+        <div class="fr-card__header">
+          <div class="fr-card__img fabrique-vignette">
+            {% image post.header_image max-480x270 as vignette %}
+            <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt="">
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <div class="fr-col">
+    <p>{% translate "No event found." %}</p>
+  </div>
+{% endfor %}

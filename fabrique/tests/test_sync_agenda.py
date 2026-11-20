@@ -301,8 +301,16 @@ class ImageTests(TestCase):
         self.assertIn("Démo du RNB", report.unchanged)
         self.assertEqual(self.grist.telechargements, [7])
 
-        reponse = self.client.get(EventsIndexPage.objects.get(slug="agenda").url)
-        self.assertIn(image.file.url, reponse.content.decode())
+        # Liste : vignette réduite et entière, pas le fichier original.
+        contenu = self.client.get(EventsIndexPage.objects.get(slug="agenda").url).content.decode()
+        self.assertIn("fabrique-vignette", contenu)
+        self.assertIn("fabrique/agenda.css", contenu)
+        self.assertNotIn(image.file.url, contenu)
+        self.assertIn(image.get_rendition("max-480x270").url, contenu)
+
+        # Page de l'événement : feuille de style qui retire le bandeau.
+        contenu = self.client.get(self.demo().url).content.decode()
+        self.assertIn("fabrique/agenda-evenement.css", contenu)
 
     def test_image_changee_puis_retiree(self):
         self.sync(7)
