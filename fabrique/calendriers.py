@@ -11,17 +11,21 @@ Pour chaque calendrier :
   calendrier : titre, début, fin, lieu, lien visio, page de l'événement,
   description, annulation. Le type, l'image, la série, les inscriptions et la
   case Publié restent aux éditeurs du Grist ;
-- un événement qui a disparu du calendrier est dépublié (case Publié décochée).
+- un événement à venir qui a disparu du calendrier est dépublié (case Publié
+  décochée). Un événement passé n'est jamais dépublié : certains flux (les
+  sites Sites Faciles, par exemple) ne contiennent que les événements à venir.
 
 Si le calendrier est illisible ou vide, rien n'est modifié pour cette source.
 
 Liste des calendriers : variable d'environnement AGENDA_CALENDRIERS, une ligne
 « Source | Équipe | URL iCal » par calendrier (séparées par des retours à la
-ligne ou des points-virgules). Par défaut : le Framagenda de Panoramax.
+ligne ou des points-virgules). Par défaut : le Framagenda de Panoramax et l'agenda
+du site Voies locales en commun.
 """
 
 import logging
 import re
+import time as horloge
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
@@ -54,7 +58,13 @@ PAR_DEFAUT = [
         "Framagenda Panoramax",
         "Panoramax",
         "https://framagenda.org/remote.php/dav/public-calendars/ZQQ5s2EEwT7Nzjm5/?export",
-    )
+    ),
+    # Site Sites Faciles : le flux iCal ne contient que les événements à venir.
+    Calendrier(
+        "Site Voies locales",
+        "Voies locales",
+        "https://www.voies-locales.beta.gouv.fr/actualit%C3%A9s/ical/",
+    ),
 ]
 
 
@@ -68,7 +78,9 @@ def depuis_env(valeur: str | None) -> list[Calendrier]:
             continue
         parties = [p.strip() for p in ligne.split("|")]
         if len(parties) != 3 or not all(parties):
-            raise ValueError(f"AGENDA_CALENDRIERS : « {ligne.strip()} » n'est pas de la forme « Source | Équipe | URL ».")
+            raise ValueError(
+                f"AGENDA_CALENDRIERS : « {ligne.strip()} » n'est pas de la forme « Source | Équipe | URL »."
+            )
         calendriers.append(Calendrier(*parties))
     return calendriers
 
@@ -168,7 +180,15 @@ def _egal(champ: str, actuel, nouveau) -> bool:
     return (actuel or "") == nouveau
 
 
-def planifier(calendrier: Calendrier, evenements: list[dict], records: list[dict]) -> Plan:
+def _passe(fields: dict, maintenant: float) -> bool:
+    fin = fields.get("Fin") or fields.get("Debut")
+    return isinstance(fin, (int, float)) and fin < maintenant
+
+
+def planifier(
+    calendrier: Calendrier, evenements: list[dict], records: list[dict], maintenant: float | None = None
+) -> Plan:
+    maintenant = horloge.time() if maintenant is None else maintenant
     plan = Plan()
     existants = {
         r["fields"].get("Source_uid"): r
@@ -200,7 +220,9 @@ def planifier(calendrier: Calendrier, evenements: list[dict], records: list[dict
 
     if evenements:  # calendrier vide : on ne dépublie rien (garde-fou)
         for uid, record in existants.items():
-            if uid not in vus and record["fields"].get("Publie"):
+            fields = record["fields"]
+            # Un événement passé qui sort du flux reste publié (archives de l'agenda).
+            if uid not in vus and fields.get("Publie") and not _passe(fields, maintenant):
                 plan.depublications.append({"id": record["id"], "fields": {"Publie": False}})
     return plan
 

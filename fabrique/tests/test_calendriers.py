@@ -97,7 +97,9 @@ class LectureTests(SimpleTestCase):
     def test_visio_trouvee_dans_la_description(self):
         e = self.evenements["echange"]
         self.assertEqual((e["Lieu"], e["Lien_visio"]), ("", "https://meet.jit.si/panoramax"))
-        self.assertEqual(e["Description"], "Echange mensuel sur Jitsi : https://meet.jit.si/panoramax  \nVenez nombreux, merci !")
+        self.assertEqual(
+            e["Description"], "Echange mensuel sur Jitsi : https://meet.jit.si/panoramax  \nVenez nombreux, merci !"
+        )
 
     def test_annulation_et_lieu_texte(self):
         e = self.evenements["hackathon"]
@@ -106,11 +108,41 @@ class LectureTests(SimpleTestCase):
 
     def test_configuration(self):
         self.assertEqual(calendriers.depuis_env(None), calendriers.PAR_DEFAUT)
+        self.assertEqual([c.equipe for c in calendriers.PAR_DEFAUT], ["Panoramax", "Voies locales"])
         self.assertEqual(calendriers.depuis_env(""), [])
         liste = calendriers.depuis_env("Framagenda BAN | BAN | https://exemple.fr/ban.ics; RNB | RNB | https://x/rnb")
         self.assertEqual([c.equipe for c in liste], ["BAN", "RNB"])
         with self.assertRaises(ValueError):
             calendriers.depuis_env("pas de séparateur")
+
+
+# Flux iCal d'un site Sites Faciles (ex. Voies locales en commun) : heures en UTC, identifiant = n° de page,
+# pas de description ; seulement les événements à venir.
+ICS_SITES_FACILES = b"""BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Sites Faciles//
+BEGIN:VEVENT
+SUMMARY:Commission Besoins et usages du CNIG
+DTSTART:20261123T120000Z
+DTEND:20261123T140000Z
+DTSTAMP:20261120T100000Z
+UID:51
+LOCATION:Visio
+END:VEVENT
+END:VCALENDAR
+"""
+
+
+class SitesFacilesTests(SimpleTestCase):
+    def test_flux_sites_faciles(self):
+        (e,) = calendriers.lire(ICS_SITES_FACILES)
+        self.assertEqual(e["uid"], "51")
+        self.assertEqual((e["Debut"], e["Fin"]), (ts(2026, 11, 23, 13), ts(2026, 11, 23, 15)))
+        # « Visio » sans lien dans la description : reste un lieu.
+        self.assertEqual((e["Lieu"], e["Lien_visio"], e["Description"]), ("Visio", "", ""))
+        voies_locales = calendriers.PAR_DEFAUT[1]
+        (ajout,) = calendriers.planifier(voies_locales, [e], []).ajouts
+        self.assertEqual((ajout["Source"], ajout["Equipe"]), ("Site Voies locales", ["L", "Voies locales"]))
 
 
 class PlanTests(SimpleTestCase):
@@ -146,10 +178,14 @@ class PlanTests(SimpleTestCase):
         self.assertFalse(plan.ajouts)
 
     def test_evenement_retire_du_calendrier(self):
+        maintenant = ts(2026, 11, 20, 12)
         records = self.records()
-        records.append({"id": 99, "fields": {"Source": "Framagenda Panoramax", "Source_uid": "ancien", "Publie": True}})
+        source = {"Source": "Framagenda Panoramax", "Publie": True}
+        records.append({"id": 99, "fields": {**source, "Source_uid": "a-venir", "Debut": ts(2026, 12, 1, 10)}})
+        # Passé : reste publié même s'il n'est plus dans le flux (flux limités aux événements à venir).
+        records.append({"id": 98, "fields": {**source, "Source_uid": "passe", "Fin": ts(2026, 11, 2, 12)}})
         records.append({"id": 100, "fields": {"Titre": "Saisi à la main", "Publie": True}})
-        plan = calendriers.planifier(PANORAMAX, self.evenements, records)
+        plan = calendriers.planifier(PANORAMAX, self.evenements, records, maintenant=maintenant)
         self.assertEqual(plan.depublications, [{"id": 99, "fields": {"Publie": False}}])
 
     def test_calendrier_vide_ne_depublie_rien(self):
@@ -179,7 +215,8 @@ class ImportCommandeTests(TestCase):
     def setUp(self):
         import os
 
-        os.environ.pop("AGENDA_CALENDRIERS", None)
+        os.environ["AGENDA_CALENDRIERS"] = f"{PANORAMAX.source} | {PANORAMAX.equipe} | {PANORAMAX.url}"
+        self.addCleanup(os.environ.pop, "AGENDA_CALENDRIERS", None)
         self.grist = FausseGrist()
         for nom in ("fetch_records", "add_records", "update_records"):
             patch = mock.patch.object(grist, nom, getattr(self.grist, nom))
