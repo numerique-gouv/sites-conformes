@@ -219,9 +219,12 @@ def owned_blocks(actu: Actu, images_corps: "ImagesCorps | None" = None) -> list[
         else:
             texte = "En savoir plus"
         bouton = _bouton("lien", texte, actu.lien, "fr-btn", "fr-icon-external-link-line")
-        blocks.append(
-            {"type": "buttons_list", "id": f"{OWNED_PREFIX}liens", "value": {"buttons": [bouton], "position": ""}}
-        )
+        liens = {"type": "buttons_list", "id": f"{OWNED_PREFIX}liens", "value": {"buttons": [bouton], "position": ""}}
+        if actu.newsletter and actu.corps:
+            # Infolettre affichée en entier : le lien vers la version e-mail est proposé dès le début de l'article.
+            blocks.insert(0, liens)
+        else:
+            blocks.append(liens)
     return blocks
 
 

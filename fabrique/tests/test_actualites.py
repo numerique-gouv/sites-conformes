@@ -634,11 +634,12 @@ class ImagesDuTexteTests(TestCase):
     def test_images_en_blocs_de_la_mediatheque(self):
         self.run_sync()
         page = BlogEntryPage.objects.get(title="Info Panoramax octobre 2026")
-        self.assertEqual([b.block_type for b in page.body], ["markdown", "image", "markdown", "image", "buttons_list"])
-        image = page.body[1].value
+        self.assertEqual([b.block_type for b in page.body], ["buttons_list", "markdown", "image", "markdown", "image"])
+        self.assertEqual(page.body[0].value["buttons"][0].value["text"], "Voir la version e-mail")
+        image = page.body[2].value
         self.assertEqual((image["alt"], image["url"]), ("Fondation", "https://forum.example/t/1"))
         self.assertEqual(image["width"], "fr-content-media--sm")
-        self.assertEqual(page.body[2].value, "Texte avec une icône au milieu.")
+        self.assertEqual(page.body[3].value, "Texte avec une icône au milieu.")
         self.assertEqual([c for _, c in self.appels], ["Actualités", "Actualités"])
 
         contenu = self.client.get(page.url).content.decode()
@@ -659,7 +660,7 @@ class ImagesDuTexteTests(TestCase):
         self.run_sync(telecharger=False)
         self.assertEqual(self.appels, [])
         page = BlogEntryPage.objects.get(title="Info Panoramax octobre 2026")
-        self.assertEqual([b.block_type for b in page.body], ["markdown", "markdown", "buttons_list"])
+        self.assertEqual([b.block_type for b in page.body], ["buttons_list", "markdown", "markdown"])
         self.assertNotIn("mailinblue", self.client.get(page.url).content.decode())
 
 
