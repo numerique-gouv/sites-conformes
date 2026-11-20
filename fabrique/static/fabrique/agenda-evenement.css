@@ -1,0 +1,23 @@
+/* Page d'un événement de l'agenda — chargé par templates/events/event_entry_page.html.
+   Pas de bandeau : l'image d'en-tête est une vignette, montrée entière dans la carte de l'événement. */
+
+.cmsfr-hero {
+  display: none;
+}
+
+.fr-card--horizontal .fr-card__img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--background-alt-grey);
+}
+
+.fr-card--horizontal .fr-card__img img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 12rem;
+  aspect-ratio: auto;
+  object-fit: contain;
+}

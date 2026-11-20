@@ -1,0 +1,8 @@
+{% extends "events/event_entry_page.html" %}
+{% load static %}
+{# Agenda de la Fabrique : pas de bandeau, image entière dans la carte. Le reste vient de Sites Faciles. #}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'fabrique/agenda-evenement.css' %}" />
+{% endblock extra_css %}
