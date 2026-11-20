@@ -82,7 +82,9 @@ Le mieux est d'utiliser un compte qui n'a que l'accès en lecture au document.
 - L'image d'en-tête, à partir de la colonne Image (pièce jointe JPG, PNG, WebP ou GIF, 10 Mo au plus ; format
   paysage conseillé). Elle sert de vignette dans la liste de l'agenda et dans la fiche de l'événement, et de bandeau
   en haut de la page. Les images importées sont rangées dans la collection « Agenda » de Wagtail ; chaque fichier
-  n'est téléchargé qu'une fois. Une image retirée dans Grist est retirée de la page.
+  n'est téléchargé qu'une fois. Une image retirée dans Grist est retirée de la page. Dans la liste, toutes les
+  vignettes sont affichées avec à peu près la même surface (filtre `largeur_vignette`) : un logo carré ou une petite
+  image ne paraît pas plus petit qu'un logo en longueur. Mieux vaut un logo sans marge blanche autour.
 - Dans le corps, les blocs dont l'identifiant commence par `grist-` : alerte d'annulation, public et places restantes,
   description (markdown) et boutons (s'inscrire, rejoindre la visio, page de l'événement, ajouter à Outlook).
 

@@ -1,7 +1,8 @@
-{% load i18n wagtailimages_tags %}
+{% load i18n wagtailimages_tags fabrique_images %}
 {% comment %}
   Copie du gabarit de Sites Faciles (events) : vignette réduite et entière (max-480x270, classe fabrique-vignette)
   au lieu du fichier original recadré en 16:9. Voir fabrique/static/fabrique/agenda.css.
+  Taille : même surface pour toutes les vignettes, logo carré ou en longueur (filtre largeur_vignette).
   Étiquettes : type de l'événement et équipes concernées, lus dans Grist (fabrique.EtiquettesEvenement) ;
   pour un événement saisi à la main, ses catégories comme dans Sites Faciles.
 {% endcomment %}
@@ -61,7 +62,7 @@
         <div class="fr-card__header">
           <div class="fr-card__img fabrique-vignette">
             {% image post.header_image max-480x270 as vignette %}
-            <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt="">
+            <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt="" style="width: {{ post.header_image|largeur_vignette }}px">
           </div>
         </div>
       {% endif %}
