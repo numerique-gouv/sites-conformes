@@ -197,7 +197,9 @@ def _sans_entete(blocs: list[str], titre: str) -> list[str]:
         return blocs
     for i, bloc in enumerate(blocs[:12]):
         texte = _comparable(re.sub(r"^#+\s*", "", bloc).replace("*", ""))
-        if bloc.startswith("#") and texte and (texte.startswith(cible) or cible.startswith(texte)):
+        # « Info Panoramax » pour « Info Panoramax avril 2026 », « Voies locales en commun » pour
+        # « Info Voies locales en commun — novembre 2026 » : le titre de l'e-mail reprend celui de l'actu.
+        if bloc.startswith("#") and len(texte) >= 8 and (texte in cible or cible in texte):
             reste = blocs[i + 1 :]
             # Date de l'infolettre juste sous le titre (« Avril 2026 »).
             if reste and len(reste[0]) <= 40 and re.search(rf"\b({MOIS})\b|\b20\d\d\b", reste[0], re.I):

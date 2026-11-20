@@ -177,9 +177,18 @@ def blocs_corps(actu: Actu, images_corps: "ImagesCorps | None") -> list[tuple[st
     return blocs
 
 
+def _comparable(texte: str) -> str:
+    return " ".join(re.findall(r"\w+", texte.casefold()))
+
+
+def _repete_le_titre(chapo: str, titre: str) -> bool:
+    """Chapô qui ne dit rien de plus que le titre (aperçu Brevo identique à l'objet de l'e-mail)."""
+    return _comparable(chapo) in _comparable(titre)
+
+
 def owned_blocks(actu: Actu, images_corps: "ImagesCorps | None" = None) -> list[dict]:
     blocks = []
-    if actu.chapo:
+    if actu.chapo and not _repete_le_titre(actu.chapo, actu.titre):
         blocks.append(
             {"type": "paragraph", "id": f"{OWNED_PREFIX}chapo", "value": f"<p><b>{html.escape(actu.chapo)}</b></p>"}
         )
@@ -220,7 +229,8 @@ def _resume(actu: Actu, longueur: int = 160) -> str:
     """Description courte pour les moteurs de recherche et les cartes, à partir du chapô ou du texte."""
     # Jamais vide : Sites Faciles remplirait la description à l'enregistrement, et la page semblerait modifiée
     # à chaque synchronisation.
-    texte = actu.chapo or re.sub(r"[#*_`>\[\]]|\(https?://[^)]*\)", "", actu.corps) or actu.titre
+    chapo = "" if _repete_le_titre(actu.chapo, actu.titre) else actu.chapo
+    texte = chapo or re.sub(r"[#*_`>\[\]]|\(https?://[^)]*\)", "", actu.corps) or actu.titre
     texte = " ".join(texte.split())
     if len(texte) > longueur:
         texte = texte[: longueur - 1].rsplit(" ", 1)[0] + "…"

@@ -661,3 +661,30 @@ class ImagesDuTexteTests(TestCase):
         page = BlogEntryPage.objects.get(title="Info Panoramax octobre 2026")
         self.assertEqual([b.block_type for b in page.body], ["markdown", "markdown", "buttons_list"])
         self.assertNotIn("mailinblue", self.client.get(page.url).content.decode())
+
+
+class VoiesLocalesTests(TestCase):
+    """Gabarit d'e-mail de Voies locales : bannière puis intertitre « Voies locales en commun »."""
+
+    HTML = """<html><body><table>
+<tr><td><img src="https://img.mailinblue.com/2/banniere.png"></td></tr>
+<tr><td><h2>Voies locales en commun</h2><p>Ce mois-ci le programme a passé un cap :</p></td></tr>
+<tr><td><h2>L'outil de saisie des voies est en test !</h2>
+<img src="https://img.mailinblue.com/2/outil.png" width="300">
+<p>Des séances de tests ont lieu.</p></td></tr></table></body></html>"""
+
+    def test_entete_court_retire(self):
+        md = en_markdown(self.HTML, "Info Voies locales en commun — novembre 2026")
+        self.assertTrue(md.startswith("Ce mois-ci le programme a passé un cap :"), md)
+        self.assertNotIn("banniere", md)
+        self.assertIn("outil.png", md)
+
+    def test_chapo_qui_repete_le_titre_ignore(self):
+        records = [
+            actu(1, "Info Voies locales en commun — novembre 2026", Equipe=["L", "Voies locales"],
+                 Source="Newsletter Brevo", Chapo="Info Voies locales en commun", Corps="Le programme a passé un cap.")
+        ]  # fmt: skip
+        actualites.run(actualites.parse(records), "actualites")
+        page = BlogEntryPage.objects.get(title="Info Voies locales en commun — novembre 2026")
+        self.assertEqual([b.block_type for b in page.body], ["markdown"])
+        self.assertEqual(page.search_description, "Le programme a passé un cap.")

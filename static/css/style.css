@@ -86,3 +86,13 @@ p:empty {
         order: 2;
     }
 }
+
+/* Fabrique : image d'un bloc « Image » sans ratio choisi. Le DSFR impose alors un ratio 16/9 sans recadrage,
+   ce qui étire l'image (logo en longueur, capture carrée…). On garde ses proportions d'origine, en limitant
+   la hauteur des images très hautes. Les images avec un ratio choisi (fr-ratio-…) ne changent pas. */
+.fr-content-media .fr-responsive-img:not([class*="fr-ratio-"]) {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: 32rem;
+    object-fit: contain;
+}
