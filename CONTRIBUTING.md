@@ -168,7 +168,80 @@ Pour ce faire la variable `EMAIL_BACKEND` doit être définie avec `django.core.
 
 ### Fichiers media
 
-Nous utilisons en production sur Scalingo un service d’« *Object Storage* » compatible avec l’API S3 pour le stockage de tous les fichiers medias.
+Nous utilisons en production sur Scalingo un service d’« *Object Storage* » compatible avec l’API S3 (OVHcloud) pour le stockage de tous les fichiers medias.
+
+#### URLs publiques et cache
+
+Sans la variable `S3_PUBLIC_HOST`, les URLs des médias sont signées (`X-Amz-Signature`). La signature change à chaque affichage, donc ni le navigateur ni un proxy ne peuvent garder les fichiers en cache.
+
+Si `S3_PUBLIC_HOST` est définie (en général avec la même valeur que `S3_HOST`) :
+
+* les URLs ne sont plus signées et restent stables. Chez OVHcloud, il faut aussi définir `S3_ADDRESSING_STYLE=virtual` (URLs `bucket.hôte/clé`) : OVHcloud refuse les requêtes anonymes au format `hôte/bucket/clé` (erreur 400 « Not S3 request »), qui est la valeur par défaut (`path`) ;
+* les images (`original_images/` et `images/`) sont envoyées avec une ACL `public-read`, objet par objet. OVHcloud ne gère pas les politiques de bucket, et une ACL publique sur le bucket permettrait d’en lister le contenu : le bucket reste donc privé ;
+* les documents restent privés sur S3. Ils sont servis par Wagtail (`WAGTAILDOCS_SERVE_METHOD = "serve_view"`), qui vérifie les restrictions des collections privées avant d’envoyer le fichier.
+
+Tous les fichiers envoyés reçoivent un en-tête `Cache-Control`, défini par `S3_CACHE_CONTROL`, ou à défaut `MEDIA_CACHE_CONTROL` (par défaut `public, max-age=3600`). Les noms de fichiers sont uniques (`file_overwrite=False`), on peut donc choisir une durée longue, par exemple `public, max-age=2592000`.
+
+La commande `set_s3_cache_control` met à jour les objets envoyés avant ces réglages. Elle peut être relancée sans risque :
+
+```sh
+python manage.py set_s3_cache_control --public-read --dry-run  # aperçu
+python manage.py set_s3_cache_control --public-read            # application
+```
+
+L’option `--public-read` rend les images publiques. Elle est automatique quand `S3_PUBLIC_HOST` est définie.
+
+La commande ne traite que les fichiers connus de Wagtail (images, renditions, documents) : elle lit leurs noms dans la base au lieu de lister le bucket. Elle vérifie qu’une image est publique avec une requête anonyme, au lieu de lire son ACL. Elle n’a donc besoin que des droits que l’utilisateur S3 de l’app doit avoir de toute façon : `s3:GetObject`, `s3:PutObject` et, pour les images publiques, `s3:PutObjectAcl` (aussi requis à chaque envoi d’image quand `S3_PUBLIC_HOST` est définie). `s3:ListBucket` et `s3:GetObjectAcl` ne sont pas nécessaires.
+
+#### Droits de l’utilisateur S3 (OVHcloud)
+
+Politique à importer pour l’utilisateur S3 de l’app (espace client OVHcloud → Public Cloud → Object Storage → *Utilisateurs S3* → *Importer une politique (JSON)*), via un fichier `userPolicy.json` ayant le contenu suivant, en remplaçant `<S3_BUCKET_NAME>` par le nom du bucket :
+
+```json
+{
+  "Statement": [
+    {
+      "Sid": "MediaObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:DeleteObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<S3_BUCKET_NAME>/*"
+      ]
+    }
+  ]
+}
+```
+
+| Droit | Utilisé pour |
+| --- | --- |
+| `s3:GetObject` | lecture des médias, `HEAD` de la commande `set_s3_cache_control` |
+| `s3:PutObject` | envoi de fichiers, copie faite par la commande |
+| `s3:PutObjectAcl` | images publiques, à l’envoi et dans la commande |
+| `s3:DeleteObject` | suppression d’images et de documents dans Wagtail |
+| `s3:AbortMultipartUpload`, `s3:ListMultipartUploadParts` | envoi de gros fichiers, que boto3 découpe en plusieurs morceaux |
+
+L’import **remplace** la politique existante : téléchargez-la d’abord, et reportez dans ce modèle les droits à conserver (par exemple sur d’autres buckets).
+
+L’utilisateur n’a pas `s3:ListBucket` : le bucket ne peut pas être listé, même avec les clés de l’app. En contrepartie, S3 répond 403 au lieu de 404 pour un objet absent. La commande compte donc ces objets comme « unreadable (missing or access denied) ».
+
+Un changement de politique peut mettre quelques minutes à s’appliquer chez OVHcloud : attendez avant de relancer la commande.
+
+Pour passer un environnement en URLs publiques, dans cet ordre :
+
+1. mettre à jour la politique de l’utilisateur S3 (voir ci-dessus) ;
+2. déployer, avec `S3_CACHE_CONTROL` défini ;
+3. lancer `set_s3_cache_control --public-read` (voir ci-dessus) ;
+4. définir `S3_PUBLIC_HOST` (et `S3_ADDRESSING_STYLE=virtual` chez OVHcloud) ;
+5. relancer la commande, pour les images envoyées entre les étapes 3 et 4.
+
+#### Stockage local
 
 En local, il est possible d’utiliser simplement le stockage de fichiers local (`FileSystemStorage`) en laissant vide la variable `S3_HOST` dans le fichier `.env`.
 Il est alors conseillé de définir la variable `MEDIA_ROOT` (par exemple à "medias") pour éviter la création de plusieurs répertoires de médias à la racine.
