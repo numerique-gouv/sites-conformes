@@ -241,3 +241,93 @@ class RenduTests(TestCase):
         ical = self.client.get(index.url + "ical/")
         self.assertEqual(ical.status_code, 200)
         self.assertIn(b"SUMMARY:D\xc3\xa9mo du RNB", ical.content)
+
+
+def png(couleur="red", taille=(64, 36)) -> bytes:
+    from PIL import Image as PILImage
+
+    tampon = io.BytesIO()
+    PILImage.new("RGB", taille, couleur).save(tampon, format="PNG")
+    return tampon.getvalue()
+
+
+class FausseGrist:
+    """Pièces jointes en mémoire, avec le compte des téléchargements."""
+
+    def __init__(self, fichiers: dict[int, tuple[str, bytes]]):
+        self.fichiers, self.telechargements = fichiers, []
+
+    def infos(self, attachment_id):
+        if attachment_id not in self.fichiers:
+            return None
+        nom, contenu = self.fichiers[attachment_id]
+        return {"fileName": nom, "fileSize": len(contenu)}
+
+    def download(self, attachment_id):
+        self.telechargements.append(attachment_id)
+        return self.fichiers[attachment_id][1]
+
+
+class ImageTests(TestCase):
+    def setUp(self):
+        import tempfile
+
+        from django.test import override_settings
+
+        self.media = tempfile.TemporaryDirectory()
+        self.addCleanup(self.media.cleanup)
+        reglages = override_settings(MEDIA_ROOT=self.media.name)
+        reglages.enable()
+        self.addCleanup(reglages.disable)
+        self.grist = FausseGrist({7: ("affiche.png", png()), 8: ("autre.png", png("blue")), 9: ("prog.pdf", b"%PDF")})
+
+    def sync(self, image=None):
+        records = copy.deepcopy(RECORDS)
+        records[0]["fields"]["Image"] = ["L", image] if image else None
+        return agenda.run(grist.parse(records), "agenda", pieces_jointes=self.grist)
+
+    def demo(self):
+        return EventEntryPage.objects.get(title="Démo du RNB")
+
+    def test_image_importee_une_seule_fois(self):
+        self.sync(7)
+        image = self.demo().header_image
+        self.assertIsNotNone(image)
+        self.assertEqual(image.collection.name, "Agenda")
+        self.assertEqual((image.width, image.height), (64, 36))
+        self.assertIsNone(EventEntryPage.objects.get(title="Atelier adresses").header_image)
+
+        report = self.sync(7)
+        self.assertIn("Démo du RNB", report.unchanged)
+        self.assertEqual(self.grist.telechargements, [7])
+
+        reponse = self.client.get(EventsIndexPage.objects.get(slug="agenda").url)
+        self.assertIn(image.file.url, reponse.content.decode())
+
+    def test_image_changee_puis_retiree(self):
+        self.sync(7)
+        self.sync(8)
+        self.assertIn("-8-", self.demo().header_image.file.name)
+        self.sync(None)
+        self.assertIsNone(self.demo().header_image)
+
+    def test_image_choisie_a_la_main_conservee(self):
+        from wagtail.images import get_image_model
+        from wagtail.images.tests.utils import get_test_image_file
+
+        self.sync(None)
+        manuelle = get_image_model().objects.create(title="Photo", file=get_test_image_file())
+        demo = self.demo()
+        demo.header_image = manuelle
+        demo.save_revision().publish()
+
+        self.sync(None)
+        self.assertEqual(self.demo().header_image, manuelle)
+        # Une image ajoutée ensuite dans Grist prend la place.
+        self.sync(7)
+        self.assertEqual(self.demo().header_image.collection.name, "Agenda")
+
+    def test_fichier_qui_n_est_pas_une_image(self):
+        self.sync(9)
+        self.assertIsNone(self.demo().header_image)
+        self.assertEqual(self.grist.telechargements, [])

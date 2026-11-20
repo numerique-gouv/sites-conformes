@@ -41,7 +41,11 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             try:
-                report = agenda.run(evenements, options["agenda_slug"], source)
+                # En simulation, pas d'import d'image : le fichier resterait dans le stockage malgré l'annulation.
+                pieces_jointes = (
+                    None if options["dry_run"] else grist.PiecesJointes(source.base_url, source.doc_id, api_key)
+                )
+                report = agenda.run(evenements, options["agenda_slug"], source, pieces_jointes)
             except RuntimeError as e:
                 raise CommandError(str(e)) from e
             if options["dry_run"]:

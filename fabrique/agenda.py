@@ -6,8 +6,13 @@
 - Une page Événement (EventEntryPage) par événement publié dans Grist. La
   synchronisation possède le titre, les dates, le lieu, le lien d'inscription,
   les étiquettes (type, équipes, séries) et les blocs du corps dont l'identifiant
-  commence par « grist- ». Les autres blocs, l'image d'en-tête et les réglages
-  restent aux éditeurs.
+  commence par « grist- ». Les autres blocs et les réglages restent aux éditeurs.
+- L'image de l'événement (colonne Image, pièce jointe) devient l'image d'en-tête
+  de la page : vignette dans la liste de l'agenda et dans la fiche de
+  l'événement, bandeau en haut de la page. Les images importées sont rangées dans
+  la collection « Agenda » de Wagtail. Une image d'en-tête choisie à la main
+  dans Wagtail (hors de cette collection) n'est remplacée que si l'événement a
+  une image dans Grist.
 - Une page dont l'événement a été dépublié ou supprimé dans Grist est dépubliée,
   mais reste dans Wagtail. Les événements passés restent en ligne (archives).
 
@@ -19,9 +24,12 @@ import html
 import logging
 import re
 from dataclasses import dataclass
+from io import BytesIO
 
+from django.core.files.images import ImageFile
 from django.utils.text import slugify
-from wagtail.models import Page, Site
+from wagtail.images import get_image_model
+from wagtail.models import Collection, Page, Site
 
 from events.models import EventEntryPage, EventsIndexPage
 from fabrique import grist
@@ -32,6 +40,9 @@ logger = logging.getLogger(__name__)
 
 OWNED_PREFIX = "grist-"
 PREFIXE_ANNULE = "Annulé : "
+COLLECTION_IMAGES = "Agenda"
+EXTENSIONS_IMAGES = {"jpg", "jpeg", "png", "webp", "gif"}
+TAILLE_MAX_IMAGE = 10 * 1024 * 1024
 
 
 @dataclass
@@ -148,6 +159,82 @@ def owned_blocks(ev: Evenement) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# Images
+# ---------------------------------------------------------------------------
+
+
+class Images:
+    """Importe dans Wagtail les images des événements, une seule fois chacune.
+
+    Le nom du fichier importé contient l'identifiant et la taille de la pièce jointe Grist : on retrouve ainsi
+    l'image déjà importée sans retélécharger le fichier à chaque synchronisation."""
+
+    def __init__(self, pieces_jointes: "grist.PiecesJointes | None", doc_id: str):
+        self.pieces_jointes, self.doc_id = pieces_jointes, doc_id
+        self._collection: Collection | None = None
+
+    @property
+    def collection(self) -> Collection:
+        if self._collection is None:
+            root = Collection.get_first_root_node()
+            self._collection = root.get_children().filter(name=COLLECTION_IMAGES).first() or root.add_child(
+                name=COLLECTION_IMAGES
+            )
+        return self._collection
+
+    def owns(self, image) -> bool:
+        return image is not None and image.collection_id == self.collection.id
+
+    def get(self, ev: Evenement):
+        """Image Wagtail de l'événement, ou None (pas d'image, fichier refusé ou Grist injoignable)."""
+        if not ev.image or self.pieces_jointes is None:
+            return None
+        try:
+            infos = self.pieces_jointes.infos(ev.image)
+        except RuntimeError as e:
+            logger.warning("%s : liste des pièces jointes illisible (%s).", ev.titre, e)
+            return None
+        if not infos:
+            return None
+        nom = str(infos.get("fileName") or "")
+        extension = nom.rsplit(".", 1)[-1].lower() if "." in nom else ""
+        taille = infos.get("fileSize") or 0
+        if extension not in EXTENSIONS_IMAGES:
+            logger.warning("%s : « %s » n'est pas une image JPG, PNG, WebP ou GIF, ignorée.", ev.titre, nom)
+            return None
+        if taille > TAILLE_MAX_IMAGE:
+            logger.warning("%s : image « %s » trop lourde (%s octets), ignorée.", ev.titre, nom, taille)
+            return None
+
+        cle = f"grist-{self.doc_id}-{ev.image}-{taille}"
+        Image = get_image_model()
+        image = Image.objects.filter(collection=self.collection, file__contains=cle).first()
+        if image is not None:
+            return image
+        try:
+            contenu = self.pieces_jointes.download(ev.image)
+        except RuntimeError as e:
+            logger.warning("%s : image « %s » non téléchargée (%s).", ev.titre, nom, e)
+            return None
+        image = Image(title=ev.titre[:255], collection=self.collection)
+        image.file = ImageFile(BytesIO(contenu), name=f"{cle}.{extension}")
+        image._set_image_file_metadata()
+        image.save()
+        return image
+
+    def resolve(self, ev: Evenement, actuelle):
+        """Image d'en-tête à donner à la page, compte tenu de celle qu'elle a déjà."""
+        image = self.get(ev)
+        if image is not None:
+            return image
+        if not ev.image and self.owns(actuelle):
+            # Image retirée dans Grist : on retire celle qu'on avait importée.
+            return None
+        # Pas d'image dans Grist et image choisie à la main, ou image Grist momentanément illisible : on garde.
+        return actuelle
+
+
+# ---------------------------------------------------------------------------
 # Champs de la page
 # ---------------------------------------------------------------------------
 
@@ -214,7 +301,9 @@ def get_or_create_agenda(root: Page, slug: str, report: Report) -> EventsIndexPa
     return index
 
 
-def sync_events(index: EventsIndexPage, evenements: list[Evenement], source: Source, report: Report) -> None:
+def sync_events(
+    index: EventsIndexPage, evenements: list[Evenement], source: Source, report: Report, images: Images
+) -> None:
     pages: dict[int, EventEntryPage] = {}
     for page in EventEntryPage.objects.child_of(index):
         row_id = source.row_id(page)
@@ -232,6 +321,7 @@ def sync_events(index: EventsIndexPage, evenements: list[Evenement], source: Sou
             continue
 
         values = event_values(ev, source)
+        values["header_image"] = images.resolve(ev, page.header_image if page is not None else None)
         tags = sorted(ev.etiquettes)
         if page is None:
             page = EventEntryPage(slug=_unique_slug(index, slugify(ev.titre)[:80] or "evenement"), **values)
@@ -277,10 +367,15 @@ def synced_live_pages(slug: str, source: Source) -> int:
     return sum(1 for p in EventEntryPage.objects.child_of(index).live() if source.row_id(p) is not None)
 
 
-def run(evenements: list[Evenement], slug: str, source: Source | None = None) -> Report:
+def run(
+    evenements: list[Evenement],
+    slug: str,
+    source: Source | None = None,
+    pieces_jointes: "grist.PiecesJointes | None" = None,
+) -> Report:
     source = source or Source()
     report = Report()
     root = Site.objects.get(is_default_site=True).root_page.specific
     index = get_or_create_agenda(root, slug, report)
-    sync_events(index, evenements, source, report)
+    sync_events(index, evenements, source, report, Images(pieces_jointes, source.doc_id))
     return report
