@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound
 from django.views import View
 from wagtail import hooks
@@ -45,7 +46,7 @@ class ServeFileView(View):
             # Never let a shared cache keep a copy of a restricted document
             response["Cache-Control"] = "private, no-store"
         else:
-            response["Cache-Control"] = "public, max-age=3600"
+            response["Cache-Control"] = settings.MEDIA_CACHE_CONTROL
         # Uploaded files (SVG, txt…) are served from the site's origin: prevent script execution and MIME sniffing
         response["Content-Security-Policy"] = "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'"
         response["X-Content-Type-Options"] = "nosniff"

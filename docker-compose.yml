@@ -11,6 +11,22 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  garage:
+    image: dxflrs/garage:v2.3.0
+    profiles:
+      - s3
+    ports:
+      - "3900:3900"  # S3-compatible API
+      - "3902:3902"  # S3 web (browser access)
+    volumes:
+      - garage_data:/data
+      - ./garage/garage.toml:/etc/garage.toml:ro
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: GKarageKEY00000000000000000
+      GARAGE_DEFAULT_SECRET_KEY: GKarageSECRETe1087f810d44b283bd7a61077c363893
+      GARAGE_DEFAULT_BUCKET: sites-conformes-media
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+
   web:
     build: .
     user: "1000:1000"
@@ -33,3 +49,4 @@ volumes:
   postgres_data:
   medias:
   staticfiles:
+  garage_data:
