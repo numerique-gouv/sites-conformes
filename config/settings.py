@@ -26,6 +26,18 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def getenv_bool(key: str, default: bool):
+    try:
+        value = os.environ[key]
+    except KeyError:
+        return default
+    return value.casefold() in ["1", "true"]
+
+
+def getenv_list(key: str, default: str) -> list[str]:
+    return os.getenv(key, default).replace(" ", "").split(",")
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -46,8 +58,8 @@ HOST_PORT = os.getenv("HOST_PORT", "")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#force-script-name
 FORCE_SCRIPT_NAME = os.getenv("FORCE_SCRIPT_NAME", "").rstrip("/")
 
-# Allow enabling WhiteNoise via an environment variable (disabled by default)
-SF_USE_WHITENOISE = True if os.getenv("SF_USE_WHITENOISE", False) in ["1", "True"] else False
+# Allow disabling WhiteNoise via an environment variable (enabled by default)
+SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", True)
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -123,7 +135,11 @@ MIDDLEWARE = [
 ]
 
 if SF_USE_WHITENOISE:
-    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    # WhiteNoise must come right after SecurityMiddleware so static files skip the rest of the stack
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+        "whitenoise.middleware.WhiteNoiseMiddleware",
+    )
 
 # Only add this on a dev machine, outside of tests
 if not TESTING and DEBUG and "localhost" in HOST_URL:
@@ -261,23 +277,67 @@ STATICFILES_FINDERS = [
 # S3 uploads & MEDIA CONFIGURATION
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
-if os.getenv("S3_HOST"):
-    endpoint_url = f"{os.getenv('S3_PROTOCOL', 'https')}://{os.getenv('S3_HOST')}"
+# Cache-Control default for all served media files.
+# Used by S3 object_parameters and the set_s3_cache_control backfill command.
+# Override per-deployment via the MEDIA_CACHE_CONTROL env var.
+MEDIA_CACHE_CONTROL = os.getenv("MEDIA_CACHE_CONTROL", "public, max-age=3600")
 
-    STORAGES["default"] = {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "bucket_name": os.getenv("S3_BUCKET_NAME", "set-bucket-name"),
-            "access_key": os.getenv("S3_KEY_ID", "123"),
-            "secret_key": os.getenv("S3_KEY_SECRET", "secret"),
-            "endpoint_url": endpoint_url,
-            "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
-            "file_overwrite": False,
-            "location": os.getenv("S3_LOCATION", ""),
+if os.getenv("S3_HOST"):
+    protocol = os.getenv("S3_PROTOCOL", "https")
+    endpoint_url = f"{protocol}://{os.getenv('S3_HOST')}"
+    bucket_name = os.getenv("S3_BUCKET_NAME", "set-bucket-name")
+    public_host = os.getenv("S3_PUBLIC_HOST", "")
+    addressing_style = os.getenv("S3_ADDRESSING_STYLE", "path")
+
+    s3_cache_control = os.getenv("S3_CACHE_CONTROL", MEDIA_CACHE_CONTROL)
+
+    options = {
+        "bucket_name": bucket_name,
+        "access_key": os.getenv("S3_KEY_ID", "123"),
+        "secret_key": os.getenv("S3_KEY_SECRET", "secret"),
+        "endpoint_url": endpoint_url,
+        "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
+        "file_overwrite": False,
+        "location": os.getenv("S3_LOCATION", ""),
+        "object_parameters": {
+            "CacheControl": s3_cache_control,
         },
     }
 
-    MEDIA_URL = f"{endpoint_url}/"
+    if os.getenv("S3_ADDRESSING_STYLE"):
+        # Also used by boto3 clients, including the unsigned one of set_s3_cache_control.
+        options["addressing_style"] = addressing_style
+
+    if public_host:
+        # Unsigned, stable URLs so that browsers and proxies can cache media.
+        # Images get a public-read ACL on upload (see content_manager/storages.py);
+        # documents stay private and are served by Wagtail (see below).
+        if addressing_style == "virtual":
+            # bucket.host/key: required by OVHcloud, which rejects anonymous
+            # path-style requests ("Not S3 request").
+            options["custom_domain"] = f"{bucket_name}.{public_host}"
+        else:
+            # host/bucket/key: path-style URLs, e.g. for MinIO (upstream default).
+            options["custom_domain"] = f"{public_host}/{bucket_name}"
+        options["url_protocol"] = f"{protocol}:"
+        options["querystring_auth"] = False
+        storage_backend = "content_manager.storages.PublicImagesS3Storage"
+        public_endpoint = f"{protocol}://{options['custom_domain'].split('/')[0]}"
+    else:
+        storage_backend = "storages.backends.s3.S3Storage"
+        public_endpoint = endpoint_url
+
+    STORAGES["default"] = {
+        "BACKEND": storage_backend,
+        "OPTIONS": options,
+    }
+
+    MEDIA_URL = f"{public_endpoint}/"
+
+    # Documents are private objects: serve them through Wagtail, which checks
+    # collection view restrictions, instead of redirecting to the S3 URL
+    # (that would expose restricted documents, or fail on unsigned URLs).
+    WAGTAILDOCS_SERVE_METHOD = "serve_view"
 else:
     STORAGES["default"] = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -294,17 +354,6 @@ STATIC_URL = os.getenv("STATIC_URL", "static/")
 
 if FORCE_SCRIPT_NAME and not STATIC_URL.startswith(FORCE_SCRIPT_NAME):
     STATIC_URL = f"{FORCE_SCRIPT_NAME}/{STATIC_URL}"
-
-
-# Allow Django to serve statics even in production if needed
-SF_PROD_SERVE_STATIC = True if os.getenv("SF_PROD_SERVE_STATIC", False) in ["1", "True"] else False
-if SF_PROD_SERVE_STATIC:
-    import mimetypes
-
-    mimetypes.add_type("application/javascript", ".js", True)
-    mimetypes.add_type("text/css", ".css", True)
-
-    WHITENOISE_STATIC_PREFIX = STATIC_URL
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
