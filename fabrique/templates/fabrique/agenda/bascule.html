@@ -1,0 +1,13 @@
+{# Bascule entre la vue calendrier (par défaut) et la liste de Sites Faciles. #}
+<ul class="fr-btns-group fr-btns-group--inline fr-btns-group--sm fr-btns-group--icon-left fr-mb-2w fabrique-bascule" aria-label="Affichage de l'agenda">
+  <li>
+    <a href="{{ url_calendrier }}#posts-list"
+       class="fr-btn fr-btn--icon-left fr-icon-calendar-line{% if vue != 'calendrier' %} fr-btn--secondary{% endif %}"
+       {% if vue == 'calendrier' %}aria-current="page"{% endif %}>Calendrier</a>
+  </li>
+  <li>
+    <a href="{{ url_liste }}#posts-list"
+       class="fr-btn fr-btn--icon-left fr-icon-list-unordered{% if vue != 'liste' %} fr-btn--secondary{% endif %}"
+       {% if vue == 'liste' %}aria-current="page"{% endif %}>Liste</a>
+  </li>
+</ul>

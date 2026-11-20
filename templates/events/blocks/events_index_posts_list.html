@@ -1,11 +1,20 @@
-{% load i18n wagtailimages_tags fabrique_images %}
+{% load i18n wagtailimages_tags fabrique_images agenda_calendrier %}
 {% comment %}
   Copie du gabarit de Sites Faciles (events) : vignette réduite et entière (max-480x270, classe fabrique-vignette)
   au lieu du fichier original recadré en 16:9. Voir fabrique/static/fabrique/agenda.css.
   Taille : même surface pour toutes les vignettes, logo carré ou en longueur (filtre largeur_vignette).
   Étiquettes : type de l'événement et équipes concernées, lus dans Grist (fabrique.EtiquettesEvenement) ;
   pour un événement saisi à la main, ses catégories comme dans Sites Faciles.
+  Vue : sur la page Agenda, calendrier par défaut (fabrique/calendrier.py), cartes avec ?vue=liste ;
+  sur les archives, toujours les cartes.
 {% endcomment %}
+{% vue_agenda as vue %}
+{% if vue %}
+  <div class="fr-col-12">{% bascule_agenda vue %}</div>
+{% endif %}
+{% if vue == "calendrier" %}
+  <div class="fr-col-12">{% calendrier_agenda %}</div>
+{% else %}
 {% for post in posts %}
   <div class="fr-col fr-col-md-6">
     <div class="fr-card fr-enlarge-link">
@@ -73,3 +82,4 @@
     <p>{% translate "No event found." %}</p>
   </div>
 {% endfor %}
+{% endif %}
