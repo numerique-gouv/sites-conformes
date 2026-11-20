@@ -29,6 +29,22 @@ anciens menus en a besoin. Il sera retiré dans une version ultérieure :
 anciens menus ne seraient pas convertis.
 :::
 
+## Prochaine version - Fichiers statiques servis par WhiteNoise
+
+Quand `SF_USE_WHITENOISE=1`, les fichiers statiques étaient en réalité servis
+par `dj-static`, qui enveloppait l’application dans `config/wsgi.py` et
+interceptait les requêtes avant WhiteNoise. C’est désormais WhiteNoise qui les
+sert, compressés en gzip et brotli, avec un cache navigateur illimité pour les
+fichiers hashés par `collectstatic`.
+
+- La variable `SF_PROD_SERVE_STATIC` est supprimée : elle n’avait pas d’utilité
+  avec WhiteNoise et empêchait de servir les statiques depuis un sous-répertoire
+  (`FORCE_SCRIPT_NAME`). Vous pouvez la retirer de vos variables
+  d’environnement.
+- Si votre projet a son propre `settings.py`, placez
+  `whitenoise.middleware.WhiteNoiseMiddleware` juste après
+  `django.middleware.security.SecurityMiddleware` (voir {doc}`paquet/configuration`).
+
 ## v4.0.0 - Packagification
 
 Cette version transforme `sites-conformes` en package Python distribué sur

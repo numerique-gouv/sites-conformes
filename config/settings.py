@@ -144,7 +144,7 @@ if not TESTING and DEBUG and "localhost" in HOST_URL:
 # Middleware definition
 
 MIDDLEWARE = [
-    # Must stay first so that it also wraps WhiteNoise, appended below
+    # Must stay first so that it also wraps WhiteNoise, inserted below
     "sites_conformes.core.middleware.NoIndexMiddleware",
     # Outside of the session and CSRF middlewares, to see the cookies they set
     "sites_conformes.core.middleware.PublicCacheMiddleware",
@@ -162,7 +162,11 @@ MIDDLEWARE = [
 ]
 
 if SF_USE_WHITENOISE:
-    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    # Right after SecurityMiddleware, so that static files skip the rest of the stack
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+        "whitenoise.middleware.WhiteNoiseMiddleware",
+    )
 
 # Only add this on a dev machine, outside of tests
 if not TESTING and DEBUG and "localhost" in HOST_URL:
@@ -359,16 +363,6 @@ STATIC_URL = os.getenv("STATIC_URL", "static/")
 if FORCE_SCRIPT_NAME and not STATIC_URL.startswith(FORCE_SCRIPT_NAME):
     STATIC_URL = f"{FORCE_SCRIPT_NAME}/{STATIC_URL}"
 
-
-# Allow Django to serve statics even in production if needed
-SF_PROD_SERVE_STATIC = getenv_bool("SF_PROD_SERVE_STATIC", False)
-if SF_PROD_SERVE_STATIC:
-    import mimetypes
-
-    mimetypes.add_type("application/javascript", ".js", True)
-    mimetypes.add_type("text/css", ".css", True)
-
-    WHITENOISE_STATIC_PREFIX = STATIC_URL
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "sites_conformes/static"),)
 
