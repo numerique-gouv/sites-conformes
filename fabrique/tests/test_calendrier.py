@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
@@ -109,3 +110,46 @@ class CalendrierTests(TestCase):
 
         requete = RequestFactory().get("/agenda/", {"date_from": "2027-06-12"})
         self.assertEqual(calendrier.construire(self.index, requete, date(2027, 3, 18))["titre_mois"], "Juin 2027")
+
+
+class FiltresEtiquettesTests(TestCase):
+    def setUp(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        root = Site.objects.get(is_default_site=True).root_page
+        self.index = EventsIndexPage(title="Agenda", slug="agenda")
+        root.add_child(instance=self.index)
+        self.index.save_revision().publish()
+        debut = timezone.now() + timedelta(days=30)
+        for titre, type_, equipes, serie in [
+            ("Démo RNB", "Démo", ["RNB"], None),
+            ("Statuts", "Webinaire", ["Panoramax", "Fabrique de la donnée territoriale"], None),
+            ("Vigie", "Rencontre", ["Fabrique de la donnée territoriale"], "Collectif vigie"),
+        ]:
+            page = EventEntryPage(title=titre, slug=slugify(titre), event_date_start=debut, event_date_end=debut)
+            page.tags.set([t for t in [type_, *equipes, serie] if t])
+            self.index.add_child(instance=page)
+            page.save_revision().publish()
+            EtiquettesEvenement.objects.create(page=page, type=type_, equipes=equipes)
+
+    def test_trois_groupes(self):
+        contenu = self.client.get(self.index.url).content.decode()
+        self.assertNotIn("Filtrer par étiquette", contenu)
+        positions = [contenu.index(t) for t in ("Par équipe", "Par type d&#x27;événement", "Par série")]
+        self.assertEqual(positions, sorted(positions))
+        equipes, reste = contenu.split("Par équipe", 1)[1].split("Par type d&#x27;événement", 1)
+        types, series = reste.split("Par série", 1)
+        series = series.split("Export", 1)[0]
+        nettoie = lambda bloc: re.findall(r'class="fr-tag[^"]*"[^>]*>\s*([^<]+?)\s*</a>', bloc)  # noqa: E731
+        self.assertEqual(nettoie(equipes), ["Fabrique de la donnée territoriale", "Panoramax", "RNB"])
+        self.assertEqual(nettoie(types), ["Démo", "Rencontre", "Webinaire"])
+        self.assertEqual(nettoie(series), ["Collectif vigie"])
+        self.assertIn('class="fr-tag fr-tag--purple-glycine"', equipes)  # Panoramax, comme dans le calendrier
+        self.assertIn('class="fr-tag fr-tag--green-emeraude"', equipes)  # RNB
+        self.assertIn('class="fr-tag fr-tag--blue-ecume"', types)
+
+    def test_filtre_actif(self):
+        contenu = self.client.get(self.index.url + "?tag=rnb").content.decode()
+        self.assertRegex(contenu, r'href="/agenda/#posts-list"\s+aria-pressed="true">\s*RNB')
