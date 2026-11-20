@@ -11,7 +11,7 @@ set -a
 set +a
 
 if [[ -z "$BACKUP_DIR" ]]; then
-    echo "Please set BACKUP_DIR to a directory outsite of the django path" 1>&2
+    echo "Please set BACKUP_DIR to a directory outside of the django path" 1>&2
     exit 1
 fi
 
