@@ -172,16 +172,18 @@ class Images:
     Le nom du fichier importé contient l'identifiant et la taille de la pièce jointe Grist : on retrouve ainsi
     l'image déjà importée sans retélécharger le fichier à chaque synchronisation."""
 
-    def __init__(self, pieces_jointes: "grist.PiecesJointes | None", doc_id: str):
-        self.pieces_jointes, self.doc_id = pieces_jointes, doc_id
+    def __init__(
+        self, pieces_jointes: "grist.PiecesJointes | None", doc_id: str, collection_name: str = COLLECTION_IMAGES
+    ):
+        self.pieces_jointes, self.doc_id, self.collection_name = pieces_jointes, doc_id, collection_name
         self._collection: Collection | None = None
 
     @property
     def collection(self) -> Collection:
         if self._collection is None:
             root = Collection.get_first_root_node()
-            self._collection = root.get_children().filter(name=COLLECTION_IMAGES).first() or root.add_child(
-                name=COLLECTION_IMAGES
+            self._collection = root.get_children().filter(name=self.collection_name).first() or root.add_child(
+                name=self.collection_name
             )
         return self._collection
 

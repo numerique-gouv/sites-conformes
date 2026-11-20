@@ -21,6 +21,7 @@ DEFAULT_BASE_URL = "https://grist.numerique.gouv.fr"
 DEFAULT_ORG = "fab-donnee-territoriale"
 DEFAULT_DOC_ID = "habcH4ftoLRf"
 TABLE = "Evenements"
+TABLE_ACTUS = "Actus"
 
 # Durée retenue quand la fin n'est pas renseignée (même règle que le lien Outlook calculé dans Grist).
 DUREE_PAR_DEFAUT = timedelta(hours=1)
@@ -133,12 +134,13 @@ def _request(
     payload: dict | None = None,
     timeout: int = 60,
     attempts: int = 3,
+    headers: dict | None = None,
 ) -> bytes:
     """Corps de la réponse. Lève une RuntimeError après les essais.
 
     Sans clé, la requête est anonyme (calendrier iCal public). Un ajout (POST) n'est jamais retenté, pour ne
     pas créer de doublons si la première requête a abouti malgré l'erreur."""
-    headers = {"User-Agent": "fabrique-site-facile/sync"}
+    headers = {"User-Agent": "fabrique-site-facile/sync", **(headers or {})}
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
     data = None
@@ -174,21 +176,25 @@ def _api(base_url: str, doc_id: str) -> str:
     return f"{base_url.rstrip('/')}/api/docs/{doc_id}"
 
 
-def fetch_records(base_url: str, doc_id: str, api_key: str) -> list[dict]:
-    """Toutes les lignes de la table Evenements. Lève une erreur si le document est illisible."""
-    return json.loads(_get(f"{_api(base_url, doc_id)}/tables/{TABLE}/records", api_key))["records"]
+def fetch_records(base_url: str, doc_id: str, api_key: str, table: str = TABLE) -> list[dict]:
+    """Toutes les lignes de la table (Evenements par défaut). Lève une erreur si le document est illisible."""
+    return json.loads(_get(f"{_api(base_url, doc_id)}/tables/{table}/records", api_key))["records"]
 
 
-def add_records(base_url: str, doc_id: str, api_key: str, fields: list[dict], lot: int = 100) -> None:
-    """Ajoute des lignes à la table Evenements, par lots."""
-    url = f"{_api(base_url, doc_id)}/tables/{TABLE}/records"
+def add_records(
+    base_url: str, doc_id: str, api_key: str, fields: list[dict], lot: int = 100, table: str = TABLE
+) -> None:
+    """Ajoute des lignes à la table (Evenements par défaut), par lots."""
+    url = f"{_api(base_url, doc_id)}/tables/{table}/records"
     for i in range(0, len(fields), lot):
         _request(url, api_key, "POST", {"records": [{"fields": f} for f in fields[i : i + lot]]})
 
 
-def update_records(base_url: str, doc_id: str, api_key: str, records: list[dict], lot: int = 100) -> None:
-    """Modifie des lignes de la table Evenements : [{"id": …, "fields": {…}}, …], par lots."""
-    url = f"{_api(base_url, doc_id)}/tables/{TABLE}/records"
+def update_records(
+    base_url: str, doc_id: str, api_key: str, records: list[dict], lot: int = 100, table: str = TABLE
+) -> None:
+    """Modifie des lignes de la table (Evenements par défaut) : [{"id": …, "fields": {…}}, …], par lots."""
+    url = f"{_api(base_url, doc_id)}/tables/{table}/records"
     for i in range(0, len(records), lot):
         _request(url, api_key, "PATCH", {"records": records[i : i + lot]})
 

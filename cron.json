@@ -8,6 +8,9 @@
     },
     {
       "command": "*/15 * * * * python manage.py sync_agenda_grist"
+    },
+    {
+      "command": "*/15 * * * * python manage.py sync_actualites_grist"
     }
   ]
 }
