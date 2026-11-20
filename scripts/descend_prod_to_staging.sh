@@ -226,10 +226,18 @@ check_db() {
     LOCAL_PG_VERSION=`pg_restore --version | awk '{print $3}'`
     LOCAL_PG_MAJOR=`pg_major "${LOCAL_PG_VERSION}"`
 
-    local dump_header
-    if ! dump_header=`pg_restore -l ${DUMP_FILE} | grep -E '^; +Dumped (from|by)'`; then
+    if ! pg_restore -l ${DUMP_FILE} > ${WORK_DIR}/dump.list; then
         echo "pg_restore ${LOCAL_PG_VERSION} cannot read the dump," \
             "it was probably made by a newer pg_dump: install a newer postgresql-client" 1>&2
+        exit 1
+    fi
+    local dump_header
+    dump_header=`grep -E '^; +Dumped (from|by)' ${WORK_DIR}/dump.list || true`
+
+    # Tables of the dump, to check the restoration (sorted in the C locale for comm)
+    DUMP_TABLES=`awk '$4 == "TABLE" && $5 == "public" {print $6}' ${WORK_DIR}/dump.list | LC_ALL=C sort -u`
+    if ! echo "${DUMP_TABLES}" | grep -qx 'django_migrations'; then
+        echo "No django_migrations table in the dump, see ${WORK_DIR}/dump.list" 1>&2
         exit 1
     fi
     PROD_PG_VERSION=`echo "${dump_header}" | sed -nE 's/^; +Dumped from database version: *//p'`
@@ -314,9 +322,60 @@ check_db() {
 
 #### Operations
 
+# Stop the script when the restoration failed: check_restoration STATUS LOG
+# The tables of staging were dropped before: `migrate` must not run on an empty or partial database.
+check_restoration() {
+    local status=$1 log=$2
+    local failure="" unexpected_errors staging_tables missing_tables migrations_count
+
+    # Errors on extensions are expected with the Scalingo user rights, and a pg_restore newer than
+    # the server sends settings unknown to it (eg. transaction_timeout, from PostgreSQL 17).
+    # Any other error (lost connection, failed data load...) means that the database is incomplete.
+    unexpected_errors=`grep '^pg_restore: error:' ${log} | grep -viE 'extension|transaction_timeout' || true`
+    if [[ -n "$unexpected_errors" ]]; then
+        failure="pg_restore reported unexpected errors:
+${unexpected_errors}"
+    elif ! staging_tables=`psql "${DB_URL}" -v ON_ERROR_STOP=1 -Atc \
+        "SELECT tablename FROM pg_tables WHERE schemaname = 'public'" | LC_ALL=C sort -u`; then
+        failure="Could not read the tables of the staging database after the restoration"
+    else
+        missing_tables=`LC_ALL=C comm -23 <(echo "${DUMP_TABLES}") <(echo "${staging_tables}")`
+        if [[ -n "$missing_tables" ]]; then
+            failure="`echo "${missing_tables}" | wc -l` tables of the dump are missing in the staging database:
+${missing_tables}"
+        elif ! migrations_count=`psql "${DB_URL}" -v ON_ERROR_STOP=1 -Atc "SELECT count(*) FROM django_migrations"` \
+            || [[ "$migrations_count" -eq 0 ]]; then
+            failure="The django_migrations table of the staging database is empty or unreadable"
+        fi
+    fi
+
+    if [[ -n "$failure" ]]; then
+        echo 1>&2
+        echo "The restoration FAILED (pg_restore exit code: ${status}). ${failure}" 1>&2
+        echo "The staging database is empty or incomplete: migrate and set_config were not run." 1>&2
+        echo "The pg_restore output is kept in ${log}. Run the script again with --db-only." 1>&2
+        exit 1
+    fi
+
+    if [[ $status -ne 0 ]]; then
+        echo "pg_restore reported errors (see above), they are only about extensions or settings" \
+            "unknown to the server: the restoration is complete"
+    fi
+}
+
 restore_db() {
     # Stop the web containers so that the staging code does not write during the restoration
-    WEB_AMOUNT=`sc_retry ${STAGING_REGION} ${STAGING_APP} ps | grep -cE '│ *web-[0-9]+ ' || true`
+    # Separate assignment, so that set -e stops the script when the Scalingo call fails
+    local ps_output
+    ps_output=`sc_retry ${STAGING_REGION} ${STAGING_APP} ps`
+    WEB_AMOUNT=`echo "${ps_output}" | grep -cE '│ *web-[0-9]+ ' || true`
+    # No match while the output mentions web containers: the table format has changed
+    if [[ "$WEB_AMOUNT" -eq 0 ]] && echo "${ps_output}" | grep -q 'web'; then
+        echo "Could not read the number of web containers of ${STAGING_APP} in the output of" \
+            "\`scalingo ps\`, aborting before modifying the database:" 1>&2
+        echo "${ps_output}" 1>&2
+        exit 1
+    fi
     if [[ "$WEB_AMOUNT" -gt 0 ]]; then
         # Restart the web containers whatever happens next. Set before scaling down: the scale-down
         # may be applied even if the CLI call fails, and scaling back to WEB_AMOUNT is idempotent
@@ -337,11 +396,12 @@ restore_db() {
     echo "`echo -n "${drop_statements}" | grep -c '' || true` tables dropped"
 
     echo "Restoring the backup"
-    # Errors on extensions or comments are expected with the Scalingo user rights, and a pg_restore
-    # newer than the server may send settings unknown to it (eg. transaction_timeout, from PostgreSQL 17)
+    local restore_log=${WORK_DIR}/pg_restore.log
+    local restore_status=0
     pg_restore --clean --if-exists --no-owner --no-privileges --no-comments -d "${DB_URL}" ${DUMP_FILE} \
-        || echo "pg_restore reported errors (see above), check that they are only about extensions, comments" \
-            "or settings unknown to the server (eg. transaction_timeout)"
+        2> ${restore_log} || restore_status=$?
+    cat ${restore_log} 1>&2
+    check_restoration ${restore_status} ${restore_log}
 
     kill ${TUNNEL_PID} 2> /dev/null || true
 
