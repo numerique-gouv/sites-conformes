@@ -186,7 +186,7 @@ class SyncTests(TestCase):
             self.run_sync()
 
 
-@mock.patch.dict("os.environ", {"GRIST_API_KEY": "cle-de-test"})
+@mock.patch.dict("os.environ", {"GRIST_API_KEY": "cle-de-test", "AGENDA_CALENDRIERS": ""})
 class CommandTests(TestCase):
     def call(self, records, *args):
         out, err = io.StringIO(), io.StringIO()
