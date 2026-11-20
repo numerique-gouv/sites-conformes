@@ -77,13 +77,18 @@ Le mieux est d'utiliser un compte qui n'a que l'accès en lecture au document.
 - Le titre (précédé de « Annulé : » si l'événement est annulé), les dates de début et de fin, le lieu (« En ligne »
   s'il n'y a qu'un lien de visio) et le lien d'inscription.
 - Les étiquettes : type, équipes et séries de l'événement.
+- L'image d'en-tête, à partir de la colonne Image (pièce jointe JPG, PNG, WebP ou GIF, 10 Mo au plus ; format
+  paysage conseillé). Elle sert de vignette dans la liste de l'agenda et dans la fiche de l'événement, et de bandeau
+  en haut de la page. Les images importées sont rangées dans la collection « Agenda » de Wagtail ; chaque fichier
+  n'est téléchargé qu'une fois. Une image retirée dans Grist est retirée de la page.
 - Dans le corps, les blocs dont l'identifiant commence par `grist-` : alerte d'annulation, public et places restantes,
   description (markdown) et boutons (s'inscrire, rejoindre la visio, page de l'événement, ajouter à Outlook).
 
 **Ce qu'elle ne touche jamais**
 - Les autres blocs du corps, ni leur emplacement. On peut par exemple ajouter une vidéo ou un programme détaillé
   sous les blocs synchronisés.
-- L'image d'en-tête, les réglages des pages et les événements créés à la main dans Wagtail.
+- Les réglages des pages et les événements créés à la main dans Wagtail.
+- Une image d'en-tête choisie à la main dans Wagtail, tant que l'événement n'a pas d'image dans Grist.
 
 **Publication**
 - Seuls les événements dont la case « Publié » est cochée dans Grist arrivent sur le site.

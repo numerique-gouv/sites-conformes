@@ -46,6 +46,7 @@ class Evenement:
     lien_inscription: str = ""
     places_restantes: int | None = None
     lien_outlook: str = ""
+    image: int | None = None  # identifiant de la pièce jointe (colonne Image)
 
     @property
     def etiquettes(self) -> list[str]:
@@ -81,6 +82,13 @@ def _entier(valeur) -> int | None:
     return valeur if isinstance(valeur, int) and not isinstance(valeur, bool) else None
 
 
+def _premiere_piece_jointe(valeur) -> int | None:
+    """Colonne « pièces jointes » : Grist renvoie ["L", id1, id2…]. On garde la première."""
+    if isinstance(valeur, list):
+        return next((_entier(v) for v in valeur[1:] if _entier(v) is not None), None)
+    return None
+
+
 def parse(records: list[dict]) -> list[Evenement]:
     """Événements publiés (case « Publié » cochée, avec un titre et une date de début), triés par date."""
     evenements = []
@@ -112,14 +120,14 @@ def parse(records: list[dict]) -> list[Evenement]:
                 lien_inscription=_texte(f.get("Lien_inscription")),
                 places_restantes=_entier(f.get("Places_restantes")),
                 lien_outlook=_texte(f.get("Ajouter_outlook")),
+                image=_premiere_piece_jointe(f.get("Image")),
             )
         )
     return sorted(evenements, key=lambda e: (e.debut, e.id))
 
 
-def fetch_records(base_url: str, doc_id: str, api_key: str, timeout: int = 60, attempts: int = 3) -> list[dict]:
-    """Toutes les lignes de la table Evenements. Lève une erreur si le document est illisible."""
-    url = f"{base_url.rstrip('/')}/api/docs/{doc_id}/tables/{TABLE}/records"
+def _get(url: str, api_key: str, timeout: int = 60, attempts: int = 3) -> bytes:
+    """Corps de la réponse à une requête GET authentifiée. Lève une RuntimeError après les essais."""
     request = urllib.request.Request(
         url, headers={"Authorization": f"Bearer {api_key}", "User-Agent": "fabrique-site-facile/sync"}
     )
@@ -127,7 +135,7 @@ def fetch_records(base_url: str, doc_id: str, api_key: str, timeout: int = 60, a
     for attempt in range(attempts):
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 (URL https configurée)
-                return json.load(response)["records"]
+                return response.read()
         except urllib.error.HTTPError as e:
             last_error = e
             # Clé refusée, document ou table introuvable : inutile de réessayer.
@@ -138,6 +146,36 @@ def fetch_records(base_url: str, doc_id: str, api_key: str, timeout: int = 60, a
         logger.warning("Lecture de %s impossible (essai %s/%s) : %s", url, attempt + 1, attempts, last_error)
         time.sleep(3 * (attempt + 1))
     raise RuntimeError(f"Lecture de l'agenda Grist impossible ({url}) : {last_error}")
+
+
+def _api(base_url: str, doc_id: str) -> str:
+    return f"{base_url.rstrip('/')}/api/docs/{doc_id}"
+
+
+def fetch_records(base_url: str, doc_id: str, api_key: str) -> list[dict]:
+    """Toutes les lignes de la table Evenements. Lève une erreur si le document est illisible."""
+    return json.loads(_get(f"{_api(base_url, doc_id)}/tables/{TABLE}/records", api_key))["records"]
+
+
+class PiecesJointes:
+    """Accès aux pièces jointes du document (images des événements).
+
+    La liste (nom et taille des fichiers) est lue une fois, à la première image demandée ; un fichier n'est
+    téléchargé que s'il n'a pas déjà été importé dans Wagtail."""
+
+    def __init__(self, base_url: str, doc_id: str, api_key: str):
+        self.base_url, self.doc_id, self.api_key = base_url, doc_id, api_key
+        self._infos: dict[int, dict] | None = None
+
+    def infos(self, attachment_id: int) -> dict | None:
+        """{"fileName": …, "fileSize": …} de la pièce jointe, ou None si elle n'existe plus."""
+        if self._infos is None:
+            records = json.loads(_get(f"{_api(self.base_url, self.doc_id)}/attachments", self.api_key))["records"]
+            self._infos = {r["id"]: r.get("fields", {}) for r in records}
+        return self._infos.get(attachment_id)
+
+    def download(self, attachment_id: int) -> bytes:
+        return _get(f"{_api(self.base_url, self.doc_id)}/attachments/{attachment_id}/download", self.api_key)
 
 
 def source_url(base_url: str, org: str, doc_id: str, row_id: int) -> str:
