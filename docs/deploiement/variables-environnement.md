@@ -90,6 +90,37 @@ il a alors la priorité sur les autres modes de stockage.
 | `S3_LOCATION` | Sous-dossier dans le bucket (permet de partager un bucket entre plusieurs sites). | *(vide)* | ⚪ |
 | `S3_PROTOCOL` | Protocole de connexion au service S3. | `https` | ⚪ |
 | `S3_PUBLIC_HOST` | Hôte public distinct de l’hôte interne (cas d’un MinIO derrière un proxy). | *(vide)* | ⚪ |
+| `S3_PUBLIC_RENDITIONS` | Rend publics les rendus d’images (voir ci-dessous). | `False` | ⚪ |
+
+### Rendus d’images publics
+
+Par défaut, les fichiers du bucket sont privés et leurs URL sont signées :
+elles expirent au bout d’une heure. C’est sans effet pour les visiteurs, car
+chaque affichage de page génère de nouvelles URL, mais tout ce qui garde une
+URL d’image plus longtemps tombe ensuite sur une erreur 403 : les aperçus de
+partage sur les réseaux sociaux (`og:image`), qui récupèrent l’image plus tard,
+ou un cache placé devant le site.
+
+Avec `S3_PUBLIC_RENDITIONS=True`, les **rendus** d’images (les versions
+redimensionnées, utilisées dans les pages et les aperçus de partage) sont
+déposés en lecture publique (ACL `public-read`) et servis sans signature :
+leurs URL n’expirent plus. Les images originales et les documents restent
+privés et signés. Cette option ne nécessite pas de *bucket policy* : elle
+fonctionne aussi chez les fournisseurs qui ne les gèrent pas, à condition
+qu’ils acceptent les ACL par objet.
+
+:::{warning}
+Une fois l’option activée, toute personne qui connaît l’URL d’un rendu peut
+l’afficher, y compris pour une image utilisée uniquement sur une page à accès
+restreint.
+:::
+
+Les rendus déjà créés restent privés. Après avoir activé l’option, supprimez-les
+pour qu’ils soient recréés en public à la prochaine visite :
+
+```sh
+python manage.py wagtail_update_image_renditions --purge-only
+```
 
 ## Envoi d’e-mails
 
