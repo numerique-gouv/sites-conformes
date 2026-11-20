@@ -7,8 +7,9 @@
   rédigés dans Grist et infolettres importées de Brevo. La synchronisation
   possède le titre, la date, la description, les catégories (une par équipe),
   l'étiquette « Newsletter », l'image d'en-tête et les blocs du corps dont
-  l'identifiant commence par « grist- » (chapô, texte, bouton vers la version
-  web). Les autres blocs et les réglages restent aux éditeurs.
+  l'identifiant commence par « grist- » (chapô, texte, images, bouton vers la
+  version web). Les images du texte sont rapatriées dans la médiathèque : le
+  site n'affiche aucune image hébergée chez un tiers. Les autres blocs et les réglages restent aux éditeurs.
 - Les catégories manquantes sont créées : l'actu remonte alors sur la fiche
   produit de l'équipe (champ « Catégorie des actualités »).
 - Une page dont l'actu a été dépubliée ou supprimée dans Grist est dépubliée,
@@ -34,9 +35,10 @@ from wagtail.contrib.redirects.models import Redirect
 from wagtail.models import Locale, Page, Site
 
 from blog.models import BlogEntryPage, BlogIndexPage, Category, CategoryEntryPage
-from fabrique import grist
+from fabrique import grist, images
 from fabrique.agenda import Images, _bouton, merge_owned_group
 from fabrique.infolettre_html import MOIS
+from fabrique.models import ImageImportee
 from fabrique.newsletters import SOURCE as SOURCE_NEWSLETTER
 from fabrique.sync import Report, _normalize, _publish, _unique_slug
 
@@ -117,14 +119,90 @@ class Source:
 # ---------------------------------------------------------------------------
 
 
-def owned_blocks(actu: Actu) -> list[dict]:
+# Image seule dans son paragraphe, avec ou sans lien : « ![alt](src) » ou « [![alt](src)](lien) ».
+IMAGE_SEULE = re.compile(r"\[?!\[([^\]]*)\]\((\S+?)\)(?:\]\((\S+?)\))?")
+IMAGE_DANS_LE_TEXTE = re.compile(r"\[?!\[([^\]]*)\]\((\S+?)\)(?:\]\((\S+?)\))?")
+
+
+class ImagesCorps:
+    """Images du texte des actus (infolettres), rapatriées dans la médiathèque, collection « Actualités ».
+
+    Le site n'affiche ainsi aucune image hébergée chez un tiers (Brevo…) : chaque visiteur ne contacte que le site
+    et son stockage. Une image déjà importée n'est pas retéléchargée : les adresses d'images d'une infolettre ne
+    changent pas."""
+
+    def __init__(self, telecharger: bool = True, importer=None):
+        self.telecharger, self.importer, self._cache = telecharger, importer, {}
+
+    def get(self, url: str, titre: str):
+        if url not in self._cache:
+            connue = ImageImportee.objects.select_related("image").filter(url=url).first()
+            if connue is not None:
+                self._cache[url] = connue.image
+            elif not self.telecharger:
+                self._cache[url] = None
+            else:
+                importer = self.importer or images.import_image
+                self._cache[url] = importer(url, titre[:255], collection_name=COLLECTION_IMAGES)
+        return self._cache[url]
+
+
+def blocs_corps(actu: Actu, images_corps: "ImagesCorps | None") -> list[tuple[str, object]]:
+    """Le texte markdown découpé en blocs : du texte, et un bloc image pour chaque image seule dans son paragraphe.
+
+    Les images sont celles de la médiathèque (adresse générée à l'affichage) ; une image qui n'a pas pu être
+    importée est omise, et retentée au passage suivant. Une image au milieu d'un paragraphe est retirée (son texte
+    alternatif est gardé) : le site ne charge aucune image hébergée ailleurs."""
+    blocs: list[tuple[str, object]] = []
+    texte: list[str] = []
+
+    def vider():
+        if texte:
+            blocs.append(("markdown", "\n\n".join(texte)))
+            texte.clear()
+
+    for paragraphe in re.split(r"\n{2,}", actu.corps.strip()):
+        seule = IMAGE_SEULE.fullmatch(paragraphe.strip())
+        if seule:
+            alt, src, lien = seule.groups()
+            image = images_corps.get(src, f"{actu.titre} — image") if images_corps is not None else None
+            vider()
+            if image is not None:
+                blocs.append(("image", {"image": image, "alt": alt, "url": lien or ""}))
+            continue
+        paragraphe = IMAGE_DANS_LE_TEXTE.sub(lambda m: m.group(1), paragraphe).strip()
+        if paragraphe:
+            texte.append(paragraphe)
+    vider()
+    return blocs
+
+
+def owned_blocks(actu: Actu, images_corps: "ImagesCorps | None" = None) -> list[dict]:
     blocks = []
     if actu.chapo:
         blocks.append(
             {"type": "paragraph", "id": f"{OWNED_PREFIX}chapo", "value": f"<p><b>{html.escape(actu.chapo)}</b></p>"}
         )
-    if actu.corps:
-        blocks.append({"type": "markdown", "id": f"{OWNED_PREFIX}corps", "value": actu.corps})
+    for n, (type_, valeur) in enumerate(blocs_corps(actu, images_corps), start=1):
+        if type_ == "markdown":
+            blocks.append({"type": "markdown", "id": f"{OWNED_PREFIX}corps-{n}", "value": valeur})
+        else:
+            blocks.append(
+                {
+                    "type": "image",
+                    "id": f"{OWNED_PREFIX}image-{n}",
+                    "value": {
+                        "title": "",
+                        "heading_tag": "h3",
+                        "image": valeur["image"].pk,
+                        "alt": valeur["alt"],
+                        "width": "fr-content-media--sm",
+                        "image_ratio": "",
+                        "caption": "",
+                        "url": valeur["url"],
+                    },
+                }
+            )
     if actu.lien:
         if actu.newsletter:
             # Contenu affiché en entier : le bouton mène à l'original ; sinon c'est le seul accès au contenu.
@@ -288,7 +366,14 @@ def _rediriger(ancienne: Page, nouvelle: Page) -> None:
     )
 
 
-def sync_actus(index: BlogIndexPage, actus: list[Actu], source: Source, report: Report, images: Images) -> None:
+def sync_actus(
+    index: BlogIndexPage,
+    actus: list[Actu],
+    source: Source,
+    report: Report,
+    images: Images,
+    images_corps: ImagesCorps | None = None,
+) -> None:
     pages: dict[int, BlogEntryPage] = {}
     manuelles: list[BlogEntryPage] = []
     for page in BlogEntryPage.objects.child_of(index):
@@ -315,7 +400,7 @@ def sync_actus(index: BlogIndexPage, actus: list[Actu], source: Source, report: 
         tags = [ETIQUETTE_NEWSLETTER] if actu.newsletter else []
         if page is None:
             page = BlogEntryPage(slug=_unique_slug(index, slugify(actu.titre)[:80] or "actualite"), **values)
-            page.body = owned_blocks(actu)
+            page.body = owned_blocks(actu, images_corps)
             _set_categories(page, category_ids)
             page.tags.set(tags)
             index.add_child(instance=page)
@@ -324,7 +409,7 @@ def sync_actus(index: BlogIndexPage, actus: list[Actu], source: Source, report: 
         else:
             stream_block = page.body.stream_block
             existing = _normalize(stream_block, list(page.body.raw_data))
-            new_body = _normalize(stream_block, merge_owned_group(existing, owned_blocks(actu)))
+            new_body = _normalize(stream_block, merge_owned_group(existing, owned_blocks(actu, images_corps)))
             changed = [name for name, value in values.items() if getattr(page, name) != value]
             body_changed = new_body != existing
             categories_changed = _categories(page) != category_ids
@@ -368,10 +453,13 @@ def run(
     slug: str,
     source: Source | None = None,
     pieces_jointes: "grist.PiecesJointes | None" = None,
+    images_corps: ImagesCorps | None = None,
 ) -> Report:
     source = source or Source()
     report = Report()
     root = Site.objects.get(is_default_site=True).root_page.specific
     index = get_or_create_index(root, slug, report)
-    sync_actus(index, actus, source, report, Images(pieces_jointes, source.doc_id, COLLECTION_IMAGES))
+    # En simulation (pas de pièces jointes), aucune image n'est téléchargée.
+    images_corps = images_corps or ImagesCorps(telecharger=pieces_jointes is not None)
+    sync_actus(index, actus, source, report, Images(pieces_jointes, source.doc_id, COLLECTION_IMAGES), images_corps)
     return report
