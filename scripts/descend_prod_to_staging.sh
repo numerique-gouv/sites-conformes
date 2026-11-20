@@ -65,7 +65,7 @@ fi
 
 # The backup directory only holds the database dump
 if [[ $DO_DB -eq 1 && -z "${BACKUP_DIR:-}" ]]; then
-    echo "Please set BACKUP_DIR to a directory outsite of the django path" 1>&2
+    echo "Please set BACKUP_DIR to a directory outside of the django path" 1>&2
     exit 1
 fi
 
@@ -318,9 +318,10 @@ restore_db() {
     # Stop the web containers so that the staging code does not write during the restoration
     WEB_AMOUNT=`sc_retry ${STAGING_REGION} ${STAGING_APP} ps | grep -cE '│ *web-[0-9]+ ' || true`
     if [[ "$WEB_AMOUNT" -gt 0 ]]; then
-        sc_retry ${STAGING_REGION} ${STAGING_APP} scale web:0
-        # Restart the web containers whatever happens next
+        # Restart the web containers whatever happens next. Set before scaling down: the scale-down
+        # may be applied even if the CLI call fails, and scaling back to WEB_AMOUNT is idempotent
         trap 'kill ${TUNNEL_PID} 2> /dev/null || true; sc_retry ${STAGING_REGION} ${STAGING_APP} scale web:${WEB_AMOUNT}' EXIT
+        sc_retry ${STAGING_REGION} ${STAGING_APP} scale web:0
     fi
 
     # Staging may run newer code than production: the tables of its newer migrations are not part

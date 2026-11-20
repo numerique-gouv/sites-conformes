@@ -17,7 +17,7 @@ fi
 PROD_REGION=${PROD_REGION:-osc-fr1}
 
 if [[ -z "$BACKUP_DIR" ]]; then
-    echo "Please set BACKUP_DIR to a directory outsite of the django path" 1>&2
+    echo "Please set BACKUP_DIR to a directory outside of the django path" 1>&2
     exit 1
 fi
 
