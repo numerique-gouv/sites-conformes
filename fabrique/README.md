@@ -76,7 +76,9 @@ Le mieux est d'utiliser un compte qui n'a que l'accès en lecture au document.
 **Ce qui est mis à jour depuis Grist**
 - Le titre (précédé de « Annulé : » si l'événement est annulé), les dates de début et de fin, le lieu (« En ligne »
   s'il n'y a qu'un lien de visio) et le lien d'inscription.
-- Les étiquettes : type, équipes et séries de l'événement.
+- Les étiquettes : type, équipes et séries de l'événement (elles servent au filtre de l'agenda). Le type et les
+  équipes sont aussi affichés sur la carte de l'événement dans la liste de l'agenda et des archives (le type en
+  couleur, les équipes avec une icône) ; ils sont gardés à part dans `EtiquettesEvenement`, hors révisions de la page.
 - L'image d'en-tête, à partir de la colonne Image (pièce jointe JPG, PNG, WebP ou GIF, 10 Mo au plus ; format
   paysage conseillé). Elle sert de vignette dans la liste de l'agenda et dans la fiche de l'événement, et de bandeau
   en haut de la page. Les images importées sont rangées dans la collection « Agenda » de Wagtail ; chaque fichier

@@ -7,6 +7,8 @@
   synchronisation possède le titre, les dates, le lieu, le lien d'inscription,
   les étiquettes (type, équipes, séries) et les blocs du corps dont l'identifiant
   commence par « grist- ». Les autres blocs et les réglages restent aux éditeurs.
+- Le type et les équipes sont aussi gardés à part (EtiquettesEvenement) pour être
+  affichés sur la carte de l'événement dans la liste de l'agenda.
 - L'image de l'événement (colonne Image, pièce jointe) devient l'image d'en-tête
   de la page : vignette dans la liste de l'agenda et dans la fiche de
   l'événement, bandeau en haut de la page. Les images importées sont rangées dans
@@ -34,6 +36,7 @@ from wagtail.models import Collection, Page, Site
 from events.models import EventEntryPage, EventsIndexPage
 from fabrique import grist
 from fabrique.grist import Evenement
+from fabrique.models import EtiquettesEvenement
 from fabrique.sync import Report, _normalize, _publish, _unique_slug
 
 logger = logging.getLogger(__name__)
@@ -265,6 +268,14 @@ def _tags(page: EventEntryPage) -> list[str]:
     return sorted(t.name for t in page.tags.all())
 
 
+def _enregistrer_etiquettes(page: EventEntryPage, ev: Evenement) -> None:
+    """Type et équipes affichés sur la carte de l'événement. Hors révisions : ne republie pas la page."""
+    valeurs = {"type": ev.type[:100], "equipes": ev.equipes}
+    actuelles = EtiquettesEvenement.objects.filter(page=page).values("type", "equipes").first()
+    if actuelles != valeurs:
+        EtiquettesEvenement.objects.update_or_create(page=page, defaults=valeurs)
+
+
 # ---------------------------------------------------------------------------
 # Synchronisation
 # ---------------------------------------------------------------------------
@@ -329,8 +340,11 @@ def sync_events(
             page.tags.set(tags)
             index.add_child(instance=page)
             _publish(page)
+            _enregistrer_etiquettes(page, ev)
             report.created.append(label)
             continue
+
+        _enregistrer_etiquettes(page, ev)
 
         stream_block = page.body.stream_block
         existing = _normalize(stream_block, list(page.body.raw_data))

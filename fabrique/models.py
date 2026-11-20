@@ -42,6 +42,28 @@ class ImageImportee(models.Model):
         return self.url
 
 
+class EtiquettesEvenement(models.Model):
+    """Type et équipes d'un événement de l'agenda, tels que saisis dans Grist.
+
+    Les étiquettes Wagtail de la page mélangent type, équipes et séries (elles servent au filtre de l'agenda) :
+    on garde ici le type et les équipes à part pour les afficher sur la carte de l'événement dans la liste.
+    Mis à jour par la synchronisation de l'agenda Grist, jamais à la main.
+    """
+
+    page = models.OneToOneField(
+        "events.EventEntryPage", on_delete=models.CASCADE, related_name="etiquettes_grist", verbose_name="Événement"
+    )
+    type = models.CharField("Type d'événement", max_length=100, blank=True)
+    equipes = models.JSONField("Équipes", default=list, blank=True)
+
+    class Meta:
+        verbose_name = "Étiquettes d'un événement"
+        verbose_name_plural = "Étiquettes des événements"
+
+    def __str__(self):
+        return ", ".join(filter(None, [self.type, *self.equipes]))
+
+
 class ProduitsIndexPage(SitesFacilesBasePage):
     """Catalogue des produits : une carte par fiche produit, avec un filtre par phase."""
 
