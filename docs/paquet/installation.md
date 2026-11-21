@@ -43,6 +43,7 @@ SF_USE_DB_STORAGE = getenv_bool("SF_USE_DB_STORAGE", False)
 SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 PROCONNECT_ACTIVATED = os.getenv("PROCONNECT_ACTIVATED", "") in ("1", "True")
 SF_DISABLE_LOCAL_LOGIN = getenv_bool("SF_DISABLE_LOCAL_LOGIN", False)
+PROCONNECT_DELEGATE_2FA = getenv_bool("PROCONNECT_DELEGATE_2FA", False)
 ```
 
 ### INSTALLED_APPS
@@ -93,6 +94,10 @@ if PROCONNECT_ACTIVATED:
 
     AUTHENTICATION_BACKENDS.append("sites_conformes.proconnect.backends.OIDCAuthenticationBackend")
 ```
+
+Pour déléguer la double authentification à ProConnect, il faut aussi définir
+`OIDC_AUTH_REQUEST_EXTRA_PARAMS` : voir
+{ref}`proconnect-delegate-2fa`.
 
 ### Context processors
 
