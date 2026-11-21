@@ -138,6 +138,7 @@ Tout ce bloc n’est lu que si `PROCONNECT_ACTIVATED` vaut `True`.
 | Variable | Rôle | Défaut | Niveau |
 | --- | --- | --- | --- |
 | `SITE_NAME` | Nom du site affiché dans l’administration Wagtail. | `Sites Conformes` | 🟠 |
+| `WAGTAIL_ALLOW_UNICODE_SLUGS` | Autorise les accents dans les slugs. `False` les retire à la génération. | `True` | ⚪ |
 | `WAGTAILADMIN_PATH` | Adresse de la page d’administration. | `cms-admin/` | ⚪ |
 | `SF_DISABLE_TUTORIALS` | Masque le panneau de tutoriels dans le back-office. | `False` | ⚪ |
 | `SF_SCHEME_DEPENDENT_SVGS` | Adapte les SVG au thème clair/sombre. | `False` | ⚪ |
