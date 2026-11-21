@@ -1,4 +1,4 @@
-{% load i18n static dsfr_tags %}
+{% load i18n static dsfr_tags wagtail_dsfr_tags %}
 
 <!DOCTYPE html>
 <html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}"
@@ -7,6 +7,11 @@
     <meta charset="utf-8" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    {% settings_value 'SF_META_GENERATOR_NAME' 'Sites Conformes' as generator_name %}
+    {% if generator_name %}
+      <meta name="generator" content="{{ generator_name }} — Embedded mode" />
+    {% endif %}
+
     {% block title %}
       <title>
         {% if title %}{{ title }} —{% endif %}

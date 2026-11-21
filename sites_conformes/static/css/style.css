@@ -164,12 +164,6 @@ input[data-whf_name] {
     width: 100%;
 }
 
-.cmsfr-footer__bottom-extra {
-    border-left: 1px solid var(--border-default-grey);
-    padding-left: 1em;
-    margin-left: 1em;
-}
-
 .cmsfr-display__inline {
     display: inline;
 }

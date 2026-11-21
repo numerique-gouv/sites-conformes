@@ -25,8 +25,9 @@ FILTERS: list[FilterSpec] = [
 
 
 @register.simple_tag
-def settings_value(name):
-    return getattr(settings, name, "")
+def settings_value(name, default=""):
+    """Return the Django setting `name`, or `default` if it is not defined."""
+    return getattr(settings, name, default)
 
 
 @register.simple_tag
