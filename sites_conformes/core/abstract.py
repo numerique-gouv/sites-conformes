@@ -161,7 +161,8 @@ class SitesFacilesBasePage(Page):
 
     @property
     def get_preview_image(self):
-        return self.preview_image or self.header_image
+        # SVG is skipped: social networks only accept JPEG, PNG and GIF as preview images
+        return next((image for image in (self.preview_image, self.header_image) if image and not image.is_svg()), None)
 
     @property
     def show_title(self):
