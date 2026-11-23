@@ -1,44 +1,43 @@
 from unittest.mock import MagicMock, patch
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from wagtail.models import Page, Revision
 
 from sites_conformes.db_storage.models import StoredFile
 
-S3_ENV = {
-    "S3_HOST": "s3.example.com",
-    "S3_BUCKET_NAME": "bucket",
-    "S3_KEY_ID": "k",
-    "S3_KEY_SECRET": "s",
-    "S3_LOCATION": "media",
+S3_STORAGES = {
+    **settings.STORAGES,
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "endpoint_url": "https://s3.example.com",
+            "bucket_name": "bucket",
+            "access_key": "k",
+            "secret_key": "s",
+            "location": "media",
+        },
+    },
+}
+NO_S3_STORAGES = {
+    **settings.STORAGES,
+    "default": {"BACKEND": "sites_conformes.db_storage.storage.DatabaseStorage"},
 }
 
 
 class MigrateS3ToDbCommandTestCase(TestCase):
     """Tests for the migrate_s3_to_db management command."""
 
-    def _mock_s3_env(self):
-        return {
-            "S3_HOST": "s3.example.com",
-            "S3_PROTOCOL": "https",
-            "S3_BUCKET_NAME": "test-bucket",
-            "S3_KEY_ID": "test-key",
-            "S3_KEY_SECRET": "test-secret",
-            "S3_BUCKET_REGION": "eu-west-3",
-            "S3_LOCATION": "media",
-        }
-
-    # An empty value, rather than no value, so that an S3_HOST set in .env can't leak in
-    @patch.dict("os.environ", {"S3_HOST": ""})
+    @override_settings(STORAGES=NO_S3_STORAGES)
     def test_fails_without_s3_config(self):
         """Command should fail if S3 is not configured."""
         with self.assertRaises(Exception):
             call_command("migrate_s3_to_db", "--skip-urls")
 
     @patch("sites_conformes.db_storage.management.commands.migrate_s3_to_db.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_transfer_files_dry_run(self, mock_boto3):
         """Dry run should not create StoredFile entries."""
         mock_client = MagicMock()
@@ -60,7 +59,7 @@ class MigrateS3ToDbCommandTestCase(TestCase):
         self.assertEqual(StoredFile.objects.count(), 0)
 
     @patch("sites_conformes.db_storage.management.commands.migrate_s3_to_db.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_transfer_files(self, mock_boto3):
         """Files should be transferred from S3 to StoredFile."""
         mock_client = MagicMock()
@@ -90,7 +89,7 @@ class MigrateS3ToDbCommandTestCase(TestCase):
         self.assertEqual(stored.size, 4)
 
     @patch("sites_conformes.db_storage.management.commands.migrate_s3_to_db.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_skip_existing_files(self, mock_boto3):
         """Already existing StoredFile entries should be skipped."""
         StoredFile.objects.create(
@@ -120,7 +119,7 @@ class MigrateS3ToDbCommandTestCase(TestCase):
         self.assertEqual(bytes(stored.content), b"old-data")
 
     @patch("sites_conformes.db_storage.management.commands.migrate_s3_to_db.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_update_revision_urls(self, mock_boto3):
         """S3 URLs in Revision.content (JSONField) should be replaced."""
         mock_client = MagicMock()
