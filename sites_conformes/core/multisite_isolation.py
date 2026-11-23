@@ -24,7 +24,7 @@ def is_multisite_isolation_active() -> bool:
     return bool(getattr(settings, "SF_MULTISITE_ISOLATION_ENABLED", False))
 
 
-def get_sites_for_user(user) -> list[Site]:
+def get_sites_for_user(user, permission: str | None = None) -> list[Site]:
     """
     Returns the sites a user has access to.
 
@@ -33,26 +33,36 @@ def get_sites_for_user(user) -> list[Site]:
     their descendants. A superuser has access to every site, an inactive or anonymous
     user to none.
 
+    With ``permission`` (``"app_label.codename"``, for instance
+    ``"wagtailredirects.change_redirect"``), only the groups that have this permission
+    count: the result is the sites where the user has it. A permission given to the
+    user directly, outside of a group, is not linked to any site and gives none.
+
     The result is cached on the user object, for the duration of the request.
     """
     if not user.is_authenticated or not user.is_active:
         return []
 
-    cached = getattr(user, SITES_FOR_USER_CACHE_ATTR, None)
-    if cached is None:
-        cached = _compute_sites_for_user(user)
-        setattr(user, SITES_FOR_USER_CACHE_ATTR, cached)
-    return list(cached)
+    cache = getattr(user, SITES_FOR_USER_CACHE_ATTR, None)
+    if cache is None:
+        cache = {}
+        setattr(user, SITES_FOR_USER_CACHE_ATTR, cache)
+    if permission not in cache:
+        cache[permission] = _compute_sites_for_user(user, permission)
+    return list(cache[permission])
 
 
-def _compute_sites_for_user(user) -> list[Site]:
+def _compute_sites_for_user(user, permission: str | None) -> list[Site]:
     sites = list(Site.objects.select_related("root_page").order_by("hostname", "port"))
     if user.is_superuser:
         return sites
 
-    permission_paths = set(
-        GroupPagePermission.objects.filter(group__in=user.groups.all()).values_list("page__path", flat=True)
-    )
+    groups = user.groups.all()
+    if permission is not None:
+        app_label, codename = permission.split(".")
+        groups = groups.filter(permissions__content_type__app_label=app_label, permissions__codename=codename)
+
+    permission_paths = set(GroupPagePermission.objects.filter(group__in=groups).values_list("page__path", flat=True))
     if not permission_paths:
         return []
 
