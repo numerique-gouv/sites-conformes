@@ -1,5 +1,14 @@
 from django.utils.translation import gettext_lazy as _
 
+# Image collections imported at installation (DSFR pictograms, default illustrations of the blocks).
+# Their images are shared by every site.
+DSFR_PICTOGRAMS_COLLECTION = "Pictogrammes DSFR"
+DEFAULT_ILLUSTRATIONS_COLLECTION = "Illustrations par défaut"
+INSTALLED_IMAGE_COLLECTIONS = [DSFR_PICTOGRAMS_COLLECTION, DEFAULT_ILLUSTRATIONS_COLLECTION]
+# Their files, read from the collected static files
+DSFR_PICTOGRAMS_DIR = "staticfiles/dsfr/dist/artwork/pictograms/"
+DEFAULT_ILLUSTRATIONS_DIR = "staticfiles/illustration/"
+
 HEADER_FIELDS = [
     "header_image",
     "header_with_title",

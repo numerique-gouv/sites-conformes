@@ -12,7 +12,7 @@ import sys
 import swapper
 from django.core.management.color import color_style
 from django.utils.translation import gettext_lazy as _
-from wagtail.models import Collection, Page, PageViewRestriction
+from wagtail.models import Collection, Page, PageViewRestriction, Site
 
 from sites_conformes.core.constants import HEADER_FIELDS
 from sites_conformes.core.models import CatalogIndexPage
@@ -43,22 +43,24 @@ def get_or_create_catalog_index_page(
     parent_page: Page | ContentPage | None = None,
     restriction_type: str | None = None,
     page_fields: dict | None = None,
+    site: Site | None = None,
 ) -> CatalogIndexPage:
     """
     Get a CatalogIndexPage if it exists, or creates it instead.
 
-    Pages are looked up by slug in the locale of the default site, wherever they are
-    in the tree: an existing page is returned as is, without being updated.
+    Pages are looked up by slug in the locale of the site, anywhere below its root page:
+    an existing page is returned as is, without being updated.
 
     - `body`: the StreamField value, as a list of `(block_name, value)` tuples.
-    - `parent_page`: defaults to the root page of the default site.
+    - `parent_page`: defaults to the root page of the site.
     - `restriction_type`: if set, a `PageViewRestriction` of this type
       (such as "login") is added to the new page.
     - `page_fields`: other fields to set on the new page; only the header fields
       (`HEADER_FIELDS`) and `source_url` are taken into account.
+    - `site`: defaults to the default site.
     """
 
-    site = get_default_site()
+    site = site or get_default_site()
     root_page = site.root_page
     locale = root_page.locale
 
@@ -67,13 +69,15 @@ def get_or_create_catalog_index_page(
             # Default "Page" type is allowed to allow the default root page"
             raise TypeError("The parent page should be a content page.")
     else:
-        # If parent_page is not passed as parameter, use the Home page of the default site.
+        # If parent_page is not passed as parameter, use the Home page of the site.
         if not isinstance(root_page, (Page, ContentPage)):
             raise TypeError("The parent page should be a content page.")
         parent_page = root_page
 
     # Don't replace or duplicate an already existing page
-    already_exists = CatalogIndexPage.objects.filter(slug=slug, locale=locale).first()
+    already_exists = (
+        CatalogIndexPage.objects.descendant_of(root_page, inclusive=True).filter(slug=slug, locale=locale).first()
+    )
     if already_exists:
         sys.stdout.write(f"The {slug} page seem to already exist with id {already_exists.id}\n")
         return already_exists
@@ -109,22 +113,24 @@ def get_or_create_content_page(
     parent_page: Page | ContentPage | CatalogIndexPage | None = None,
     restriction_type: str | None = None,
     page_fields: dict | None = None,
+    site: Site | None = None,
 ) -> ContentPage:
     """
     Get a ContentPage if it exists, or creates it instead.
 
-    Pages are looked up by slug in the locale of the default site, wherever they are
-    in the tree: an existing page is returned as is, without being updated.
+    Pages are looked up by slug in the locale of the site, anywhere below its root page:
+    an existing page is returned as is, without being updated.
 
     - `body`: the StreamField value, as a list of `(block_name, value)` tuples.
-    - `parent_page`: defaults to the root page of the default site.
+    - `parent_page`: defaults to the root page of the site.
     - `restriction_type`: if set, a `PageViewRestriction` of this type
       (such as "login") is added to the new page.
     - `page_fields`: other fields to set on the new page; only the header fields
       (`HEADER_FIELDS`) and `source_url` are taken into account.
+    - `site`: defaults to the default site.
     """
 
-    site = get_default_site()
+    site = site or get_default_site()
     root_page = site.root_page
     locale = root_page.locale
 
@@ -133,13 +139,15 @@ def get_or_create_content_page(
             # Default "Page" type is allowed to allow the default root page"
             raise TypeError("The parent page should be a content page or a catalog index page.")
     else:
-        # If parent_page is not passed as parameter, use the Home page of the default site.
+        # If parent_page is not passed as parameter, use the Home page of the site.
         if not isinstance(root_page, (Page, ContentPage, CatalogIndexPage)):
             raise TypeError("The parent page should be a content page or a catalog index page.")
         parent_page = root_page
 
     # Don't replace or duplicate an already existing page
-    already_exists = ContentPage.objects.filter(slug=slug, locale=locale).first()
+    already_exists = (
+        ContentPage.objects.descendant_of(root_page, inclusive=True).filter(slug=slug, locale=locale).first()
+    )
     if already_exists:
         sys.stdout.write(f"The {slug} page seem to already exist with id {already_exists.id}\n")
         return already_exists
@@ -168,35 +176,36 @@ def get_or_create_content_page(
     return new_page
 
 
-def get_or_create_footer_bottom_menu() -> FooterBottomMenu:
+def get_or_create_footer_bottom_menu(site: Site | None = None) -> FooterBottomMenu:
     """
-    Get the footer menu of the default site (in its locale), or create it if it doesn't already exist.
+    Get the footer menu of the site (in the locale of its root page), or create it if it doesn't already exist.
+    The site defaults to the default site.
 
     In any case, return it.
     """
 
-    default_site = get_default_site()
-    root_page = default_site.root_page
-    locale = root_page.locale
+    site = site or get_default_site()
+    locale = site.root_page.locale
 
-    footer_menu, _created = FooterBottomMenu.objects.get_or_create(site=default_site, locale=locale)
+    footer_menu, _created = FooterBottomMenu.objects.get_or_create(site=site, locale=locale)
 
     return footer_menu
 
 
-def get_or_create_main_menu() -> MainMenu:
+def get_or_create_main_menu(site: Site | None = None) -> MainMenu:
     """
-    Get the main menu of the default site (in its locale), or create it if it doesn't already exist.
+    Get the main menu of the site (in the locale of its root page), or create it if it doesn't already exist.
+    The site defaults to the default site.
 
     In any case, return it.
     A new main menu gets a link to the home page.
     """
 
-    default_site = get_default_site()
-    root_page = default_site.root_page
+    site = site or get_default_site()
+    root_page = site.root_page
     locale = root_page.locale
 
-    main_menu, created = MainMenu.objects.get_or_create(site=default_site, locale=locale)
+    main_menu, created = MainMenu.objects.get_or_create(site=site, locale=locale)
 
     if created:
         # Add a link to the home page by default

@@ -5,7 +5,6 @@ from wagtail import blocks
 from wagtail.admin.telepath import register
 from wagtail.blocks import StructValue
 from wagtail.blocks.struct_block import StructBlockAdapter
-from wagtail.images import get_image_model
 
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES,
@@ -17,6 +16,7 @@ from sites_conformes.core.constants import (
     LIMITED_RICHTEXTFIELD_FEATURES_WITH_HEADINGS,
     TEMPLATE_EXAMPLE_TAG_BADGE_LIST,
 )
+from sites_conformes.core.utils import get_installed_image
 
 from .basics import AccordionsBlock
 from .buttons_links import ButtonBlock, LinkBlock
@@ -24,8 +24,6 @@ from .cards import VerticalCardBlock
 from .layout import LayoutBlock
 from .medias import ImageBlockWithDefault
 from .utils import help_text_with_details
-
-Image = get_image_model()
 
 
 class BaseSection(blocks.StructBlock):
@@ -160,7 +158,6 @@ class ImageAndTextItems(blocks.StructBlock):
 
 
 class ImageAndTextListBlock(blocks.ListBlock):
-
     def get_default(self):
         images_titles = [
             "Pictogrammes DSFR — System — Success",
@@ -170,7 +167,7 @@ class ImageAndTextListBlock(blocks.ListBlock):
 
         items = []
         for index, image_title in enumerate(images_titles, start=1):
-            image = Image.objects.filter(title=image_title).first()
+            image = get_installed_image(image_title)
             items.append(
                 {
                     "image": {
@@ -288,7 +285,7 @@ class SpotLightItem(blocks.StreamBlock):
     card = VerticalCardBlock()
 
     def get_default(self):
-        image_placeholder = Image.objects.filter(title="Placeholder Sites Faciles").first()
+        image_placeholder = get_installed_image("Placeholder Sites Faciles")
 
         default_card_data = {
             "title": "Titre de l'article",
