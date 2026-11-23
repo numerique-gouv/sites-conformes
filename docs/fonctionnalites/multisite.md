@@ -94,16 +94,19 @@ La commande crée :
 Elle ne modifie aucun autre site, ni les groupes existants.
 
 **Relancer la commande** avec le même nom d’hôte et le même port ne crée aucun
-doublon : elle complète le site. C’est ainsi qu’on ajoute une langue à un site
-existant (`--locales fr,en,de`) : la nouvelle page d’accueil traduite reçoit les
-droits des groupes et le workflow du site. Le nom d’un site existant n’est pas
-modifié.
+doublon : elle complète le site. Le nom d’un site existant n’est pas modifié.
 
-:::{note}
-Une page d’accueil traduite depuis l’administration ne reçoit ni les droits
-des groupes, ni le workflow du site : relancez `create_site` avec la nouvelle
-langue.
-:::
+### Ajouter une langue à un site
+
+Traduisez la page d’accueil du site depuis l’administration, comme d’habitude
+(bouton **Traduire** de la page d’accueil), ou relancez `create_site` avec la
+nouvelle langue (`--locales fr,en,de`).
+
+Dans les deux cas, la page d’accueil traduite reçoit les droits de page et le
+workflow de la page d’accueil du site. Sans cela, elle n’en aurait aucun : les
+pages d’accueil traduites sont placées à côté de la page d’accueil dans l’arbre,
+et non en dessous. Le menu principal et le menu de pied de page de la nouvelle
+langue sont créés par `create_site`, ou depuis **Menus** dans l’administration.
 
 ### Droits des groupes
 

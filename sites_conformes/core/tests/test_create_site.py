@@ -15,6 +15,7 @@ from wagtail.models import (
     GroupApprovalTask,
     GroupCollectionPermission,
     GroupPagePermission,
+    Locale,
     Page,
     Site,
     TaskState,
@@ -390,6 +391,34 @@ class CreateSiteTestsMixin:
         for role, group in setup.groups.items():
             with self.subTest(role=role):
                 self.assertTrue(GroupPagePermission.objects.filter(group=group, page=home_en).exists())
+
+    def test_home_page_translated_in_the_admin_gets_the_permissions_and_the_workflow(self):
+        setup = create_site(hostname="site-d.localhost", name="Site D")
+        home = setup.site.root_page
+        locale_en = Locale.objects.get(language_code="en")
+        self.client.force_login(self.users["superadmin"])
+
+        response = self.client.post(
+            reverse("wagtail_localize:submit_page_translation", args=[home.pk]), {"locales": [locale_en.pk]}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        home_en = home.get_translation(locale_en)
+        self.assertEqual(home_en.get_workflow(), setup.workflow)
+        self.assertEqual(
+            set(GroupPagePermission.objects.filter(page=home_en).values_list("group_id", "permission_id")),
+            set(GroupPagePermission.objects.filter(page=home).values_list("group_id", "permission_id")),
+        )
+        editor = User.objects.create_user(username="editeur-d")
+        editor.groups.add(setup.groups[EDITORS])
+        self.assertTrue(home_en.permissions_for_user(editor).can_edit())
+        self.assertTrue(home_en.permissions_for_user(editor).can_add_subpage())
+
+    def test_translated_sub_page_gets_no_page_permission(self):
+        page = self.home_c.add_child(instance=ContentPage(title="Rubrique", slug="rubrique"))
+        page.copy_for_translation(Locale.objects.get(language_code="en"))
+        translation = page.get_translation(Locale.objects.get(language_code="en"))
+        self.assertFalse(GroupPagePermission.objects.filter(page=translation).exists())
 
     def test_starter_pages_are_created_below_the_site(self):
         setup = create_site(hostname="site-d.localhost", name="Site D", with_starter_pages=True)

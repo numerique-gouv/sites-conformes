@@ -403,6 +403,36 @@ def get_or_create_site_workflow(site: Site, groups: dict, name: str) -> tuple:
     return workflow, warnings
 
 
+def give_translated_root_page_the_site_access(sender, source_obj, target_obj, **kwargs) -> None:
+    """
+    Receiver of Wagtail's ``copy_for_translation_done`` signal.
+
+    A translated home page is next to the home page in the tree, not below it: it inherits
+    neither the page permissions nor the workflow of the site. When the home page of a site
+    is translated, in the admin or by ``create_site``, its translation receives the page
+    permissions and the workflow of the home page of the site.
+    """
+    if not isinstance(target_obj, Page) or target_obj.depth != 2:
+        return
+
+    site = (
+        Site.objects.filter(root_page__translation_key=target_obj.translation_key).select_related("root_page").first()
+    )
+    if site is None or site.root_page_id == target_obj.pk:
+        return
+
+    for group_id, permission_id in GroupPagePermission.objects.filter(page=site.root_page).values_list(
+        "group_id", "permission_id"
+    ):
+        GroupPagePermission.objects.get_or_create(
+            group_id=group_id, page_id=target_obj.pk, permission_id=permission_id
+        )
+
+    workflow_page = WorkflowPage.objects.filter(page=site.root_page).first()
+    if workflow_page is not None:
+        WorkflowPage.objects.get_or_create(page_id=target_obj.pk, defaults={"workflow_id": workflow_page.workflow_id})
+
+
 # Menus and configuration
 
 

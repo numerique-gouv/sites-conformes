@@ -15,6 +15,15 @@ class ContentManagerConfig(AppConfig):
 
         patch_wagtail_localize_handle_image_block()
 
+        # A translated home page receives the page permissions and the workflow of its site
+        from wagtail.signals import copy_for_translation_done
+
+        from .services.sites import give_translated_root_page_the_site_access
+
+        copy_for_translation_done.connect(
+            give_translated_root_page_the_site_access, dispatch_uid="give_translated_root_page_the_site_access"
+        )
+
         # Wagtail registers every concrete page class descending from its base page model,
         # including a swapped-out ContentPage, which would keep it creatable in the admin.
         from wagtail.models import PAGE_MODEL_CLASSES
