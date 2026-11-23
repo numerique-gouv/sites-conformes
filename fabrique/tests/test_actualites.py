@@ -7,6 +7,8 @@ from urllib.parse import parse_qs, urlparse
 
 from django.core.management import call_command
 from django.test import SimpleTestCase, TestCase
+from wagtail.images import get_image_model
+from wagtail.images.tests.utils import get_test_image_file
 from wagtail.models import Site
 
 from blog.models import BlogEntryPage, BlogIndexPage, Category
@@ -431,6 +433,13 @@ class RenduTests(TestCase):
         contenu = reponse.content.decode()
         self.assertIn("Info Panoramax octobre 2026", contenu)
         self.assertIn("Le RNB atteint 50 millions de bâtiments", contenu)
+        # Vignette entière, de même surface apparente que les autres : un logo carré fait 144 px de côté.
+        image = get_image_model().objects.create(title="Logo carré", file=get_test_image_file(size=(400, 400)))
+        lettre.header_image = image
+        lettre.save_revision().publish()
+        contenu = self.client.get(index.url).content.decode()
+        self.assertIn('class="fr-card__img fabrique-vignette"', contenu)
+        self.assertIn('style="width: 144px"', contenu)
         # Filtre par étiquette : seulement les infolettres.
         contenu = self.client.get(index.url + "?tag=newsletter").content.decode()
         self.assertIn("Info Panoramax octobre 2026", contenu)

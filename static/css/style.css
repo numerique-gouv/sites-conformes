@@ -96,3 +96,27 @@ p:empty {
     max-height: 32rem;
     object-fit: contain;
 }
+
+/* Fabrique : vignettes des cartes de l'agenda, des archives et des actualités
+   (templates/events/blocks/events_index_posts_list.html, templates/blog/blocks/blog_index_posts_list.html) :
+   le DSFR recadre en 16:9 (object-fit: cover) ; on affiche l'image entière sur un fond neutre. */
+.fr-card .fr-card__img.fabrique-vignette {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 11rem; /* 9rem d'image + marges : bandeaux de même hauteur, titres alignés d'une carte à l'autre */
+    padding: 1rem;
+    background-color: var(--background-alt-grey);
+}
+
+/* La largeur est fixée dans le gabarit (filtre largeur_vignette) pour une surface égale d'une image à l'autre ;
+   width: auto ne sert que si elle manque. */
+.fr-card .fr-card__img.fabrique-vignette img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 9rem;
+    aspect-ratio: auto;
+    object-fit: contain;
+}

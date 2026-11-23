@@ -1,0 +1,43 @@
+{% load i18n wagtailimages_tags fabrique_images %}
+{% comment %}
+  Copie du gabarit de Sites Faciles (blog) : vignette entière, jamais recadrée, de même taille apparente
+  pour toutes les actualités (logo carré ou en longueur), comme dans l'agenda. Voir la classe fabrique-vignette
+  dans static/css/style.css et le filtre largeur_vignette (fabrique/templatetags/fabrique_images.py).
+{% endcomment %}
+{% for post in posts %}
+  <div class="fr-col fr-col-md-6">
+    <div class="fr-card fr-enlarge-link">
+      <div class="fr-card__body">
+        <div class="fr-card__content">
+          <h3 class="fr-card__title">
+            <a href="{{ post.url }}">{{ post.title }}</a>
+          </h3>
+          <p class="fr-card__desc">Publié le {{ post.date |date:'l j F Y' }}</p>
+          {% if post.blog_categories.all %}
+            <div class="fr-card__start">
+              <ul class="fr-tags-group">
+                {% for cat in post.blog_categories.all %}
+                  <li>
+                    <p class="fr-tag">{{ cat.name }}</p>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {% if post.header_image %}
+        <div class="fr-card__header">
+          <div class="fr-card__img fabrique-vignette">
+            {% image post.header_image max-480x270 preserve-svg as vignette %}
+            <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt=""{% with largeur=post.header_image|largeur_vignette %}{% if largeur %} style="width: {{ largeur }}px"{% endif %}{% endwith %}>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <div class="fr-col">
+    <p>{% translate "No article found." %}</p>
+  </div>
+{% endfor %}
