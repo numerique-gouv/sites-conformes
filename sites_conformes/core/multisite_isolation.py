@@ -89,15 +89,25 @@ def get_site_for_page(page: Page | None, parent_page: Page | None = None) -> Sit
     """
     Returns the site of a page, or None if the page is outside of every site.
 
-    For a saved page, relies on ``Page.get_site()`` from Wagtail, which handles the
-    translated root pages and, for nested sites, returns the most specific one.
+    The site is the closest one whose root page contains the page. Otherwise, for a page
+    below a translation of a root page, it is the site of this root page.
     A page being created has no path yet: its site is the one of its parent page.
     """
     if page is not None and page.pk:
-        return page.get_site()
+        return _get_site_for_saved_page(page)
     if parent_page is not None:
-        return parent_page.get_site()
+        return _get_site_for_saved_page(parent_page)
     return None
+
+
+def _get_site_for_saved_page(page: Page) -> Site | None:
+    # Not Page.get_site() first: Wagtail attributes a page to every site whose root page
+    # or one of its translations contains it, so with a site for each language, it returns
+    # the first site in the order of their URL paths, whatever the language of the page.
+    sites = [site for site in Site.objects.select_related("root_page") if page.path.startswith(site.root_page.path)]
+    if sites:
+        return max(sites, key=lambda site: len(site.root_page.path))
+    return page.get_site()
 
 
 def get_objects_for_page_form(queryset: QuerySet, site: Site | None, current_values=()) -> QuerySet:
