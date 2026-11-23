@@ -329,7 +329,7 @@ elif SF_USE_DB_STORAGE:
         "BACKEND": "sites_conformes.db_storage.storage.DatabaseStorage",
     }
     MEDIA_URL = config("MEDIA_URL", default="db-storage/")
-    MEDIA_ROOT = BASE_DIR / MEDIA_ROOT
+    MEDIA_ROOT = str(BASE_DIR / MEDIA_ROOT)
 
     if FORCE_SCRIPT_NAME and not MEDIA_URL.startswith(FORCE_SCRIPT_NAME):
         MEDIA_URL = f"{FORCE_SCRIPT_NAME}/{MEDIA_URL}"
@@ -337,13 +337,14 @@ else:
     STORAGES["default"] = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     }
-    MEDIA_ROOT = BASE_DIR / MEDIA_ROOT
+    MEDIA_ROOT = str(BASE_DIR / MEDIA_ROOT)
     MEDIA_URL = config("MEDIA_URL", default="medias/")
 
     if FORCE_SCRIPT_NAME and not MEDIA_URL.startswith(FORCE_SCRIPT_NAME):
         MEDIA_URL = f"{FORCE_SCRIPT_NAME}/{MEDIA_URL}"
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# MEDIA_ROOT and STATIC_ROOT must stay strings: dj_static (config/wsgi.py) concatenates them with str paths
+STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
 STATIC_URL = config("STATIC_URL", default="static/")
 
