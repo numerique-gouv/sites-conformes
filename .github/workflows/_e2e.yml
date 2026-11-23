@@ -46,13 +46,15 @@ jobs:
 
       # When running against main, overlay current-branch test files so both
       # baseline and comparison jobs use the same test definitions.
+      # pyproject.toml is deliberately not overlaid: the Python dependencies belong
+      # to the application code under test, and must match its settings and uv.lock
+      # (e.g. a PR swapping a dependency would otherwise break the main baseline).
       - name: Checkout E2E files from PR branch
         uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
           sparse-checkout: |
             playwright.config.ts
-            pyproject.toml
             e2e/
             .github/
             .env.test
