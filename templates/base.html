@@ -21,7 +21,10 @@
       <link rel="canonical" href="{% canonical_url %}" />
     {% endblock canonical_url %}
 
-    {% dsfr_favicon %}
+    <link rel="apple-touch-icon" href="{% static 'favicon/apple-touch-icon.png' %}" />
+    <link rel="icon" href="{% static 'favicon/favicon-96x96.png' %}" type="image/png" sizes="96x96" />
+    <link rel="shortcut icon" href="{% static 'favicon/favicon.ico' %}" type="image/x-icon" />
+    <link rel="manifest" href="{% static 'favicon/manifest.webmanifest' %}" crossorigin="use-credentials" />
 
     {% dsfr_css %}
     <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />

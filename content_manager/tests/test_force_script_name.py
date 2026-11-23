@@ -38,7 +38,7 @@ class ContentPageTestCase(WagtailPageTestCase):
             response.content.decode(),
         )
         self.assertInHTML(
-            """<link rel="apple-touch-icon" href="/test_subpath/static/dsfr/dist/favicon/apple-touch-icon.png" />""",
+            """<link rel="apple-touch-icon" href="/test_subpath/static/favicon/apple-touch-icon.png" />""",
             response.content.decode(),
         )
 
