@@ -24,7 +24,7 @@ from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.core.blocks.medias import ImageBlockWithDefault
 from sites_conformes.core.constants import DEFAULT_ILLUSTRATIONS_COLLECTION, DSFR_PICTOGRAMS_COLLECTION
-from sites_conformes.core.models import CmsDsfrConfig, ContentPage
+from sites_conformes.core.models import CmsDsfrConfig, ContentPage, CustomScriptsSettings
 from sites_conformes.core.multisite_isolation import get_sites_for_user
 from sites_conformes.core.services.accessors import (
     get_or_create_collection,
@@ -278,20 +278,49 @@ class CreateSiteTestsMixin:
                 with self.subTest(permission=permission, username=username):
                     self.assertEqual(self.get_user(username).has_perm(permission), username in usernames)
 
-    def test_only_administrators_edit_the_settings_of_the_site(self):
-        url = reverse("wagtailsettings:edit", args=["sites_conformes_core", "cmsdsfrconfig", self.site_c.pk])
-        for username, status_code in [("admin-c", 200), ("moderateur-c", 302), ("editeur-c", 302)]:
-            with self.subTest(username=username):
-                self.client.force_login(self.get_user(username))
-                response = self.client.get(url, HTTP_HOST="site-c.localhost")
-                self.assertEqual(response.status_code, status_code)
+    def get_settings_url(self, model, site: Site) -> str:
+        return reverse("wagtailsettings:edit", args=[model._meta.app_label, model._meta.model_name, site.pk])
 
-        if self.other_sites:
-            self.client.force_login(self.get_user("admin-c"))
-            other_url = reverse(
-                "wagtailsettings:edit", args=["sites_conformes_core", "cmsdsfrconfig", self.other_sites[0].pk]
-            )
-            self.assertEqual(self.client.get(other_url, HTTP_HOST="site-c.localhost").status_code, 302)
+    def test_only_administrators_edit_the_settings_of_the_site(self):
+        for model in [CmsDsfrConfig, CustomScriptsSettings]:
+            policy = model.get_permission_policy()
+            for username in self.users_c:
+                user = self.get_user(username)
+                is_admin = username == "admin-c"
+                with self.subTest(model=model.__name__, username=username):
+                    # Given for the site only, never as a global permission
+                    self.assertFalse(user.has_perm(f"sites_conformes_core.change_{model._meta.model_name}"))
+                    self.assertEqual(policy.user_has_permission_for_instance(user, "change", self.site_c), is_admin)
+                    self.client.force_login(user)
+                    response = self.client.get(self.get_settings_url(model, self.site_c), HTTP_HOST="site-c.localhost")
+                    self.assertEqual(response.status_code, 200 if is_admin else 302)
+
+    def test_administrators_save_the_scripts_of_the_site(self):
+        self.client.force_login(self.get_user("admin-c"))
+        response = self.client.post(
+            self.get_settings_url(CustomScriptsSettings, self.site_c),
+            {"head_scripts": "<!-- Site C -->", "body_scripts": ""},
+            HTTP_HOST="site-c.localhost",
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CustomScriptsSettings.for_site(self.site_c).head_scripts, "<!-- Site C -->")
+
+    def test_administrators_cannot_read_or_edit_the_settings_of_the_other_sites(self):
+        user = self.get_user("admin-c")
+        self.client.force_login(user)
+        for site in self.other_sites:
+            head_scripts = CustomScriptsSettings.for_site(site).head_scripts
+            for model in [CmsDsfrConfig, CustomScriptsSettings]:
+                with self.subTest(site=site.site_name, model=model.__name__):
+                    self.assertFalse(
+                        model.get_permission_policy().user_has_permission_for_instance(user, "change", site)
+                    )
+                    url = self.get_settings_url(model, site)
+                    self.assertEqual(self.client.get(url, HTTP_HOST="site-c.localhost").status_code, 302)
+                    data = {"head_scripts": "<script>alert(1)</script>", "site_title": "Piraté"}
+                    self.assertEqual(self.client.post(url, data, HTTP_HOST="site-c.localhost").status_code, 302)
+            self.assertEqual(CustomScriptsSettings.for_site(site).head_scripts, head_scripts)
+            self.assertNotEqual(CmsDsfrConfig.for_site(site).site_title, "Piraté")
 
     def test_images_are_added_to_the_collection_of_the_site_only(self):
         for username in self.users_c:
