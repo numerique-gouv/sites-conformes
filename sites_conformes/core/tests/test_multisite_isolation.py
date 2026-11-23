@@ -157,6 +157,26 @@ class MultisiteIsolationTestsMixin:
         self.assertIsNone(get_site_for_page(Page(title="Nouvelle page"), parent_page=orphan))
         self.assertIsNone(get_site_for_page(Page(title="Nouvelle page")))
 
+    def test_site_of_a_page_with_a_site_for_each_language(self):
+        home_en = self.site_a.root_page.get_translations().get()
+        site_a_en = Site.objects.create(
+            hostname="en.site-a.localhost", port=self.site_a.port, root_page=home_en, site_name="Site A en"
+        )
+        page = self.get_page(self.site_a, "le-ministere/nos-missions")
+        page_en = page.get_translations().get()
+
+        self.assertEqual(get_site_for_page(page), self.site_a)
+        self.assertEqual(get_site_for_page(home_en), site_a_en)
+        self.assertEqual(get_site_for_page(page_en), site_a_en)
+        self.assertEqual(get_site_for_page(Page(title="New page"), parent_page=page_en.get_parent()), site_a_en)
+
+    def test_site_of_a_page_of_a_nested_site(self):
+        ministry = self.get_page(self.site_a, "le-ministere")
+        nested = Site.objects.create(hostname="ministere.site-a.localhost", port=self.site_a.port, root_page=ministry)
+
+        self.assertEqual(get_site_for_page(self.get_page(self.site_a, "le-ministere/nos-missions")), nested)
+        self.assertEqual(get_site_for_page(self.get_page(self.site_a, "contact")), self.site_a)
+
     # get_objects_for_page_form
 
     def test_objects_without_site(self):
