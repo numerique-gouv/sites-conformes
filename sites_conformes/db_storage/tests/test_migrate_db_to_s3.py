@@ -17,12 +17,10 @@ S3_ENV = {
 class MigrateDbToS3CommandTestCase(TestCase):
     """Tests for the migrate_db_to_s3 management command."""
 
-    @patch.dict("os.environ", {}, clear=False)
+    # An empty value, rather than no value, so that an S3_HOST set in .env can't leak in
+    @patch.dict("os.environ", {"S3_HOST": ""})
     def test_fails_without_s3_config(self):
         """Command should fail if S3 is not configured."""
-        import os
-
-        os.environ.pop("S3_HOST", None)
         with self.assertRaises(Exception):
             call_command("migrate_db_to_s3")
 

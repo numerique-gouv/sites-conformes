@@ -30,13 +30,10 @@ class MigrateS3ToDbCommandTestCase(TestCase):
             "S3_LOCATION": "media",
         }
 
-    @patch.dict("os.environ", {}, clear=False)
+    # An empty value, rather than no value, so that an S3_HOST set in .env can't leak in
+    @patch.dict("os.environ", {"S3_HOST": ""})
     def test_fails_without_s3_config(self):
         """Command should fail if S3 is not configured."""
-        # Remove S3_HOST if present
-        import os
-
-        os.environ.pop("S3_HOST", None)
         with self.assertRaises(Exception):
             call_command("migrate_s3_to_db", "--skip-urls")
 

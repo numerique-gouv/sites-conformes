@@ -1,7 +1,9 @@
 import boto3
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from sites_conformes.db_storage.models import StoredFile
+from sites_conformes.env import AutoConfig
 
 
 class Command(BaseCommand):
@@ -36,21 +38,21 @@ class Command(BaseCommand):
     # ─────────────────────────────────────
 
     def _get_s3_config(self):
-        """Read S3 configuration from environment (same vars as settings.py)."""
-        import os
+        """Read S3 configuration from the environment or the project's .env (same vars as settings.py)."""
+        config = AutoConfig(search_path=getattr(settings, "BASE_DIR", None))
 
-        host = os.getenv("S3_HOST")
+        host = config("S3_HOST", default="")
         if not host:
             return None
 
-        protocol = os.getenv("S3_PROTOCOL", "https")
+        protocol = config("S3_PROTOCOL", default="https")
         return {
             "endpoint_url": f"{protocol}://{host}",
-            "bucket_name": os.getenv("S3_BUCKET_NAME", ""),
-            "access_key": os.getenv("S3_KEY_ID", ""),
-            "secret_key": os.getenv("S3_KEY_SECRET", ""),
-            "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
-            "location": os.getenv("S3_LOCATION", ""),
+            "bucket_name": config("S3_BUCKET_NAME", default=""),
+            "access_key": config("S3_KEY_ID", default=""),
+            "secret_key": config("S3_KEY_SECRET", default=""),
+            "region_name": config("S3_BUCKET_REGION", default="fr"),
+            "location": config("S3_LOCATION", default=""),
         }
 
     def _get_s3_client(self, s3_config):
