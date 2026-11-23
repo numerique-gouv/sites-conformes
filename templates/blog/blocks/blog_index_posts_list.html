@@ -3,6 +3,7 @@
   Copie du gabarit de Sites Faciles (blog) : vignette entière, jamais recadrée, de même taille apparente
   pour toutes les actualités (logo carré ou en longueur), comme dans l'agenda. Voir la classe fabrique-vignette
   dans static/css/style.css et le filtre largeur_vignette (fabrique/templatetags/fabrique_images.py).
+  Une actualité sans image prend le logo du site.
 {% endcomment %}
 {% for post in posts %}
   <div class="fr-col fr-col-md-6">
@@ -26,14 +27,17 @@
           {% endif %}
         </div>
       </div>
-      {% if post.header_image %}
-        <div class="fr-card__header">
-          <div class="fr-card__img fabrique-vignette">
-            {% image post.header_image max-480x270 preserve-svg as vignette %}
-            <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt=""{% with largeur=post.header_image|largeur_vignette %}{% if largeur %} style="width: {{ largeur }}px"{% endif %}{% endwith %}>
+      {# Sans image d'en-tête : le logo du site (Configuration du site > Logo), pour que toutes les cartes en aient une. #}
+      {% with image_carte=post.header_image|default:settings.content_manager.CmsDsfrConfig.operator_logo_file %}
+        {% if image_carte %}
+          <div class="fr-card__header">
+            <div class="fr-card__img fabrique-vignette">
+              {% image image_carte max-480x270 preserve-svg as vignette %}
+              <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt=""{% with largeur=image_carte|largeur_vignette %}{% if largeur %} style="width: {{ largeur }}px"{% endif %}{% endwith %}>
+            </div>
           </div>
-        </div>
-      {% endif %}
+        {% endif %}
+      {% endwith %}
     </div>
   </div>
 {% empty %}

@@ -85,7 +85,8 @@ Le mieux est d'utiliser un compte qui n'a que l'accès en lecture au document.
   n'est téléchargé qu'une fois. Une image retirée dans Grist est retirée de la page. Dans la liste, toutes les
   vignettes sont affichées avec à peu près la même surface (filtre `largeur_vignette`) : un logo carré ou une petite
   image ne paraît pas plus petit qu'un logo en longueur. Même chose pour les vignettes de la liste des actualités
-  (gabarit `templates/blog/blocks/blog_index_posts_list.html`). Mieux vaut un logo sans marge blanche autour.
+  (gabarit `templates/blog/blocks/blog_index_posts_list.html`) ; une actualité sans image y prend le logo du site
+  (Configuration du site > Logo). Mieux vaut un logo sans marge blanche autour.
 - Dans le corps, les blocs dont l'identifiant commence par `grist-` : alerte d'annulation, public et places restantes,
   description (markdown) et boutons (s'inscrire, rejoindre la visio, page de l'événement, ajouter à Outlook).
 
