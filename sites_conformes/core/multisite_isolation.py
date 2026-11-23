@@ -7,6 +7,7 @@ enabled, so that each caller decides what to do when it is not
 """
 
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.core import checks
 from django.db import DatabaseError
 from django.db.models import Q, QuerySet
@@ -21,7 +22,8 @@ def is_multisite_isolation_active() -> bool:
 
     Only reads the SF_MULTISITE_ISOLATION_ENABLED setting, whatever the number of sites.
     """
-    return bool(getattr(settings, "SF_MULTISITE_ISOLATION_ENABLED", False))
+    # Not defined in the settings of the projects that use the package
+    return getattr(settings, "SF_MULTISITE_ISOLATION_ENABLED", False)
 
 
 def get_sites_for_user(user, permission: str | None = None) -> list[Site]:
@@ -33,10 +35,14 @@ def get_sites_for_user(user, permission: str | None = None) -> list[Site]:
     their descendants. A superuser has access to every site, an inactive or anonymous
     user to none.
 
+    With nested sites, a permission on a page of the inner site also gives access to the
+    outer one, as the page is below its root page.
+
     With ``permission`` (``"app_label.codename"``, for instance
     ``"wagtailredirects.change_redirect"``), only the groups that have this permission
     count: the result is the sites where the user has it. A permission given to the
     user directly, outside of a group, is not linked to any site and gives none.
+    Raises ValueError if the permission is badly formatted or does not exist.
 
     The result is cached on the user object, for the duration of the request.
     """
@@ -53,14 +59,16 @@ def get_sites_for_user(user, permission: str | None = None) -> list[Site]:
 
 
 def _compute_sites_for_user(user, permission: str | None) -> list[Site]:
+    # Checked before the superuser shortcut, so that a typo is noticed with every account
+    permission_filter = None if permission is None else _get_permission_filter(permission)
+
     sites = list(Site.objects.select_related("root_page").order_by("hostname", "port"))
     if user.is_superuser:
         return sites
 
     groups = user.groups.all()
-    if permission is not None:
-        app_label, codename = permission.split(".")
-        groups = groups.filter(permissions__content_type__app_label=app_label, permissions__codename=codename)
+    if permission_filter is not None:
+        groups = groups.filter(permission_filter)
 
     permission_paths = set(GroupPagePermission.objects.filter(group__in=groups).values_list("page__path", flat=True))
     if not permission_paths:
@@ -83,6 +91,16 @@ def _compute_sites_for_user(user, permission: str | None) -> list[Site]:
         )
 
     return [site for site in sites if is_accessible(site)]
+
+
+def _get_permission_filter(permission: str) -> Q:
+    app_label, _, codename = permission.partition(".")
+    if not app_label or not codename:
+        raise ValueError(f'Expected a permission formatted as "app_label.codename", got "{permission}".')
+    permission_filter = Q(permissions__content_type__app_label=app_label, permissions__codename=codename)
+    if not Permission.objects.filter(content_type__app_label=app_label, codename=codename).exists():
+        raise ValueError(f'Unknown permission "{permission}".')
+    return permission_filter
 
 
 def get_site_for_page(page: Page | None, parent_page: Page | None = None) -> Site | None:
@@ -112,12 +130,22 @@ def _get_site_for_saved_page(page: Page) -> Site | None:
 
 def get_objects_for_page_form(queryset: QuerySet, site: Site | None, current_values=()) -> QuerySet:
     """
-    Returns the objects offered in the form of a page, among the given queryset, whose
-    model has a ``site`` field.
+    Returns the choices of a field of a page form, among the given queryset, whose model
+    has a ``site`` field: for instance the categories offered in the form of a blog entry,
+    with ``site`` given by ``get_site_for_page``.
 
     These are the objects of the site, or the objects without site if ``site`` is None.
-    The values already selected on the page are kept, so that saving the page does not
-    remove them. ``current_values`` accepts objects or primary keys.
+    The values already selected on the page are kept, even from another site (for
+    instance after the page was moved from another site): otherwise the form would reject
+    them, or saving the page would remove them. ``current_values`` accepts objects or
+    primary keys.
+
+    For instance, in the form of a blog entry::
+
+        site = get_site_for_page(self.instance, parent_page=self.parent_page)
+        self.fields["blog_categories"].queryset = get_objects_for_page_form(
+            Category.objects.all(), site, current_values=self.instance.blog_categories.all()
+        )
     """
     in_scope = Q(site__isnull=True) if site is None else Q(site=site)
     current_pks = [getattr(value, "pk", value) for value in current_values or ()]
@@ -148,9 +176,9 @@ def check_multisite_isolation_setting(app_configs=None, databases=None, **kwargs
 
     return [
         checks.Info(
-            "L’instance a plusieurs sites et le cloisonnement multisite est désactivé : "
-            "les contributeurs ne sont pas limités aux sites de leurs groupes.",
-            hint="Pour les y limiter, activez la variable d’environnement SF_MULTISITE_ISOLATION_ENABLED.",
+            "The instance has several sites and the multisite isolation is disabled: "
+            "contributors are not restricted to the sites of their groups.",
+            hint="To restrict them, enable the SF_MULTISITE_ISOLATION_ENABLED environment variable.",
             id="sites_conformes_core.I001",
         )
     ]

@@ -41,12 +41,22 @@ Un contributeur a accès à un site si l’un de ses groupes a un droit de page
   donne ainsi accès à tous les sites ;
 - une sous-page du site : un droit sur une seule rubrique suffit.
 
+Si un site est placé sous la page d’accueil d’un autre site, un droit sur une
+page du premier donne aussi accès au second, puisque cette page est aussi sous
+sa page d’accueil.
+
 Un superadministrateur a accès à tous les sites. Un compte désactivé n’a accès
 à aucun site.
 
 Ces règles ne remplacent pas les droits de page de Wagtail : elles définissent
 le périmètre d’un contributeur, et ses droits de page continuent de dire ce
 qu’il peut faire sur chaque page.
+
+## Hébergement
+
+Chaque site doit répondre à son nom de domaine : ajoutez-les tous à
+`ALLOWED_HOSTS`. Sur Scalingo, ne définissez pas de domaine canonique (voir
+{ref}`scalingo-plusieurs-sites`).
 
 ## Message au déploiement
 
@@ -56,8 +66,8 @@ déploiement :
 
 ```text
 INFOS:
-?: (sites_conformes_core.I001) L’instance a plusieurs sites et le cloisonnement multisite est désactivé : les contributeurs ne sont pas limités aux sites de leurs groupes.
-    HINT: Pour les y limiter, activez la variable d’environnement SF_MULTISITE_ISOLATION_ENABLED.
+?: (sites_conformes_core.I001) The instance has several sites and the multisite isolation is disabled: contributors are not restricted to the sites of their groups.
+    HINT: To restrict them, enable the SF_MULTISITE_ISOLATION_ENABLED environment variable.
 ```
 
 Ce message ne bloque rien. Il n’appelle aucune action si l’absence de

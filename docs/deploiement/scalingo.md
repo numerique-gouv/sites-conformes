@@ -357,6 +357,22 @@ le site l’utiliseront encore : e-mails de réinitialisation de mot de passe et
 notification, plan du site, adresses absolues des pages…
 :::
 
+(scalingo-plusieurs-sites)=
+
+### Plusieurs sites sur la même application
+
+Pour servir plusieurs sites depuis la même application (voir
+{doc}`../fonctionnalites/multisite`), ajoutez le domaine de chaque site dans
+**« Routage public »** et dans `ALLOWED_HOSTS`.
+
+Ne définissez pas de **domaine canonique** (l’étoile à côté d’un domaine, dans
+**« Routage public »**) : Scalingo redirigerait tous les autres domaines vers
+lui, et un seul site resterait joignable. Pour en retirer un :
+
+```sh
+scalingo -a ${APP_NAME} unset-canonical-domain
+```
+
 ## Indexation des contenus
 
 Les contenus des pages sont indexés pour permettre la recherche sur le site, par

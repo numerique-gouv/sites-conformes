@@ -87,6 +87,12 @@ class MultisiteIsolationTestsMixin:
         user = self.create_user_with_page_permission(orphan)
         self.assertEqual(get_sites_for_user(user), [])
 
+    def test_permission_on_a_page_of_a_nested_site_also_gives_the_outer_site(self):
+        ministry = self.get_page(self.site_a, "le-ministere")
+        nested = Site.objects.create(hostname="ministere.site-a.localhost", port=self.site_a.port, root_page=ministry)
+        user = self.create_user_with_page_permission(self.get_page(self.site_a, "le-ministere/nos-missions"))
+        self.assertSites(user, [self.site_a, nested])
+
     def test_sites_are_cached_on_the_user(self):
         user = self.get_fresh_user("editeur-a")
         self.assertSites(user, [self.site_a])
@@ -126,6 +132,19 @@ class MultisiteIsolationTestsMixin:
         user.groups.add(group)
         self.assertSites(user, [], CHANGE_REDIRECT)
         self.assertSites(user, [self.site_a])
+
+    def test_badly_formatted_permission(self):
+        for username in ["editeur-a", "superadmin"]:
+            for permission in ["change_redirect", ".change_redirect", "wagtailredirects."]:
+                with self.subTest(username=username, permission=permission):
+                    with self.assertRaisesMessage(ValueError, "app_label.codename"):
+                        get_sites_for_user(self.get_fresh_user(username), permission)
+
+    def test_unknown_permission(self):
+        for username in ["editeur-a", "superadmin"]:
+            with self.subTest(username=username):
+                with self.assertRaisesMessage(ValueError, "Unknown permission"):
+                    get_sites_for_user(self.get_fresh_user(username), "wagtailredirects.change_redirection")
 
     def test_sites_are_cached_for_each_permission(self):
         user = self.get_fresh_user("moderateur-a")
