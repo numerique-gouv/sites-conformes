@@ -139,13 +139,6 @@ def get_objects_for_page_form(queryset: QuerySet, site: Site | None, current_val
     instance after the page was moved from another site): otherwise the form would reject
     them, or saving the page would remove them. ``current_values`` accepts objects or
     primary keys.
-
-    For instance, in the form of a blog entry::
-
-        site = get_site_for_page(self.instance, parent_page=self.parent_page)
-        self.fields["blog_categories"].queryset = get_objects_for_page_form(
-            Category.objects.all(), site, current_values=self.instance.blog_categories.all()
-        )
     """
     in_scope = Q(site__isnull=True) if site is None else Q(site=site)
     current_pks = [getattr(value, "pk", value) for value in current_values or ()]
