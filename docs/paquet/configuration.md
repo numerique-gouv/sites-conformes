@@ -96,6 +96,12 @@ Quand `True`, `sites_conformes.db_storage` doit être ajouté à
 Active WhiteNoise pour servir les fichiers statiques sans serveur de fichiers
 dédié. Désactivé par défaut.
 
+Les fichiers sont alors servis compressés (gzip et brotli) et, pour ceux dont le
+nom est hashé par `collectstatic`, avec un cache navigateur illimité. Le
+middleware `whitenoise.middleware.WhiteNoiseMiddleware` doit être placé juste
+après `django.middleware.security.SecurityMiddleware`, et l’application WSGI ne
+doit pas être enveloppée par un autre service de statiques (comme `dj_static.Cling`).
+
 ```python
 SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 ```
