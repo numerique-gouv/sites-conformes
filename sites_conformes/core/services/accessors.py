@@ -23,6 +23,18 @@ ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
 style = color_style()
 
 
+def get_existing_pages(page_model, root_page: Page, parent_page: Page):
+    """
+    Pages of the given model where an existing page is looked up: below the root page of the site,
+    and below the parent page when it is outside the site (such as the page templates index,
+    created right under the root of the tree).
+    """
+    pages = page_model.objects.descendant_of(root_page, inclusive=True)
+    if not parent_page.path.startswith(root_page.path):
+        pages = pages | page_model.objects.descendant_of(parent_page, inclusive=True)
+    return pages
+
+
 def get_or_create_collection(col_name: str) -> Collection:
     """
     Get the collection with the given name, or create it right under the root collection.
@@ -48,7 +60,8 @@ def get_or_create_catalog_index_page(
     """
     Get a CatalogIndexPage if it exists, or creates it instead.
 
-    Pages are looked up by slug in the locale of the site, anywhere below its root page:
+    Pages are looked up by slug in the locale of the site, anywhere below its root page
+    (or below the parent page, when it is outside the site):
     an existing page is returned as is, without being updated.
 
     - `body`: the StreamField value, as a list of `(block_name, value)` tuples.
@@ -76,7 +89,7 @@ def get_or_create_catalog_index_page(
 
     # Don't replace or duplicate an already existing page
     already_exists = (
-        CatalogIndexPage.objects.descendant_of(root_page, inclusive=True).filter(slug=slug, locale=locale).first()
+        get_existing_pages(CatalogIndexPage, root_page, parent_page).filter(slug=slug, locale=locale).first()
     )
     if already_exists:
         sys.stdout.write(f"The {slug} page seem to already exist with id {already_exists.id}\n")
@@ -118,7 +131,8 @@ def get_or_create_content_page(
     """
     Get a ContentPage if it exists, or creates it instead.
 
-    Pages are looked up by slug in the locale of the site, anywhere below its root page:
+    Pages are looked up by slug in the locale of the site, anywhere below its root page
+    (or below the parent page, when it is outside the site):
     an existing page is returned as is, without being updated.
 
     - `body`: the StreamField value, as a list of `(block_name, value)` tuples.
@@ -145,9 +159,7 @@ def get_or_create_content_page(
         parent_page = root_page
 
     # Don't replace or duplicate an already existing page
-    already_exists = (
-        ContentPage.objects.descendant_of(root_page, inclusive=True).filter(slug=slug, locale=locale).first()
-    )
+    already_exists = get_existing_pages(ContentPage, root_page, parent_page).filter(slug=slug, locale=locale).first()
     if already_exists:
         sys.stdout.write(f"The {slug} page seem to already exist with id {already_exists.id}\n")
         return already_exists

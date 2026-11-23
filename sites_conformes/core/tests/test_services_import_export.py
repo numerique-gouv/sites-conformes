@@ -40,6 +40,16 @@ class ImportPagesTestCase(WagtailPageTestCase):
         )
         self.assertEqual(template.id, find_template.id)
 
+    def test_next_deployments_reuse_the_templates_index(self):
+        # Each deployment runs both commands again; the templates index is outside the default site
+        templates_count = ContentPage.objects.child_of(self.templates_index).count()
+
+        call_command("create_starter_pages")
+        call_command("import_page_templates")
+
+        self.assertEqual(ContentPage.objects.filter(slug="page_templates_index").count(), 1)
+        self.assertEqual(ContentPage.objects.child_of(self.templates_index).count(), templates_count)
+
 
 def page_api_response():
     """Minimal copy of a page as returned by the Wagtail API of the source site"""
