@@ -13,7 +13,11 @@ from sites_conformes.core.multisite_isolation import (
     get_sites_for_user,
     is_multisite_isolation_active,
 )
+from sites_conformes.core.services.demo_sites import ADMINISTRATORS, get_site_group
 from sites_conformes.core.tests.base import MonositeTestCase, MultisiteTestCase
+
+CHANGE_REDIRECT = "wagtailredirects.change_redirect"
+CHANGE_MAIN_MENU = "sites_conformes_menus.change_mainmenu"
 
 
 class MultisiteIsolationTestsMixin:
@@ -42,8 +46,15 @@ class MultisiteIsolationTestsMixin:
         # Without the sites cached on the object
         return get_user_model().objects.get(username=username)
 
-    def assertSites(self, user, expected: list):
-        self.assertEqual({site.hostname for site in get_sites_for_user(user)}, {site.hostname for site in expected})
+    def get_permission(self, identifier: str) -> Permission:
+        app_label, codename = identifier.split(".")
+        return Permission.objects.get(content_type__app_label=app_label, codename=codename)
+
+    def assertSites(self, user, expected: list, permission: str | None = None):
+        self.assertEqual(
+            {site.hostname for site in get_sites_for_user(user, permission)},
+            {site.hostname for site in expected},
+        )
 
     # get_sites_for_user
 
@@ -90,6 +101,39 @@ class MultisiteIsolationTestsMixin:
         user = self.get_fresh_user("editeur-a")
         get_sites_for_user(user).clear()
         self.assertSites(user, [self.site_a])
+
+    # get_sites_for_user with a permission
+
+    def test_sites_where_the_user_has_a_permission(self):
+        self.assertSites(self.users["admin-a"], [self.site_a], CHANGE_REDIRECT)
+        self.assertSites(self.users["moderateur-a"], [], CHANGE_REDIRECT)
+        self.assertSites(self.users["moderateur-a"], [self.site_a], CHANGE_MAIN_MENU)
+        self.assertSites(self.users["editeur-a"], [], CHANGE_MAIN_MENU)
+
+    def test_superadmin_has_every_permission_on_every_site(self):
+        self.assertSites(self.users["superadmin"], list(Site.objects.all()), CHANGE_REDIRECT)
+
+    def test_permission_given_to_the_user_directly_gives_no_site(self):
+        user = self.get_fresh_user("editeur-a")
+        user.user_permissions.add(self.get_permission(CHANGE_REDIRECT))
+        self.assertTrue(user.has_perm(CHANGE_REDIRECT))
+        self.assertSites(user, [], CHANGE_REDIRECT)
+
+    def test_permission_of_a_group_without_page_permission_gives_no_site(self):
+        group = Group.objects.create(name="Redirections")
+        group.permissions.add(self.get_permission(CHANGE_REDIRECT))
+        user = self.get_fresh_user("editeur-a")
+        user.groups.add(group)
+        self.assertSites(user, [], CHANGE_REDIRECT)
+        self.assertSites(user, [self.site_a])
+
+    def test_sites_are_cached_for_each_permission(self):
+        user = self.get_fresh_user("moderateur-a")
+        self.assertSites(user, [self.site_a])
+        self.assertSites(user, [], CHANGE_REDIRECT)
+        with self.assertNumQueries(0):
+            self.assertSites(user, [self.site_a])
+            self.assertSites(user, [], CHANGE_REDIRECT)
 
     # get_site_for_page
 
@@ -199,6 +243,20 @@ class MultisiteIsolationTestCase(MultisiteIsolationTestsMixin, MultisiteTestCase
         page_en = self.get_page(self.site_a, "le-ministere/nos-missions").get_translations().get()
         user = self.create_user_with_page_permission(page_en)
         self.assertSites(user, [self.site_a])
+
+    def test_user_with_a_different_role_on_each_site(self):
+        # Moderator on site A and administrator on site B
+        user = self.get_fresh_user("moderateur-a")
+        user.groups.add(get_site_group("b", ADMINISTRATORS))
+
+        self.assertSites(user, [self.site_a, self.site_b])
+        # Only administrators manage the redirections, moderators and administrators the menus
+        self.assertSites(user, [self.site_b], CHANGE_REDIRECT)
+        self.assertSites(user, [self.site_a, self.site_b], CHANGE_MAIN_MENU)
+
+    def test_editor_of_sites_a_and_b_manages_the_redirections_of_no_site(self):
+        self.assertSites(self.users["editeur-ab"], [self.site_a, self.site_b])
+        self.assertSites(self.users["editeur-ab"], [], CHANGE_REDIRECT)
 
     def test_site_of_a_page_being_created_under_a_page_of_site_b(self):
         parent = self.get_page(self.site_b, "demarches/par-planete")
