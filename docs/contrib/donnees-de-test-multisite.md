@@ -34,6 +34,10 @@ Chaque site a sa collection d’images, ses menus, sa configuration, trois group
 administrateurs ne modifient la configuration et les scripts que de leur site
 (droits de site Wagtail, et non droits globaux).
 
+Collection, groupes, droits et workflow sont créés par le même service que la
+commande `create_site` (voir [Multisite](../fonctionnalites/multisite.md)) : les
+sites de démo suivent les mêmes rôles qu’un site créé en production.
+
 Certains éléments sont **volontairement communs** aux deux sites, pour révéler
 les collisions :
 
