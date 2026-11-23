@@ -1,28 +1,5 @@
-/* Agenda de la Fabrique — images d'événements entières et petites, jamais recadrées.
-   Chargé par les gabarits surchargés dans templates/events/. */
-
-/* Vignettes des cartes de la liste de l'agenda et des archives :
-   le DSFR recadre en 16:9 (object-fit: cover) ; on affiche l'image entière sur un fond neutre. */
-.fr-card .fr-card__img.fabrique-vignette {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  height: 11rem; /* 9rem d'image + marges : bandeaux de même hauteur, titres alignés d'une carte à l'autre */
-  padding: 1rem;
-  background-color: var(--background-alt-grey);
-}
-
-/* La largeur est fixée dans le gabarit (filtre largeur_vignette) pour une surface égale d'une image à l'autre ;
-   width: auto ne sert que si elle manque. */
-.fr-card .fr-card__img.fabrique-vignette img {
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 9rem;
-  aspect-ratio: auto;
-  object-fit: contain;
-}
+/* Agenda de la Fabrique — chargé par les gabarits surchargés dans templates/events/.
+   Les vignettes des cartes (classe fabrique-vignette) sont dans static/css/style.css, communes avec les actualités. */
 
 /* Étiquette du type d'événement sur les cartes : couleur d'accent pour la distinguer des équipes.
    Le DSFR ne colore que les étiquettes cliquables ; celles des cartes ne le sont pas (carte entièrement cliquable). */

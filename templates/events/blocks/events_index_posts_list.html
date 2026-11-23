@@ -70,8 +70,8 @@
       {% if post.header_image %}
         <div class="fr-card__header">
           <div class="fr-card__img fabrique-vignette">
-            {% image post.header_image max-480x270 as vignette %}
-            <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt="" style="width: {{ post.header_image|largeur_vignette }}px">
+            {% image post.header_image max-480x270 preserve-svg as vignette %}
+            <img class="fr-responsive-img" src="{{ vignette.url }}" width="{{ vignette.width }}" height="{{ vignette.height }}" alt=""{% with largeur=post.header_image|largeur_vignette %}{% if largeur %} style="width: {{ largeur }}px"{% endif %}{% endwith %}>
           </div>
         </div>
       {% endif %}
