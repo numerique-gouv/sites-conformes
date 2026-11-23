@@ -61,14 +61,8 @@ Chaque site doit répondre à son nom de domaine : ajoutez-les tous à
 ## Message au déploiement
 
 Si l’instance a plusieurs sites et que la variable est désactivée, Django
-affiche un message d’information lors de `migrate`, donc à chaque
-déploiement :
-
-```text
-INFOS:
-?: (sites_conformes_core.I001) The instance has several sites and the multisite isolation is disabled: contributors are not restricted to the sites of their groups.
-    HINT: To restrict them, enable the SF_MULTISITE_ISOLATION_ENABLED environment variable.
-```
+affiche un message d’information (`sites_conformes_core.I001`) lors de
+`migrate`, donc à chaque déploiement.
 
 Ce message ne bloque rien. Il n’appelle aucune action si l’absence de
 cloisonnement est voulue.
