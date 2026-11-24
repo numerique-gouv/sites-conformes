@@ -17,12 +17,18 @@ Pour chaque calendrier :
 
 Si le calendrier est illisible ou vide, rien n'est modifié pour cette source.
 
+Deux formats de source : iCal (Framagenda, sites Sites Faciles…) et l'API JSON
+des événements de la BAN (bal-admin.adresse.data.gouv.fr/api/events), qui donne
+aussi le public visé (colonne Public, suivie comme les autres champs) et le type
+(donné à la création seulement).
+
 Liste des calendriers : variable d'environnement AGENDA_CALENDRIERS, une ligne
-« Source | Équipe | URL iCal » par calendrier (séparées par des retours à la
-ligne ou des points-virgules). Par défaut : le Framagenda de Panoramax et l'agenda
-du site Voies locales en commun.
+« Source | Équipe | URL [| format] » par calendrier (format : ical par défaut, ou ban) (séparées par des retours à la
+ligne ou des points-virgules). Par défaut : le Framagenda de Panoramax, l'agenda
+du site Voies locales en commun et l'agenda de la BAN.
 """
 
+import json
 import logging
 import re
 import time as horloge
@@ -44,13 +50,20 @@ VISIO_RE = re.compile(r"\b(jitsi|visio|en ligne|zoom|teams|bbb|bigbluebutton|web
 
 # Champs du Grist qui appartiennent au calendrier d'origine (écrasés à chaque import).
 CHAMPS_CALENDRIER = ("Titre", "Debut", "Fin", "Lieu", "Lien_visio", "Lien_evenement", "Description", "Annule")
+# Champs suivis seulement quand la source les fournit (l'API BAN donne le public visé).
+CHAMPS_FACULTATIFS = ("Public",)
+# Liens de visioconférence (sinon, un lien de source va dans « Page de l'événement »).
+VISIO_URL_RE = re.compile(
+    r"webinaire\.numerique\.gouv\.fr|visio\.|jit\.si|jitsi|zoom\.us|teams\.microsoft|bbb|bigbluebutton", re.I
+)
 
 
 @dataclass(frozen=True)
 class Calendrier:
     source: str  # valeur de la colonne Source, ex. « Framagenda Panoramax »
     equipe: str  # équipe donnée aux nouveaux événements, ex. « Panoramax »
-    url: str  # export iCal public
+    url: str  # export iCal public, ou API JSON
+    format: str = "ical"  # « ical » ou « ban » (API des événements de la BAN)
 
 
 PAR_DEFAUT = [
@@ -65,7 +78,16 @@ PAR_DEFAUT = [
         "Voies locales",
         "https://www.voies-locales.beta.gouv.fr/actualit%C3%A9s/ical/",
     ),
+    # API JSON de l'agenda de la BAN (webinaires Mes Adresses, événements partenaires) : tout l'historique.
+    Calendrier(
+        "Agenda BAN",
+        "BAN",
+        "https://bal-admin.adresse.data.gouv.fr/api/events",
+        "ban",
+    ),
 ]
+
+FORMATS = ("ical", "ban")
 
 
 def depuis_env(valeur: str | None) -> list[Calendrier]:
@@ -77,9 +99,10 @@ def depuis_env(valeur: str | None) -> list[Calendrier]:
         if not ligne.strip():
             continue
         parties = [p.strip() for p in ligne.split("|")]
-        if len(parties) != 3 or not all(parties):
+        if len(parties) not in (3, 4) or not all(parties) or (len(parties) == 4 and parties[3] not in FORMATS):
             raise ValueError(
-                f"AGENDA_CALENDRIERS : « {ligne.strip()} » n'est pas de la forme « Source | Équipe | URL »."
+                f"AGENDA_CALENDRIERS : « {ligne.strip()} » n'est pas de la forme "
+                "« Source | Équipe | URL [| ical ou ban] »."
             )
         calendriers.append(Calendrier(*parties))
     return calendriers
@@ -157,6 +180,77 @@ def lire(contenu: bytes) -> list[dict]:
     return evenements
 
 
+# Types de la BAN → types du Grist (donnés à la création seulement).
+TYPES_BAN = {
+    "formation": "Formation",
+    "formation-lvl2": "Formation",
+    "formation spéciale": "Formation",
+    "partenaire": "Rencontre communauté",
+}
+
+
+def _heure_ban(jour: date, heure) -> datetime | None:
+    try:
+        h, m = (int(x) for x in str(heure).split(":")[:2])
+    except (TypeError, ValueError):
+        return None
+    return datetime.combine(jour, time(h, m), tzinfo=PARIS)
+
+
+def _adresse_ban(adresse) -> str:
+    if isinstance(adresse, str):
+        return adresse.strip()
+    if isinstance(adresse, dict):
+        parties = [str(v).strip() for v in adresse.values() if isinstance(v, (str, int)) and str(v).strip()]
+        return ", ".join(parties)
+    return ""
+
+
+def lire_ban(contenu: bytes) -> list[dict]:
+    """Événements de l'API de la BAN (liste JSON), sous forme de champs du Grist (+ « uid », « creation »)."""
+    evenements = []
+    for item in json.loads(contenu):
+        if not isinstance(item, dict):
+            continue
+        uid, titre = str(item.get("id") or "").strip(), str(item.get("title") or "").strip()
+        try:
+            jour = date.fromisoformat(str(item.get("date") or "")[:10])
+        except ValueError:
+            continue
+        if not uid or not titre:
+            continue
+        debut = _heure_ban(jour, item.get("startHour")) or datetime.combine(jour, time(0, 0), tzinfo=PARIS)
+        fin = _heure_ban(jour, item.get("endHour"))
+        if fin is None or fin < debut:
+            fin = debut + DUREE_PAR_DEFAUT if item.get("startHour") else _moment(jour + timedelta(days=1), fin=True)
+
+        lien = str(item.get("href") or "").strip()
+        lien_visio = lien if lien and VISIO_URL_RE.search(lien) else ""
+        sous_titre = str(item.get("subtitle") or "").strip()
+        description = str(item.get("description") or "").strip()
+        texte = "\n\n".join(p for p in (f"**{sous_titre}**" if sous_titre else "", _description(description)) if p)
+
+        evenements.append(
+            {
+                "uid": uid,
+                "Titre": titre,
+                "Debut": debut.timestamp(),
+                "Fin": fin.timestamp(),
+                "Lieu": "" if item.get("isOnlineOnly") else _adresse_ban(item.get("address")),
+                "Lien_visio": lien_visio,
+                "Lien_evenement": "" if lien_visio else lien,
+                "Description": texte,
+                "Annule": False,
+                "Public": str(item.get("target") or "").strip(),
+                "creation": {"Type": TYPES_BAN.get(str(item.get("type") or "").strip().lower(), "")},
+            }
+        )
+    return evenements
+
+
+LECTEURS = {"ical": lambda contenu: lire(contenu), "ban": lambda contenu: lire_ban(contenu)}
+
+
 # ---------------------------------------------------------------------------
 # Comparaison avec le Grist
 # ---------------------------------------------------------------------------
@@ -202,10 +296,12 @@ def planifier(
             continue
         vus.add(uid)
         champs = {k: ev[k] for k in CHAMPS_CALENDRIER}
+        champs.update({k: ev[k] for k in CHAMPS_FACULTATIFS if k in ev})
         record = existants.get(uid)
         if record is None:
             plan.ajouts.append(
                 {
+                    **{k: v for k, v in ev.get("creation", {}).items() if v},
                     **champs,
                     "Source": calendrier.source,
                     "Source_uid": uid,
@@ -260,7 +356,7 @@ def importer(
     resultats = []
     for calendrier in calendriers:
         try:
-            evenements = lire(grist._get(calendrier.url))
+            evenements = LECTEURS[calendrier.format](grist._get(calendrier.url))
         except Exception as e:  # noqa: BLE001 — calendrier injoignable ou illisible : on passe
             logger.warning("Calendrier %s illisible : %s", calendrier.source, e)
             resultats.append(Resultat(calendrier, erreur=str(e)))

@@ -1,4 +1,5 @@
 import io
+import json
 from datetime import datetime
 from unittest import mock
 from zoneinfo import ZoneInfo
@@ -108,7 +109,12 @@ class LectureTests(SimpleTestCase):
 
     def test_configuration(self):
         self.assertEqual(calendriers.depuis_env(None), calendriers.PAR_DEFAUT)
-        self.assertEqual([c.equipe for c in calendriers.PAR_DEFAUT], ["Panoramax", "Voies locales"])
+        self.assertEqual([c.equipe for c in calendriers.PAR_DEFAUT], ["Panoramax", "Voies locales", "BAN"])
+        self.assertEqual(calendriers.PAR_DEFAUT[2].format, "ban")
+        (ban,) = calendriers.depuis_env("Agenda BAN | BAN | https://exemple.fr/api/events | ban")
+        self.assertEqual(ban.format, "ban")
+        with self.assertRaises(ValueError):
+            calendriers.depuis_env("Agenda BAN | BAN | https://exemple.fr/api/events | xml")
         self.assertEqual(calendriers.depuis_env(""), [])
         liste = calendriers.depuis_env("Framagenda BAN | BAN | https://exemple.fr/ban.ics; RNB | RNB | https://x/rnb")
         self.assertEqual([c.equipe for c in liste], ["BAN", "RNB"])
@@ -258,3 +264,100 @@ class ImportCommandeTests(TestCase):
     def test_sans_calendriers(self):
         self.call("--sans-calendriers")
         self.telechargement.assert_not_called()
+
+
+# Extrait de l'API des événements de la BAN (bal-admin.adresse.data.gouv.fr/api/events), champs réels.
+API_BAN = json.dumps(
+    [
+        {
+            "id": "65afd71b2822a2f19e2e7c09",
+            "title": "Webinaire Mes Adresses",
+            "subtitle": "Je débute sur Mes Adresses",
+            "description": "Rappel des principales fonctionnalités.",
+            "type": "formation",
+            "target": "communes",
+            "date": "2022-09-08",
+            "tags": ["Base Adresse Locale", "Commune"],
+            "isOnlineOnly": True,
+            "address": None,
+            "href": "https://cryptpad.fr/form/#/2/form/view/KFNeMiPGM/embed/",
+            "isSubscriptionClosed": False,
+            "startHour": "14:00",
+            "endHour": "15:30",
+        },
+        {
+            "id": "6af9e4be9a3e799db9553fcb",
+            "title": "Webinaire Mes Adresses - NIVEAU 2",
+            "subtitle": "Formation approndie",
+            "description": "Pour se perfectionner sur Mes Adresses",
+            "type": "formation-lvl2",
+            "target": "communes",
+            "date": "2026-12-10",
+            "isOnlineOnly": True,
+            "address": None,
+            "href": "https://webinaire.numerique.gouv.fr/meeting/signin/invite/62207/hash/2971a9",
+            "startHour": "10:00",
+            "endHour": "11:30",
+        },
+        {
+            "id": "6af9e4349a3e799db9553fc9",
+            "title": "Événement Partenaire de la Charte de la Base Adresse Locale",
+            "subtitle": None,
+            "description": None,
+            "type": "partenaire",
+            "target": "Communes, EPCI, départements, IDG et entreprises partenaires de la Charte",
+            "date": "2026-12-15",
+            "isOnlineOnly": False,
+            "address": {"nom": "Salle des fêtes", "commune": "Saint-Mandé"},
+            "href": "https://adresse.data.gouv.fr/",
+            "isSubscriptionClosed": True,
+            "startHour": "10:00",
+            "endHour": None,
+        },
+        {"id": "sans-date", "title": "Sans date", "date": None},
+    ]
+).encode()
+
+
+class BanTests(SimpleTestCase):
+    def setUp(self):
+        self.evenements = {e["uid"]: e for e in calendriers.lire_ban(API_BAN)}
+
+    def test_lecture(self):
+        self.assertEqual(len(self.evenements), 3)  # l'événement sans date est ignoré
+        n2 = self.evenements["6af9e4be9a3e799db9553fcb"]
+        self.assertEqual((n2["Debut"], n2["Fin"]), (ts(2026, 12, 10, 10), ts(2026, 12, 10, 11, 30)))
+        self.assertEqual(
+            n2["Lien_visio"], "https://webinaire.numerique.gouv.fr/meeting/signin/invite/62207/hash/2971a9"
+        )
+        self.assertEqual((n2["Lien_evenement"], n2["Lieu"], n2["Public"]), ("", "", "communes"))
+        self.assertEqual(n2["Description"], "**Formation approndie**\n\nPour se perfectionner sur Mes Adresses")
+        self.assertEqual(n2["creation"], {"Type": "Formation"})
+
+    def test_formulaire_adresse_et_heure_de_fin_absente(self):
+        ancien = self.evenements["65afd71b2822a2f19e2e7c09"]
+        self.assertEqual(
+            (ancien["Lien_visio"], ancien["Lien_evenement"]),
+            ("", "https://cryptpad.fr/form/#/2/form/view/KFNeMiPGM/embed/"),
+        )
+        partenaire = self.evenements["6af9e4349a3e799db9553fc9"]
+        self.assertEqual(partenaire["Lieu"], "Salle des fêtes, Saint-Mandé")
+        self.assertEqual(partenaire["Fin"], ts(2026, 12, 15, 11))  # une heure par défaut
+        self.assertEqual(partenaire["Description"], "")
+        self.assertEqual(partenaire["creation"], {"Type": "Rencontre communauté"})
+
+    def test_plan(self):
+        ban = calendriers.PAR_DEFAUT[2]
+        evenements = calendriers.lire_ban(API_BAN)
+        plan = calendriers.planifier(ban, evenements, [])
+        ajout = next(a for a in plan.ajouts if a["Source_uid"] == "6af9e4be9a3e799db9553fcb")
+        self.assertEqual((ajout["Source"], ajout["Equipe"], ajout["Type"]), ("Agenda BAN", ["L", "BAN"], "Formation"))
+        self.assertEqual(ajout["Public"], "communes")
+        self.assertNotIn("creation", ajout)
+        # Ensuite : le public suit la source, le type reste aux éditeurs.
+        records = [
+            {"id": i, "fields": {**a, "Type": "Webinaire", "Public": "Tout le monde"}}
+            for i, a in enumerate(plan.ajouts, 1)
+        ]
+        maj = calendriers.planifier(ban, evenements, records).mises_a_jour
+        self.assertEqual({tuple(m["fields"]) for m in maj}, {("Public",)})
