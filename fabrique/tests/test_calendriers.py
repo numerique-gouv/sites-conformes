@@ -109,7 +109,8 @@ class LectureTests(SimpleTestCase):
 
     def test_configuration(self):
         self.assertEqual(calendriers.depuis_env(None), calendriers.PAR_DEFAUT)
-        self.assertEqual([c.equipe for c in calendriers.PAR_DEFAUT], ["Panoramax", "Voies locales", "BAN"])
+        self.assertEqual([c.equipe for c in calendriers.PAR_DEFAUT], ["Panoramax", "Voies locales", "BAN", "BAN"])
+        self.assertEqual(calendriers.PAR_DEFAUT[3].format, "grist-ban")
         self.assertEqual(calendriers.PAR_DEFAUT[2].format, "ban")
         (ban,) = calendriers.depuis_env("Agenda BAN | BAN | https://exemple.fr/api/events | ban")
         self.assertEqual(ban.format, "ban")
@@ -361,3 +362,88 @@ class BanTests(SimpleTestCase):
         ]
         maj = calendriers.planifier(ban, evenements, records).mises_a_jour
         self.assertEqual({tuple(m["fields"]) for m in maj}, {("Public",)})
+
+
+# Extrait du Grist de la BAN (table Evenements, champs réels) : dates à minuit UTC, adresse en référence.
+GRIST_BAN_EVENEMENTS = {
+    "records": [
+        {
+            "id": 37,
+            "fields": {
+                "title": "Rencontre Utilisateurs Nationaux BAN",
+                "subtitle": "Adresse-Lab",
+                "description": "Journée de co-construction entre utilisateurs experts de l'adresse",
+                "type": "adresselab",
+                "target": "Les SI nationaux utilisateurs avancés de la donnée adresse",
+                "date": 1796860800,  # 2026-12-10
+                "isOnlineOnly": False,
+                "address": 5,
+                "href": "",
+                "startHour": "10:00",
+                "endHour": "16:00",
+                "validation_publication": True,
+            },
+        },
+        {
+            "id": 34,
+            "fields": {
+                "title": "Adresse-Lab T4 2026",
+                "type": "adresselab",
+                "date": 1796688000,  # 2026-12-08
+                "isOnlineOnly": True,
+                "address": None,
+                "href": "https://webinaire.numerique.gouv.fr/meeting/signin/invite/1/hash/abc",
+                "startHour": "10:30",
+                "endHour": "12:00",
+                "validation_publication": True,
+            },
+        },
+        {"id": 40, "fields": {"title": "Brouillon", "date": 1796688000, "validation_publication": False}},
+    ]
+}
+GRIST_BAN_ADRESSES = {
+    "records": [
+        {
+            "id": 5,
+            "fields": {
+                "nom": "IGN - Saint-Mandé",
+                "numero": "73",
+                "voie": "Avenue de Paris",
+                "codePostal": "94160",
+                "commune": "Saint-Mandé",
+            },
+        }
+    ]
+}
+
+
+class GristBanTests(SimpleTestCase):
+    def setUp(self):
+        def faux_get(url, api_key=None):
+            self.cles.append(api_key)
+            table = GRIST_BAN_ADRESSES if "Adresses_Evenements" in url else GRIST_BAN_EVENEMENTS
+            return json.dumps(table).encode()
+
+        self.cles = []
+        patch = mock.patch.object(grist, "_get", side_effect=faux_get)
+        patch.start()
+        self.addCleanup(patch.stop)
+        self.grist_ban = calendriers.PAR_DEFAUT[3]
+        self.evenements = {e["uid"]: e for e in calendriers.charger(self.grist_ban, "cle-de-test")}
+
+    def test_lecture(self):
+        self.assertEqual(set(self.evenements), {"grist-37", "grist-34"})  # non validé : ignoré
+        self.assertEqual(self.cles, ["cle-de-test", "cle-de-test"])
+        rencontre = self.evenements["grist-37"]
+        self.assertEqual((rencontre["Debut"], rencontre["Fin"]), (ts(2026, 12, 10, 10), ts(2026, 12, 10, 16)))
+        self.assertEqual(rencontre["Lieu"], "IGN - Saint-Mandé, 73 Avenue de Paris, 94160 Saint-Mandé")
+        self.assertEqual(rencontre["creation"], {"Type": "Atelier", "Serie": ["L", "Adresse-Lab"]})
+        lab = self.evenements["grist-34"]
+        self.assertEqual((lab["Debut"], lab["Lieu"]), (ts(2026, 12, 8, 10, 30), ""))
+        self.assertTrue(lab["Lien_visio"].startswith("https://webinaire.numerique.gouv.fr/"))
+
+    def test_plan(self):
+        plan = calendriers.planifier(self.grist_ban, list(self.evenements.values()), [])
+        ajout = next(a for a in plan.ajouts if a["Source_uid"] == "grist-37")
+        self.assertEqual((ajout["Source"], ajout["Equipe"]), ("Grist BAN", ["L", "BAN"]))
+        self.assertEqual((ajout["Type"], ajout["Serie"]), ("Atelier", ["L", "Adresse-Lab"]))
