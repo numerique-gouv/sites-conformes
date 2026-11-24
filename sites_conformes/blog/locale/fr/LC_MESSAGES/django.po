@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 13:08+0100\n"
+"POT-Creation-Date: 2026-11-04 13:09+0100\n"
 "PO-Revision-Date: 2026-10-19 12:55+0200\n"
 "Last-Translator: Sylvain Boissel <sylvain@boissel.dev>\n"
 "Language-Team: \n"
@@ -47,9 +47,6 @@ msgstr "Informations de contact"
 
 msgid "Person"
 msgstr "Personne"
-
-msgid "Category"
-msgstr "Catégorie"
 
 msgid "Posts per page"
 msgstr "Articles par page"
@@ -99,6 +96,9 @@ msgstr "Étiquettes et Catégories"
 
 msgid "Blog page"
 msgstr "Page de blog"
+
+msgid "Category"
+msgstr "Catégorie"
 
 msgid "Published on"
 msgstr "Publié le"

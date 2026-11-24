@@ -3,9 +3,11 @@ from django.db import connection
 from wagtail.models import Page, Site, get_page_models
 from wagtail.test.utils import WagtailPageTestCase
 
-from home.models import CustomContentPage, HomePage
+from home.models import CustomBlogEntryPage, CustomContentPage, HomePage
+from sites_conformes.blog import models as blog_models
+from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage
 from sites_conformes.core import models as core_models
-from sites_conformes.core.models import CatalogIndexPage, ContentPage, Tag
+from sites_conformes.core.models import CatalogIndexPage, Category, ContentPage, Tag
 from sites_conformes.core.services.accessors import get_or_create_content_page
 
 
@@ -97,3 +99,47 @@ class CustomContentPageTests(WagtailPageTestCase):
     def test_accessor_creates_the_swapped_model(self):
         page = get_or_create_content_page(slug="via-accessor", title="Via accessor", body=[])
         self.assertIsInstance(page, CustomContentPage)
+
+
+class CustomBlogEntryPageTests(WagtailPageTestCase):
+    """
+    The shipped BlogEntryPage is swapped for home.CustomBlogEntryPage (SF_BLOGENTRYPAGE_MODEL).
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        home = Site.objects.get(is_default_site=True).root_page
+        cls.blog = home.add_child(instance=BlogIndexPage(title="Blog", slug="blog"))
+        cls.category = Category.objects.create(name="Bretagne", slug="bretagne", locale=cls.blog.locale)
+
+    def add_entry(self, slug, **kwargs):
+        return self.blog.add_child(instance=CustomBlogEntryPage(title=slug.title(), slug=slug, live=True, **kwargs))
+
+    def test_setting_swaps_the_model(self):
+        self.assertIs(swapper.load_model("sites_conformes_blog", "BlogEntryPage"), CustomBlogEntryPage)
+        self.assertEqual(BlogEntryPage._meta.swapped, "home.CustomBlogEntryPage")
+
+    def test_default_model_is_hidden_from_wagtail(self):
+        self.assertNotIn(BlogEntryPage, get_page_models())
+        self.assertCanCreateAt(BlogIndexPage, CustomBlogEntryPage)
+        self.assertCanNotCreateAt(BlogIndexPage, BlogEntryPage)
+
+    def test_shipped_through_models_are_not_declared(self):
+        self.assertFalse(hasattr(blog_models, "CategoryEntryPage"))
+        self.assertFalse(hasattr(blog_models, "TagEntryPage"))
+        tables = connection.introspection.table_names()
+        self.assertNotIn("sites_conformes_blog_blogentrypage", tables)
+        self.assertNotIn("sites_conformes_blog_categoryentrypage", tables)
+        self.assertNotIn("sites_conformes_blog_tagentrypage", tables)
+
+    def test_blog_index_lists_and_filters_custom_entries_by_category(self):
+        entry = self.add_entry("en-bretagne")
+        entry.categories.add(self.category)
+        entry.tags.add("dsfr")
+        entry.save()
+        self.add_entry("ailleurs")
+
+        response = self.client.get(self.blog.url + "?category=bretagne")
+
+        self.assertEqual(list(response.context["posts"]), [entry])
+        self.assertPageIsRenderable(entry)

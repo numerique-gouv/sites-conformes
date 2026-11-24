@@ -102,10 +102,47 @@ swapper.get_model_name("sites_conformes_core", "ContentPage")
 swapper.is_swapped("sites_conformes_core", "ContentPage")
 ```
 
+## Articles de blog
+
+Les articles de blog se remplacent de la même façon, avec le réglage
+`SF_BLOGENTRYPAGE_MODEL` et la classe `AbstractBlogEntryPage`. Le modèle
+déclare lui-même ses étiquettes et ses catégories, avec leurs modèles
+intermédiaires :
+
+```python
+from django.db import models
+from modelcluster.contrib.taggit import ClusterTaggableManager
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from sites_conformes.blog.models import AbstractBlogEntryPage
+from sites_conformes.core.models import Category
+from taggit.models import TaggedItemBase
+
+
+class CustomBlogEntryPage(AbstractBlogEntryPage):
+    tags = ClusterTaggableManager(through="TagCustomBlogEntryPage", blank=True)
+    categories = ParentalManyToManyField(
+        Category, through="CategoryCustomBlogEntryPage", blank=True
+    )
+
+
+class TagCustomBlogEntryPage(TaggedItemBase):
+    content_object = ParentalKey(CustomBlogEntryPage, related_name="tagged_items")
+
+
+class CategoryCustomBlogEntryPage(models.Model):
+    category = models.ForeignKey(Category, related_name="+", on_delete=models.CASCADE)
+    page = ParentalKey(CustomBlogEntryPage, related_name="entry_categories")
+```
+
+```python
+SF_BLOGENTRYPAGE_MODEL = "my_app.CustomBlogEntryPage"
+```
+
 ## Exemple
 
-Le projet de démonstration du dépôt (`demo/`) remplace le modèle par
-`home.CustomContentPage` : voir `demo/home/models.py`, le réglage dans
+Le projet de démonstration du dépôt (`demo/`) remplace les modèles par
+`home.CustomContentPage` et `home.CustomBlogEntryPage` : voir
+`demo/home/models.py`, le réglage dans
 `demo/demo/settings/base.py` et les tests dans `demo/home/tests.py`, exécutés
 en CI.
 Il peut être utilisé comme source d'inspiration pour voir une mise en œuvre

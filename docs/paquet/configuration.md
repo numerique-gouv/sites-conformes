@@ -119,6 +119,21 @@ Valeur par défaut :
 SF_CONTENTPAGE_MODEL = "sites_conformes_core.ContentPage"
 ```
 
+## SF_BLOGENTRYPAGE_MODEL
+
+Modèle Django utilisé pour les articles de blog, au format `app_label.ModelName`.
+Il doit hériter de `AbstractBlogEntryPage` et déclarer lui-même ses champs `tags`
+et `categories` ainsi que leurs modèles intermédiaires.
+
+Voir {doc}`modele-de-page-personnalise`. Comme `SF_CONTENTPAGE_MODEL`, ce réglage
+doit être défini avant la première migration du projet.
+
+Valeur par défaut :
+
+```python
+SF_BLOGENTRYPAGE_MODEL = "sites_conformes_blog.BlogEntryPage"
+```
+
 ## SF_DISABLE_LOCAL_LOGIN
 
 Désactive la connexion par mot de passe au profit d’un SSO (ProConnect, etc.).
