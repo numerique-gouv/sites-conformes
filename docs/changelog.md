@@ -7,6 +7,17 @@ pour la liste complète des versions.
 Les notes de mise à jour qui requièrent une action de l’opérateur (migration de
 schéma, gel des contributions, etc.) sont reprises ci-dessous.
 
+## Prochaine version - Cloisonnement multisite des menus et des pages
+
+Pour les projets qui utilisent le paquet, ajoutez
+`sites_conformes.core.middleware.MultisiteIsolationMiddleware` à `MIDDLEWARE`,
+après le middleware d’authentification (voir {doc}`paquet/installation`). Il
+ne fait rien tant que le cloisonnement multisite est désactivé.
+
+Avant d’activer le cloisonnement, lancez `python manage.py multisite_isolation_report`
+pour repérer les groupes qui perdraient l’accès aux menus (voir
+{doc}`fonctionnalites/multisite`).
+
 ## Prochaine version - Suppression des données de l’ancien système de menus
 
 Les menus ont été convertis vers l’application `sites_conformes.menus` lors

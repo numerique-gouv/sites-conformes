@@ -103,6 +103,24 @@ TEMPLATES[0]["OPTIONS"]["context_processors"].extend([
 ])
 ```
 
+### Middleware
+
+Le middleware de cloisonnement multisite limite l’explorateur et le sélecteur
+de pages aux sites de chaque contributeur (voir {doc}`../fonctionnalites/multisite`).
+Il ne fait rien tant que le cloisonnement est désactivé. Ajoutez-le après le
+middleware d’authentification :
+
+```python
+MIDDLEWARE.insert(
+    MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1,
+    "sites_conformes.core.middleware.MultisiteIsolationMiddleware",
+)
+```
+
+:::{note}
+`MIDDLEWARE` doit être une liste et non un tuple, sinon `insert` renverra une erreur.
+:::
+
 ### Templates et fichiers statiques
 
 Le package fournit des templates de base partagés (`base.html`, blocs DSFR,

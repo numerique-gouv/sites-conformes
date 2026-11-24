@@ -1,10 +1,20 @@
 import logging
 
+from django.apps import apps
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse, QueryDict
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.cache import patch_cache_control, patch_vary_headers
+from wagtail.models import Page
 
 from sites_conformes.core.models import CmsDsfrConfig
+from sites_conformes.core.multisite_isolation import (
+    SITE_SCOPED_VIEWSETS,
+    get_sites_for_user,
+    is_multisite_isolation_active,
+    is_page_in_scope,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -157,3 +167,142 @@ class IframeMiddleware:
     def _is_admin_request(request: HttpRequest) -> bool:
         admin_path = settings.WAGTAILADMIN_PATH.lstrip("/")
         return request.path_info.lstrip("/").startswith(admin_path)
+
+
+class MultisiteIsolationMiddleware:
+    """
+    Restricts the admin views that the viewsets and hooks cannot reach to the sites of
+    the user, when the multisite isolation is enabled (see
+    ``sites_conformes.core.multisite_isolation``):
+
+    - the page explorer returns a 404 for a page outside of the user's sites, so that its
+      title is not shown;
+    - the page chooser, opened on such a page (for instance the parent of a link to
+      another site, already set), opens at the root of the tree instead, filtered by the
+      ``construct_page_chooser_queryset`` hook;
+    - the bulk actions and the wagtail-localize views of a model using
+      ``SiteScopedViewSetMixin`` return a 404 for an object outside of the scope.
+
+    Must be placed after the authentication middleware.
+    """
+
+    BULK_ACTION_PERMISSIONS = {"delete": ["delete"], "publish": ["publish"], "unpublish": ["publish"]}
+
+    def __init__(self, get_response):
+        """
+        Maps the names of the restricted views to the method checking each one.
+        """
+        self.get_response = get_response
+        self.handlers = {
+            "wagtailadmin_explore": self.check_explored_page,
+            "wagtailadmin_explore_results": self.check_explored_page,
+            "wagtailadmin_choose_page_child": self.check_chooser_parent_page,
+            "wagtail_bulk_action": self.check_bulk_action,
+            "wagtail_localize:submit_snippet_translation": self.check_snippet,
+            "wagtail_localize:snippets_api_detail": self.check_snippet,
+            "wagtail_localize:update_translations": self.check_translation_source,
+        }
+
+    def __call__(self, request: HttpRequest) -> HttpResponse:
+        """
+        Passes the request on: the checks happen in process_view, once the view is known.
+        """
+        return self.get_response(request)
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        """
+        Runs the check of the view, if any, for a restricted user.
+        """
+        handler = self.handlers.get(request.resolver_match.view_name)
+        if handler is None or not is_multisite_isolation_active():
+            return None
+        user = getattr(request, "user", None)
+        if user is None or not user.is_authenticated or user.is_superuser:
+            return None
+        return handler(request, **view_kwargs)
+
+    @staticmethod
+    def is_page_hidden(request, page_id) -> bool:
+        """
+        Whether the page exists and is outside of the sites of the user.
+        """
+        page = Page.objects.filter(pk=page_id).first()
+        return page is not None and not is_page_in_scope(page, get_sites_for_user(request.user))
+
+    def check_explored_page(self, request, parent_page_id, **kwargs):
+        """
+        Returns a 404 in the explorer for a page outside of the sites of the user.
+        """
+        if self.is_page_hidden(request, parent_page_id):
+            raise Http404
+
+    def check_chooser_parent_page(self, request, parent_page_id, **kwargs):
+        """
+        Redirects the page chooser to the root when it is opened on a page outside of the sites of the user.
+        """
+        if self.is_page_hidden(request, parent_page_id):
+            url = reverse("wagtailadmin_choose_page")
+            if query_string := request.META.get("QUERY_STRING"):
+                url = f"{url}?{query_string}"
+            return redirect(url)
+
+    @staticmethod
+    def get_viewset(app_label, model_name):
+        """
+        Returns the SiteScopedViewSetMixin viewset of the model, or None if it is not site-scoped.
+        """
+        try:
+            model = apps.get_model(app_label, model_name)
+        except LookupError:
+            return None
+        return SITE_SCOPED_VIEWSETS.get(model)
+
+    def check_bulk_action(self, request, app_label, model_name, action, **kwargs):
+        """
+        Restricts a bulk action on a site-scoped model to the objects of the scope.
+        """
+        viewset = self.get_viewset(app_label, model_name)
+        if viewset is None:
+            return
+        actions = self.BULK_ACTION_PERMISSIONS.get(action)
+        ids = request.GET.getlist("id")
+        if "all" in ids:
+            # Wagtail would act on every object of the model: only keep those of the scope
+            pks = viewset.filter_queryset(viewset.model._default_manager.all(), request.user, actions).values_list(
+                "pk", flat=True
+            )
+            query = request.GET.copy()
+            query.setlist("id", [str(pk) for pk in pks])
+            request.GET = QueryDict(query.urlencode())
+            request.META["QUERY_STRING"] = query.urlencode()
+            return
+        in_scope = viewset.filter_queryset(viewset.model._default_manager.filter(pk__in=ids), request.user, actions)
+        if in_scope.count() != len(set(ids)):
+            raise Http404
+
+    def check_snippet(self, request, app_label, model_name, pk, **kwargs):
+        """
+        Returns a 404 for a wagtail-localize view of an object outside of the scope.
+        """
+        viewset = self.get_viewset(app_label, model_name)
+        if viewset is not None and not viewset.is_in_scope(request.user, pk):
+            raise Http404
+
+    def check_translation_source(self, request, translation_source_id, **kwargs):
+        """
+        Returns a 404 when syncing the translations of an object outside of the scope.
+        """
+        from wagtail_localize.models import TranslationSource
+
+        source = TranslationSource.objects.filter(pk=translation_source_id).first()
+        if source is None:
+            return
+        viewset = SITE_SCOPED_VIEWSETS.get(source.specific_content_type.model_class())
+        if viewset is None:
+            return
+        try:
+            instance = source.get_source_instance()
+        except viewset.model.DoesNotExist:
+            return
+        if not viewset.is_in_scope(request.user, instance.pk):
+            raise Http404
