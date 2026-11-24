@@ -60,3 +60,9 @@ class Command(BaseCommand):
 
         for warning in setup.warnings:
             self.stdout.write(self.style.WARNING(f"Attention : {warning}"))
+
+        # Each process of the application keeps the root pages of the sites in its own cache for an hour:
+        # the running ones don't see the changes made by this command.
+        self.stdout.write(
+            self.style.WARNING("À faire : redémarrez l’application pour qu’elle prenne en compte ce site.")
+        )

@@ -149,6 +149,12 @@ collections : une image d’un site portant le même titre n’est jamais repris
   accès à aucun site une fois le cloisonnement activé.
 - **Comptes :** ajoutez les personnes aux groupes du site depuis
   **Paramètres → Utilisateurs**.
+- **Redémarrage :** redémarrez l’application après la commande (sur Scalingo :
+  `scalingo -a <application> restart`). Chaque processus de l’application
+  garde la liste des pages d’accueil des sites en cache pendant une heure :
+  d’ici là, il ne connaît pas les adresses des pages du nouveau site. La
+  prévisualisation de ces pages utilise alors le site par défaut, le bouton
+  « Voir en ligne » n’apparaît pas, et les liens vers ces pages sont vides.
 
 ### Pages de démarrage d’un site existant
 

@@ -474,6 +474,7 @@ class CreateSiteTestsMixin:
         self.assertIn("Site « Site D » créé", output)
         self.assertIn("Site D – Éditeurs", output)
         self.assertIn("Attention : « site-d.localhost » n’est pas dans ALLOWED_HOSTS", output)
+        self.assertIn("À faire : redémarrez l’application", output)
 
         stdout = StringIO()
         call_command("create_site", hostname="site-d.localhost", name="Site D", stdout=stdout)
