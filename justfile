@@ -28,6 +28,11 @@ alias csu := createsuperuser
 createsuperuser:
     {{docker_cmd}} {{uv_run}} python manage.py createsuperuser
 
+# Create a site, or complete an existing one (e.g. just create-site --hostname site-c.example.org --name "Site C" --locales fr,en)
+[positional-arguments]
+create-site *args:
+    {{docker_cmd}} {{uv_run}} python manage.py create_site "$@"
+
 alias first-deploy := deploy
 deploy:
     just collectstatic

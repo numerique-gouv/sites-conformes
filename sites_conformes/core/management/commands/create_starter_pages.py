@@ -1,36 +1,58 @@
 import swapper
 from django.core.management import call_command
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.urls import reverse
-from wagtail.images import get_image_model
-from wagtail.models import Page
+from wagtail.models import Page, Site
 from wagtail.rich_text import RichText
 
 from sites_conformes.core.services.accessors import get_or_create_footer_bottom_menu, get_or_create_main_menu
-from sites_conformes.core.utils import get_default_site
+from sites_conformes.core.services.sites import import_installed_images
+from sites_conformes.core.utils import get_default_site, get_installed_image
 from sites_conformes.forms.models import FormField, FormPage
 
-Image = get_image_model()
 ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
 
 ALL_ALLOWED_SLUGS = ["home", "mentions-legales", "accessibilite", "contact"]
+
+# Pages created for a given site: its home page already exists
+SITE_SLUGS = ["mentions-legales", "accessibilite", "contact"]
 
 
 class Command(BaseCommand):
     help = """
     Creates a series of starter pages, in order to avoid new sites having only a blank "Welcome to Wagtail" page.
+
+    With --site, creates the pages below the home page of this site, even if the instance already has pages.
     """
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--slug", nargs="+", type=str, help="[Optional] Slug of the page(s) to create", choices=ALL_ALLOWED_SLUGS
         )
+        parser.add_argument(
+            "--site",
+            type=int,
+            help="[Optional] ID of the site to create the pages in. Defaults to the default site.",
+        )
 
     def handle(self, *args, **kwargs):
+        site_id = kwargs.get("site")
+        slugs = kwargs.get("slug")
+
+        if site_id is not None:
+            site = Site.objects.filter(pk=site_id).first()
+            if not site:
+                raise CommandError(f"Aucun site n’a l’identifiant {site_id}.")
+            if slugs and "home" in slugs:
+                raise CommandError("La page d’accueil d’un site est créée avec le site, par la commande create_site.")
+
+            # These images are shared by all the sites: they are only imported if missing
+            import_installed_images()
+            self.create_pages(slugs or SITE_SLUGS, site)
+            return
+
         call_command("import_dsfr_pictograms")
         call_command("import_illustration_images")
-
-        slugs = kwargs.get("slug")
 
         if not slugs:
             # Only run the script on a new site or for specific slugs
@@ -50,6 +72,10 @@ class Command(BaseCommand):
 
             slugs = ALL_ALLOWED_SLUGS
 
+        # The default site is looked up by each page: creating the home page changes its root page
+        self.create_pages(slugs)
+
+    def create_pages(self, slugs: list, site: Site | None = None) -> None:
         for slug in slugs:
             if slug == "home":
                 self.create_homepage()
@@ -80,7 +106,7 @@ class Command(BaseCommand):
                 """  # noqa
                 body.append(("paragraph", RichText(text_raw)))
 
-                self.create_page(slug=slug, title=title, body=body)
+                self.create_page(slug=slug, title=title, body=body, site=site)
             elif slug == "accessibilite":
                 title = "Déclaration d’accessibilité"
                 body = []
@@ -95,9 +121,11 @@ class Command(BaseCommand):
                 }
 
                 body.append(("alert", alert_block))
-                self.create_page(slug=slug, title=title, body=body, footer_label="Accessibilité : non conforme")
+                self.create_page(
+                    slug=slug, title=title, body=body, footer_label="Accessibilité : non conforme", site=site
+                )
             elif slug == "contact":
-                self.create_contact_page(slug)
+                self.create_contact_page(slug, site=site)
             else:
                 raise ValueError(f"Valeur inconnue : {slug}")
 
@@ -115,7 +143,7 @@ class Command(BaseCommand):
         body = []
         title = "Votre nouveau site avec Sites Conformes"
 
-        image = Image.objects.filter(title="Pictogrammes DSFR — Digital — Coding").first()
+        image = get_installed_image("Pictogrammes DSFR — Digital — Coding")
         text_raw = """<p>Bienvenue !</p>
 
         <p>Vous venez de créer un site utilisant le gestionnaire de contenus de l’État.</p>
@@ -163,21 +191,28 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"Homepage created with id {home_page.id}"))
 
-    def create_page(self, slug: str, title: str, body: list, footer_label: str = ""):
+    def get_existing_page(self, slug: str, site: Site) -> Page | None:
         """
-        Creates a page for the site and adds it to the footer
+        Returns the page of the site with the given slug: the other sites can have the same pages.
         """
+        return Page.objects.descendant_of(site.root_page, inclusive=True).filter(slug=slug).first()
+
+    def create_page(self, slug: str, title: str, body: list, footer_label: str = "", site: Site | None = None):
+        """
+        Creates a page for the site (by default, the default site) and adds it to the footer
+        """
+        site = site or get_default_site()
 
         # Don't replace a manually created page
-        already_exists = ContentPage.objects.filter(slug=slug).first()
+        already_exists = self.get_existing_page(slug, site)
         if already_exists:
             self.stdout.write(f"The {slug} page seem to already exist with id {already_exists.id}")
             return
 
-        home_page = get_default_site().root_page
+        home_page = site.root_page
         new_page = home_page.add_child(instance=ContentPage(title=title, body=body, slug=slug, show_in_menus=True))
 
-        footer_menu = get_or_create_footer_bottom_menu()
+        footer_menu = get_or_create_footer_bottom_menu(site)
 
         link_label = footer_label if footer_label else title
 
@@ -190,13 +225,14 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"Page {slug} created with id {new_page.id}"))
 
-    def create_contact_page(self, slug: str = "contact") -> None:
+    def create_contact_page(self, slug: str = "contact", site: Site | None = None) -> None:
         """
-        Creates a contact page for the site and adds it the main menu
+        Creates a contact page for the site (by default, the default site) and adds it the main menu
         """
+        site = site or get_default_site()
 
         # Don't replace a manually created page
-        already_exists = ContentPage.objects.filter(slug=slug).first()
+        already_exists = self.get_existing_page(slug, site)
         if already_exists:
             self.stdout.write(f"The contact page seem to already exist with id {already_exists.id}")
             return
@@ -212,8 +248,7 @@ class Command(BaseCommand):
 
         thank_you_text = RichText("<p>Merci pour votre message ! Nous reviendrons vers vous rapidement.</p>")
 
-        default_site = get_default_site()
-        home_page = default_site.root_page
+        home_page = site.root_page
         contact_page = home_page.add_child(
             instance=FormPage(title=title, slug=slug, intro=intro, thank_you_text=thank_you_text, show_in_menus=True)
         )
@@ -275,7 +310,7 @@ class Command(BaseCommand):
             FormField.objects.create(**field_data)
 
         # Menu item
-        main_menu = get_or_create_main_menu()
+        main_menu = get_or_create_main_menu(site)
 
         link_value = {
             "text": title,

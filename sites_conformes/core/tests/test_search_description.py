@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from django.test import SimpleTestCase, override_settings
 from django.utils.translation import gettext
@@ -127,11 +127,8 @@ class SearchDescriptionTestCase(SimpleTestCase):
 
         self.assertEqual(result, "Hero heading. Body paragraph.")
 
-    @patch(
-        "sites_conformes.core.blocks.medias.Image.objects.filter",
-        return_value=MagicMock(first=MagicMock(return_value=None)),
-    )
-    def test_hero_text_is_extracted(self, _mock_filter):
+    @patch("sites_conformes.core.blocks.medias.get_installed_image", return_value=None)
+    def test_hero_text_is_extracted(self, _mock_get_installed_image):
         hero = _hero(
             [
                 {
@@ -159,11 +156,8 @@ class SearchDescriptionTestCase(SimpleTestCase):
         self.assertEqual(result, "Hero heading. Hero description of the organisation. Click this button")
         self.assertNotIn("https://example.com", result)
 
-    @patch(
-        "sites_conformes.core.blocks.medias.Image.objects.filter",
-        return_value=MagicMock(first=MagicMock(return_value=None)),
-    )
-    def test_hero_text_comes_before_body(self, _mock_filter):
+    @patch("sites_conformes.core.blocks.medias.get_installed_image", return_value=None)
+    def test_hero_text_comes_before_body(self, _mock_get_installed_image):
         hero = _hero(
             [
                 {

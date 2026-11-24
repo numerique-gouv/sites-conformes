@@ -25,6 +25,7 @@ from wagtail.utils.file import hash_filelike
 
 from sites_conformes.core.constants import HEADER_FIELDS
 from sites_conformes.core.services.accessors import get_or_create_collection, get_or_create_content_page
+from sites_conformes.core.utils import get_installed_image
 
 ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
 
@@ -358,7 +359,7 @@ class ImportExportImages:
             filename = image_data["filename"]
 
             if image_data["is_pictogram"]:
-                pictogram = Image.objects.filter(title=filename).first()
+                pictogram = get_installed_image(filename)
                 image_data["local_id"] = pictogram.id
             else:
                 image = self.get_or_create_image(image_data)

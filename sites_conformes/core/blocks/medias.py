@@ -1,15 +1,12 @@
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import VIDEO_RATIOS
 from wagtail import blocks
-from wagtail.images import get_image_model
 from wagtail.images.blocks import ImageBlock
 
 from sites_conformes.core.constants import (
     MEDIA_WIDTH_CHOICES,
 )
-
-Image = get_image_model()
-
+from sites_conformes.core.utils import get_installed_image
 
 ## Image
 
@@ -41,7 +38,7 @@ class ImageBlockWithDefault(CustomImageBlock):
 
     def get_default(self):
         if self._default_image_title:
-            image = Image.objects.filter(title=self._default_image_title).first()
+            image = get_installed_image(self._default_image_title)
             if image:
                 # ImageBlock represents its value as an Image instance with
                 # contextual_alt_text and decorative attached, not as a dict.

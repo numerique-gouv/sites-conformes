@@ -12,7 +12,22 @@ from dsfr.constants import IMAGE_RATIOS
 from wagtail.images import get_image_model
 from wagtail.models import Site
 
+from sites_conformes.core.constants import INSTALLED_IMAGE_COLLECTIONS
+
 Image = get_image_model()
+
+
+def get_installed_image(title: str):
+    """
+    Returns the image with the given title among the images imported at installation
+    (DSFR pictograms, default illustrations), or None.
+
+    Other images are ignored: on an instance with several sites, an image of a site
+    could have the same title.
+    """
+    return Image.objects.filter(
+        title=title, collection__depth=2, collection__name__in=INSTALLED_IMAGE_COLLECTIONS
+    ).first()
 
 
 def import_image(full_file_path: str, title: str):

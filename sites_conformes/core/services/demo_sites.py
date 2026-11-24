@@ -7,7 +7,6 @@ with the package: this service only works from a checkout of the repository.
 """
 
 import json
-import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -15,28 +14,25 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import Group, Permission
-from django.core.management import call_command
+from django.contrib.auth.models import Group
 from django.db import transaction
 from django.test import override_settings
 from django.utils import timezone
-from wagtail.models import (
-    Collection,
-    GroupApprovalTask,
-    GroupCollectionPermission,
-    GroupPagePermission,
-    GroupSitePermission,
-    Locale,
-    Page,
-    Site,
-    Workflow,
-    WorkflowPage,
-    WorkflowTask,
-)
+from wagtail.models import Collection, Locale, Page, Site
 from wagtail.rich_text import RichText
 
 from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category, Organization, Person
 from sites_conformes.core.models import CmsDsfrConfig, ContentPage
+from sites_conformes.core.services.sites import (
+    ADMINISTRATORS,
+    EDITORS,
+    MODERATORS,
+    get_or_create_site_collection,
+    get_or_create_site_groups,
+    get_or_create_site_workflow,
+    get_site_group_name,
+    import_installed_images,
+)
 from sites_conformes.core.utils import get_closest_image_ratio, import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
 from sites_conformes.forms.models import FormField, FormPage
@@ -49,123 +45,6 @@ DEMO_IMAGES_DIR = DEMO_DATA_DIR / "img"
 DEFAULT_PASSWORD = "demo-sites-conformes"  # nosec B105
 
 SITE_KEYS = ("a", "b")
-
-ADMINISTRATORS = "Administrateurs"
-MODERATORS = "Modérateurs"
-EDITORS = "Éditeurs"
-
-# Permissions of each role, following the roles table of the multisite plan.
-# Page permissions are given on the home page of the site and its translations,
-# collection and site permissions on the collection and the site.
-ROLE_PERMISSIONS = {
-    ADMINISTRATORS: {
-        "page": ["add_page", "change_page", "publish_page", "bulk_delete_page", "lock_page", "unlock_page"],
-        "collection": [
-            "wagtailimages.add_image",
-            "wagtailimages.change_image",
-            "wagtailimages.choose_image",
-            "wagtailimages.delete_image",
-            "wagtaildocs.add_document",
-            "wagtaildocs.change_document",
-            "wagtaildocs.choose_document",
-            "wagtaildocs.delete_document",
-        ],
-        "model": [
-            "wagtailadmin.access_admin",
-            "sites_conformes_blog.add_category",
-            "sites_conformes_blog.change_category",
-            "sites_conformes_blog.delete_category",
-            "sites_conformes_blog.add_organization",
-            "sites_conformes_blog.change_organization",
-            "sites_conformes_blog.delete_organization",
-            "sites_conformes_blog.add_person",
-            "sites_conformes_blog.change_person",
-            "sites_conformes_blog.delete_person",
-            "sites_conformes_menus.add_mainmenu",
-            "sites_conformes_menus.change_mainmenu",
-            "sites_conformes_menus.delete_mainmenu",
-            "sites_conformes_menus.add_topmenu",
-            "sites_conformes_menus.change_topmenu",
-            "sites_conformes_menus.delete_topmenu",
-            "sites_conformes_menus.add_footerbottommenu",
-            "sites_conformes_menus.change_footerbottommenu",
-            "sites_conformes_menus.delete_footerbottommenu",
-            "wagtailredirects.add_redirect",
-            "wagtailredirects.change_redirect",
-            "wagtailredirects.delete_redirect",
-            "auth.add_user",
-            "auth.change_user",
-            "auth.delete_user",
-        ],
-        # Site settings: a global permission would give access to the settings of every site
-        "site": [
-            "sites_conformes_core.change_cmsdsfrconfig",
-            "sites_conformes_core.change_customscriptssettings",
-        ],
-    },
-    MODERATORS: {
-        "page": ["add_page", "change_page", "publish_page", "lock_page", "unlock_page"],
-        "collection": [
-            "wagtailimages.add_image",
-            "wagtailimages.change_image",
-            "wagtailimages.choose_image",
-            "wagtailimages.delete_image",
-            "wagtaildocs.add_document",
-            "wagtaildocs.change_document",
-            "wagtaildocs.choose_document",
-            "wagtaildocs.delete_document",
-        ],
-        "model": [
-            "wagtailadmin.access_admin",
-            "sites_conformes_blog.add_category",
-            "sites_conformes_blog.change_category",
-            "sites_conformes_blog.delete_category",
-            "sites_conformes_blog.add_organization",
-            "sites_conformes_blog.change_organization",
-            "sites_conformes_blog.delete_organization",
-            "sites_conformes_blog.add_person",
-            "sites_conformes_blog.change_person",
-            "sites_conformes_blog.delete_person",
-            "sites_conformes_menus.add_mainmenu",
-            "sites_conformes_menus.change_mainmenu",
-            "sites_conformes_menus.delete_mainmenu",
-            "sites_conformes_menus.add_topmenu",
-            "sites_conformes_menus.change_topmenu",
-            "sites_conformes_menus.delete_topmenu",
-            "sites_conformes_menus.add_footerbottommenu",
-            "sites_conformes_menus.change_footerbottommenu",
-            "sites_conformes_menus.delete_footerbottommenu",
-        ],
-    },
-    EDITORS: {
-        "page": ["add_page", "change_page"],
-        "collection": [
-            "wagtailimages.add_image",
-            "wagtailimages.change_image",
-            "wagtailimages.choose_image",
-            "wagtailimages.delete_image",
-            "wagtaildocs.add_document",
-            "wagtaildocs.change_document",
-            "wagtaildocs.choose_document",
-            "wagtaildocs.delete_document",
-        ],
-        "model": [
-            "wagtailadmin.access_admin",
-            "sites_conformes_blog.add_category",
-            "sites_conformes_blog.change_category",
-            "sites_conformes_blog.delete_category",
-            "sites_conformes_blog.add_organization",
-            "sites_conformes_blog.change_organization",
-            "sites_conformes_blog.delete_organization",
-            "sites_conformes_blog.add_person",
-            "sites_conformes_blog.change_person",
-            "sites_conformes_blog.delete_person",
-        ],
-    },
-}
-
-# Collections created at installation, that every contributor can choose images from.
-SHARED_COLLECTIONS = ["Pictogrammes DSFR", "Illustrations par défaut"]
 
 # (username, first name, last name, {site key: [roles]})
 DEMO_USERS = [
@@ -196,15 +75,10 @@ def load_demo_content() -> dict:
         return json.load(content_file)
 
 
-def get_permission(identifier: str) -> Permission:
-    app_label, codename = identifier.split(".")
-    return Permission.objects.get(content_type__app_label=app_label, codename=codename)
-
-
 def get_site_group(site_key: str, role: str, content: dict | None = None) -> Group:
     content = content or load_demo_content()
     site_name = next(spec["site_name"] for spec in content["sites"] if spec["key"] == site_key)
-    return Group.objects.get(name=f"{site_name} – {role}")
+    return Group.objects.get(name=get_site_group_name(site_name, role))
 
 
 def create_demo_users(site_keys: list, password: str = DEFAULT_PASSWORD, only_cross_site: bool = False) -> dict:
@@ -301,7 +175,7 @@ class DemoSitesBuilder:
         collections = {spec["key"]: self.create_collection(spec) for spec in site_specs}
 
         if self.with_media:
-            self.import_shared_images()
+            import_installed_images()
             self.import_images(collections)
 
         self.create_categories()
@@ -310,9 +184,10 @@ class DemoSitesBuilder:
         for spec in site_specs:
             site = self.create_site(spec)
             self.result.sites[spec["key"]] = site
-            groups = self.create_groups(spec, site, collections[spec["key"]])
+            # Groups and workflow follow the roles of any new site
+            groups = get_or_create_site_groups(site, collections[spec["key"]], spec["site_name"])
             self.result.groups[spec["key"]] = groups
-            self.create_workflow(spec, site, groups)
+            get_or_create_site_workflow(site, groups, spec["short_name"])
 
         # The "Welcome to Wagtail" page created at installation
         Page.objects.filter(pk__in=initial_pages).delete()
@@ -324,14 +199,7 @@ class DemoSitesBuilder:
     # Media
 
     def create_collection(self, spec: dict) -> Collection:
-        return Collection.get_first_root_node().add_child(name=spec["site_name"])
-
-    def import_shared_images(self) -> None:
-        # These commands read the static files collected by "collectstatic"
-        if os.path.isdir("staticfiles/dsfr/dist/artwork/pictograms/"):
-            call_command("import_dsfr_pictograms", verbosity=0)
-        if os.path.isdir("staticfiles/illustration/"):
-            call_command("import_illustration_images", verbosity=0)
+        return get_or_create_site_collection(spec["site_name"])
 
     def import_images(self, collections: dict) -> None:
         root_collection = Collection.get_first_root_node()
@@ -681,52 +549,7 @@ class DemoSitesBuilder:
                 items=footer_items(self.locale_en),
             )
 
-    # Groups, workflows and users
-
-    def create_groups(self, spec: dict, site: Site, collection: Collection) -> dict:
-        home = site.root_page
-        roots = [home] + list(home.get_translations())
-        shared_collections = Collection.objects.filter(name__in=SHARED_COLLECTIONS)
-
-        groups = {}
-        for role, permissions in ROLE_PERMISSIONS.items():
-            group = Group.objects.create(name=f"{spec['site_name']} – {role}")
-            group.permissions.set([get_permission(identifier) for identifier in permissions["model"]])
-
-            for root in roots:
-                for codename in permissions["page"]:
-                    GroupPagePermission.objects.create(
-                        group=group, page=root, permission=get_permission(f"wagtailcore.{codename}")
-                    )
-
-            for identifier in permissions["collection"]:
-                GroupCollectionPermission.objects.create(
-                    group=group, collection=collection, permission=get_permission(identifier)
-                )
-
-            for identifier in permissions.get("site", []):
-                GroupSitePermission.objects.create(group=group, site=site, permission=get_permission(identifier))
-
-            for shared_collection in shared_collections:
-                GroupCollectionPermission.objects.create(
-                    group=group,
-                    collection=shared_collection,
-                    permission=get_permission("wagtailimages.choose_image"),
-                )
-
-            groups[role] = group
-
-        return groups
-
-    def create_workflow(self, spec: dict, site: Site, groups: dict) -> None:
-        workflow = Workflow.objects.create(name=f"Validation {spec['short_name']}")
-        task = GroupApprovalTask.objects.create(name=f"Approbation {spec['short_name']}")
-        task.groups.set([groups[MODERATORS], groups[ADMINISTRATORS]])
-        WorkflowTask.objects.create(workflow=workflow, task=task, sort_order=0)
-
-        home = site.root_page
-        for root in [home] + list(home.get_translations()):
-            WorkflowPage.objects.create(workflow=workflow, page=root)
+    # Users
 
     def create_users(self, password: str) -> None:
         self.result.users = create_demo_users(self.site_keys, password)

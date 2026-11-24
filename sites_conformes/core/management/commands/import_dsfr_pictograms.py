@@ -3,6 +3,7 @@ import os
 from django.core.management.base import BaseCommand
 from wagtail.images import get_image_model
 
+from sites_conformes.core.constants import DSFR_PICTOGRAMS_COLLECTION, DSFR_PICTOGRAMS_DIR
 from sites_conformes.core.services.accessors import get_or_create_collection
 from sites_conformes.core.utils import import_image, overwrite_image
 
@@ -27,14 +28,14 @@ class Command(BaseCommand):
         verbosity = int(kwargs.get("verbosity", 1))
         force_update = kwargs.get("force")
 
-        picto_root = "staticfiles/dsfr/dist/artwork/pictograms/"
+        picto_root = DSFR_PICTOGRAMS_DIR
         picto_folders = os.listdir(picto_root)
         picto_folders.sort()
 
         exists_counter = 0
         imported_counter = 0
 
-        collection = get_or_create_collection("Pictogrammes DSFR")
+        collection = get_or_create_collection(DSFR_PICTOGRAMS_COLLECTION)
 
         for folder in picto_folders:
             folder_path = os.path.join(picto_root, folder)
