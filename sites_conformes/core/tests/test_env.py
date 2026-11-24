@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
-from sites_conformes.env import AutoConfig
+from sites_conformes.env import read_env
 
 ENV_FILE = """
 DATABASE_USER=dju
@@ -17,42 +17,65 @@ LOOP=${LOOP}x
 PLAIN=no reference
 """
 
+NAMES = [
+    "DATABASE_USER",
+    "DATABASE_HOST",
+    "DATABASE_NAME",
+    "DATABASE_URL",
+    "NESTED",
+    "UNKNOWN",
+    "LOOP",
+    "PLAIN",
+    "NOT_DEFINED_ANYWHERE",
+]
 
-class ExpandingAutoConfigTestCase(SimpleTestCase):
+
+class ReadEnvTestCase(SimpleTestCase):
     def setUp(self):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
-        Path(directory.name, ".env").write_text(ENV_FILE)
-        self.config = AutoConfig(search_path=directory.name)
+        self.env_file = Path(directory.name, ".env")
+        self.env_file.write_text(ENV_FILE)
 
-        # Make sure the variables from the developer's environment don't leak in
-        names = ["DATABASE_USER", "DATABASE_HOST", "DATABASE_NAME", "DATABASE_URL", "NOT_DEFINED_ANYWHERE"]
+        # Restore os.environ after each test, and make sure the developer's environment doesn't leak in
         patcher = patch.dict(os.environ)
         patcher.start()
         self.addCleanup(patcher.stop)
-        for name in names:
+        for name in NAMES:
             os.environ.pop(name, None)
 
     def test_expands_references_from_the_file_and_defaults(self):
-        self.assertEqual(self.config("DATABASE_URL"), "postgres://dju@localhost/djdb")
+        read_env(self.env_file)
+        self.assertEqual(os.environ["DATABASE_URL"], "postgres://dju@localhost/djdb")
 
     def test_expands_nested_references(self):
-        self.assertEqual(self.config("NESTED"), "postgres://dju@localhost/djdb?sslmode=require")
+        read_env(self.env_file)
+        self.assertEqual(os.environ["NESTED"], "postgres://dju@localhost/djdb?sslmode=require")
 
     def test_environment_wins_over_the_file(self):
         os.environ["DATABASE_USER"] = "env-user"
         os.environ["DATABASE_NAME"] = "env-db"
-        self.assertEqual(self.config("DATABASE_URL"), "postgres://env-user@localhost/env-db")
+        read_env(self.env_file)
+        self.assertEqual(os.environ["DATABASE_USER"], "env-user")
+        self.assertEqual(os.environ["DATABASE_URL"], "postgres://env-user@localhost/env-db")
 
     def test_environment_values_are_not_expanded(self):
         os.environ["DATABASE_URL"] = "postgres://${DATABASE_USER}"
-        self.assertEqual(self.config("DATABASE_URL"), "postgres://${DATABASE_USER}")
+        read_env(self.env_file)
+        self.assertEqual(os.environ["DATABASE_URL"], "postgres://${DATABASE_USER}")
 
     def test_unknown_reference_is_empty(self):
-        self.assertEqual(self.config("UNKNOWN"), "ab")
+        read_env(self.env_file)
+        self.assertEqual(os.environ["UNKNOWN"], "ab")
 
     def test_self_reference_does_not_recurse(self):
-        self.assertEqual(self.config("LOOP"), "x")
+        read_env(self.env_file)
+        self.assertEqual(os.environ["LOOP"], "x")
 
     def test_value_without_reference(self):
-        self.assertEqual(self.config("PLAIN"), "no reference")
+        read_env(self.env_file)
+        self.assertEqual(os.environ["PLAIN"], "no reference")
+
+    def test_missing_file_is_ignored(self):
+        read_env(self.env_file.with_name("missing.env"))
+        self.assertNotIn("PLAIN", os.environ)

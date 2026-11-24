@@ -18,9 +18,9 @@ Niveaux :
 - 🟠 recommandé selon l’usage
 - ⚪ optionnel / avancé.
 
-Les variables booléennes acceptent `True`/`False`, `1`/`0`, `yes`/`no` ou
-`on`/`off` (sans tenir compte de la casse). Une valeur vide vaut `False`, et
-toute autre valeur empêche le site de démarrer.
+Les variables booléennes valent `True` pour `true`, `on`, `ok`, `y`, `yes`,
+`1` ou tout autre entier non nul (sans tenir compte de la casse). Toute autre
+valeur, y compris une valeur vide, vaut `False`.
 
 ## Modèle minimal à copier
 

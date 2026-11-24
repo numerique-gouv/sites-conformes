@@ -49,7 +49,7 @@ dependencies = [
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
     "swapper>=1.4,<2",
-    "python-decouple>=3.8",
+    "django-environ>=0.12",
 ]
 
 [dependency-groups]
@@ -210,7 +210,7 @@ extend_exclude = ["^demo/", ".*/migrations/", ".*/tests/"]
 # Packages whose distributed module name doesn't match deptry's default guess
 # (package name with hyphens replaced by underscores).
 "django-dsfr" = "dsfr"
-"python-decouple" = "decouple"
+"django-environ" = "environ"
 "wagtail-markdown" = "wagtailmarkdown"
 "django-taggit" = "taggit"
 "beautifulsoup4" = "bs4"

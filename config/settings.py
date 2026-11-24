@@ -13,51 +13,52 @@ https://github.com/betagouv/tous-a-bord/blob/main/config/settings.py
 
 import sys
 from pathlib import Path
-from typing import cast
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
-from sites_conformes.env import Csv, config
+from sites_conformes.env import env, read_env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="")
+SECRET_KEY = env.str("SECRET_KEY", default="")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", default=False, cast=bool)
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,.localhost", cast=Csv())
-USE_X_FORWARDED_HOST = config("USE_X_FORWARDED_HOST", default=False, cast=bool)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", cast=str.strip, default=["127.0.0.1", ".localhost"])
+USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=False)
 
-HOST_PROTO = config("HOST_PROTO", default="https")
-HOST_URL = cast(str, config("HOST_URL", default="localhost"))
-HOST_PORT = config("HOST_PORT", default="")
+HOST_PROTO = env.str("HOST_PROTO", default="https")
+HOST_URL = env.str("HOST_URL", default="localhost")
+HOST_PORT = env.str("HOST_PORT", default="")
 
 # Prefix of the application when served under a sub-path.
 # ``FORCE_SCRIPT_NAME`` is the Django setting handling this behaviour:
 # https://docs.djangoproject.com/en/5.2/ref/settings/#force-script-name
-FORCE_SCRIPT_NAME = config("FORCE_SCRIPT_NAME", default="").rstrip("/")
+FORCE_SCRIPT_NAME = env.str("FORCE_SCRIPT_NAME", default="").rstrip("/")
 
 # Allow enabling WhiteNoise via an environment variable (disabled by default)
-SF_USE_WHITENOISE = config("SF_USE_WHITENOISE", default=False, cast=bool)
+SF_USE_WHITENOISE = env.bool("SF_USE_WHITENOISE", default=False)
 
 # Allow storing media files in PostgreSQL instead of the filesystem (disabled by default)
 # Useful for PaaS deployments with ephemeral filesystems (Scalingo, Heroku, etc.)
 # /!\ Not recommended beyond 1 GB of media — prefer S3 for larger volumes.
 # Selection order: S3_HOST wins if set, then SF_USE_DB_STORAGE, then filesystem (default)
-SF_USE_DB_STORAGE = config("SF_USE_DB_STORAGE", default=False, cast=bool)
+SF_USE_DB_STORAGE = env.bool("SF_USE_DB_STORAGE", default=False)
 
 # Ask search engines not to index anything served by this instance (disabled by default)
-SF_NOINDEX = config("SF_NOINDEX", default=False, cast=bool)
+SF_NOINDEX = env.bool("SF_NOINDEX", default=False)
 
 # Let browsers and the CDN cache anonymous pages for this many seconds (0 = disabled, default)
-SF_PUBLIC_CACHE_MAX_AGE = config("SF_PUBLIC_CACHE_MAX_AGE", default=0, cast=int)
+SF_PUBLIC_CACHE_MAX_AGE = env.int("SF_PUBLIC_CACHE_MAX_AGE", default=0)
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -207,7 +208,7 @@ HONEYPOT_ENABLED_DEFAULT = True
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_URL = config("DATABASE_URL", default="")
+DATABASE_URL = env.str("DATABASE_URL", default="")
 if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.parse(
@@ -229,7 +230,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": config("AUTH_PASSWORD_MINIMUM_LENGTH", default=15, cast=int),
+            "min_length": env.int("AUTH_PASSWORD_MINIMUM_LENGTH", default=15),
         },
     },
     {
@@ -289,22 +290,22 @@ STATICFILES_FINDERS = [
 # S3 uploads & MEDIA CONFIGURATION
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
-MEDIA_ROOT = cast(str, config("MEDIA_ROOT", default=""))
-S3_HOST = config("S3_HOST", default="")
+MEDIA_ROOT = env.str("MEDIA_ROOT", default="")
+S3_HOST = env.str("S3_HOST", default="")
 if S3_HOST:
-    protocol = config("S3_PROTOCOL", default="https")
+    protocol = env.str("S3_PROTOCOL", default="https")
     endpoint_url = f"{protocol}://{S3_HOST}"
-    bucket_name = config("S3_BUCKET_NAME", default="")
-    public_host = config("S3_PUBLIC_HOST", default="")
+    bucket_name = env.str("S3_BUCKET_NAME", default="")
+    public_host = env.str("S3_PUBLIC_HOST", default="")
 
     options = {
         "bucket_name": bucket_name,
-        "access_key": config("S3_KEY_ID", default=""),
-        "secret_key": config("S3_KEY_SECRET", default=""),
+        "access_key": env.str("S3_KEY_ID", default=""),
+        "secret_key": env.str("S3_KEY_SECRET", default=""),
         "endpoint_url": endpoint_url,
-        "region_name": config("S3_BUCKET_REGION", default="fr"),
+        "region_name": env.str("S3_BUCKET_REGION", default="fr"),
         "file_overwrite": False,
-        "location": config("S3_LOCATION", default=""),
+        "location": env.str("S3_LOCATION", default=""),
     }
 
     if public_host:
@@ -328,7 +329,7 @@ elif SF_USE_DB_STORAGE:
     STORAGES["default"] = {
         "BACKEND": "sites_conformes.db_storage.storage.DatabaseStorage",
     }
-    MEDIA_URL = config("MEDIA_URL", default="db-storage/")
+    MEDIA_URL = env.str("MEDIA_URL", default="db-storage/")
     MEDIA_ROOT = str(BASE_DIR / MEDIA_ROOT)
 
     if FORCE_SCRIPT_NAME and not MEDIA_URL.startswith(FORCE_SCRIPT_NAME):
@@ -338,7 +339,7 @@ else:
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     }
     MEDIA_ROOT = str(BASE_DIR / MEDIA_ROOT)
-    MEDIA_URL = config("MEDIA_URL", default="medias/")
+    MEDIA_URL = env.str("MEDIA_URL", default="medias/")
 
     if FORCE_SCRIPT_NAME and not MEDIA_URL.startswith(FORCE_SCRIPT_NAME):
         MEDIA_URL = f"{FORCE_SCRIPT_NAME}/{MEDIA_URL}"
@@ -346,7 +347,7 @@ else:
 # MEDIA_ROOT and STATIC_ROOT must stay strings: dj_static (config/wsgi.py) concatenates them with str paths
 STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
-STATIC_URL = config("STATIC_URL", default="static/")
+STATIC_URL = env.str("STATIC_URL", default="static/")
 
 if FORCE_SCRIPT_NAME and not STATIC_URL.startswith(FORCE_SCRIPT_NAME):
     STATIC_URL = f"{FORCE_SCRIPT_NAME}/{STATIC_URL}"
@@ -362,11 +363,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # Wagtail settings
 # https://docs.wagtail.org/en/stable/reference/settings.html
 
-WAGTAIL_SITE_NAME = config("SITE_NAME", default="Sites Conformes")
+WAGTAIL_SITE_NAME = env.str("SITE_NAME", default="Sites Conformes")
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
-WAGTAILADMIN_BASE_URL = config("WAGTAILADMIN_BASE_URL", default="")
+WAGTAILADMIN_BASE_URL = env.str("WAGTAILADMIN_BASE_URL", default="")
 
 # If not set in env, we build it from mandatory variables
 if not WAGTAILADMIN_BASE_URL:
@@ -377,7 +378,7 @@ if not WAGTAILADMIN_BASE_URL:
 
 WAGTAILAPI_BASE_URL = WAGTAILADMIN_BASE_URL
 
-WAGTAILADMIN_PATH = config("WAGTAILADMIN_PATH", default="cms-admin/")
+WAGTAILADMIN_PATH = env.str("WAGTAILADMIN_PATH", default="cms-admin/")
 
 LOGIN_URL = f"{FORCE_SCRIPT_NAME}/{WAGTAILADMIN_PATH}login/"
 LOGOUT_URL = f"{FORCE_SCRIPT_NAME}/{WAGTAILADMIN_PATH}logout/"
@@ -408,17 +409,17 @@ WAGTAILEMBEDS_RESPONSIVE_HTML = True
 WAGTAIL_MODERATION_ENABLED = False
 
 # Settings for the notifications panel of the dashboard admin
-NOTIFICATIONS_FILE_URL = config(
+NOTIFICATIONS_FILE_URL = env.str(
     "NOTIFICATIONS_FILE_URL",
     default="https://raw.githubusercontent.com/numerique-gouv/sites-conformes/refs/heads/main/notifications.json",
 )
 # GitHub API endpoint used to detect the latest published version (overridable for forks)
-LATEST_RELEASE_URL = config(
+LATEST_RELEASE_URL = env.str(
     "LATEST_RELEASE_URL", default="https://api.github.com/repos/numerique-gouv/sites-conformes/releases/latest"
 )
 # Human-facing releases page linked from the "new version available" notification (overridable for forks)
-RELEASES_URL = config("RELEASES_URL", default="https://github.com/numerique-gouv/sites-conformes/releases")
-ADVERTISE_LATEST_VERSION = config("ADVERTISE_LATEST_VERSION", default=True, cast=bool)
+RELEASES_URL = env.str("RELEASES_URL", default="https://github.com/numerique-gouv/sites-conformes/releases")
+ADVERTISE_LATEST_VERSION = env.bool("ADVERTISE_LATEST_VERSION", default=True)
 WAGTAIL_ENABLE_UPDATE_CHECK = False  # Disable Wagtail's own update check, we use our own
 
 # Wagtailmenus: Obsolete, to be removed in a future version (replaced by "sites_conformes.menus")
@@ -445,55 +446,59 @@ WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
 WAGTAILMENUS_FLAT_MENUS_EDITABLE_IN_WAGTAILADMIN = False
 WAGTAILMENUS_MAIN_MENUS_EDITABLE_IN_WAGTAILADMIN = False
 
-WAGTAILDOCS_MAX_UPLOAD_SIZE = config("WAGTAILDOCS_MAX_UPLOAD_SIZE", default=10 * 1024 * 1024, cast=int)  # 10MB
+WAGTAILDOCS_MAX_UPLOAD_SIZE = env.int("WAGTAILDOCS_MAX_UPLOAD_SIZE", default=10 * 1024 * 1024)  # 10MB
 
 WAGTAILIMAGES_IMAGE_MODEL = "sites_conformes_customimages.CustomImage"
 WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
-WAGTAILDOCS_EXTENSIONS = config("WAGTAILDOCS_EXTENSIONS", default="pdf,docx,odt,xlsx,ods,pptx,odp,csv,txt", cast=Csv())
-SF_SCHEME_DEPENDENT_SVGS = config("SF_SCHEME_DEPENDENT_SVGS", default=False, cast=bool)
+WAGTAILDOCS_EXTENSIONS = env.list(
+    "WAGTAILDOCS_EXTENSIONS",
+    cast=str.strip,
+    default=["pdf", "docx", "odt", "xlsx", "ods", "pptx", "odp", "csv", "txt"],
+)
+SF_SCHEME_DEPENDENT_SVGS = env.bool("SF_SCHEME_DEPENDENT_SVGS", default=False)
 
 # Allows for complex Streamfields without completely removing checks
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
-DATA_UPLOAD_MAX_MEMORY_SIZE = config("DATA_UPLOAD_MAX_MEMORY_SIZE", default=10 * 1024 * 1024, cast=int)  # 10MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = config("FILE_UPLOAD_MAX_MEMORY_SIZE", default=2.5 * 1024 * 1024, cast=int)  # 2.5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = env.int("DATA_UPLOAD_MAX_MEMORY_SIZE", default=10 * 1024 * 1024)  # 10MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = env.int("FILE_UPLOAD_MAX_MEMORY_SIZE", default=int(2.5 * 1024 * 1024))  # 2.5MB
 
 # Email settings
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="")
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="")
 if DEFAULT_FROM_EMAIL:
-    EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
-    EMAIL_HOST = config("EMAIL_HOST", default=None)
-    EMAIL_PORT = config("EMAIL_PORT", default=None)
-    EMAIL_HOST_USER = config("EMAIL_HOST_USER", default=None)
-    EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default=None)
-    EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False, cast=bool)
-    EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=False, cast=bool)
-    EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=30, cast=int)
-    EMAIL_SSL_KEYFILE = config("EMAIL_SSL_KEYFILE", default=None)
-    EMAIL_SSL_CERTFILE = config("EMAIL_SSL_CERTFILE", default=None)
+    EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+    EMAIL_HOST = env.str("EMAIL_HOST", default=None)
+    EMAIL_PORT = env.str("EMAIL_PORT", default=None)
+    EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", default=None)
+    EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default=None)
+    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+    EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+    EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=30)
+    EMAIL_SSL_KEYFILE = env.str("EMAIL_SSL_KEYFILE", default=None)
+    EMAIL_SSL_CERTFILE = env.str("EMAIL_SSL_CERTFILE", default=None)
 
 # Forms
-WAGTAIL_PASSWORD_RESET_ENABLED = config("WAGTAIL_PASSWORD_RESET_ENABLED", default=False, cast=bool)
+WAGTAIL_PASSWORD_RESET_ENABLED = env.bool("WAGTAIL_PASSWORD_RESET_ENABLED", default=False)
 WAGTAILADMIN_USER_PASSWORD_RESET_FORM = "sites_conformes.dashboard.forms.DsfrPasswordResetForm"  # nosec B105
-DSFR_MARK_OPTIONAL_FIELDS = config("DSFR_MARK_OPTIONAL_FIELDS", default=True, cast=bool)
+DSFR_MARK_OPTIONAL_FIELDS = env.bool("DSFR_MARK_OPTIONAL_FIELDS", default=True)
 
 # (Optional) 2FA settings
 # See https://wagtail-2fa.readthedocs.io/en/stable/
-WAGTAIL_2FA_REQUIRED = config("WAGTAIL_2FA_REQUIRED", default=False, cast=bool)
-WAGTAIL_2FA_OTP_TOTP_NAME = config("WAGTAIL_2FA_OTP_TOTP_NAME", default=WAGTAIL_SITE_NAME)
+WAGTAIL_2FA_REQUIRED = env.bool("WAGTAIL_2FA_REQUIRED", default=False)
+WAGTAIL_2FA_OTP_TOTP_NAME = env.str("WAGTAIL_2FA_OTP_TOTP_NAME", default=WAGTAIL_SITE_NAME)
 # Duration of the confirmation code sent by email to add a 2FA device after a ProConnect login
-SF_2FA_EMAIL_CODE_VALIDITY_DURATION = config("SF_2FA_EMAIL_CODE_VALIDITY_DURATION", default=15 * 60, cast=int)
-SF_2FA_EMAIL_CODE_MAX_ATTEMPTS = config("SF_2FA_EMAIL_CODE_MAX_ATTEMPTS", default=3, cast=int)
+SF_2FA_EMAIL_CODE_VALIDITY_DURATION = env.int("SF_2FA_EMAIL_CODE_VALIDITY_DURATION", default=15 * 60)
+SF_2FA_EMAIL_CODE_MAX_ATTEMPTS = env.int("SF_2FA_EMAIL_CODE_MAX_ATTEMPTS", default=3)
 
 # (Optional) ProConnect settings
-PROCONNECT_ACTIVATED = config("PROCONNECT_ACTIVATED", default=False, cast=bool)
-OIDC_CREATE_USER = config("PROCONNECT_CREATE_USER", default=True, cast=bool)
-OIDC_RP_CLIENT_ID = config("PROCONNECT_CLIENT_ID", default="")
-OIDC_RP_CLIENT_SECRET = config("PROCONNECT_CLIENT_SECRET", default="")
-OIDC_RP_SCOPES = config("PROCONNECT_SCOPES", default="openid given_name usual_name email siret uid")
-OIDC_RP_SIGN_ALGO = config("PROCONNECT_SIGN_ALGO", default="RS256")
+PROCONNECT_ACTIVATED = env.bool("PROCONNECT_ACTIVATED", default=False)
+OIDC_CREATE_USER = env.bool("PROCONNECT_CREATE_USER", default=True)
+OIDC_RP_CLIENT_ID = env.str("PROCONNECT_CLIENT_ID", default="")
+OIDC_RP_CLIENT_SECRET = env.str("PROCONNECT_CLIENT_SECRET", default="")
+OIDC_RP_SCOPES = env.str("PROCONNECT_SCOPES", default="openid given_name usual_name email siret uid")
+OIDC_RP_SIGN_ALGO = env.str("PROCONNECT_SIGN_ALGO", default="RS256")
 OIDC_STORE_ID_TOKEN = True
-PROCONNECT_DOMAIN = config("PROCONNECT_DOMAIN", default="fca.integ01.dev-agentconnect.fr")
-PROCONNECT_API_ROOT = config("PROCONNECT_API_ROOT", default=f"https://{PROCONNECT_DOMAIN}/api/v2")
+PROCONNECT_DOMAIN = env.str("PROCONNECT_DOMAIN", default="fca.integ01.dev-agentconnect.fr")
+PROCONNECT_API_ROOT = env.str("PROCONNECT_API_ROOT", default=f"https://{PROCONNECT_DOMAIN}/api/v2")
 OIDC_OP_JWKS_ENDPOINT = f"{PROCONNECT_API_ROOT}/jwks"
 OIDC_OP_AUTHORIZATION_ENDPOINT = f"{PROCONNECT_API_ROOT}/authorize"
 OIDC_OP_TOKEN_ENDPOINT = f"{PROCONNECT_API_ROOT}/token"
@@ -502,9 +507,9 @@ OIDC_OP_LOGOUT_ENDPOINT = f"{PROCONNECT_API_ROOT}/session/end"
 USER_OIDC_ESSENTIAL_CLAIMS = ["email"]
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {"acr_values": "eidas1"}
 OIDC_REDIRECT_ALLOWED_HOSTS = ALLOWED_HOSTS
-PROCONNECT_USER_CREATION_FILTER = config("PROCONNECT_USER_CREATION_FILTER", default=None)
-LASUITE_DOMAINE_API_KEY = config("LASUITE_DOMAINE_API_KEY", default=None)
-SF_DISABLE_LOCAL_LOGIN = config("SF_DISABLE_LOCAL_LOGIN", default=False, cast=bool)
+PROCONNECT_USER_CREATION_FILTER = env.str("PROCONNECT_USER_CREATION_FILTER", default=None)
+LASUITE_DOMAINE_API_KEY = env.str("LASUITE_DOMAINE_API_KEY", default=None)
+SF_DISABLE_LOCAL_LOGIN = env.bool("SF_DISABLE_LOCAL_LOGIN", default=False)
 
 LOGIN_REDIRECT_URL = f"{FORCE_SCRIPT_NAME}/"
 LOGOUT_REDIRECT_URL = f"{FORCE_SCRIPT_NAME}/"
@@ -539,13 +544,13 @@ for host in ALLOWED_HOSTS:
         else:
             CSRF_TRUSTED_ORIGINS.append(f"{HOST_PROTO}://{host}")
 
-CSRF_TRUSTED_ORIGINS += cast(list, config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv()))
+CSRF_TRUSTED_ORIGINS += [origin for origin in env.list("CSRF_TRUSTED_ORIGINS", cast=str.strip, default=[]) if origin]
 
 # Disable the integrity checksums by default.
 # They can clash with Whitenoise and are normally not useful as we serve the statics from a trusted source
-DSFR_USE_INTEGRITY_CHECKSUMS = config("DSFR_USE_INTEGRITY_CHECKSUMS", default=False, cast=bool)
+DSFR_USE_INTEGRITY_CHECKSUMS = env.bool("DSFR_USE_INTEGRITY_CHECKSUMS", default=False)
 
-SF_DISABLE_TUTORIALS = config("SF_DISABLE_TUTORIALS", default=False, cast=bool)
+SF_DISABLE_TUTORIALS = env.bool("SF_DISABLE_TUTORIALS", default=False)
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # Legacy clickjacking fallback for browsers without CSP frame-ancestors
@@ -555,19 +560,19 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # Sentry config
-if sentry_dsn := config("SENTRY_DSN", default=""):
+if sentry_dsn := env.str("SENTRY_DSN", default=""):
     import sentry_sdk  # noqa: E402
 
     # Share of requests traced for performance monitoring; tracing is
     # disabled while unset.
-    traces_sample_rate = config("SENTRY_TRACES_SAMPLE_RATE", default=0, cast=float)
+    traces_sample_rate = env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0)
     if not 0.0 <= traces_sample_rate <= 1.0:
         raise ImproperlyConfigured(f"SENTRY_TRACES_SAMPLE_RATE must be between 0 and 1, got {traces_sample_rate}.")
     sentry_sdk.init(
         dsn=sentry_dsn,
-        send_default_pii=config("SENTRY_SEND_DEFAULT_PII", default=False, cast=bool),
-        environment=config("SENTRY_ENVIRONMENT", default="production"),
+        send_default_pii=env.bool("SENTRY_SEND_DEFAULT_PII", default=False),
+        environment=env.str("SENTRY_ENVIRONMENT", default="production"),
         traces_sample_rate=traces_sample_rate or None,
     )
 
-SENTRY_USE_DEBUG_URL = config("SENTRY_USE_DEBUG_URL", default=False, cast=bool)
+SENTRY_USE_DEBUG_URL = env.bool("SENTRY_USE_DEBUG_URL", default=False)

@@ -750,6 +750,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-environ"
+version = "0.14.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/57/e1/4c4ddcf6e90f023e89edb1d92f9a7fffce61ad4b691df497f2f5c0be6e26/django_environ-0.14.0.tar.gz", hash = "sha256:b6c48d93b9d2ff8a3ea14099e90c35aa4f101c1b4d5f262dfee0d27b06742ed7", size = 60417, upload-time = "2026-06-18T22:49:55.847Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1a/fe/67b423fc30f16d10259e901320fbc121746bf168aaaad9043e6ebb0110c1/django_environ-0.14.0-py3-none-any.whl", hash = "sha256:8dbe8a57f0a540ab8abd6f54f230de5e99e3a2c9d797cb9caecb037bca3d47d8", size = 20934, upload-time = "2026-06-18T22:49:54.355Z" },
+]
+
+[[package]]
 name = "django-filter"
 version = "26.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1658,15 +1667,6 @@ wheels = [
 ]
 
 [[package]]
-name = "python-decouple"
-version = "3.8"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e1/97/373dcd5844ec0ea5893e13c39a2c67e7537987ad8de3842fe078db4582fa/python-decouple-3.8.tar.gz", hash = "sha256:ba6e2657d4f376ecc46f77a3a615e058d93ba5e465c01bbe57289bfb7cce680f", size = 9612, upload-time = "2023-03-01T19:38:38.143Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/d4/9193206c4563ec771faf2ccf54815ca7918529fe81f6adb22ee6d0e06622/python_decouple-3.8-py3-none-any.whl", hash = "sha256:d0d45340815b25f4de59c974b855bb38d03151d81b037d9e3f463b0c9f8cbd66", size = 9947, upload-time = "2023-03-01T19:38:36.015Z" },
-]
-
-[[package]]
 name = "pytokens"
 version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2080,6 +2080,7 @@ dependencies = [
     { name = "dj-static" },
     { name = "django" },
     { name = "django-dsfr" },
+    { name = "django-environ" },
     { name = "django-modelcluster" },
     { name = "django-otp" },
     { name = "django-storages", extra = ["s3"] },
@@ -2091,7 +2092,6 @@ dependencies = [
     { name = "mozilla-django-oidc" },
     { name = "packaging" },
     { name = "psycopg2-binary" },
-    { name = "python-decouple" },
     { name = "requests" },
     { name = "rust-just" },
     { name = "sentry-sdk", extra = ["django"] },
@@ -2132,6 +2132,7 @@ requires-dist = [
     { name = "dj-static", specifier = ">=0.0.6" },
     { name = "django", specifier = ">=6.0,<6.1" },
     { name = "django-dsfr", specifier = ">=2.4.0" },
+    { name = "django-environ", specifier = ">=0.12" },
     { name = "django-modelcluster", specifier = ">=6.5" },
     { name = "django-otp", specifier = ">=1.7.0" },
     { name = "django-storages", extras = ["s3"], specifier = ">=1.14.6" },
@@ -2143,7 +2144,6 @@ requires-dist = [
     { name = "mozilla-django-oidc", specifier = ">=4.0.1" },
     { name = "packaging", specifier = ">=26.3" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
-    { name = "python-decouple", specifier = ">=3.8" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rust-just", specifier = ">=1.40.0" },
     { name = "sentry-sdk", extras = ["django"], specifier = ">=2.61.0" },
