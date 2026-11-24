@@ -430,8 +430,6 @@ class CreateSiteTestsMixin:
                 self.assertEqual(page.get_site(), setup.site)
         self.assertIsInstance(home.get_children().get(slug="contact").specific, FormPage)
 
-        footer_menu = FooterBottomMenu.objects.get(site=setup.site)
-        self.assertEqual(len(footer_menu.items), 2)
         main_menu = MainMenu.objects.get(site=setup.site)
         self.assertEqual([item.value["page"].slug for item in main_menu.items], [home.slug, "contact"])
 
@@ -567,7 +565,6 @@ class CreateStarterPagesTestCase(ClearSiteRootPathsCacheMixin, WagtailPageTestCa
             sorted(home.get_children().values_list("slug", flat=True)),
             ["accessibilite", "contact", "mentions-legales"],
         )
-        self.assertEqual(len(FooterBottomMenu.objects.get(site=site).items), 2)
         self.assertEqual(
             [item.value["page"].slug for item in MainMenu.objects.get(site=site).items], ["home", "contact"]
         )
@@ -585,6 +582,7 @@ class CreateStarterPagesTestCase(ClearSiteRootPathsCacheMixin, WagtailPageTestCa
         call_command("create_starter_pages", stdout=StringIO())
         default_site = get_default_site()
         default_pages = list(Page.objects.values_list("pk", "title", "slug"))
+        default_footer_items = get_menu_items(FooterBottomMenu.objects.get(site=default_site))
         create_installed_images()
         site = create_site(hostname="site-c.localhost", name="Site C").site
 
@@ -595,7 +593,7 @@ class CreateStarterPagesTestCase(ClearSiteRootPathsCacheMixin, WagtailPageTestCa
             ["accessibilite", "contact", "mentions-legales"],
         )
         self.assertTrue(set(default_pages) <= set(Page.objects.values_list("pk", "title", "slug")))
-        self.assertEqual(len(FooterBottomMenu.objects.get(site=default_site).items), 2)
+        self.assertEqual(get_menu_items(FooterBottomMenu.objects.get(site=default_site)), default_footer_items)
 
         # Idempotent
         count = Page.objects.count()

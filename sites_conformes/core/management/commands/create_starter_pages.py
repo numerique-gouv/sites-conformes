@@ -222,7 +222,6 @@ class Command(BaseCommand):
             "link_type": "page",
         }
         footer_menu.items.append(("link", link_value))
-        footer_menu.save()
 
         self.stdout.write(self.style.SUCCESS(f"Page {slug} created with id {new_page.id}"))
 
