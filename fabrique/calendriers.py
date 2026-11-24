@@ -17,15 +17,18 @@ Pour chaque calendrier :
 
 Si le calendrier est illisible ou vide, rien n'est modifié pour cette source.
 
-Deux formats de source : iCal (Framagenda, sites Sites Faciles…) et l'API JSON
+Trois formats de source : iCal (Framagenda, sites Sites Faciles…), l'API JSON
 des événements de la BAN (bal-admin.adresse.data.gouv.fr/api/events), qui donne
 aussi le public visé (colonne Public, suivie comme les autres champs) et le type
-(donné à la création seulement).
+(donné à la création seulement), et le Grist de la BAN (table Evenements, mêmes
+champs, plus des adresses et une case de validation de publication ; lu avec la
+clé GRIST_API_KEY, qui doit y avoir accès).
 
 Liste des calendriers : variable d'environnement AGENDA_CALENDRIERS, une ligne
-« Source | Équipe | URL [| format] » par calendrier (format : ical par défaut, ou ban) (séparées par des retours à la
+« Source | Équipe | URL [| format] » par calendrier
+(format : ical par défaut, ban ou grist-ban) (séparées par des retours à la
 ligne ou des points-virgules). Par défaut : le Framagenda de Panoramax, l'agenda
-du site Voies locales en commun et l'agenda de la BAN.
+du site Voies locales en commun, et les deux agendas de la BAN (API et Grist).
 """
 
 import json
@@ -85,9 +88,16 @@ PAR_DEFAUT = [
         "https://bal-admin.adresse.data.gouv.fr/api/events",
         "ban",
     ),
+    # Grist de la BAN (Adresse-Lab, rencontres régionales…) : événements validés pour publication.
+    Calendrier(
+        "Grist BAN",
+        "BAN",
+        "https://grist.numerique.gouv.fr/api/docs/cS36SuWF2W2z",
+        "grist-ban",
+    ),
 ]
 
-FORMATS = ("ical", "ban")
+FORMATS = ("ical", "ban", "grist-ban")
 
 
 def depuis_env(valeur: str | None) -> list[Calendrier]:
@@ -186,7 +196,11 @@ TYPES_BAN = {
     "formation-lvl2": "Formation",
     "formation spéciale": "Formation",
     "partenaire": "Rencontre communauté",
+    "adresselab": "Atelier",
+    "adresse-region": "Rencontre communauté",
 }
+# Séries des types de la BAN (données à la création seulement).
+SERIES_BAN = {"adresselab": "Adresse-Lab"}
 
 
 def _heure_ban(jour: date, heure) -> datetime | None:
@@ -204,6 +218,13 @@ def _adresse_ban(adresse) -> str:
         parties = [str(v).strip() for v in adresse.values() if isinstance(v, (str, int)) and str(v).strip()]
         return ", ".join(parties)
     return ""
+
+
+def _creation_ban(type_ban: str) -> dict:
+    creation = {"Type": TYPES_BAN.get(type_ban, "")}
+    if type_ban in SERIES_BAN:
+        creation["Serie"] = ["L", SERIES_BAN[type_ban]]
+    return creation
 
 
 def lire_ban(contenu: bytes) -> list[dict]:
@@ -242,13 +263,63 @@ def lire_ban(contenu: bytes) -> list[dict]:
                 "Description": texte,
                 "Annule": False,
                 "Public": str(item.get("target") or "").strip(),
-                "creation": {"Type": TYPES_BAN.get(str(item.get("type") or "").strip().lower(), "")},
+                "creation": _creation_ban(str(item.get("type") or "").strip().lower()),
             }
         )
     return evenements
 
 
+def _date_grist(valeur) -> str:
+    """Colonne Date de Grist (horodatage à minuit UTC) → « AAAA-MM-JJ »."""
+    if isinstance(valeur, (int, float)) and not isinstance(valeur, bool):
+        return datetime.fromtimestamp(valeur, tz=ZoneInfo("UTC")).date().isoformat()
+    return ""
+
+
+def lire_grist_ban(url_document: str, api_key: str) -> list[dict]:
+    """Événements validés du Grist de la BAN, ramenés au format de l'API pour réutiliser lire_ban."""
+    lignes = json.loads(grist._get(f"{url_document}/tables/Evenements/records", api_key))["records"]
+    adresses = {
+        r["id"]: r.get("fields", {})
+        for r in json.loads(grist._get(f"{url_document}/tables/Adresses_Evenements/records", api_key))["records"]
+    }
+    items = []
+    for ligne in lignes:
+        f = ligne.get("fields", {})
+        if f.get("validation_publication") is not True:
+            continue
+        adresse = adresses.get(f.get("address")) if f.get("address") else None
+        if adresse:
+            rue = " ".join(str(adresse.get(k) or "").strip() for k in ("numero", "voie")).strip()
+            ville = " ".join(str(adresse.get(k) or "").strip() for k in ("codePostal", "commune")).strip()
+            adresse = ", ".join(p for p in (str(adresse.get("nom") or "").strip(), rue, ville) if p)
+        items.append(
+            {
+                "id": f"grist-{ligne['id']}",
+                "title": f.get("title"),
+                "subtitle": f.get("subtitle"),
+                "description": f.get("description"),
+                "type": f.get("type"),
+                "target": f.get("target"),
+                "date": _date_grist(f.get("date")),
+                "isOnlineOnly": f.get("isOnlineOnly"),
+                "address": adresse,
+                "href": f.get("href"),
+                "startHour": f.get("startHour"),
+                "endHour": f.get("endHour"),
+            }
+        )
+    return lire_ban(json.dumps(items).encode())
+
+
 LECTEURS = {"ical": lambda contenu: lire(contenu), "ban": lambda contenu: lire_ban(contenu)}
+
+
+def charger(calendrier: Calendrier, api_key: str) -> list[dict]:
+    """Événements d'une source, quel que soit son format."""
+    if calendrier.format == "grist-ban":
+        return lire_grist_ban(calendrier.url.rstrip("/"), api_key)
+    return LECTEURS[calendrier.format](grist._get(calendrier.url))
 
 
 # ---------------------------------------------------------------------------
@@ -356,7 +427,7 @@ def importer(
     resultats = []
     for calendrier in calendriers:
         try:
-            evenements = LECTEURS[calendrier.format](grist._get(calendrier.url))
+            evenements = charger(calendrier, api_key)
         except Exception as e:  # noqa: BLE001 — calendrier injoignable ou illisible : on passe
             logger.warning("Calendrier %s illisible : %s", calendrier.source, e)
             resultats.append(Resultat(calendrier, erreur=str(e)))
