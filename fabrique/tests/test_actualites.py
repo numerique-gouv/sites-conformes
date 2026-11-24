@@ -12,6 +12,7 @@ from wagtail.images.tests.utils import get_test_image_file
 from wagtail.models import Site
 
 from blog.models import BlogEntryPage, BlogIndexPage, Category
+from content_manager.models import CmsDsfrConfig
 from fabrique import actualites, grist, newsletters
 
 DOC = "habcH4ftoLRf"
@@ -440,6 +441,17 @@ class RenduTests(TestCase):
         contenu = self.client.get(index.url).content.decode()
         self.assertIn('class="fr-card__img fabrique-vignette"', contenu)
         self.assertIn('style="width: 144px"', contenu)
+        self.assertEqual(contenu.count("fabrique-vignette"), 1)  # le communiqué n'a pas d'image
+        # Sans image : le logo du site (ici en longueur, 4:1 → 360 px de large).
+        config = CmsDsfrConfig.for_site(Site.objects.get(is_default_site=True))
+        config.operator_logo_file = get_image_model().objects.create(
+            title="Logo de la Fabrique", file=get_test_image_file(size=(800, 200))
+        )
+        config.save()
+        contenu = self.client.get(index.url).content.decode()
+        self.assertEqual(contenu.count('class="fr-card__img fabrique-vignette"'), 2)
+        self.assertIn('style="width: 144px"', contenu)
+        self.assertIn('style="width: 360px"', contenu)
         # Filtre par étiquette : seulement les infolettres.
         contenu = self.client.get(index.url + "?tag=newsletter").content.decode()
         self.assertIn("Info Panoramax octobre 2026", contenu)
