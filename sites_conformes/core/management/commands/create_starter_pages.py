@@ -196,8 +196,8 @@ class Command(BaseCommand):
         Creates a contact page for the site and adds it the main menu
         """
 
-        # Don't replace a manually created page
-        already_exists = ContentPage.objects.filter(slug=slug).first()
+        # Don't replace a manually created page, whatever its type
+        already_exists = Page.objects.filter(slug=slug).first()
         if already_exists:
             self.stdout.write(f"The contact page seem to already exist with id {already_exists.id}")
             return
