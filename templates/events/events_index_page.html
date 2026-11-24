@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% load static dsfr_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags wagtail_dsfr_tags i18n humanize agenda_calendrier %}
 {% comment %}
-  Copie du gabarit de Sites Faciles (events/events_index_page.html), deux changements :
+  Copie du gabarit de Sites Faciles (events/events_index_page.html), trois changements :
   - feuille de style de l'agenda (bloc extra_css) : vignettes et vue calendrier ;
-  - filtre par étiquette en trois groupes, équipe, type et série (balise filtres_etiquettes_agenda, fabrique/filtres.py).
+  - filtre par étiquette en trois groupes, équipe, type et série (balise filtres_etiquettes_agenda, fabrique/filtres.py) ;
+  - liste : événements passés inclus quand le filtre par date remonte dans le passé (balise posts_agenda).
   À reporter lors d'une mise à jour de Sites Faciles si ce gabarit change.
 {% endcomment %}
 
@@ -182,6 +183,8 @@
 
       <div class="fr-col fr-col-md-8 fr-col-12" id="posts-list">
         <h2>{% translate "Events" %}</h2>
+        {# Fabrique : avec un filtre par date dans le passé, la liste inclut aussi les événements passés. #}
+        {% posts_agenda as posts %}
         <div class="fr-grid-row fr-grid-row--gutters">{% include "events/blocks/events_index_posts_list.html" %}</div>
         {% if posts.paginator.num_pages > 1 %}
           <div class="fr-container fr-grid-row fr-grid-row--center fr-mt-6w">{% dsfr_pagination posts %}</div>
