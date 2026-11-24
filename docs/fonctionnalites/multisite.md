@@ -58,13 +58,18 @@ Chaque site doit répondre à son nom de domaine : ajoutez-les tous à
 `ALLOWED_HOSTS`. Sur Scalingo, ne définissez pas de domaine canonique (voir
 {ref}`scalingo-plusieurs-sites`).
 
+(multisite-creer-un-site)=
+
 ## Créer un site
 
 La commande `create_site` crée un site prêt à recevoir ses contributeurs :
 
 ```sh
-python manage.py create_site --hostname site-c.example.org --name "Site C" --locales fr,en
+just create-site --hostname site-c.example.org --name "Site C" --locales fr,en
 ```
+
+`just create-site` lance `python manage.py create_site` avec les mêmes options.
+Sur Scalingo, voir {ref}`scalingo-plusieurs-sites`.
 
 | Option | Rôle |
 | --- | --- |
@@ -149,8 +154,8 @@ collections : une image d’un site portant le même titre n’est jamais repris
   accès à aucun site une fois le cloisonnement activé.
 - **Comptes :** ajoutez les personnes aux groupes du site depuis
   **Paramètres → Utilisateurs**.
-- **Redémarrage :** redémarrez l’application après la commande (sur Scalingo :
-  `scalingo -a <application> restart`). Chaque processus de l’application
+- **Redémarrage :** redémarrez l’application après la commande (sur Scalingo,
+  voir {ref}`scalingo-plusieurs-sites`). Chaque processus de l’application
   garde la liste des pages d’accueil des sites en cache pendant une heure :
   d’ici là, il ne connaît pas les adresses des pages du nouveau site. La
   prévisualisation de ces pages utilise alors le site par défaut, le bouton

@@ -373,6 +373,17 @@ lui, et un seul site resterait joignable. Pour en retirer un :
 scalingo -a ${APP_NAME} unset-canonical-domain
 ```
 
+Pour créer un site (voir {ref}`la commande create_site <multisite-creer-un-site>`),
+puis redémarrer l’application pour qu’elle le prenne en compte :
+
+```sh
+scalingo -a ${APP_NAME} run 'just create-site --hostname site-c.example.org --name "Site C" --locales fr,en'
+scalingo -a ${APP_NAME} restart
+```
+
+Les guillemets simples autour de la commande gardent « Site C » en un seul
+argument.
+
 ## Indexation des contenus
 
 Les contenus des pages sont indexés pour permettre la recherche sur le site, par
