@@ -153,3 +153,47 @@ class FiltresEtiquettesTests(TestCase):
     def test_filtre_actif(self):
         contenu = self.client.get(self.index.url + "?tag=rnb").content.decode()
         self.assertRegex(contenu, r'href="/agenda/#posts-list"\s+aria-pressed="true">\s*RNB')
+
+
+class ListeDatesPasseesTests(TestCase):
+    """Filtre par date dans le passé : Sites Faciles ne listait que les événements à venir (0 résultat)."""
+
+    def setUp(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        root = Site.objects.get(is_default_site=True).root_page
+        self.index = EventsIndexPage(title="Agenda", slug="agenda")
+        root.add_child(instance=self.index)
+        self.index.save_revision().publish()
+        self.aujourdhui = timezone.localdate()
+        self.passe = self.aujourdhui - timedelta(days=12)
+        self.futur = self.aujourdhui + timedelta(days=5)
+        for titre, jour, tags in [("Webinaire passé", self.passe, ["BAN"]), ("Autre passé", self.passe, ["RNB"]),
+                                  ("Atelier à venir", self.futur, ["BAN"])]:  # fmt: skip
+            debut = moment(jour.year, jour.month, jour.day, 10)
+            page = EventEntryPage(title=titre, slug=slugify(titre), event_date_start=debut, event_date_end=debut)
+            page.tags.set(tags)
+            self.index.add_child(instance=page)
+            page.save_revision().publish()
+
+    def liste(self, **params):
+        from urllib.parse import urlencode
+
+        contenu = self.client.get(self.index.url + "?" + urlencode({"vue": "liste", **params})).content.decode()
+        return re.findall(r'class="fr-card__title">\s*<a href="[^"]+"[^>]*>\s*([^<]+?)\s*</a>', contenu)
+
+    def test_jour_passe(self):
+        jour = self.passe.isoformat()
+        self.assertEqual(self.liste(date_from=jour, date_to=jour), ["Webinaire passé", "Autre passé"])
+        self.assertEqual(self.liste(date_from=jour, date_to=jour, tag="ban"), ["Webinaire passé"])
+
+    def test_periode_a_cheval_et_sans_filtre(self):
+        self.assertEqual(
+            self.liste(date_from=self.passe.isoformat(), date_to=self.futur.isoformat()),
+            ["Webinaire passé", "Autre passé", "Atelier à venir"],
+        )
+        # Sans filtre de date, ou avec une date à venir : la liste de Sites Faciles, à venir seulement.
+        self.assertEqual(self.liste(), ["Atelier à venir"])
+        self.assertEqual(self.liste(date_from=self.aujourdhui.isoformat()), ["Atelier à venir"])
