@@ -136,6 +136,9 @@ def remove_all_summary_items(request, items):
 
 @hooks.register("construct_homepage_panels")
 def add_shortcuts_panel(request, panels):
+    """
+    Adds the notifications, shortcuts and tutorials panels to the dashboard.
+    """
     panels.insert(0, NotificationPanel())
     panels.append(ShortcutsPanel())
     if not settings.SF_DISABLE_TUTORIALS:

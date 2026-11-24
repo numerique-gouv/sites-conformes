@@ -15,6 +15,7 @@ from wagtail.admin.ui.components import Component
 from wagtail.admin.views.account import PasswordResetConfirmView as WagtailPasswordResetConfirmView
 from wagtail.models import Site
 
+from sites_conformes.core.multisite_isolation import get_sites_for_user, is_multisite_isolation_active
 from sites_conformes.dashboard.forms import DsfrSetPasswordForm
 from sites_conformes.dashboard.notifications import get_all_notifications
 from sites_conformes.dashboard.services.email_code import (
@@ -28,11 +29,36 @@ logger = logging.getLogger(__name__)
 finder = AdminURLFinder()
 
 
+def get_shortcuts_site(user) -> Site | None:
+    """
+    Returns the site targeted by the shortcuts of the dashboard: the default site, or
+    with the multisite isolation enabled, the first site of the user if the default
+    site is not one of theirs.
+    """
+    default_site = Site.objects.filter(is_default_site=True).first()
+    if not is_multisite_isolation_active() or user.is_superuser:
+        return default_site
+
+    sites = get_sites_for_user(user)
+    if default_site in sites:
+        return default_site
+    return sites[0] if sites else None
+
+
 class ShortcutsPanel(Component):
     order = 50
 
     def get_context_data(self, parent_content=None):
-        site = Site.objects.filter(is_default_site=True).first()
+        """
+        Returns the URLs of the shortcuts to the site of the user, see ``get_shortcuts_site``.
+        """
+        if parent_content:
+            site = get_shortcuts_site(parent_content["request"].user)
+        else:
+            site = Site.objects.filter(is_default_site=True).first()
+        if site is None:
+            # User without any site, with the multisite isolation enabled
+            return {}
         home_page = site.root_page
         home_page_edit = reverse("wagtailadmin_pages:edit", args=(quote(home_page.pk),))
         pages_list = reverse("wagtailadmin_explore", args=(quote(home_page.pk),))

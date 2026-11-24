@@ -157,6 +157,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "sites_conformes.core.middleware.MultisiteIsolationMiddleware",
     "sites_conformes.dashboard.middleware.VerifyUserStaticFilesMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "sites_conformes.core.middleware.IframeMiddleware",

@@ -21,6 +21,12 @@ class ContentManagerConfig(AppConfig):
 
         PAGE_MODEL_CLASSES[:] = [model for model in PAGE_MODEL_CLASSES if not model._meta.swapped]
 
-        from .multisite_isolation import check_multisite_isolation_setting
+        from .multisite_isolation import (
+            check_groups_without_site,
+            check_multisite_isolation_middleware,
+            check_multisite_isolation_setting,
+        )
 
         checks.register(check_multisite_isolation_setting, checks.Tags.database)
+        checks.register(check_groups_without_site, checks.Tags.database)
+        checks.register(check_multisite_isolation_middleware)

@@ -1,7 +1,9 @@
 """
-Text alignment features for Draftail editor.
+Wagtail hooks of the core app:
 
-Implementation using BlockFeature with custom CSS that preserves content styling.
+- text alignment features for the Draftail editor, using BlockFeature with custom CSS
+  that preserves content styling;
+- multisite isolation of the page chooser.
 """
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
@@ -11,6 +13,24 @@ from wagtail import hooks
 from wagtail.admin.rich_text.converters.html_to_contentstate import (
     BlockElementHandler,
 )
+
+from sites_conformes.core.multisite_isolation import (
+    get_pages_in_scope_filter,
+    get_sites_for_user,
+    is_multisite_isolation_active,
+)
+
+
+@hooks.register("construct_page_chooser_queryset")
+def restrict_page_chooser_to_user_sites(pages, request):
+    """
+    With the multisite isolation enabled, the page chooser only offers the pages of the
+    user's sites, when browsing and searching. The links already set to other pages are
+    kept: the chooser does not validate them.
+    """
+    if not is_multisite_isolation_active() or request.user.is_superuser:
+        return pages
+    return pages.filter(get_pages_in_scope_filter(get_sites_for_user(request.user)))
 
 
 @hooks.register("register_rich_text_features")
