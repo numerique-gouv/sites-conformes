@@ -1,12 +1,8 @@
 /* Agenda de la Fabrique — chargé par les gabarits surchargés dans templates/events/.
    Les vignettes des cartes (classe fabrique-vignette) sont dans static/css/style.css, communes avec les actualités. */
 
-/* Étiquette du type d'événement sur les cartes : couleur d'accent pour la distinguer des équipes.
-   Le DSFR ne colore que les étiquettes cliquables ; celles des cartes ne le sont pas (carte entièrement cliquable). */
-.fr-card p.fr-tag.fabrique-tag-type {
-  background-color: var(--background-contrast-blue-ecume);
-  color: var(--text-label-blue-ecume);
-}
+/* L'étiquette du type d'événement des cartes (fabrique-tag-type) est dans static/css/style.css : les cartes
+   s'affichent aussi sur la page d'accueil (bloc « Prochains rendez-vous »). */
 
 /* ---------------------------------------------------------------------------
    Vue calendrier (fabrique/templates/fabrique/agenda/calendrier.html)
