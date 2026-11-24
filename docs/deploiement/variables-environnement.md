@@ -58,6 +58,7 @@ du dépôt fournit un modèle complet et commenté.
 | `WAGTAILADMIN_BASE_URL` | URL de base insérée dans les e-mails (liens de réinitialisation, notifications). Si vide, reconstruite à partir de `HOST_PROTO` + `HOST_URL`. | *(reconstruit)* | 🟠 |
 | `CSRF_TRUSTED_ORIGINS` | Origines de confiance pour les formulaires, séparées par des virgules. Si vide, déduites de `ALLOWED_HOSTS`. | *(déduit)* | ⚪ |
 | `USE_X_FORWARDED_HOST` | À activer si un proxy place le vrai domaine dans l’en-tête `X-Forwarded-Host`. | `False` | ⚪ |
+| `USE_X_FORWARDED_PROTO` | À activer si un proxy (Nginx, CDN…) termine le HTTPS et transmet l’en-tête `X-Forwarded-Proto`. Sans cela, le site génère des adresses en `http`, par exemple le `redirect_uri` de ProConnect. Ne l’activez pas si le site est exposé sans proxy. Inutile sur Scalingo, où c’est déjà géré. | `False` | 🟠 |
 | `FORCE_SCRIPT_NAME` | Préfixe d’URL si le site est servi sous un sous-chemin (ex. `/mon-site`). | *(vide)* | ⚪ |
 
 ## Stockage des fichiers (statiques et médias)

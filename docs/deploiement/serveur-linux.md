@@ -192,6 +192,19 @@ Le projet fournit un script générateur de configuration Nginx, accessible via
 Vous pouvez l’utiliser comme point de départ plutôt que de tout écrire à la main.
 :::
 
+Si Nginx sert le site en HTTPS, définissez `USE_X_FORWARDED_PROTO=True` dans le
+fichier `.env` : le site fait alors confiance à l’en-tête `X-Forwarded-Proto`
+transmis par Nginx et génère ses adresses en `https` (indispensable pour ProConnect).
+
+:::{warning}
+Si un autre service termine le HTTPS avant Nginx (CDN comme Cloudflare, répartiteur
+de charge…) et le joint en HTTP, `$scheme` vaut `http` et la ligne
+`proxy_set_header X-Forwarded-Proto $scheme;` écrase l’information. Faites alors
+joindre Nginx en HTTPS (mode « Full (strict) » chez Cloudflare), ou transmettez
+l’en-tête reçu avec `proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;`,
+à condition que Nginx n’accepte que le trafic de ce service.
+:::
+
 Activez le site et rechargez Nginx :
 
 ```sh
