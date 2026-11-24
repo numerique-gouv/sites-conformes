@@ -242,3 +242,33 @@ cartes de Sites Faciles reste disponible avec le bouton « Liste » (`?vue=liste
 - Petit écran : la grille est remplacée par la liste des jours qui ont des événements.
 - Point d'entrée : `templates/events/blocks/events_index_posts_list.html` (copie du gabarit de Sites Faciles), qui
   affiche le calendrier ou les cartes selon la vue.
+
+## Mise à jour de la page d'accueil
+
+```sh
+python manage.py maj_accueil --dry-run   # affiche ce qui changerait, sans rien enregistrer
+python manage.py maj_accueil             # enregistre un brouillon de l'accueil, à prévisualiser puis publier dans Wagtail
+python manage.py maj_accueil --publier   # publie directement
+python manage.py maj_accueil --menu      # réordonne aussi le menu principal (effet immédiat, pas de brouillon)
+```
+
+Commande ponctuelle, pas lancée par le cron. Elle complète l'accueil saisi dans Wagtail pour y faire apparaître les
+pages Produits, Agenda et Actualités. Elle ne retire ni ne réécrit rien : elle repère les sections par leur texte et
+y ajoute des éléments. On peut la relancer sans créer de doublons.
+
+**Ce qu'elle ajoute**
+- **Bandeau** : boutons « Découvrir nos produits » et « Voir l'agenda ». Dans les boutons de l'en-tête si la page
+  en affiche un, sinon dans un bloc « Liste de boutons » juste après le bloc d'introduction.
+- **Avant « Comment ça marche ? »** : un bloc « Prochains rendez-vous » (4 événements à venir) et un bloc
+  « Dernières actualités » (4 actualités). Leurs gabarits (`templates/content_manager/blocks/`) reprennent les
+  cartes de l'agenda et des actualités : dates de l'événement, type et équipes, vignette entière, abonnement iCal.
+- **Encart « Projets sélectionnés par le comité des partenaires »** : lien vers le dernier compte rendu du comité
+  (l'actualité la plus récente dont le titre contient « comité des partenaires »).
+- **Gouvernance** : sous chaque description (Collectif vigie, Comité des partenaires, Comités d'investissement), un
+  lien vers l'agenda filtré sur l'étiquette du type d'événement, ou vers le compte rendu du comité.
+- **Menu**, avec `--menu` seulement : Accueil, Produits, Agenda, Actualités, puis Partenaires et Équipe.
+
+Les blocs ajoutés ont un identifiant qui commence par `accueil-`. On peut ensuite les déplacer ou les régler dans
+Wagtail (nombre de cartes, filtre par étiquette…). Un réglage modifié sur un bloc `accueil-` est remis à sa valeur
+par défaut si on relance la commande. Une section introuvable est signalée et laissée telle quelle. Si l'accueil a un
+brouillon non publié, la commande s'arrête sans rien faire.
