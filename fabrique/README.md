@@ -111,8 +111,9 @@ Le mieux est d'utiliser un compte qui n'a que l'accès en lecture au document.
 ### Import de calendriers iCal (Framagenda…)
 
 Avant de lire le Grist, `sync_agenda_grist` importe dans la table `Evenements` les calendriers iCal publics des
-équipes qui tiennent déjà leur propre agenda. Par défaut : le Framagenda de Panoramax et l'agenda du site
-Voies locales en commun (flux iCal de Sites Faciles, `/actualités/ical/`, qui ne contient que les événements à venir). Les équipes continuent
+équipes qui tiennent déjà leur propre agenda. Par défaut : le Framagenda de Panoramax, l'agenda du site
+Voies locales en commun et l'API des événements de la BAN (`https://bal-admin.adresse.data.gouv.fr/api/events`, tout
+l'historique depuis 2021 ; public visé suivi dans la colonne Public, type donné à la création) (flux iCal de Sites Faciles, `/actualités/ical/`, qui ne contient que les événements à venir). Les équipes continuent
 d'utiliser leur calendrier ; les événements arrivent dans le Grist, puis sur le site dans le même passage.
 
 - **Nouvel événement** : ajouté au Grist, **publié**, avec l'équipe du calendrier et la colonne *Source*
@@ -130,7 +131,7 @@ d'utiliser leur calendrier ; les événements arrivent dans le Grist, puis sur l
 La clé `GRIST_API_KEY` doit avoir le droit de modifier le document.
 
 **Liste des calendriers** : variable `AGENDA_CALENDRIERS`, une ligne (ou un `;`) par calendrier, de la forme
-`Source | Équipe | URL iCal`. Absente : les calendriers par défaut ci-dessus. Vide : aucun import. Pour un Framagenda,
+`Source | Équipe | URL iCal` (ou `Source | Équipe | URL | ban` pour une API au format de la BAN). Absente : les calendriers par défaut ci-dessus. Vide : aucun import. Pour un Framagenda,
 l'URL iCal d'un calendrier public est `https://framagenda.org/remote.php/dav/public-calendars/<jeton>/?export`, où
 `<jeton>` est l'identifiant de son lien de partage public. Pensez à ajouter la nouvelle source aux choix de la
 colonne *Source* dans le Grist.
