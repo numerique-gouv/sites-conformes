@@ -1,0 +1,34 @@
+{% load i18n %}
+{% comment %}
+  Copie du gabarit de Sites Faciles (content_manager) pour le bloc « Étapes ». Seule différence : le détail des
+  étapes, côte à côte dès 576 px chez Sites Faciles (fr-col-sm), donc quatre colonnes étroites sur tablette. Ici :
+  une étape par ligne sous 768 px ; jusqu'à 3 étapes, côte à côte au-delà ; à partir de 4, deux par ligne de 768 à
+  992 px puis toutes sur une ligne.
+{% endcomment %}
+<div class="fr-container fr-my-3w">
+  <div class="fr-stepper">
+    <h2 class="fr-stepper__title">
+      {{ value.title }}
+      <span class="fr-stepper__state">
+        {% with current_step=value.current total_steps=value.total %}
+          {% blocktranslate %}Step {{ current_step }} of {{ total_steps }}{% endblocktranslate %}
+        {% endwith %}
+      </span>
+    </h2>
+    <div class="fr-stepper__steps"
+         data-fr-current-step="{{ value.current }}"
+         data-fr-steps="{{ value.total }}"></div>
+    <dl class="fr-grid-row fr-grid-row--gutters cmsfr-stepper__details">
+      {% for step in value.steps %}
+        <div class="fr-col-12 {% if value.steps|length > 3 %}fr-col-md-6 fr-col-lg{% else %}fr-col-md{% endif %}">
+          <dt>
+            <span class="fr-text--bold">{{ step.value.title }}</span>
+          </dt>
+          <dd>
+            {{ step.value.detail|linebreaksbr }}
+          </dd>
+        </div>
+      {% endfor %}
+    </dl>
+  </div>
+</div>
