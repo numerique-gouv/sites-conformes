@@ -10,6 +10,7 @@ from wagtail.contrib.sitemaps.views import sitemap
 from wagtail.documents import urls as wagtaildocs_urls
 
 from config.api import api_router
+from fabrique.flux import flux_agenda
 from proconnect import urls as oidc_urls
 
 urlpatterns = [
@@ -18,6 +19,8 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("api/v2/", api_router.urls),
     path("favicon.ico", RedirectView.as_view(url="/static/favicon/favicon.ico", permanent=True)),
+    # Flux iCal d'abonnement à l'agenda (fabrique/flux.py).
+    path("flux/<slug:nom>.ics", flux_agenda, name="flux_agenda"),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),

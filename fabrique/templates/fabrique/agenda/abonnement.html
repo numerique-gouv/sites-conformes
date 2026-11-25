@@ -1,0 +1,19 @@
+{# Abonnement aux flux iCal de l'agenda (fabrique/flux.py). webcal:// ouvre l'abonnement dans Apple Calendrier et Outlook. #}
+<ul class="fr-btns-group fr-btns-group--icon-left fr-mt-1w">
+  <li>
+    <a class="fr-btn fr-icon-calendar-line" href="{{ essentiel.webcal }}">S'abonner à l'agenda</a>
+  </li>
+  <li>
+    <a class="fr-btn fr-btn--secondary fr-icon-calendar-2-line" href="{{ complet.webcal }}">S'abonner à tout l'agenda</a>
+  </li>
+</ul>
+<p class="fr-text--sm fr-mb-1w">
+  « S'abonner à l'agenda » : les événements de la Fabrique et les comités des équipes produits.
+  « Tout l'agenda » ajoute les autres événements des équipes.
+  Votre agenda se met ensuite à jour tout seul, en général sous quelques heures.
+</p>
+<p class="fr-text--xs fr-mb-1w">
+  Google Agenda ou autre logiciel : ajoutez un agenda « à partir de l'URL » avec l'adresse
+  <a href="{{ essentiel.https }}">{{ essentiel.https }}</a>
+  (ou <a href="{{ complet.https }}">celle de tout l'agenda</a>).
+</p>

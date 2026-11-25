@@ -92,3 +92,17 @@ def posts_agenda(context):
         .prefetch_related("tags", "event_categories")
     )
     return Paginator(evenements, page.posts_per_page).get_page(request.GET.get("page"))
+
+
+@register.inclusion_tag("fabrique/agenda/abonnement.html", takes_context=True)
+def abonnement_agenda(context) -> dict:
+    """Boutons d'abonnement aux flux de l'agenda (fabrique/flux.py) : liens webcal://, adresse https à copier."""
+    from django.urls import reverse
+
+    request = context["request"]
+
+    def adresses(nom):
+        https = request.build_absolute_uri(reverse("flux_agenda", args=[nom]))
+        return {"https": https, "webcal": "webcal://" + https.split("://", 1)[1]}
+
+    return {"essentiel": adresses("agenda-fabrique"), "complet": adresses("agenda-complet")}

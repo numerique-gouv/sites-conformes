@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load static dsfr_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags wagtail_dsfr_tags i18n humanize agenda_calendrier %}
 {% comment %}
-  Copie du gabarit de Sites Faciles (events/events_index_page.html), trois changements :
+  Copie du gabarit de Sites Faciles (events/events_index_page.html), quatre changements :
   - feuille de style de l'agenda (bloc extra_css) : vignettes et vue calendrier ;
   - filtre par étiquette en trois groupes, équipe, type et série (balise filtres_etiquettes_agenda, fabrique/filtres.py) ;
-  - liste : événements passés inclus quand le filtre par date remonte dans le passé (balise posts_agenda).
+  - liste : événements passés inclus quand le filtre par date remonte dans le passé (balise posts_agenda) ;
+  - export : abonnement webcal:// aux flux de l'agenda (balise abonnement_agenda, fabrique/flux.py).
   À reporter lors d'une mise à jour de Sites Faciles si ce gabarit change.
 {% endcomment %}
 
@@ -156,14 +157,9 @@
                 </div>
               {% endif %}
 
-              <h3 class="fr-h6">{% translate "Export" %}</h3>
-              <ul class="fr-btns-group fr-mt-1w">
-                <li>
-                  <a type="button"
-                     href="{% routablepageurl page 'ical_view' %}"
-                     class="fr-btn fr-btn--secondary">{% translate "Add to your calendar (iCal)" %}</a>
-                </li>
-              </ul>
+              {# Fabrique : abonnement (webcal://) aux flux de l'agenda au lieu du téléchargement du fichier iCal. #}
+              <h3 class="fr-h6">S'abonner</h3>
+              {% abonnement_agenda %}
 
               {% if page.past_events.count %}
                 <h3 class="fr-h6">{% translate "Archives" %}</h3>
