@@ -1,3 +1,4 @@
+import importlib
 from datetime import datetime, timedelta
 from io import StringIO
 
@@ -259,3 +260,11 @@ class AccueilTest(TestCase):
         call_command("maj_accueil", "--dry-run", stdout=sortie, stderr=StringIO())
         self.assertIn("[simulation] ✔ Prochains rendez-vous : bloc ajouté", sortie.getvalue())
         self.assertFalse(Page.objects.get(id=self.accueil.id).has_unpublished_changes)
+
+    def test_migration_de_deploiement(self):
+        migration = importlib.import_module("fabrique.migrations.0003_maj_accueil")
+        migration.maj_accueil(None, None)
+        self.assertIn("accueil-agenda", [b.id for b in self.brouillon().body])
+        # Relancée sur un brouillon en cours, elle ne fait rien et ne lève pas d'erreur.
+        migration.maj_accueil(None, None)
+        self.assertTrue(Page.objects.get(id=self.accueil.id).has_unpublished_changes)

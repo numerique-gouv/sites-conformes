@@ -252,7 +252,9 @@ python manage.py maj_accueil --publier   # publie directement
 python manage.py maj_accueil --menu      # réordonne aussi le menu principal (effet immédiat, pas de brouillon)
 ```
 
-Commande ponctuelle, pas lancée par le cron. Elle complète l'accueil saisi dans Wagtail pour y faire apparaître les
+Commande ponctuelle, pas lancée par le cron. La migration `fabrique/0003_maj_accueil` l'a lancée une fois au
+déploiement, en brouillon (sans `--menu`), à la place d'un `scalingo run` ; elle ne bloque jamais le déploiement et
+écrit son rapport dans le journal (lignes `maj_accueil`). Elle complète l'accueil saisi dans Wagtail pour y faire apparaître les
 pages Produits, Agenda et Actualités. Elle ne retire ni ne réécrit rien : elle repère les sections par leur texte et
 y ajoute des éléments. On peut la relancer sans créer de doublons.
 
