@@ -1,10 +1,10 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from sites_conformes.forms.baseform import SitesFacilesBaseForm
+from sites_conformes.forms.baseform import SitesConformesBaseForm
 
 
-class EventSearchForm(SitesFacilesBaseForm):
+class EventSearchForm(SitesConformesBaseForm):
     """Main form for events page list."""
 
     date_from = forms.DateField(
