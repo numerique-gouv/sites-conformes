@@ -150,3 +150,8 @@ config.json
 cron.json
 temp.json
 .migration-docs/
+# Playwright artifacts
+test-results
+__screenshots__
+playwright-report
+blob-report

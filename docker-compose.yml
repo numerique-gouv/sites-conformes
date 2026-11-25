@@ -26,6 +26,65 @@ services:
     depends_on:
       - db
 
+  # End-to-end tests (`just e2e`): not started by a plain `docker compose up`
+  db-e2e:
+    image: postgres:17-alpine
+    profiles: [e2e]
+    environment:
+      POSTGRES_USER: dju
+      POSTGRES_PASSWORD: djpwd
+      POSTGRES_DB: djdb
+    # Throwaway database, reset by `just e2e-down`
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "dju", "-d", "djdb"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+
+  web-e2e:
+    build: .
+    profiles: [e2e]
+    environment:
+      DATABASE_URL: postgres://dju:djpwd@db-e2e:5432/djdb
+      SECRET_KEY: e2e-tests-only
+      DEBUG: "False"
+      DJANGO_SETTINGS_MODULE: config.settings_test
+      ALLOWED_HOSTS: web-e2e,localhost,127.0.0.1
+      USE_UV: "0"
+      USE_DOCKER: "0"
+    entrypoint: ["sh", "-c", "just e2e-setup && python manage.py runserver 0.0.0.0:8000"]
+    volumes:
+      - .:/app
+      - /app/medias
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+    depends_on:
+      db-e2e:
+        condition: service_healthy
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.65.1-noble
+    profiles: [e2e]
+    # Run as the host user so that reports and screenshots are not owned by root
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /app
+    environment:
+      HOME: /tmp
+      E2E_BASE_URL: http://web-e2e:8000
+    entrypoint: ["sh", "-c", "npm ci --no-audit --no-fund && exec \"$$@\"", "--"]
+    command: ["npx", "playwright", "test"]
+    volumes:
+      - .:/app
+    depends_on:
+      web-e2e:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   medias:

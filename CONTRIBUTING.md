@@ -32,6 +32,38 @@ just unittest blog
 just coverage events
 ```
 
+### Tests end-to-end
+
+Les tests end-to-end utilisent [Playwright](https://playwright.dev/) et se trouvent dans le dossier `e2e/`.
+En local, ils tournent dans Docker (profil `e2e` du fichier `docker-compose.yml`) : il n’est pas nécessaire
+d’installer Node ni Chromium, et ils utilisent une base de données jetable, distincte de la base de développement.
+
+```sh
+# Lance les tests (le premier lancement construit l’image et prépare la base, ce qui prend quelques minutes)
+just e2e
+
+# Arrête les conteneurs et réinitialise la base e2e
+just e2e-down
+```
+
+`just e2e` démarre trois conteneurs :
+
+- `db-e2e` : une base PostgreSQL jetable ;
+- `web-e2e` : le serveur Django avec `DEBUG=False` (pour obtenir les vraies pages d’erreur, comme en CI),
+  et le contenu créé par `just e2e-setup` (pages de base, pages de démo et pages de la commande `create_e2e_pages`) ;
+- `playwright` : l’image officielle de Playwright, qui lance les tests.
+
+Les conteneurs `db-e2e` et `web-e2e` restent démarrés entre deux lancements, pour aller plus vite.
+Le code est monté dans les conteneurs : les modifications sont prises en compte sans reconstruire l’image.
+
+Les arguments supplémentaires sont transmis à Playwright, par exemple `just e2e e2e/numerique.spec.ts`.
+Le rapport HTML est généré dans le dossier `playwright-report/`.
+
+Les tests marqués `@regression` comparent en plus une capture d’écran pleine page à une référence.
+En CI, la référence est générée à partir de la branche `main`, puis comparée à la branche de la PR.
+Une différence visuelle fait échouer la CI, sauf si la PR porte le label `visual-change`.
+En local, `just e2e --update-snapshots --grep=@regression` génère la référence.
+
 ## Définition du fini
 
 Avant chaque mise en production, les intervenant·es sont prié·es de [passer cette liste en revue](./DOD.md).

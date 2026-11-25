@@ -1,0 +1,40 @@
+name: Setup E2E Tools
+description: Install Node.js, npm dependencies, and Playwright Chromium
+
+runs:
+  using: composite
+  steps:
+    # Node LTS, per the official Playwright CI guide. The post-download
+    # extract-zip hang seen on Node 24.16.0 (nodejs/node#63487,
+    # microsoft/playwright#41000) is fixed in Playwright >= 1.60.0, which this
+    # project now pins — so no Node version workaround is needed.
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: lts/*
+
+    - name: Install Node dependencies
+      shell: bash
+      run: npm ci
+
+    # The Azure Ubuntu mirror used by the runners sometimes stalls on package
+    # downloads (each one sits on apt's default timeout, logged as "Ign:"),
+    # which eats the whole step timeout. Fail fast on stuck downloads and
+    # retry them instead.
+    - name: Configure apt retries
+      shell: bash
+      run: |
+        echo 'Acquire::Retries "5"; Acquire::http::Timeout "15"; Acquire::https::Timeout "15";' \
+          | sudo tee /etc/apt/apt.conf.d/99-ci-retries
+
+    # Install browsers + system deps as the official CI guide prescribes. The
+    # timeout turns any stall into a fast failure, and the install is
+    # idempotent, so a stalled attempt is simply retried.
+    - name: Install Playwright Browsers
+      shell: bash
+      run: |
+        for attempt in 1 2 3; do
+          timeout 300 npx playwright install --with-deps chromium && exit 0
+          echo "::warning::Playwright install attempt $attempt failed, retrying"
+        done
+        exit 1
