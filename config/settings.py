@@ -50,6 +50,12 @@ DEBUG = getenv_bool("DEBUG", False)
 ALLOWED_HOSTS = getenv_list("ALLOWED_HOSTS", "127.0.0.1,.localhost")
 USE_X_FORWARDED_HOST = getenv_bool("USE_X_FORWARDED_HOST", False)
 
+# Behind a proxy terminating TLS, trust its X-Forwarded-Proto header so that
+# request.is_secure() and absolute URLs (e.g. ProConnect redirect_uri) use https.
+# Only enable it if the proxy always sets or overwrites this header.
+if getenv_bool("USE_X_FORWARDED_PROTO", False):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 HOST_PROTO = os.getenv("HOST_PROTO", "https")
 HOST_URL = os.getenv("HOST_URL", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "")

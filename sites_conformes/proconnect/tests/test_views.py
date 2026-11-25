@@ -50,6 +50,23 @@ class OIDCLogoutViewTestCase(TestCase):
         self.assertIn(state, self.client.session["oidc_states"])
         self.assertIn("_auth_user_id", self.client.session)
 
+    @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
+    def test_post_logout_redirect_uri_uses_forwarded_proto(self):
+        self.login_with_id_token()
+
+        response = self.client.post(self.url, HTTP_X_FORWARDED_PROTO="https")
+
+        query = parse_qs(urlparse(response["Location"]).query)
+        self.assertTrue(query["post_logout_redirect_uri"][0].startswith("https://"))
+
+    def test_post_logout_redirect_uri_ignores_forwarded_proto_by_default(self):
+        self.login_with_id_token()
+
+        response = self.client.post(self.url, HTTP_X_FORWARDED_PROTO="https")
+
+        query = parse_qs(urlparse(response["Location"]).query)
+        self.assertTrue(query["post_logout_redirect_uri"][0].startswith("http://"))
+
     @override_settings(OIDC_OP_LOGOUT_ENDPOINT=None)
     def test_user_is_logged_out_locally_without_provider_endpoint(self):
         self.login_with_id_token()
