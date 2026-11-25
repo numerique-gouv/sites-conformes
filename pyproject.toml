@@ -23,7 +23,6 @@ dependencies = [
     # Lift once wagtail-2fa adds Wagtail 8 support (see labd/wagtail-2fa#280).
     "wagtail>=7.2.0,<8.0.0",
     "psycopg2-binary>=2.9.10",
-    "python-dotenv>=1.1.0",
     "dj-database-url>=3.0.0",
     "gunicorn>=23.0.0",
     "dj-static>=0.0.6",
@@ -50,6 +49,7 @@ dependencies = [
     "django-modelcluster>=6.5",
     "djangorestframework>=3.18.0",
     "swapper>=1.4,<2",
+    "django-environ>=0.12",
 ]
 
 [dependency-groups]
@@ -210,7 +210,7 @@ extend_exclude = ["^demo/", ".*/migrations/", ".*/tests/"]
 # Packages whose distributed module name doesn't match deptry's default guess
 # (package name with hyphens replaced by underscores).
 "django-dsfr" = "dsfr"
-"python-dotenv" = "dotenv"
+"django-environ" = "environ"
 "wagtail-markdown" = "wagtailmarkdown"
 "django-taggit" = "taggit"
 "beautifulsoup4" = "bs4"

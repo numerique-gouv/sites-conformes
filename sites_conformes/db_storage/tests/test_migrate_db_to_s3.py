@@ -1,33 +1,41 @@
 from unittest.mock import MagicMock, patch
 
+from django.conf import settings
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from sites_conformes.db_storage.models import StoredFile
 
-S3_ENV = {
-    "S3_HOST": "s3.example.com",
-    "S3_BUCKET_NAME": "bucket",
-    "S3_KEY_ID": "k",
-    "S3_KEY_SECRET": "s",
-    "S3_LOCATION": "media",
+S3_STORAGES = {
+    **settings.STORAGES,
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "endpoint_url": "https://s3.example.com",
+            "bucket_name": "bucket",
+            "access_key": "k",
+            "secret_key": "s",
+            "location": "media",
+        },
+    },
+}
+NO_S3_STORAGES = {
+    **settings.STORAGES,
+    "default": {"BACKEND": "sites_conformes.db_storage.storage.DatabaseStorage"},
 }
 
 
 class MigrateDbToS3CommandTestCase(TestCase):
     """Tests for the migrate_db_to_s3 management command."""
 
-    @patch.dict("os.environ", {}, clear=False)
+    @override_settings(STORAGES=NO_S3_STORAGES)
     def test_fails_without_s3_config(self):
         """Command should fail if S3 is not configured."""
-        import os
-
-        os.environ.pop("S3_HOST", None)
         with self.assertRaises(Exception):
             call_command("migrate_db_to_s3")
 
     @patch("sites_conformes.db_storage.management.commands.migrate_db_to_s3.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_dry_run_does_not_upload(self, mock_boto3):
         """Dry run should not upload any files to S3."""
         StoredFile.objects.create(
@@ -45,7 +53,7 @@ class MigrateDbToS3CommandTestCase(TestCase):
         mock_client.put_object.assert_not_called()
 
     @patch("sites_conformes.db_storage.management.commands.migrate_db_to_s3.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_upload_files(self, mock_boto3):
         """Files should be uploaded from StoredFile to S3."""
         StoredFile.objects.create(
@@ -72,7 +80,7 @@ class MigrateDbToS3CommandTestCase(TestCase):
         self.assertEqual(call_kwargs["ContentType"], "image/jpeg")
 
     @patch("sites_conformes.db_storage.management.commands.migrate_db_to_s3.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_skip_existing_on_s3(self, mock_boto3):
         """Files already on S3 should be skipped."""
         StoredFile.objects.create(
@@ -93,7 +101,7 @@ class MigrateDbToS3CommandTestCase(TestCase):
         mock_client.put_object.assert_not_called()
 
     @patch("sites_conformes.db_storage.management.commands.migrate_db_to_s3.boto3")
-    @patch.dict("os.environ", S3_ENV)
+    @override_settings(STORAGES=S3_STORAGES)
     def test_empty_db(self, mock_boto3):
         """No error when database has no stored files."""
         mock_client = MagicMock()

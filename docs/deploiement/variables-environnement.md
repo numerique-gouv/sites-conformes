@@ -18,6 +18,10 @@ Niveaux :
 - 🟠 recommandé selon l’usage
 - ⚪ optionnel / avancé.
 
+Les variables booléennes valent `True` pour `true`, `on`, `ok`, `y`, `yes`,
+`1` ou tout autre entier non nul (sans tenir compte de la casse). Toute autre
+valeur, y compris une valeur vide, vaut `False`.
+
 ## Modèle minimal à copier
 
 Les variables ci-dessous sont les **strictement indispensables** : sans elles, le

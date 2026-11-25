@@ -7,6 +7,7 @@ from wagtail.fields import RichTextField
 from wagtail.models import Revision
 
 from sites_conformes.db_storage.models import StoredFile
+from sites_conformes.db_storage.s3 import get_s3_config
 
 
 class Command(BaseCommand):
@@ -37,11 +38,11 @@ class Command(BaseCommand):
         skip_files = options["skip_files"]
         skip_urls = options["skip_urls"]
 
-        s3_config = self._get_s3_config()
+        s3_config = get_s3_config()
         if not s3_config:
             raise CommandError(
-                "S3 is not configured. Set S3_HOST, S3_KEY_ID, S3_KEY_SECRET, "
-                "and S3_BUCKET_NAME environment variables."
+                "S3 is not configured: the default storage must be S3Storage "
+                "(set S3_HOST, S3_KEY_ID, S3_KEY_SECRET and S3_BUCKET_NAME)."
             )
 
         s3_base_url = self._get_s3_base_url(s3_config)
@@ -60,24 +61,6 @@ class Command(BaseCommand):
     # ─────────────────────────────────────
     # S3 configuration helpers
     # ─────────────────────────────────────
-
-    def _get_s3_config(self):
-        """Read S3 configuration from environment (same vars as settings.py)."""
-        import os
-
-        host = os.getenv("S3_HOST")
-        if not host:
-            return None
-
-        protocol = os.getenv("S3_PROTOCOL", "https")
-        return {
-            "endpoint_url": f"{protocol}://{host}",
-            "bucket_name": os.getenv("S3_BUCKET_NAME", ""),
-            "access_key": os.getenv("S3_KEY_ID", ""),
-            "secret_key": os.getenv("S3_KEY_SECRET", ""),
-            "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
-            "location": os.getenv("S3_LOCATION", ""),
-        }
 
     def _get_s3_base_url(self, s3_config):
         """Build the base URL that S3 files are served from."""

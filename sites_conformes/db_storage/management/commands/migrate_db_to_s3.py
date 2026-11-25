@@ -2,6 +2,7 @@ import boto3
 from django.core.management.base import BaseCommand, CommandError
 
 from sites_conformes.db_storage.models import StoredFile
+from sites_conformes.db_storage.s3 import get_s3_config
 
 
 class Command(BaseCommand):
@@ -17,11 +18,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
 
-        s3_config = self._get_s3_config()
+        s3_config = get_s3_config()
         if not s3_config:
             raise CommandError(
-                "S3 is not configured. Set S3_HOST, S3_KEY_ID, S3_KEY_SECRET, "
-                "and S3_BUCKET_NAME environment variables."
+                "S3 is not configured: the default storage must be S3Storage "
+                "(set S3_HOST, S3_KEY_ID, S3_KEY_SECRET and S3_BUCKET_NAME)."
             )
 
         self.stdout.write(f"S3 endpoint: {s3_config['endpoint_url']}")
@@ -34,24 +35,6 @@ class Command(BaseCommand):
     # ─────────────────────────────────────
     # S3 configuration helpers
     # ─────────────────────────────────────
-
-    def _get_s3_config(self):
-        """Read S3 configuration from environment (same vars as settings.py)."""
-        import os
-
-        host = os.getenv("S3_HOST")
-        if not host:
-            return None
-
-        protocol = os.getenv("S3_PROTOCOL", "https")
-        return {
-            "endpoint_url": f"{protocol}://{host}",
-            "bucket_name": os.getenv("S3_BUCKET_NAME", ""),
-            "access_key": os.getenv("S3_KEY_ID", ""),
-            "secret_key": os.getenv("S3_KEY_SECRET", ""),
-            "region_name": os.getenv("S3_BUCKET_REGION", "fr"),
-            "location": os.getenv("S3_LOCATION", ""),
-        }
 
     def _get_s3_client(self, s3_config):
         """Create a boto3 S3 client."""

@@ -46,18 +46,26 @@ jobs:
 
       # When running against main, overlay current-branch test files so both
       # baseline and comparison jobs use the same test definitions.
+      # Only the paths listed below are overlaid. Cone mode is disabled because it
+      # always includes every root-level file (pyproject.toml, uv.lock, manage.py…),
+      # which mixed the PR's Python dependencies with main's code: the Python
+      # dependencies belong to the application code under test, and must match its
+      # settings (e.g. a PR swapping a dependency would otherwise break the baseline).
       - name: Checkout E2E files from PR branch
         uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            playwright.config.ts
-            pyproject.toml
-            e2e/
-            .github/
-            .env.test
-            justfile
-            scripts/
+            /playwright.config.ts
+            /package.json
+            /package-lock.json
+            /.npmrc
+            /e2e/
+            /.github/
+            /.env.test
+            /justfile
+            /scripts/
           path: __e2e_overlay__
 
       - name: Overlay E2E files onto working tree
