@@ -12,7 +12,7 @@ command runs inside a single transaction, so a hard kill mid-flight rolls
 back instead of leaving a half-renamed schema.
 
 Usage:
-    python manage.py migrate_from_sites_faciles --no-input
+    python manage.py migrate_to_packaged_version --no-input
 """
 
 from django.core.management.base import BaseCommand
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 cursor, "sites_conformes_core_contentpage"
             ):
                 self.stdout.write(
-                    self.style.SUCCESS("Fresh database — no legacy Sites Faciles schema to migrate, skipping.")
+                    self.style.SUCCESS("Fresh database — no legacy Sites Conformes schema to migrate, skipping.")
                 )
                 return
 

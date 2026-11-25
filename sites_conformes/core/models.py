@@ -26,14 +26,14 @@ from wagtail.images import get_image_model_string
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import SitesConformesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.managers import TagManager
 from sites_conformes.core.validators import validate_iframe_allow_origins
 from sites_conformes.core.widgets import DsfrIconPickerWidget
 
 
-class AbstractContentPage(SitesFacilesBasePage):
+class AbstractContentPage(SitesConformesBasePage):
     """
     Base class for the swappable content page model.
 
@@ -94,10 +94,10 @@ class ContentPage(AbstractContentPage):
 if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
 
     class TagContentPage(TaggedItemBase):
-        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
+        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")  # type: ignore
 
 
-class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class CatalogIndexPage(RoutablePageMixin, SitesConformesBasePage):
     entries_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
@@ -133,7 +133,7 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         default=OR_OPERATOR,
     )
 
-    settings_panels = SitesFacilesBasePage.settings_panels + [
+    settings_panels = SitesConformesBasePage.settings_panels + [
         FieldPanel("entries_per_page"),
         MultiFieldPanel(
             [

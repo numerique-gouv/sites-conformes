@@ -69,21 +69,21 @@ des heures de pointe.
 
 ### Pendant la mise à jour
 
-La commande `python manage.py migrate_from_sites_faciles` doit s’exécuter
+La commande `python manage.py migrate_to_packaged_version` doit s’exécuter
 **avant** `python manage.py migrate`. Cet ordre garantit que les tables sont
 renommées avec leur nouveau préfixe avant que Django n’essaie d’appliquer ses
 migrations sur le nouveau schéma.
 
 **Déploiement Scalingo :** le `Procfile` de cette version appelle déjà
 `just scalingo-postdeploy`, et cette recette enchaîne automatiquement
-`migrate_from_sites_faciles` puis `migrate`. Rien à faire.
+`migrate_to_packaged_version` puis `migrate`. Rien à faire.
 
 **Autres environnements :** si vous déployez avec un autre outil (Docker,
 Heroku, Clever Cloud, déploiement manuel), assurez-vous d’exécuter avant la
 commande `migrate` existante :
 
 ```sh
-python manage.py migrate_from_sites_faciles
+python manage.py migrate_to_packaged_version
 python manage.py migrate
 ```
 

@@ -3,6 +3,7 @@ from wagtail.rich_text import RichText
 from wagtail.test.utils import WagtailPageTestCase
 from wagtail_localize.segments.extract import extract_segments
 
+from sites_conformes.core.constants import EXAMPLE_IMAGE_ERROR_PATH
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 
@@ -26,7 +27,7 @@ class TranslationImageBlockExtractionTestCase(WagtailPageTestCase):
 
     def setUp(self):
         home = Page.objects.get(slug="home")
-        image = import_image("sites_conformes/static/artwork/technical-error.svg", "Hero image")
+        image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "Hero image")
 
         hero = [
             (
@@ -73,7 +74,7 @@ class TranslationSimpleImageBlockExtractionTestCase(WagtailPageTestCase):
 
     def setUp(self):
         home = Page.objects.get(slug="home")
-        image = import_image("sites_conformes/static/artwork/technical-error.svg", "Hero image")
+        image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "Hero image")
 
         hero = [
             (

@@ -19,6 +19,7 @@ from wagtail_localize.models import (
 from wagtail_localize.strings import StringValue
 
 from sites_conformes.core.blocks.utils import HELP_ICON, help_text_with_details
+from sites_conformes.core.constants import EXAMPLE_IMAGE_ERROR_PATH
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 
@@ -107,7 +108,7 @@ class MigrateCenteredImageAltTestCase(TestCase):
 class MigrateCenteredImageAltPagesTestCase(WagtailPageTestCase):
     def setUp(self):
         home = Page.objects.get(slug="home")
-        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "fichier_2023.svg")
+        self.image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "fichier_2023.svg")
         self.page = home.add_child(instance=ContentPage(title="Legacy image", slug="legacy-image"))
         revision = self.page.save_revision()
 
@@ -209,7 +210,7 @@ class MigrateCenteredImageAltPagesTestCase(WagtailPageTestCase):
 class DecorativeImagesTestCase(WagtailPageTestCase):
     def setUp(self):
         self.home = Page.objects.get(slug="home")
-        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "fichier_2023.svg")
+        self.image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "fichier_2023.svg")
 
     def get_soup(self, page):
         return BeautifulSoup(self.client.get(page.url).content, "html.parser")
@@ -222,13 +223,13 @@ class DecorativeImagesTestCase(WagtailPageTestCase):
 
         img = self.get_soup(page).select_one(".fr-quote__image img")
 
-        self.assertEqual(img["alt"], "")
+        self.assertEqual(img["alt"], "")  # type: ignore
 
 
 class TileImageAltTestCase(WagtailPageTestCase):
     def setUp(self):
         self.home = Page.objects.get(slug="home")
-        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "fichier_2023.svg")
+        self.image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "fichier_2023.svg")
 
     def create_tile_page(self, alt_text, decorative):
         body = [
@@ -251,14 +252,14 @@ class TileImageAltTestCase(WagtailPageTestCase):
 
         img = self.get_soup(page).select_one(".fr-tile__img img")
 
-        self.assertEqual(img["alt"], "87 % de satisfaction")
+        self.assertEqual(img["alt"], "87 % de satisfaction")  # type: ignore
 
     def test_decorative_tile_image_has_empty_alt(self):
         page = self.create_tile_page("", True)
 
         img = self.get_soup(page).select_one(".fr-tile__img img")
 
-        self.assertEqual(img["alt"], "")
+        self.assertEqual(img["alt"], "")  # type: ignore
 
     @override_settings(SF_SCHEME_DEPENDENT_SVGS=True)
     def test_tile_svg_pictogram_has_accessible_name(self):
@@ -266,8 +267,8 @@ class TileImageAltTestCase(WagtailPageTestCase):
 
         svg = self.get_soup(page).select_one(".fr-tile__pictogram svg")
 
-        self.assertEqual(svg["role"], "img")
-        self.assertEqual(svg["aria-label"], "87 % de satisfaction")
+        self.assertEqual(svg["role"], "img")  # type: ignore
+        self.assertEqual(svg["aria-label"], "87 % de satisfaction")  # type: ignore
         self.assertFalse(svg.has_attr("aria-hidden"))
 
     @override_settings(SF_SCHEME_DEPENDENT_SVGS=True)
@@ -276,14 +277,14 @@ class TileImageAltTestCase(WagtailPageTestCase):
 
         svg = self.get_soup(page).select_one(".fr-tile__pictogram svg")
 
-        self.assertEqual(svg["aria-hidden"], "true")
+        self.assertEqual(svg["aria-hidden"], "true")  # type: ignore
         self.assertFalse(svg.has_attr("role"))
 
 
 class SectionAndHeroImagesTestCase(WagtailPageTestCase):
     def setUp(self):
         self.home = Page.objects.get(slug="home")
-        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "fichier_2023.svg")
+        self.image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "fichier_2023.svg")
         self.image_value = {"image": self.image, "alt_text": "Un homme dans les nuages", "decorative": False}
 
     def get_soup(self, page):
@@ -310,7 +311,7 @@ class SectionAndHeroImagesTestCase(WagtailPageTestCase):
 
         hero = self.get_soup(page).select_one(".cmsfr-hero")
 
-        self.assertIn("cmsfr-hero-position--center", hero["class"])
+        self.assertIn("cmsfr-hero-position--center", hero["class"])  # type: ignore
 
 
 class HelpTextWithDetailsTestCase(TestCase):
@@ -332,7 +333,7 @@ class HelpTextWithDetailsTestCase(TestCase):
 class ImageAndTextSvgAltTestCase(WagtailPageTestCase):
     def setUp(self):
         self.home = Page.objects.get(slug="home")
-        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "fichier_2023.svg")
+        self.image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "fichier_2023.svg")
 
     def get_svg(self, alt_text, decorative):
         value = {
@@ -348,12 +349,12 @@ class ImageAndTextSvgAltTestCase(WagtailPageTestCase):
     def test_svg_artwork_has_accessible_name(self):
         svg = self.get_svg("87 % de satisfaction", False)
 
-        self.assertEqual(svg["role"], "img")
-        self.assertEqual(svg["aria-label"], "87 % de satisfaction")
+        self.assertEqual(svg["role"], "img")  # type: ignore
+        self.assertEqual(svg["aria-label"], "87 % de satisfaction")  # type: ignore
         self.assertFalse(svg.has_attr("aria-hidden"))
 
     def test_decorative_svg_artwork_is_hidden(self):
         svg = self.get_svg("", True)
 
-        self.assertEqual(svg["aria-hidden"], "true")
+        self.assertEqual(svg["aria-hidden"], "true")  # type: ignore
         self.assertFalse(svg.has_attr("role"))

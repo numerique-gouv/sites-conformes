@@ -1,3 +1,5 @@
+import warnings
+
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -99,7 +101,7 @@ class FormField(TranslatableMixin, AbstractFormField):
         verbose_name_plural = _("Form fields")
 
 
-class SitesFacilesCustomForm(BaseForm):
+class SitesConformesCustomForm(BaseForm):
     """
     A base form that adds the necessary DSFR class on relevant fields
     """
@@ -121,7 +123,7 @@ class SitesFacilesCustomForm(BaseForm):
         return DsfrDjangoTemplates
 
 
-class SitesFacilesFormBuilder(FormBuilder):
+class SitesConformesFormBuilder(FormBuilder):
     def __init__(self, fields):
         # Ignore fields without a type (e.g. being added in the editor) instead of crashing previews
         super().__init__([field for field in fields if field.field_type])
@@ -150,7 +152,7 @@ class SitesFacilesFormBuilder(FormBuilder):
         return formfields
 
     def get_form_class(self):
-        return type("WagtailForm", (SitesFacilesCustomForm,), self.formfields)
+        return type("WagtailForm", (SitesConformesCustomForm,), self.formfields)
 
 
 class FormPage(HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm):
@@ -196,7 +198,7 @@ class FormPage(HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm
         verbose_name = _("Form page")
         verbose_name_plural = _("Form pages")
 
-    form_builder = SitesFacilesFormBuilder
+    form_builder = SitesConformesFormBuilder
 
     def all_fields_required(self):
         """
@@ -236,3 +238,18 @@ class FormPage(HoneypotFormMixin, HoneypotFormSubmissionMixin, AbstractEmailForm
             self.from_address,
             reply_to=reply_to or None,
         )
+
+
+# Deprecated aliases kept for backward compatibility with projects using the old names.
+_DEPRECATED_ALIASES = {
+    "SitesFacilesCustomForm": "SitesConformesCustomForm",
+    "SitesFacilesFormBuilder": "SitesConformesFormBuilder",
+}
+
+
+def __getattr__(name):
+    if name in _DEPRECATED_ALIASES:
+        new_name = _DEPRECATED_ALIASES[name]
+        warnings.warn(f"{name} is deprecated, use {new_name} instead.", DeprecationWarning, stacklevel=2)
+        return globals()[new_name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

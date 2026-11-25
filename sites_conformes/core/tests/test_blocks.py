@@ -11,6 +11,7 @@ from wagtail.test.utils import WagtailPageTestCase
 from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category
 from sites_conformes.core.blocks.basics import CenteredImageBlock
 from sites_conformes.core.blocks.heros import HeroBackgroundImageBlock, HeroImageAndTextBlock
+from sites_conformes.core.constants import EXAMPLE_IMAGE_BANNER_TITLE, EXAMPLE_IMAGE_ERROR_PATH, EXAMPLE_IMAGE_MAN_PATH
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage
@@ -449,7 +450,7 @@ class TileBlockTestCase(WagtailPageTestCase):
         self.assertNotContains(response, "fr-tile__header")
 
     def test_tile_with_image_has_div(self):
-        image_file = "sites_conformes/static/artwork/technical-error.svg"
+        image_file = EXAMPLE_IMAGE_ERROR_PATH
         image = import_image(image_file, "Sample image")
 
         body = [
@@ -474,7 +475,7 @@ class TileBlockTestCase(WagtailPageTestCase):
 
     @override_settings(SF_SCHEME_DEPENDENT_SVGS=True)
     def test_tile_manages_svg_image_if_setting_allows(self):
-        image_file = "sites_conformes/static/artwork/technical-error.svg"
+        image_file = EXAMPLE_IMAGE_ERROR_PATH
         image = import_image(image_file, "Sample image")
 
         body = [
@@ -743,12 +744,12 @@ class HeroBackgroundImageBlockTestCase(WagtailPageTestCase):
         home = Page.objects.get(slug="home")
         self.admin = User.objects.create_superuser("hero-bg-test", "test@test.test", "pass")
 
-        image_file = "sites_conformes/static/artwork/technical-error.svg"
+        image_file = EXAMPLE_IMAGE_ERROR_PATH
         self.image = import_image(image_file, "Hero background image")
         # The hero block's inner image uses ImageBlockWithDefault with this title;
         # its presence is what triggers the bug when an empty image dict is loaded
         # back from the StreamField JSON.
-        self.default_image = import_image(image_file, "Banner Sites Faciles Dimitri Iakymuk Unsplash")
+        self.default_image = import_image(image_file, EXAMPLE_IMAGE_BANNER_TITLE)
 
         hero_with_image = [
             (
@@ -853,7 +854,7 @@ class HeroBackgroundImageBlockTestCase(WagtailPageTestCase):
 class CenteredImageBlockTestCase(TestCase):
     def setUp(self):
         self.block = CenteredImageBlock()
-        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "Centered image")
+        self.image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "Centered image")
 
     def get_value(self, **kwargs):
         return self.block.to_python(
@@ -887,9 +888,7 @@ class CenteredImageBlockTestCase(TestCase):
 class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
     def setUp(self):
         self.block = HeroImageAndTextBlock()
-        self.image = import_image(
-            "sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png", "Hero image"
-        )
+        self.image = import_image(EXAMPLE_IMAGE_MAN_PATH, "Hero image")
 
     def get_value(self, **kwargs):
         return self.block.to_python(
@@ -911,9 +910,9 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
 
         self.assertEqual(value.image_rendition().filter_spec, "fill-1200x1200")
         img = self.render_image(value)
-        self.assertEqual(img["class"], ["fr-responsive-img", "fr-responsive-img--1x1"])
-        self.assertEqual(img["alt"], "Hero alt")
-        self.assertEqual(img.parent["class"], ["cmsfr-hero-media"])
+        self.assertEqual(img["class"], ["fr-responsive-img", "fr-responsive-img--1x1"])  # type: ignore
+        self.assertEqual(img["alt"], "Hero alt")  # type: ignore
+        self.assertEqual(img.parent["class"], ["cmsfr-hero-media"])  # type: ignore
 
     def test_ratio_formats_crop_around_the_focal_point(self):
         expected_specs = {
@@ -932,14 +931,14 @@ class HeroImageAndTextBlockTestCase(WagtailPageTestCase):
 
         self.assertEqual(value.image_rendition().filter_spec, "max-1200x1200")
         img = self.render_image(value)
-        self.assertEqual(img["class"], ["cmsfr-hero-img"])
-        self.assertEqual(img.parent["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])
+        self.assertEqual(img["class"], ["cmsfr-hero-img"])  # type: ignore
+        self.assertEqual(img.parent["class"], ["cmsfr-hero-media", "cmsfr-hero-media--sm"])  # type: ignore
 
 
 class HeroBackgroundImageFormatTestCase(TestCase):
     def setUp(self):
         self.block = HeroBackgroundImageBlock()
-        self.image = import_image("sites_conformes/static/artwork/technical-error.svg", "Hero background")
+        self.image = import_image(EXAMPLE_IMAGE_ERROR_PATH, "Hero background")
 
     def render_hero(self, background_color_or_image):
         value = self.block.to_python(
@@ -958,10 +957,10 @@ class HeroBackgroundImageFormatTestCase(TestCase):
 
     def test_image_banner_uses_the_chosen_ratio(self):
         hero = self.render_hero("image")
-        self.assertIn("fr-ratio-16x9", hero["class"])
-        self.assertNotIn("min-height: 650px", hero["style"])
+        self.assertIn("fr-ratio-16x9", hero["class"])  # type: ignore
+        self.assertNotIn("min-height: 650px", hero["style"])  # type: ignore
 
     def test_color_banner_ignores_the_image_format(self):
         hero = self.render_hero("color")
-        self.assertNotIn("fr-ratio-16x9", hero["class"])
-        self.assertIn("min-height: 650px", hero["style"])
+        self.assertNotIn("fr-ratio-16x9", hero["class"])  # type: ignore
+        self.assertIn("min-height: 650px", hero["style"])  # type: ignore

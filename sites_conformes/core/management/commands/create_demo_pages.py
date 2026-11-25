@@ -9,6 +9,18 @@ from wagtail.images import get_image_model
 from wagtail.rich_text import RichText
 
 from sites_conformes.blog.models import BlogIndexPage
+from sites_conformes.core.constants import (
+    EXAMPLE_IMAGE_BANNER_PATH,
+    EXAMPLE_IMAGE_BANNER_TITLE,
+    EXAMPLE_IMAGE_ERROR_PATH,
+    EXAMPLE_IMAGE_ERROR_TITLE,
+    EXAMPLE_IMAGE_MAN_PATH,
+    EXAMPLE_IMAGE_MAN_TITLE,
+    EXAMPLE_IMAGE_PLACEHOLDER_PATH,
+    EXAMPLE_IMAGE_PLACEHOLDER_TITLE,
+    EXAMPLE_IMAGE_WOMAN_PATH,
+    EXAMPLE_IMAGE_WOMAN_TITLE,
+)
 from sites_conformes.core.services.accessors import (
     get_or_create_catalog_index_page,
     get_or_create_content_page,
@@ -180,7 +192,7 @@ class Command(BaseCommand):
         main_menu.items.insert(-1, ("megamenu", mega_menu_values))
         main_menu.save()
 
-    def create_form_page(self, slug: str, parent_page: ContentPage) -> None:
+    def create_form_page(self, slug: str, parent_page: ContentPage) -> None:  # type: ignore
         """
         Creates a form page with all the different forms
         """
@@ -319,7 +331,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"Page {slug} created with id {form_page.id}"))
 
-    def create_common_blocks_page(self, parent_page: ContentPage) -> None:
+    def create_common_blocks_page(self, parent_page: ContentPage) -> None:  # type: ignore
         """
         Creates a page showcasing all blocks in STREAMFIELD_COMMON_BLOCKS.
         """
@@ -332,24 +344,24 @@ class Command(BaseCommand):
 
         # Load images
         img_banner = self.get_or_import_image(
-            "sites_conformes/static/illustration/Banner-Sites-Faciles-Dimitri-Iakymuk-unsplash.jpg",
-            "Banner Sites Faciles Dimitri Iakymuk Unsplash",
+            EXAMPLE_IMAGE_BANNER_PATH,
+            EXAMPLE_IMAGE_BANNER_TITLE,
         )
         img_femme = self.get_or_import_image(
-            "sites_conformes/static/illustration/illustration-sites-faciles-femme-ordinateur.png",
-            "Illustration Sites Faciles Femme Ordinateur",
+            EXAMPLE_IMAGE_WOMAN_PATH,
+            EXAMPLE_IMAGE_WOMAN_TITLE,
         )
         img_homme = self.get_or_import_image(
-            "sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png",
-            "Illustration Sites Faciles Homme Nuages",
+            EXAMPLE_IMAGE_MAN_PATH,
+            EXAMPLE_IMAGE_MAN_TITLE,
         )
         img_placeholder = self.get_or_import_image(
-            "sites_conformes/static/illustration/Placeholder-Sites-Faciles.png",
-            "Placeholder Sites Faciles",
+            EXAMPLE_IMAGE_PLACEHOLDER_PATH,
+            EXAMPLE_IMAGE_PLACEHOLDER_TITLE,
         )
         img_error = self.get_or_import_image(
-            "sites_conformes/static/artwork/technical-error.svg",
-            "Technical Error",
+            EXAMPLE_IMAGE_ERROR_PATH,
+            EXAMPLE_IMAGE_ERROR_TITLE,
         )
 
         body = []
@@ -1105,7 +1117,7 @@ class Command(BaseCommand):
         page = get_or_create_content_page(slug, title="Tous les blocs", body=body, parent_page=parent_page)
         self.stdout.write(self.style.SUCCESS(f"Page {slug} created with id {page.id}"))
 
-    def create_hero_blocks_page(self, home_page, parent_page: ContentPage) -> None:
+    def create_hero_blocks_page(self, home_page, parent_page: ContentPage) -> None:  # type: ignore
         """
         Creates a parent hero_blocks page plus sub-pages for each hero type.
         """
@@ -1113,12 +1125,12 @@ class Command(BaseCommand):
 
         # Load images
         img_banner = self.get_or_import_image(
-            "sites_conformes/static/illustration/Banner-Sites-Faciles-Dimitri-Iakymuk-unsplash.jpg",
-            "Banner Sites Faciles Dimitri Iakymuk Unsplash",
+            EXAMPLE_IMAGE_BANNER_PATH,
+            EXAMPLE_IMAGE_BANNER_TITLE,
         )
         img_homme = self.get_or_import_image(
-            "sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png",
-            "Illustration Sites Faciles Homme Nuages",
+            EXAMPLE_IMAGE_MAN_PATH,
+            EXAMPLE_IMAGE_MAN_TITLE,
         )
 
         # Create the parent hero_blocks index page

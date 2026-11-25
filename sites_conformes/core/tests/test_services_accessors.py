@@ -1,6 +1,7 @@
 from wagtail.models import Collection, PageViewRestriction
 from wagtail.test.utils import WagtailPageTestCase
 
+from sites_conformes.core.constants import EXAMPLE_IMAGE_ERROR_PATH
 from sites_conformes.core.services.accessors import (
     get_or_create_collection,
     get_or_create_content_page,
@@ -83,7 +84,7 @@ class ContentPageAccessorTestCase(WagtailPageTestCase):
         assert PageViewRestriction.objects.filter(page_id=private.pk).first().restriction_type == "login"
 
     def test_get_or_create_content_page_with_header_fields(self):
-        image_file = "sites_conformes/static/artwork/technical-error.svg"
+        image_file = EXAMPLE_IMAGE_ERROR_PATH
         image = import_image(image_file, "Sample image")
 
         header_fields = {

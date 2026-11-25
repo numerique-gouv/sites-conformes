@@ -17,7 +17,7 @@ from sites_conformes.forms.autocomplete import (
     AUTOCOMPLETE_TOKENS,
     get_autocomplete_choices_for,
 )
-from sites_conformes.forms.models import FormField, FormPage, SitesFacilesFormBuilder
+from sites_conformes.forms.models import FormField, FormPage, SitesConformesFormBuilder
 
 
 class FormsTestCase(WagtailPageTestCase):
@@ -264,9 +264,9 @@ class FormsTestCase(WagtailPageTestCase):
         self.assertInHTML("""<h1>1 résultat pour la recherche «\xa0contact\xa0»</h1>""", response.content.decode())
 
 
-class SitesFacilesCustomFormDsfrRenderingTestCase(SimpleTestCase):
+class SitesConformesCustomFormDsfrRenderingTestCase(SimpleTestCase):
     """
-    Regression test: SitesFacilesCustomForm (used by SitesFacilesFormBuilder for every public
+    Regression test: SitesConformesCustomForm (used by SitesConformesFormBuilder for every public
     FormPage) must keep dispatching to DSFR's per-widget snippet templates. It only sets the
     "fr-input"/"fr-select" classes itself (via dsfr_input_class_attr); checkboxes and radio
     buttons get no styling at all unless bound_field_class is DsfrBoundField, since their
@@ -274,7 +274,7 @@ class SitesFacilesCustomFormDsfrRenderingTestCase(SimpleTestCase):
     """
 
     def build_form(self, **fields):
-        builder = SitesFacilesFormBuilder(list(fields.values()))
+        builder = SitesConformesFormBuilder(list(fields.values()))
         return builder.get_form_class()()
 
     def test_checkbox_field_has_dsfr_markup(self):
@@ -301,7 +301,7 @@ class SitesFacilesCustomFormDsfrRenderingTestCase(SimpleTestCase):
 
 class FormFieldAutocompleteTestCase(SimpleTestCase):
     def build_form(self, *fields):
-        return SitesFacilesFormBuilder(list(fields)).get_form_class()()
+        return SitesConformesFormBuilder(list(fields)).get_form_class()()
 
     def test_autocomplete_attribute_is_rendered(self):
         field = FormField(field_type="singleline", label="Prénom", autocomplete="given-name")

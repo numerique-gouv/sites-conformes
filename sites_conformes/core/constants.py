@@ -255,3 +255,20 @@ TEMPLATE_EXAMPLE_TAG_BADGE_LIST = [
     ),
 ]
 IMAGE_GRID_SIZE = [("80", _("Small (80px)")), ("140", _("Medium (140px)")), ("200", _("Large (200px)"))]
+
+# Image example for templates
+EXAMPLE_IMAGE_BANNER_TITLE = "Banner Sites Faciles Dimitri Iakymuk Unsplash"
+EXAMPLE_IMAGE_BANNER_PATH = "sites_conformes/static/illustration/Banner-Sites-Faciles-Dimitri-Iakymuk-unsplash.jpg"
+
+EXAMPLE_IMAGE_WOMAN_TITLE = "Illustration Sites Faciles Femme Ordinateur"
+EXAMPLE_IMAGE_WOMAN_PATH = "sites_conformes/static/illustration/illustration-sites-faciles-femme-ordinateur.png"
+
+EXAMPLE_IMAGE_MAN_TITLE = "Illustration Sites Faciles Homme Nuages"
+EXAMPLE_IMAGE_MAN_PATH = "sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png"
+
+
+EXAMPLE_IMAGE_PLACEHOLDER_TITLE = "Placeholder Sites Faciles"
+EXAMPLE_IMAGE_PLACEHOLDER_PATH = "sites_conformes/static/illustration/Placeholder-Sites-Faciles.png"
+
+EXAMPLE_IMAGE_ERROR_TITLE = "Technical Error"
+EXAMPLE_IMAGE_ERROR_PATH = "sites_conformes/static/artwork/technical-error.svg"

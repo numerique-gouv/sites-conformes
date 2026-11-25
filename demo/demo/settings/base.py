@@ -194,7 +194,7 @@ WAGTAILDOCS_EXTENSIONS = [
     "zip",
 ]
 # =====================
-# SITES FACILES CONFIG
+# SITES CONFORMES CONFIG
 # ======================
 #
 TEMPLATES[0]["OPTIONS"]["context_processors"].extend(

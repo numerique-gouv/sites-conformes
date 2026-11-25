@@ -4,7 +4,7 @@ from django.test import SimpleTestCase, override_settings
 from django.utils.translation import gettext
 from wagtail.blocks import BoundBlock, CharBlock, ListBlock
 
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import SitesConformesBasePage
 from sites_conformes.core.blocks.related_entries import BlogRecentEntriesBlock
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.search_description import (
@@ -359,7 +359,7 @@ class SearchDescriptionTestCase(SimpleTestCase):
         page.hero = None
         page.body = _body([{"type": "paragraph", "value": "<p>Hello from the body.</p>"}])
 
-        SitesFacilesBasePage._fill_search_description(page)
+        SitesConformesBasePage._fill_search_description(page)
 
         self.assertEqual(page.search_description, "Hello from the body.")
 
@@ -369,6 +369,6 @@ class SearchDescriptionTestCase(SimpleTestCase):
         page.hero = None
         page.body = _body([{"type": "paragraph", "value": "<p>Hello from the body.</p>"}])
 
-        SitesFacilesBasePage._fill_search_description(page)
+        SitesConformesBasePage._fill_search_description(page)
 
         self.assertEqual(page.search_description, "Custom description")

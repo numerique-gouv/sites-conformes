@@ -1,3 +1,5 @@
+import warnings
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from dsfr.constants import COLOR_CHOICES
@@ -14,7 +16,7 @@ from sites_conformes.core.blocks.core import HERO_STREAMFIELD_BLOCKS, STREAMFIEL
 from sites_conformes.core.search_description import SEARCH_DESCRIPTION_MAX_CHARS, get_search_description
 
 
-class SitesFacilesBasePage(Page):
+class SitesConformesBasePage(Page):
     """
     This class defines a base page model that will be used
     by all pages in the site.
@@ -220,3 +222,15 @@ class SitesFacilesBasePage(Page):
         abstract = True
         verbose_name = _("Base page")
         verbose_name_plural = _("Base pages")
+
+
+def __getattr__(name):
+    # Deprecated alias kept for backward compatibility with projects using the old name.
+    if name == "SitesFacilesBasePage":
+        warnings.warn(
+            "SitesFacilesBasePage is deprecated, use SitesConformesBasePage instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return SitesConformesBasePage
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
