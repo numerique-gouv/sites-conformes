@@ -28,7 +28,7 @@ from wagtail.snippets.models import register_snippet
 
 from sites_conformes.blog.blocks import COLOPHON_BLOCKS
 from sites_conformes.blog.managers import CategoryManager
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import SitesConformesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
 from sites_conformes.core.models import Tag
 
@@ -195,7 +195,7 @@ class TagEntryPage(TaggedItemBase):
     content_object = ParentalKey("BlogEntryPage", related_name="entry_tags")  # type: ignore
 
 
-class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class BlogIndexPage(RoutablePageMixin, SitesConformesBasePage):
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
@@ -216,7 +216,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         _("Filter by source"), help_text=_("The source is the organization of the post author"), default=False
     )
 
-    settings_panels = SitesFacilesBasePage.settings_panels + [
+    settings_panels = SitesConformesBasePage.settings_panels + [
         FieldPanel("posts_per_page"),
         FieldPanel("feed_posts_limit"),
         MultiFieldPanel(
@@ -506,7 +506,7 @@ class BlogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         )
 
 
-class BlogEntryPage(SitesFacilesBasePage):
+class BlogEntryPage(SitesConformesBasePage):
     tags = ClusterTaggableManager(through="TagEntryPage", blank=True)
     blog_categories = ParentalManyToManyField(
         "Category",
@@ -519,14 +519,14 @@ class BlogEntryPage(SitesFacilesBasePage):
         "sites_conformes_blog.Person", blank=True, help_text=_("Author entries can be created in Snippets > Persons")
     )
 
-    search_fields = SitesFacilesBasePage.search_fields + [
+    search_fields = SitesConformesBasePage.search_fields + [
         index.FilterField("date"),
     ]
 
     parent_page_types = ["sites_conformes_blog.BlogIndexPage"]
     subpage_types = []
 
-    settings_panels = SitesFacilesBasePage.settings_panels + [
+    settings_panels = SitesConformesBasePage.settings_panels + [
         FieldPanel("authors"),
         FieldPanel("date"),
         MultiFieldPanel(
@@ -551,7 +551,7 @@ class BlogEntryPage(SitesFacilesBasePage):
         ),
     ]
 
-    api_fields = SitesFacilesBasePage.api_fields + [
+    api_fields = SitesConformesBasePage.api_fields + [
         APIField("tags"),
         APIField("blog_categories", serializer=CategorySerializer(many=True)),
         APIField("authors", serializer=PersonSerializer(many=True)),

@@ -17,12 +17,12 @@ from wagtail.models.i18n import Locale
 from wagtail.search import index
 
 from sites_conformes.blog.models import Category, CategorySerializer, Organization, Person, PersonSerializer
-from sites_conformes.core.abstract import SitesFacilesBasePage
+from sites_conformes.core.abstract import SitesConformesBasePage
 from sites_conformes.core.models import CmsDsfrConfig, Tag
 from sites_conformes.events.forms import EventSearchForm
 
 
-class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
+class EventsIndexPage(RoutablePageMixin, SitesConformesBasePage):
     posts_per_page = models.PositiveSmallIntegerField(
         default=10,
         validators=[MaxValueValidator(100), MinValueValidator(1)],
@@ -37,7 +37,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         _("Filter by source"), help_text=_("The source is the organization of the event author"), default=False
     )
 
-    settings_panels = SitesFacilesBasePage.settings_panels + [
+    settings_panels = SitesConformesBasePage.settings_panels + [
         FieldPanel("posts_per_page"),
         MultiFieldPanel(
             [
@@ -269,7 +269,7 @@ class EventsIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         )
 
 
-class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
+class EventEntryPage(RoutablePageMixin, SitesConformesBasePage):
     tags = ClusterTaggableManager(through="TagEventEntryPage", blank=True)
 
     event_categories = ParentalManyToManyField(
@@ -299,7 +299,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
     parent_page_types = ["sites_conformes_events.EventsIndexPage"]
     subpage_types = []
 
-    search_fields = SitesFacilesBasePage.search_fields + [
+    search_fields = SitesConformesBasePage.search_fields + [
         index.SearchField("event_categories"),
         index.SearchField("event_date_start"),
         index.SearchField("event_date_end"),
@@ -307,7 +307,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
         index.SearchField("registration_url"),
     ]
 
-    settings_panels = SitesFacilesBasePage.settings_panels + [
+    settings_panels = SitesConformesBasePage.settings_panels + [
         FieldPanel("authors"),
         FieldPanel("date"),
         MultiFieldPanel(
@@ -346,7 +346,7 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
         ),
     ]
 
-    api_fields = SitesFacilesBasePage.api_fields + [
+    api_fields = SitesConformesBasePage.api_fields + [
         APIField("tags"),
         APIField("event_categories", serializer=CategorySerializer(many=True)),
         APIField("authors", serializer=PersonSerializer(many=True)),
@@ -414,12 +414,12 @@ class EventEntryPage(RoutablePageMixin, SitesFacilesBasePage):
 
 
 class TagEventEntryPage(TaggedItemBase):
-    content_object = ParentalKey("EventEntryPage", related_name="event_entry_tags")
+    content_object = ParentalKey("EventEntryPage", related_name="event_entry_tags")  # type: ignore
 
 
 class CategoryEventEntryPage(models.Model):
     category = models.ForeignKey(Category, related_name="+", verbose_name=_("Category"), on_delete=models.CASCADE)
-    page = ParentalKey("EventEntryPage", related_name="event_entry_categories")
+    page = ParentalKey("EventEntryPage", related_name="event_entry_categories")  # type: ignore
     panels = [FieldPanel("category")]
 
     def __str__(self):
