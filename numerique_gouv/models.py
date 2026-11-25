@@ -657,6 +657,11 @@ class HubPages(NumeriqueBasePage):
         elif self.content_source == "target_audience":
             return self.target_audience.name.lower()
 
+    def get_content_source_slug(self) -> str:
+        # Slug of the selected source, used as a filter value on the index pages
+        source = getattr(self, self.content_source, None) if self.content_source else None
+        return source.slug if source else ""
+
 
 class NumeriqueEventsIndexPage(EventsIndexPage):
     subpage_types = ["numerique_gouv.NumeriqueEventPage"]
@@ -823,7 +828,7 @@ class NumeriqueCatalogIndexPage(CatalogIndexPage):
     # N'utilise pas les tags pour la version de numérique
     @property
     def show_filters(self) -> bool | models.BooleanField:
-        return self.filter_by_tag and "false"
+        return False
 
     class Meta:
         verbose_name = _("Numerique catalog index page")

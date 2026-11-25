@@ -63,8 +63,8 @@ class ThreeCardsBlock(blocks.StructBlock):
 
 
 class HighlightCards(blocks.StructBlock):
-    main_card = HorizontalCardBlock(lrequired=True, abel=_("Main card"), group=_("DSFR components"))
-    secondary_card = VerticalCardBlock(lrequired=True, abel=_("Secondary card"), group=_("DSFR components"))
+    main_card = HorizontalCardBlock(required=True, label=_("Main card"), group=_("DSFR components"))
+    secondary_card = VerticalCardBlock(required=True, label=_("Secondary card"), group=_("DSFR components"))
     tertiary_card = VerticalCardBlock(required=True, label=_("Tertiary card"), group=_("DSFR components"))
 
     class Meta:
@@ -74,8 +74,8 @@ class HighlightCards(blocks.StructBlock):
 
 
 class VerticalHighlightCards(blocks.StructBlock):
-    main_card = VerticalCardBlock(lrequired=True, abel=_("Main card"), group=_("DSFR components"))
-    secondary_card = VerticalCardBlock(lrequired=True, abel=_("Secondary card"), group=_("DSFR components"))
+    main_card = VerticalCardBlock(required=True, label=_("Main card"), group=_("DSFR components"))
+    secondary_card = VerticalCardBlock(required=True, label=_("Secondary card"), group=_("DSFR components"))
     tertiary_card = VerticalCardBlock(required=True, label=_("Tertiary card"), group=_("DSFR components"))
 
     class Meta:
@@ -228,7 +228,7 @@ class CustomRecentEntriesStructValue(RecentEntriesStructValue):
 
         page_tag_filter = self.get("page_tag_filter")
         if page_tag_filter:
-            filters["tag"] = page_tag_filter
+            filters["tag"] = page_tag_filter.slug
 
         return filters
 
