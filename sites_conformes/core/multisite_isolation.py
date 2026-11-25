@@ -7,6 +7,8 @@ enabled, so that each caller decides what to do when it is not
 
 ``SiteScopedViewSetMixin`` applies the scope to the admin views of a model with a
 ``site`` field, and only does so when the isolation is enabled.
+``SuperuserOnlyViewSetMixin`` reserves the admin views of a model shared by every site
+to the superusers, also only when the isolation is enabled.
 """
 
 from dataclasses import dataclass
@@ -23,12 +25,15 @@ from django.db import DatabaseError
 from django.db.models import Model, Q, QuerySet
 from django.http import Http404
 from wagtail.models import GroupPagePermission, Page, Site
+from wagtail.permission_policies.base import ModelPermissionPolicy
 
 SITES_FOR_USER_CACHE_ATTR = "_sf_multisite_sites"
 MIDDLEWARE_PATH = "sites_conformes.core.middleware.MultisiteIsolationMiddleware"
 
 # Models whose admin views use SiteScopedViewSetMixin, with the viewset that registered them
 SITE_SCOPED_VIEWSETS = {}
+# Same for SuperuserOnlyViewSetMixin
+SUPERUSER_ONLY_VIEWSETS = {}
 
 
 def is_multisite_isolation_active() -> bool:
@@ -499,6 +504,67 @@ class SiteScopedViewSetMixin:
                 ),
             )
         return viewset
+
+
+class SuperuserOnlyPermissionPolicy(ModelPermissionPolicy):
+    """
+    Model permissions, that only superusers have when the isolation is enabled, whatever
+    the permissions of the groups (see ``SuperuserOnlyViewSetMixin``).
+    """
+
+    def user_has_permission(self, user, action):
+        if is_multisite_isolation_active() and not user.is_superuser:
+            return False
+        return super().user_has_permission(user, action)
+
+    def users_with_any_permission(self, actions):
+        users = super().users_with_any_permission(actions)
+        if is_multisite_isolation_active():
+            users = users.filter(is_superuser=True)
+        return users
+
+
+class SuperuserOnlyViewSetMixin:
+    """
+    Reserves the admin views of a ``SnippetViewSet`` to the superusers, for a model shared
+    by every site, such as the tags.
+
+    With the isolation disabled, it changes nothing. Otherwise, for the other users, the
+    model disappears from the menu and the listing of the snippets, whatever the
+    permissions of their groups, and all its views, the chooser and the bulk actions
+    included, return a 403 (see ``is_superuser_only_view``).
+    """
+
+    def on_register(self):
+        """
+        Records the model as reserved to the superusers, for the middleware.
+        """
+        super().on_register()
+        SUPERUSER_ONLY_VIEWSETS[self.model] = self
+
+    @property
+    def permission_policy(self):
+        return SuperuserOnlyPermissionPolicy(self.model)
+
+
+def is_superuser_only_view(resolver_match, view_kwargs) -> bool:
+    """
+    Whether the resolved admin view belongs to a viewset using ``SuperuserOnlyViewSetMixin``,
+    or is a bulk action on its model.
+
+    Checked by ``MultisiteIsolationMiddleware``: the views of the viewset itself would
+    redirect to the dashboard, as Wagtail does with any permission refusal, and the
+    chooser views do not check the permissions on the model.
+    """
+    for model, viewset in SUPERUSER_ONLY_VIEWSETS.items():
+        if resolver_match.namespace in (viewset.url_namespace, viewset.get_chooser_admin_url_namespace()):
+            return True
+        if resolver_match.view_name == "wagtail_bulk_action" and (
+            view_kwargs.get("app_label"),
+            view_kwargs.get("model_name"),
+        ) == (model._meta.app_label, model._meta.model_name):
+            return True
+    return False
 
 
 def check_multisite_isolation_setting(app_configs=None, databases=None, **kwargs) -> list:

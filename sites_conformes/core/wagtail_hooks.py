@@ -3,7 +3,8 @@ Wagtail hooks of the core app:
 
 - text alignment features for the Draftail editor, using BlockFeature with custom CSS
   that preserves content styling;
-- multisite isolation of the page chooser.
+- multisite isolation of the page chooser;
+- tags, shared by every site.
 """
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
@@ -13,8 +14,12 @@ from wagtail import hooks
 from wagtail.admin.rich_text.converters.html_to_contentstate import (
     BlockElementHandler,
 )
+from wagtail.snippets.models import register_snippet
+from wagtail.snippets.views.snippets import SnippetViewSet
 
+from sites_conformes.core.models import Tag
 from sites_conformes.core.multisite_isolation import (
+    SuperuserOnlyViewSetMixin,
     get_pages_in_scope_filter,
     get_sites_for_user,
     is_multisite_isolation_active,
@@ -154,3 +159,11 @@ def editor_js():
         '<script src="{}"></script>',
         static("content_manager/js/text-alignment.js"),
     )
+
+
+class TagViewSet(SuperuserOnlyViewSetMixin, SnippetViewSet):
+    # The tags are shared by every site
+    model = Tag
+
+
+register_snippet(TagViewSet)

@@ -1,10 +1,11 @@
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet, SnippetViewSetGroup
 
+from sites_conformes.core.multisite_isolation import SuperuserOnlyViewSetMixin
 from sites_conformes.proconnect.models import WhitelistedEmailDomain
 
 
-class WhitelistedEmailDomainViewSet(SnippetViewSet):
+class WhitelistedEmailDomainViewSet(SuperuserOnlyViewSetMixin, SnippetViewSet):
     model = WhitelistedEmailDomain
     icon = "mail"  # type: ignore
     admin_url_namespace = "member_views"

@@ -2,6 +2,7 @@ import logging
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -14,6 +15,7 @@ from sites_conformes.core.multisite_isolation import (
     get_sites_for_user,
     is_multisite_isolation_active,
     is_page_in_scope,
+    is_superuser_only_view,
 )
 
 logger = logging.getLogger(__name__)
@@ -181,7 +183,8 @@ class MultisiteIsolationMiddleware:
       another site, already set), opens at the root of the tree instead, filtered by the
       ``construct_page_chooser_queryset`` hook;
     - the bulk actions and the wagtail-localize views of a model using
-      ``SiteScopedViewSetMixin`` return a 404 for an object outside of the scope.
+      ``SiteScopedViewSetMixin`` return a 404 for an object outside of the scope;
+    - the views of a model using ``SuperuserOnlyViewSetMixin`` return a 403.
 
     Must be placed after the authentication middleware.
     """
@@ -213,11 +216,16 @@ class MultisiteIsolationMiddleware:
         """
         Runs the check of the view, if any, for a restricted user.
         """
-        handler = self.handlers.get(request.resolver_match.view_name)
-        if handler is None or not is_multisite_isolation_active():
+        if not is_multisite_isolation_active():
             return None
         user = getattr(request, "user", None)
         if user is None or not user.is_authenticated or user.is_superuser:
+            return None
+        if is_superuser_only_view(request.resolver_match, view_kwargs):
+            # Raised outside of the view: a 403, not the redirection of the Wagtail admin
+            raise PermissionDenied
+        handler = self.handlers.get(request.resolver_match.view_name)
+        if handler is None:
             return None
         return handler(request, **view_kwargs)
 
