@@ -185,9 +185,9 @@ class MultisiteIsolationMiddleware:
       ``construct_page_chooser_queryset`` hook;
     - the bulk actions and the wagtail-localize views of a model using
       ``SiteScopedViewSetMixin`` return a 404 for an object outside of the scope;
-    - the views of a model using ``SuperuserOnlyViewSetMixin`` redirect to the dashboard
-      with the "permission denied" message of the Wagtail admin, or return a 403 for an
-      XHR request.
+    - the views of a model using ``SuperuserOnlyViewSetMixin``, except its chooser, redirect
+      to the dashboard with the "permission denied" message of the Wagtail admin, or return
+      a 403 for an XHR request.
 
     Must be placed after the authentication middleware.
     """
@@ -225,8 +225,7 @@ class MultisiteIsolationMiddleware:
         if user is None or not user.is_authenticated or user.is_superuser:
             return None
         if is_superuser_only_view(request.resolver_match, view_kwargs):
-            # The chooser does not check the permissions on the model: the response of the
-            # Wagtail admin is given here, in the language of the user
+            # The response of the Wagtail admin, in the language of the user
             return get_localized_response(permission_denied, request)
         handler = self.handlers.get(request.resolver_match.view_name)
         if handler is None:

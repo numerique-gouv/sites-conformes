@@ -111,6 +111,10 @@ autorisations pour accéder à cette zone. », comme sur toute page de
 l’administration qui leur est interdite. Ce blocage passe aussi par le
 middleware `MultisiteIsolationMiddleware`.
 
+Ils peuvent toujours choisir un mot-clé : dans le champ « Mots-clés » d’une
+page, ou dans le filtre par mot-clé des blocs d’articles et d’événements
+récents.
+
 Sans cloisonnement, les droits des groupes s’appliquent comme avant.
 
 ### Mots-clés communs à tous les sites

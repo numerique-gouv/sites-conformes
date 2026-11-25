@@ -45,15 +45,11 @@ class SharedSnippetsTestsMixin:
             "tag creation": reverse("wagtailsnippets_sites_conformes_core_tag:add"),
             "tag edition": reverse("wagtailsnippets_sites_conformes_core_tag:edit", args=[self.tag.pk]),
             "tag deletion": reverse("wagtailsnippets_sites_conformes_core_tag:delete", args=[self.tag.pk]),
-            "tag chooser": reverse("wagtailsnippetchoosers_sites_conformes_core_tag:choose"),
             "tag bulk deletion": reverse("wagtail_bulk_action", args=["sites_conformes_core", "tag", "delete"])
             + f"?id={self.tag.pk}",
             "domains list": reverse("member_views:list"),
             "domain creation": reverse("member_views:add"),
             "domain edition": reverse("member_views:edit", args=[self.domain.pk]),
-            "domain chooser": reverse(
-                "wagtailsnippetchoosers_sites_conformes_proconnect_whitelistedemaildomain:choose"
-            ),
         }
 
     def assertAccessDenied(self, url: str):
@@ -125,6 +121,18 @@ class SharedSnippetsTestsMixin:
         self.assertEqual(self.tag.name, "Lampadaires et réverbères")
         self.assertEqual(self.domain.domain, "planetes.gouv.fr")
 
+    def test_editor_opens_the_tag_chooser_of_a_block(self):
+        self.client.force_login(self.users["editeur-a"])
+
+        # As the chooser of the "Filter by tag" field of the recent entries blocks
+        response = self.client.get(
+            reverse("wagtailsnippetchoosers_sites_conformes_core_tag:choose"),
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Lampadaires")
+
     def test_editor_gets_tag_suggestions(self):
         self.client.force_login(self.users["editeur-a"])
 
@@ -173,11 +181,11 @@ class MultisiteSharedSnippetsTestCase(SharedSnippetsTestsMixin, MultisiteTestCas
         self.assertNotIn("proconnect", self.get_menu_item_names(editor))
         self.assertNotIn("tag", self.get_snippet_model_names(editor))
 
-    def test_editor_gets_a_403_on_the_tag_chooser_in_a_modal(self):
+    def test_editor_gets_a_403_on_a_tag_list_request_in_xhr(self):
         self.client.force_login(self.users["editeur-a"])
 
         response = self.client.get(
-            reverse("wagtailsnippetchoosers_sites_conformes_core_tag:choose"),
+            reverse("wagtailsnippets_sites_conformes_core_tag:list_results"),
             headers={"x-requested-with": "XMLHttpRequest"},
         )
 

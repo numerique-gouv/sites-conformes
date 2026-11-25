@@ -531,8 +531,10 @@ class SuperuserOnlyViewSetMixin:
 
     With the isolation disabled, it changes nothing. Otherwise, for the other users, the
     model disappears from the menu and the listing of the snippets, whatever the
-    permissions of their groups, and all its views, the chooser and the bulk actions
-    included, deny the access as the Wagtail admin does (see ``is_superuser_only_view``).
+    permissions of their groups, and its views, the bulk actions included, deny the
+    access as the Wagtail admin does (see ``is_superuser_only_view``). The chooser stays
+    open: choosing an object, for instance a tag in the filter of a block, is not
+    managing it.
     """
 
     def on_register(self):
@@ -550,14 +552,12 @@ class SuperuserOnlyViewSetMixin:
 def is_superuser_only_view(resolver_match, view_kwargs) -> bool:
     """
     Whether the resolved admin view belongs to a viewset using ``SuperuserOnlyViewSetMixin``,
-    or is a bulk action on its model.
+    or is a bulk action on its model. The chooser of the viewset is not one of them.
 
-    Checked by ``MultisiteIsolationMiddleware``: the views of the viewset itself would
-    redirect to the dashboard, as Wagtail does with any permission refusal, and the
-    chooser views do not check the permissions on the model.
+    Checked by ``MultisiteIsolationMiddleware``, for all these views at once.
     """
     for model, viewset in SUPERUSER_ONLY_VIEWSETS.items():
-        if resolver_match.namespace in (viewset.url_namespace, viewset.get_chooser_admin_url_namespace()):
+        if resolver_match.namespace == viewset.url_namespace:
             return True
         if resolver_match.view_name == "wagtail_bulk_action" and (
             view_kwargs.get("app_label"),
