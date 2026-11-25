@@ -11,6 +11,8 @@ from wagtail.blocks.struct_block import StructBlockAdapter, StructBlockValidatio
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
     ALIGN_VERTICAL_CHOICES,
+    EXAMPLE_IMAGE_BANNER_TITLE,
+    EXAMPLE_IMAGE_MAN_TITLE,
     HERO_IMAGE_SIZE_CHOICES,
     IMAGE_FORMAT_CHOICES,
     MEDIA_WIDTH_CHOICES,
@@ -43,9 +45,7 @@ class HeroImageStructValue(StructValue):
 
 
 class HeroImageBlock(blocks.StructBlock):
-    image = ImageBlockWithDefault(
-        label=_("Image"), default_image_title="Banner Sites Faciles Dimitri Iakymuk Unsplash", required=False
-    )
+    image = ImageBlockWithDefault(label=_("Image"), default_image_title=EXAMPLE_IMAGE_BANNER_TITLE, required=False)
     image_positioning = blocks.ChoiceBlock(
         choices=ALIGN_VERTICAL_CHOICES + ALIGN_HORIZONTAL_CHOICES_EXTENDED,
         label=_("Image positioning"),
@@ -58,7 +58,7 @@ class HeroImageBlock(blocks.StructBlock):
 class HeroImageBlockWithRatioWidth(HeroImageBlock):
     image = ImageBlockWithDefault(
         label=_("Image"),
-        default_image_title="Banner Sites Faciles Dimitri Iakymuk Unsplash",
+        default_image_title=EXAMPLE_IMAGE_BANNER_TITLE,
         required=False,
         help_text=help_text_with_details(
             _("Recommended size: at least 1920 px wide with the “Large” width (default)."),
@@ -99,7 +99,7 @@ class HeroImageBlockWithRatioWidth(HeroImageBlock):
 class HeroImageBlockWithMask(HeroImageBlock):
     image = ImageBlockWithDefault(
         label=_("Image"),
-        default_image_title="Banner Sites Faciles Dimitri Iakymuk Unsplash",
+        default_image_title=EXAMPLE_IMAGE_BANNER_TITLE,
         required=False,
         help_text=help_text_with_details(
             _("Recommended size: at least 1920 px wide, with the important element in the center."),
@@ -185,7 +185,7 @@ class HeroImageAndTextBlock(blocks.StructBlock):
     )
     image = ImageBlockWithDefault(
         label=_("Hero image"),
-        default_image_title="Illustration Sites Faciles Homme Nuages",
+        default_image_title=EXAMPLE_IMAGE_MAN_TITLE,
         help_text=help_text_with_details(
             _("Recommended size: at least 600 px wide. Its shape depends on the “Image format” field below."),
             _(

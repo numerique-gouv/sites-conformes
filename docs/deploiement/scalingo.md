@@ -124,8 +124,8 @@ Le tableau indique exactement quoi taper dans la colonne « valeur » :
 
 | Nom du réglage (à gauche) | Valeur à taper (à droite) ou exemple | À quoi ça sert ? |
 | --- | --- | --- |
-| 🔴 `HOST_URL` | Exemple : `test-sites-faciles.osc-fr1.scalingo.io` | le nom de domaine de l’URL principale de votre site. Remplacez-le par le domaine définitif dès qu’il est branché (voir {ref}`scalingo-domaine-definitif`) |
-| 🔴 `ALLOWED_HOSTS` | Exemple : `test-sites-faciles.osc-fr1.scalingo.io,test-sites-faciles.numerique.gouv.fr` | le ou les domaines autorisés à accéder au site, séparés par des virgules s’il y en a plusieurs. On peut déjà entrer le domaine définitif si on le connaît |
+| 🔴 `HOST_URL` | Exemple : `test-sites-conformes.osc-fr1.scalingo.io` | le nom de domaine de l’URL principale de votre site. Remplacez-le par le domaine définitif dès qu’il est branché (voir {ref}`scalingo-domaine-definitif`) |
+| 🔴 `ALLOWED_HOSTS` | Exemple : `test-sites-conformes.osc-fr1.scalingo.io,test-sites-conformes.numerique.gouv.fr` | le ou les domaines autorisés à accéder au site, séparés par des virgules s’il y en a plusieurs. On peut déjà entrer le domaine définitif si on le connaît |
 | 🔴 `SECRET_KEY` | *(voir encart ci-dessous)* | clé secrète, par exemple générée dans un terminal (rapprochez-vous d’un utilisateur technique pour cette étape) |
 | 🔴 `DATABASE_URL` | *(rempli automatiquement)* | Ce paramètre a normalement été rempli automatiquement par Scalingo à l’étape 1, vérifiez que c’est bien le cas |
 
@@ -210,7 +210,7 @@ un et vous donne son nom et deux clés d’accès, que vous recopiez ici.
 
 Le paramètre `S3_LOCATION` est optionnel mais permet de partager le bucket S3
 avec plusieurs installations de Sites Conformes. Il est recommandé d’utiliser
-le nom de l’app comme valeur (ici `test-sites-faciles`).
+le nom de l’app comme valeur (ici `test-sites-conformes`).
 
 Une alternative au S3 est le stockage des médias directement en base PostgreSQL,
 voir {doc}`../donnees/stockage-medias`.
@@ -296,7 +296,7 @@ Une longue suite de 50 caractères s’affiche : copiez-la, retournez dans l’o
 connecter pour gérer le site) :
 
 ```sh
-APP_NAME=test-sites-faciles
+APP_NAME=test-sites-conformes
 scalingo -a ${APP_NAME} run python manage.py createsuperuser
 ```
 

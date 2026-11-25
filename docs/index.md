@@ -56,6 +56,6 @@ changelog
 - 📝 [Documentation éditeur Sites Conformes](https://sites.beta.gouv.fr/documentation/)
 : créer et gérer les contenus depuis le back-office
 - 📖 [Documentation Wagtail](https://docs.wagtail.org/) — le CMS sous-jacent
-- 💬 [Salon Tchap Sites Faciles](https://www.tchap.gouv.fr/#/room/#sites-faciles:agent.dinum.tchap.gouv.fr)
+- 💬 [Salon Tchap public](https://www.tchap.gouv.fr/#/room/#sites-faciles:agent.dinum.tchap.gouv.fr)
 : échanger avec l’équipe et la communauté
 - 🐛 [Signaler un bug](mailto:contact@sites.beta.gouv.fr) — écrire à `contact@sites.beta.gouv.fr`

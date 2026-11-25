@@ -105,7 +105,7 @@ stable) et non `main` (les développements en cours).
 Les méthodes de cette section déploient un site à la fois. Pour gérer une flotte
 d’instances (une « usine à sites »), plusieurs dispositifs existent :
 
-- **`sites-faciles-saas`** — un gestionnaire officiel maintenu par l’équipe, qui
+- **`sites-conformes-saas`** — un gestionnaire officiel maintenu par l’équipe, qui
   automatise la création d’instances sur des plateformes PaaS (Scalingo,
   Alwaysdata) via leurs API. C’est ce qui fait tourner l’offre mutualisée
   officielle.

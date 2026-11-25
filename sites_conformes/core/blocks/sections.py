@@ -10,6 +10,8 @@ from wagtail.images import get_image_model
 from sites_conformes.core.constants import (
     ALIGN_HORIZONTAL_CHOICES,
     ALIGN_HORIZONTAL_CHOICES_EXTENDED,
+    EXAMPLE_IMAGE_PLACEHOLDER_TITLE,
+    EXAMPLE_IMAGE_WOMAN_TITLE,
     EXTRA_LIMITED_RICHTEXTFIELD_FEATURES,
     GRID_6_8_12_CHOICES,
     GRID_HORIZONTAL_ALIGN_CHOICES,
@@ -118,7 +120,7 @@ class ImageTextCTASection(blocks.StructBlock):
     )
     image = ImageBlockWithDefault(
         label=_("Image"),
-        default_image_title="Illustration Sites Faciles Femme Ordinateur",
+        default_image_title=EXAMPLE_IMAGE_WOMAN_TITLE,
         default_image_decorative=True,
         help_text=help_text_with_details(
             _("Recommended size: at least 600 × 600 px. The image is displayed as a square."),
@@ -288,7 +290,7 @@ class SpotLightItem(blocks.StreamBlock):
     card = VerticalCardBlock()
 
     def get_default(self):
-        image_placeholder = Image.objects.filter(title="Placeholder Sites Faciles").first()
+        image_placeholder = Image.objects.filter(title=EXAMPLE_IMAGE_PLACEHOLDER_TITLE).first()
 
         default_card_data = {
             "title": "Titre de l'article",

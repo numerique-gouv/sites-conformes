@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase
 
-from sites_conformes.core.management.commands.migrate_from_sites_faciles import Command
+from sites_conformes.core.management.commands.migrate_to_packaged_version import Command
 
 
 def table_exists(table_name):
@@ -22,14 +22,14 @@ class FreshDatabaseTestCase(TestCase):
     def test_fresh_database_is_skipped(self):
         """The test database already has the sites_conformes_ tables, so nothing should be done."""
         out = StringIO()
-        call_command("migrate_from_sites_faciles", "--no-input", stdout=out)
+        call_command("migrate_to_packaged_version", "--no-input", stdout=out)
 
         self.assertIn("Fresh database", out.getvalue())
 
 
 class LegacySchemaTestCase(TestCase):
     """
-    Simulate a legacy Sites Faciles schema, with tables, migration records and content types
+    Simulate a legacy Sites Conformes schema, with tables, migration records and content types
     not yet prefixed with sites_conformes_
     """
 
@@ -54,7 +54,7 @@ class LegacySchemaTestCase(TestCase):
 
     def call_command(self, *args):
         out = StringIO()
-        call_command("migrate_from_sites_faciles", *args, stdout=out)
+        call_command("migrate_to_packaged_version", *args, stdout=out)
         return out.getvalue()
 
     def count_migrations(self, app):

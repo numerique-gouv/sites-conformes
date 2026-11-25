@@ -94,7 +94,7 @@ class ContentPage(AbstractContentPage):
 if not swapper.is_swapped("sites_conformes_core", "ContentPage"):
 
     class TagContentPage(TaggedItemBase):
-        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")
+        content_object = ParentalKey(ContentPage, related_name="contentpage_tags")  # type: ignore
 
 
 class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
