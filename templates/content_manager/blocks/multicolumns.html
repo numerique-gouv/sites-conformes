@@ -1,0 +1,42 @@
+{% load dsfr_tags wagtailcore_tags wagtailimages_tags %}
+{% comment %}
+  Copie du gabarit de Sites Faciles (content_manager) pour le bloc « Colonnes multiples ». Seule différence : la
+  largeur des colonnes sans largeur choisie (texte, carte, image…). Sites Faciles les met côte à côte dès 576 px
+  (fr-col-sm), si bien qu'entre 576 et 992 px (grands téléphones à l'horizontale, tablettes) trois ou quatre colonnes
+  tiennent sur une ligne et deviennent illisibles. Ici : une colonne sous 768 px ; jusqu'à 3 colonnes, côte à côte
+  au-delà ; à partir de 4, deux par ligne de 768 à 992 px puis toutes sur une ligne.
+{% endcomment %}
+{% image value.bg_image original as bg_img %}
+<div class="fr-py-5w {{ value.vertical_margin }} cmsfr-block-multicolumns"
+     {% if value.bg_color_class or bg_img or value.bg_color %}style="background:{% endif %}
+     {% if bg_img %}no-repeat center url({{ bg_img.url }}){% endif %}
+     {% if value.bg_color_class %} var(--background-alt-{{ value.bg_color_class }}) {% elif value.bg_color %}{{ value.bg_color }}{% endif %}
+     {% if value.bg_color_class or bg_img or value.bg_color %};"{% endif %}>
+  <div class="fr-container">
+    {% if value.title %}
+      <div class="fr-grid-row fr-grid-row--gutters">
+        <div class="fr-col-12 fr-mt-3w">
+          <{{ value.heading_tag|default:"h2" }}>{{ value.title }}</{{ value.heading_tag|default:"h2" }}>
+        </div>
+      </div>
+    {% endif %}
+    <div class="fr-grid-row fr-grid-row--gutters {{ value.grid_position }} fr-py-3w">
+      {% for subblock in value.columns %}
+        {% if subblock.block_type == "column" %}
+          <div class="fr-col-12{% if subblock.value.width %} fr-col-lg-{{ subblock.value.width }}{% endif %}">
+            {% include_block subblock.value.content %}
+          </div>
+        {% elif subblock.block_type == "text" %}
+          <div class="fr-col-12 {% if value.columns|length > 3 %}fr-col-md-6 fr-col-lg{% else %}fr-col-md{% endif %}">{{ subblock.value|richtext }}</div>
+        {% elif subblock.block_type == "video" %}
+          <div class="fr-col-12 {% if value.columns|length > 3 %}fr-col-md-6 fr-col-lg{% else %}fr-col-md{% endif %}">
+            <h2>{{ subblock.value.title }}</h2>
+            {% include_block subblock %}
+          </div>
+        {% else %}
+          <div class="fr-col-12 {% if value.columns|length > 3 %}fr-col-md-6 fr-col-lg{% else %}fr-col-md{% endif %}">{% include_block subblock %}</div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
