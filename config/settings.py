@@ -376,6 +376,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 WAGTAIL_SITE_NAME = os.getenv("SITE_NAME", "Sites Conformes")
 
+# One switch for page slugs, snippet slugs, and tag slugs. True keeps accents.
+WAGTAIL_ALLOW_UNICODE_SLUGS = getenv_bool("WAGTAIL_ALLOW_UNICODE_SLUGS", True)
+TAGGIT_STRIP_UNICODE_WHEN_SLUGIFYING = not WAGTAIL_ALLOW_UNICODE_SLUGS
+
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 WAGTAILADMIN_BASE_URL = os.getenv("WAGTAILADMIN_BASE_URL", "")
