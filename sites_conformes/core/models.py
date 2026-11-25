@@ -24,7 +24,6 @@ from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import RichTextField
 from wagtail.images import get_image_model_string
 from wagtail.models import Orderable
-from wagtail.snippets.models import register_snippet
 
 from sites_conformes.core.abstract import SitesFacilesBasePage
 from sites_conformes.core.constants import LIMITED_RICHTEXTFIELD_FEATURES
@@ -331,7 +330,6 @@ class CatalogIndexPage(RoutablePageMixin, SitesFacilesBasePage):
         )
 
 
-@register_snippet
 class Tag(TaggitTag):
     objects = TagManager()
 

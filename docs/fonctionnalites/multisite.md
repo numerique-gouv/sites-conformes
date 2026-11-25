@@ -98,6 +98,39 @@ Pour le détail des modèles et des membres de chaque groupe :
 python manage.py multisite_isolation_report
 ```
 
+## Réservé au superadministrateur
+
+Les mots-clés et les domaines autorisés de ProConnect sont communs à tous les
+sites. Quand le cloisonnement est actif, seul un superadministrateur les gère
+(**Fragments → Mot-clés** et **ProConnect → Whitelisted email domains**).
+
+Les autres contributeurs ne voient pas ces entrées, même si l’un de leurs
+groupes a des droits sur ces modèles. S’ils saisissent leur adresse, ils sont
+renvoyés au tableau de bord avec le message « Désolé, vous n’avez pas les
+autorisations pour accéder à cette zone. », comme sur toute page de
+l’administration qui leur est interdite. Ce blocage passe aussi par le
+middleware `MultisiteIsolationMiddleware`.
+
+Ils peuvent toujours choisir un mot-clé : dans le champ « Mots-clés » d’une
+page, ou dans le filtre par mot-clé des blocs d’articles et d’événements
+récents.
+
+Sans cloisonnement, les droits des groupes s’appliquent comme avant.
+
+### Mots-clés communs à tous les sites
+
+Les mots-clés n’appartiennent à aucun site ni à aucune langue. C’est un choix
+assumé :
+
+- dans le champ « Mots-clés » d’une page, les suggestions comprennent ceux
+  des autres sites ;
+- un contributeur qui peut modifier une page crée un mot-clé en saisissant un
+  nom qui n’existe pas encore. Le mot-clé est créé dès l’enregistrement du
+  brouillon, avant toute validation, et il est aussitôt proposé aux
+  contributeurs de tous les sites ;
+- un mot-clé renommé ou supprimé par un superadministrateur l’est sur tous
+  les sites.
+
 ## Hébergement
 
 Chaque site doit répondre à son nom de domaine : ajoutez-les tous à
