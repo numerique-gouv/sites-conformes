@@ -19,6 +19,7 @@ from sites_conformes.core.services.import_export import (
     remove_block_ids,
     update_streamfield_image_ids,
 )
+from sites_conformes.core.utils import guess_extension
 
 
 class ImportPagesTestCase(WagtailPageTestCase):
@@ -206,3 +207,53 @@ class ImportPagesWithParentTestCase(WagtailPageTestCase):
         self.assertEqual(updated_page.pk, page.pk)
         self.assertEqual(updated_page.title, "Modèle mis à jour")
         self.assertFalse(ContentPage.objects.filter(slug="page_templates_index").exists())
+
+
+class GuessExtensionTestCase(SimpleTestCase):
+    """Unit tests for guess_extension — no DB required."""
+
+    def _call(self, filename, content=b""):
+        return guess_extension(filename, content)
+
+    def test_svg_extension_preserved(self):
+        self.assertEqual(self._call("icon.svg"), ".svg")
+
+    def test_png_extension_preserved(self):
+        self.assertEqual(self._call("photo.PNG"), ".png")
+
+    def test_jpg_extension_preserved(self):
+        self.assertEqual(self._call("photo.jpg"), ".jpg")
+
+    def test_sniff_png(self):
+        self.assertEqual(self._call("image", b"\x89PNG rest of header"), ".png")
+
+    def test_sniff_jpg(self):
+        self.assertEqual(self._call("image", b"\xff\xd8\xff rest"), ".jpg")
+
+    def test_sniff_gif87(self):
+        self.assertEqual(self._call("image", b"GIF87a rest"), ".gif")
+
+    def test_sniff_gif89(self):
+        self.assertEqual(self._call("image", b"GIF89a rest"), ".gif")
+
+    def test_sniff_webp(self):
+        self.assertEqual(self._call("image", b"RIFF\x00\x00\x00\x00WEBP rest"), ".webp")
+
+    def test_sniff_avif(self):
+        # ISOBMFF: 4-byte box size, "ftyp" box type, then the "avif" brand.
+        self.assertEqual(self._call("image", b"\x00\x00\x00\x20ftypavif rest"), ".avif")
+
+    def test_sniff_avif_sequence_brand(self):
+        self.assertEqual(self._call("image", b"\x00\x00\x00\x20ftypavis rest"), ".avif")
+
+    def test_sniff_svg(self):
+        svg = b'<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"></svg>'
+        self.assertEqual(self._call("image", svg), ".svg")
+
+    def test_sniff_svg_uppercase_tag(self):
+        # The check lowercases the bytes before searching
+        svg = b"<SVG xmlns='http://www.w3.org/2000/svg'></SVG>"
+        self.assertEqual(self._call("image", svg), ".svg")
+
+    def test_unknown_content_returns_empty(self):
+        self.assertEqual(self._call("image", b"\x00\x01\x02\x03"), "")

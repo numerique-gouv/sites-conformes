@@ -155,23 +155,23 @@ class HeroImageBlockWithMask(HeroImageBlock):
 
 
 class HeroImageAndTextStructValue(StructValue):
-    def image_rendition(self):
+    def image_filter_spec(self):
         """
         Crop the image to the chosen format around its focal point, or keep its original proportions.
         """
-        image = self.get("image")
-        if not image:
-            return None
-
         image_format = self.get("image_format")
         if not image_format:
-            return image.get_rendition("max-1200x1200")
+            return "max-1200x1200"
 
         # Formats are DSFR classes ending with the ratio, e.g. "fr-responsive-img--16x9"
         ratio_width, ratio_height = (int(n) for n in image_format.rsplit("--", 1)[1].split("x"))
         if ratio_width >= ratio_height:
-            return image.get_rendition(f"fill-1200x{round(1200 * ratio_height / ratio_width)}")
-        return image.get_rendition(f"fill-{round(1200 * ratio_width / ratio_height)}x1200")
+            return f"fill-1200x{round(1200 * ratio_height / ratio_width)}"
+        return f"fill-{round(1200 * ratio_width / ratio_height)}x1200"
+
+    def image_css_class(self):
+        image_format = self.get("image_format")
+        return f"fr-responsive-img {image_format}" if image_format else "cmsfr-hero-img"
 
 
 class HeroImageAndTextBlock(blocks.StructBlock):
