@@ -1,4 +1,7 @@
+from html import unescape
+
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages
 from django.test import RequestFactory
 from django.urls import reverse
 from wagtail.admin.menu import admin_menu
@@ -54,7 +57,14 @@ class SharedSnippetsTestsMixin:
         }
 
     def assertAccessDenied(self, url: str):
-        self.assertEqual(self.client.get(url).status_code, 403)
+        response = self.client.get(url)
+
+        self.assertRedirects(response, reverse("wagtailadmin_home"), fetch_redirect_response=False)
+        # The messages of the previous requests stay in the session, not shown
+        message = list(get_messages(response.wsgi_request))[-1]
+        self.assertEqual(
+            unescape(message.message).strip(), "Désolé, vous n'avez pas les autorisations pour accéder à cette zone."
+        )
 
     def get_menu_item_names(self, user) -> set:
         request = RequestFactory().get("/admin/")
@@ -162,6 +172,16 @@ class MultisiteSharedSnippetsTestCase(SharedSnippetsTestsMixin, MultisiteTestCas
 
         self.assertNotIn("proconnect", self.get_menu_item_names(editor))
         self.assertNotIn("tag", self.get_snippet_model_names(editor))
+
+    def test_editor_gets_a_403_on_the_tag_chooser_in_a_modal(self):
+        self.client.force_login(self.users["editeur-a"])
+
+        response = self.client.get(
+            reverse("wagtailsnippetchoosers_sites_conformes_core_tag:choose"),
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+
+        self.assertEqual(response.status_code, 403)
 
     def test_site_administrator_does_not_access_the_shared_snippets(self):
         self.client.force_login(self.users["admin-a"])

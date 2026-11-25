@@ -105,10 +105,11 @@ sites. Quand le cloisonnement est actif, seul un superadministrateur les gère
 (**Fragments → Mot-clés** et **ProConnect → Whitelisted email domains**).
 
 Les autres contributeurs ne voient pas ces entrées, même si l’un de leurs
-groupes a des droits sur ces modèles. S’ils saisissent leur adresse, ils
-reçoivent une erreur 403 : ces fragments ne sont pas ceux d’un autre site,
-mais ils leur sont interdits. Ce blocage passe aussi par le middleware
-`MultisiteIsolationMiddleware`.
+groupes a des droits sur ces modèles. S’ils saisissent leur adresse, ils sont
+renvoyés au tableau de bord avec le message « Désolé, vous n’avez pas les
+autorisations pour accéder à cette zone. », comme sur toute page de
+l’administration qui leur est interdite. Ce blocage passe aussi par le
+middleware `MultisiteIsolationMiddleware`.
 
 Sans cloisonnement, les droits des groupes s’appliquent comme avant.
 

@@ -532,7 +532,7 @@ class SuperuserOnlyViewSetMixin:
     With the isolation disabled, it changes nothing. Otherwise, for the other users, the
     model disappears from the menu and the listing of the snippets, whatever the
     permissions of their groups, and all its views, the chooser and the bulk actions
-    included, return a 403 (see ``is_superuser_only_view``).
+    included, deny the access as the Wagtail admin does (see ``is_superuser_only_view``).
     """
 
     def on_register(self):

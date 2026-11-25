@@ -2,11 +2,12 @@ import logging
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.cache import patch_cache_control, patch_vary_headers
+from wagtail.admin.auth import permission_denied
+from wagtail.admin.localization import get_localized_response
 from wagtail.models import Page
 
 from sites_conformes.core.models import CmsDsfrConfig
@@ -184,7 +185,9 @@ class MultisiteIsolationMiddleware:
       ``construct_page_chooser_queryset`` hook;
     - the bulk actions and the wagtail-localize views of a model using
       ``SiteScopedViewSetMixin`` return a 404 for an object outside of the scope;
-    - the views of a model using ``SuperuserOnlyViewSetMixin`` return a 403.
+    - the views of a model using ``SuperuserOnlyViewSetMixin`` redirect to the dashboard
+      with the "permission denied" message of the Wagtail admin, or return a 403 for an
+      XHR request.
 
     Must be placed after the authentication middleware.
     """
@@ -222,8 +225,9 @@ class MultisiteIsolationMiddleware:
         if user is None or not user.is_authenticated or user.is_superuser:
             return None
         if is_superuser_only_view(request.resolver_match, view_kwargs):
-            # Raised outside of the view: a 403, not the redirection of the Wagtail admin
-            raise PermissionDenied
+            # The chooser does not check the permissions on the model: the response of the
+            # Wagtail admin is given here, in the language of the user
+            return get_localized_response(permission_denied, request)
         handler = self.handlers.get(request.resolver_match.view_name)
         if handler is None:
             return None
