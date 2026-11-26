@@ -605,6 +605,19 @@ class CmsDsfrConfig(ClusterableModel, BaseSiteSetting):
         _("Display a Copy to clipboard link at the bottom of pages"), default=True
     )
 
+    default_preview_image = models.ForeignKey(
+        get_image_model_string(),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name=_("Default preview image"),
+        help_text=_(
+            "Image displayed as a preview when a page with neither a preview image nor a header image "
+            "is shared on social media. Recommended size: 1200 × 630 pixels."
+        ),
+    )
+
     site_panels = [
         FieldPanel("site_title"),
         FieldPanel("site_tagline"),
@@ -696,6 +709,7 @@ class CmsDsfrConfig(ClusterableModel, BaseSiteSetting):
             ],
             heading=_("Types of share links"),
         ),
+        FieldPanel("default_preview_image"),
     ]
     edit_handler = TabbedInterface(
         [
