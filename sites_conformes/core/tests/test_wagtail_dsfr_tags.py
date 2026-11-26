@@ -1,5 +1,6 @@
 from datetime import date, datetime
 
+from django.conf import settings
 from django.template import Context
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.utils.translation import override
@@ -7,7 +8,7 @@ from wagtail.models import Locale, Page, Site
 from wagtail.test.utils import WagtailPageTestCase
 
 from sites_conformes.core.models import CmsDsfrConfig, ContentPage, LanguageSelectorItem
-from sites_conformes.core.templatetags.wagtail_dsfr_tags import canonical_url, toggle_url_filter
+from sites_conformes.core.templatetags.wagtail_dsfr_tags import canonical_url, settings_value, toggle_url_filter
 
 
 class LanguageSelectorTagBaseTestCase(WagtailPageTestCase):
@@ -343,3 +344,45 @@ class CanonicalUrlTagTestCase(WagtailPageTestCase):
 
     def test_no_request_returns_empty_string(self):
         self.assertEqual(canonical_url(Context({})), "")
+
+
+class SettingsValueTagTestCase(SimpleTestCase):
+    @override_settings(SF_TEST_SETTING="value")
+    def test_returns_defined_setting(self):
+        self.assertEqual(settings_value("SF_TEST_SETTING"), "value")
+        self.assertEqual(settings_value("SF_TEST_SETTING", "default"), "value")
+
+    def test_missing_setting_returns_empty_string(self):
+        self.assertEqual(settings_value("SF_UNDEFINED_SETTING"), "")
+
+    def test_missing_setting_returns_default(self):
+        self.assertEqual(settings_value("SF_UNDEFINED_SETTING", "default"), "default")
+
+
+class MetaGeneratorTestCase(WagtailPageTestCase):
+    def setUp(self):
+        home_page = Page.objects.get(slug="home")
+        self.content_page = home_page.add_child(instance=ContentPage(title="Page de test", slug="test-page"))
+        self.content_page.save()
+
+    def get(self, **extra):
+        return self.client.get(self.content_page.get_url(), **extra)
+
+    @override_settings(SF_META_GENERATOR_NAME="Mon générateur")
+    def test_uses_configured_name(self):
+        self.assertContains(self.get(), '<meta name="generator" content="Mon générateur" />', html=True)
+        self.assertContains(
+            self.get(HTTP_SEC_FETCH_DEST="iframe"),
+            '<meta name="generator" content="Mon générateur — Embedded mode" />',
+            html=True,
+        )
+
+    @override_settings()
+    def test_defaults_to_sites_conformes_when_setting_is_missing(self):
+        del settings.SF_META_GENERATOR_NAME
+        self.assertContains(self.get(), '<meta name="generator" content="Sites Conformes" />', html=True)
+
+    @override_settings(SF_META_GENERATOR_NAME="")
+    def test_empty_name_removes_the_tag(self):
+        self.assertNotContains(self.get(), 'name="generator"')
+        self.assertNotContains(self.get(HTTP_SEC_FETCH_DEST="iframe"), 'name="generator"')

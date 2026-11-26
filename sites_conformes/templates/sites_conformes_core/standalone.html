@@ -17,6 +17,11 @@
     {% block description %}
     {% endblock description %}
 
+    {% settings_value 'SF_META_GENERATOR_NAME' 'Sites Conformes' as generator_name %}
+    {% if generator_name %}
+      <meta name="generator" content="{{ generator_name }}" />
+    {% endif %}
+
     {% block canonical_url %}
       <link rel="canonical" href="{% canonical_url %}" />
     {% endblock canonical_url %}
