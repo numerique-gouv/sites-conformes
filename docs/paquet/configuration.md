@@ -109,15 +109,15 @@ SF_USE_WHITENOISE = getenv_bool("SF_USE_WHITENOISE", False)
 ## SF_CONTENTPAGE_MODEL
 
 Modèle Django utilisé pour les pages de contenu, au format `app_label.ModelName`.
-Permet de remplacer le modèle initial `ContentPage` par un modèle de votre choix.
-Celui-ci doit hériter de
-`AbstractContentPage`, sur le principe des modèles de Page personnalisé de Wagtail
-ou User de Django.
+Permet de remplacer le modèle initial `ContentPage` par un modèle de votre choix,
+hérité de `AbstractContentPage` — même principe que `AUTH_USER_MODEL` ou les
+modèles de page personnalisés de Wagtail.
 
 Voir {doc}`modele-de-page-personnalise`.
 
-Ce réglage doit être défini avant la première migration du projet : les sites
-existants ne peuvent pas changer de modèle sans une migration de contenu.
+À définir **avant la première migration** du projet. Sur un site existant,
+les pages doivent être déplacées vers le nouveau modèle :
+{ref}`changer-de-modele-site-existant`.
 
 Valeur par défaut :
 
