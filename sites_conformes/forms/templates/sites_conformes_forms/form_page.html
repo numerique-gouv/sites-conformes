@@ -2,6 +2,7 @@
 {% load wagtailcore_tags wagtail_dsfr_tags i18n honeypot_tags static %}
 
 {% block extra_css %}
+  {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/honeypot.css' %}">
 {% endblock extra_css %}
 
@@ -58,5 +59,6 @@
 {% endblock content %}
 
 {% block extra_js %}
+  {{ block.super }}
   <script src="{% static 'js/honeypot.js' %}"></script>
 {% endblock extra_js %}

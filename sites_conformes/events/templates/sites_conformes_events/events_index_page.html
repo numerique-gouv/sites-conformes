@@ -233,5 +233,6 @@
 {% endblock content %}
 
 {% block extra_js %}
+  {{ block.super }}
   <script src="{% static 'events/filters.js' %}"></script>
 {% endblock extra_js %}
