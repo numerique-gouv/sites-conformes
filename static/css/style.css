@@ -128,3 +128,43 @@ p:empty {
     background-color: var(--background-contrast-blue-ecume);
     color: var(--text-label-blue-ecume);
 }
+
+/* Fabrique : en-tête des actualités (templates/blog/blog_entry_page.html). Au lieu du bandeau recadré de
+   Sites Faciles, titre à gauche et image d'en-tête entière à droite (sous le titre sur mobile). */
+.fabrique-entete-actu {
+    background-color: var(--background-alt-grey);
+}
+
+.fabrique-entete-actu .fr-breadcrumb {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.fabrique-entete-actu h1 {
+    margin-bottom: 1rem;
+}
+
+.fabrique-entete-actu__image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    background-color: var(--background-default-grey);
+    border: 1px solid var(--border-default-grey);
+}
+
+.fabrique-entete-actu__image img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 12rem;
+    object-fit: contain;
+}
+
+@media (max-width: 47.99em) {
+    .fabrique-entete-actu__image img {
+        max-height: 8rem;
+    }
+}

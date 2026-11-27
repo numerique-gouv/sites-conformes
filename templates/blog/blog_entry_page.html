@@ -1,0 +1,90 @@
+{% extends "blog/blog_entry_page.html" %}
+
+{% load i18n wagtailcore_tags wagtailimages_tags wagtail_dsfr_tags %}
+
+{% comment %}
+  Copie du bloc « content » du gabarit de Sites Faciles (blog/templates/blog/blog_entry_page.html), sauf l'en-tête.
+  Sites Faciles pose l'image d'en-tête en bandeau recadré (fill-1200x350, background-size: cover) : les logos et
+  illustrations carrées des équipes y sont coupés. Ici, l'en-tête a deux colonnes : fil d'Ariane, titre et date
+  à gauche, image entière (jamais recadrée) à droite, sous le titre sur mobile. Styles : classe
+  fabrique-entete-actu dans static/css/style.css. Le reste du bloc est inchangé.
+{% endcomment %}
+
+{% block content %}
+  {% with categories=page.blog_categories.all %}
+    <div class="fabrique-entete-actu fr-mb-4w">
+      <div class="fr-container fr-py-4w">
+        {% include "content_manager/blocks/breadcrumbs.html" %}
+        <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
+          <div class="fr-col-12{% if page.header_image %} fr-col-md-8{% endif %}">
+            <h1>
+              {{ page.title }}
+              {% include "content_manager/blocks/page_visibility.html" %}
+            </h1>
+            <p class="fr-mb-0">
+              Publié le <a href="{% pageurl page.get_parent %}{% toggle_url_filter year=page.date.year %}">{{ page.date |date:'l j F Y' }}</a>
+              {% if categories %}
+                |
+                {% for category in categories %}
+                  <a href="{% pageurl page.get_parent %}{% toggle_url_filter category=category %}">{{ category.name }}</a>
+                  {% if not forloop.last %},{% endif %}
+                {% endfor %}
+              {% endif %}
+            </p>
+            {% if page.header_cta_buttons %}
+              <div class="fr-mt-3w">
+                {% for block in page.header_cta_buttons %}
+                  {% include_block block %}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          {% if page.header_image %}
+            <div class="fr-col-12 fr-col-md-4">
+              <div class="fabrique-entete-actu__image">
+                {% image page.header_image max-480x360 preserve-svg as image_entete %}
+                <img src="{{ image_entete.url }}" width="{{ image_entete.width }}" height="{{ image_entete.height }}" alt="">
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% include "content_manager/blocks/messages.html" %}
+
+    {% include "content_manager/blocks/blocks_stream.html" with stream=page.body %}
+
+    {% with authors=page.authors.all %}
+      {% if authors %}
+        <div class="fr-container fr-my-6w">
+          <h2>{% translate "Posted by:" %}</h2>
+          <div class="fr-grid-row fr-grid-row--gutters">
+            {% for author in authors %}
+              {% include "blog/blocks/contact_card.html" with value=author %}
+            {% endfor %}
+          </div>
+        </div>
+
+      {% endif %}
+    {% endwith %}
+
+    {% if categories %}
+      {% for category in categories %}
+        {% include "content_manager/blocks/blocks_stream.html" with stream=category.colophon %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="fr-container fr-my-4w">
+    {% for tag in page.tags.all|dictsort:"slug" %}
+      <a class="fr-tag"
+         target="_self"
+         href="{% pageurl page.get_parent %}{% toggle_url_filter tag=tag %}">{{ tag }}</a>
+    {% endfor %}
+  </div>
+
+  {% if settings.content_manager.CmsDsfrConfig.show_share_links and settings.content_manager.CmsDsfrConfig.share_links_blog_posts %}
+    {% include "blocks/share.html" %}
+  {% endif %}
+{% endblock content %}

@@ -442,6 +442,18 @@ class RenduTests(TestCase):
         self.assertIn('class="fr-card__img fabrique-vignette"', contenu)
         self.assertIn('style="width: 144px"', contenu)
         self.assertEqual(contenu.count("fabrique-vignette"), 1)  # le communiqué n'a pas d'image
+        # Page de l'article : pas de bandeau recadré, l'image entière à côté du titre.
+        contenu = self.client.get(lettre.url).content.decode()
+        self.assertNotIn("cmsfr-hero", contenu)
+        self.assertIn('class="fabrique-entete-actu__image"', contenu)
+        self.assertNotIn("fill-1200x350", contenu)
+        self.assertEqual(contenu.count("<h1"), 1)
+        self.assertIn("Info Panoramax octobre 2026", contenu)
+        self.assertIn("Publié le", contenu)
+        # Sans image d'en-tête, le titre prend toute la largeur.
+        contenu = self.client.get(communique.url).content.decode()
+        self.assertNotIn("fabrique-entete-actu__image", contenu)
+        self.assertIn('class="fr-col-12"', contenu)
         # Sans image : le logo du site (ici en longueur, 4:1 → 360 px de large).
         config = CmsDsfrConfig.for_site(Site.objects.get(is_default_site=True))
         config.operator_logo_file = get_image_model().objects.create(

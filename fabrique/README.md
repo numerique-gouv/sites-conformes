@@ -160,7 +160,10 @@ Chapô, Corps (markdown), Lien (version web), Image, Identifiant source, Modifi�
 - **Actualités** (`BlogIndexPage`) : la page à l'adresse `FABRIQUE_ACTUS_SLUG` (`actualites` par défaut). Si elle
   n'existe pas mais que le site a une seule page d'actualités, c'est celle-là qui est utilisée ; s'il n'en a aucune,
   elle est créée.
-- **Article** (`BlogEntryPage`) : un par actu publiée dans Grist.
+- **Article** (`BlogEntryPage`) : un par actu publiée dans Grist. Son en-tête (`templates/blog/blog_entry_page.html`,
+  copie du gabarit de Sites Faciles) met le titre à gauche et l'image d'en-tête entière à droite, au lieu du bandeau
+  recadré en 1200 × 350 qui coupait les logos des équipes (styles : `fabrique-entete-actu` dans
+  `static/css/style.css`).
 
 **Ce qui est mis à jour depuis Grist**
 - Le titre, la date et la description (chapô, ou début du texte).
