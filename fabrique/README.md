@@ -243,6 +243,20 @@ cartes de Sites Faciles reste disponible avec le bouton « Liste » (`?vue=liste
 - Point d'entrée : `templates/events/blocks/events_index_posts_list.html` (copie du gabarit de Sites Faciles), qui
   affiche le calendrier ou les cartes selon la vue.
 
+### Abonnement à l'agenda (flux iCal)
+
+Deux flux iCal (`fabrique/flux.py`, URL `/flux/<nom>.ics`), proposés sur `/agenda/` par des liens `webcal://`
+(abonnement direct dans Outlook et Apple Calendrier) et une adresse `https://` à coller dans Google Agenda :
+
+- `agenda-fabrique` : l'essentiel — tous les événements de la Fabrique (équipe « Fabrique de la donnée territoriale »
+  dans Grist, ou événement saisi à la main dans Wagtail) et seulement les comités des équipes (type ou étiquette
+  commençant par « Comité ») ;
+- `agenda-complet` : tous les événements.
+
+Les flux gardent les événements terminés depuis moins de 3 mois, marquent `STATUS:CANCELLED` les événements
+« Annulé : … », et indiquent un rafraîchissement toutes les 4 heures. Ils remplacent, sur la page, le bouton de
+téléchargement iCal de Sites Faciles (`/agenda/ical/`, toujours en ligne).
+
 ## Mise à jour de la page d'accueil
 
 ```sh
