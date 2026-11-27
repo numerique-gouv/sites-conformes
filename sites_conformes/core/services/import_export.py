@@ -15,7 +15,6 @@ from pathlib import PosixPath
 
 import requests
 import swapper
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.images import ImageFile
 from django.utils import timezone
@@ -23,12 +22,12 @@ from wagtail.images import get_image_model
 from wagtail.models import Page
 from wagtail.utils.file import hash_filelike
 
-from sites_conformes.core.constants import HEADER_FIELDS
+from sites_conformes.core.constants import HEADER_FIELDS, PAGE_TEMPLATES_ROOT
+from sites_conformes.core.models import AbstractContentPage
 from sites_conformes.core.services.accessors import get_or_create_collection, get_or_create_content_page
 
 ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
 
-PAGE_TEMPLATES_ROOT = settings.BASE_DIR / "sites_conformes/core/page_templates"
 TEMPLATES_DATA_FILE = PAGE_TEMPLATES_ROOT / "pages_data.json"
 IMAGES_FOLDER = PAGE_TEMPLATES_ROOT / "img"
 
@@ -164,7 +163,7 @@ class ImportPages:
             # Do not create the parent page at this step if it doesn't exit
             self.parent_page = None
 
-    def get_or_create_page_templates_index(self) -> ContentPage:
+    def get_or_create_page_templates_index(self) -> AbstractContentPage:
         """
         Get or create the page templates index, used as parent page when none is given.
         """
@@ -199,7 +198,7 @@ class ImportPages:
             else:
                 self.import_page(page_id)
 
-    def import_page(self, page_id: str) -> ContentPage:
+    def import_page(self, page_id: str) -> AbstractContentPage:
         """
         Create a new page from the exported page with the given source ID.
         """

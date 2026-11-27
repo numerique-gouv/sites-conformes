@@ -1,7 +1,6 @@
-import os
+from pathlib import Path
 
 import swapper
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from faker import Faker
 from taggit.models import slugify
@@ -21,6 +20,7 @@ from sites_conformes.core.constants import (
     EXAMPLE_IMAGE_WOMAN_PATH,
     EXAMPLE_IMAGE_WOMAN_TITLE,
 )
+from sites_conformes.core.models import AbstractContentPage
 from sites_conformes.core.services.accessors import (
     get_or_create_catalog_index_page,
     get_or_create_content_page,
@@ -106,13 +106,12 @@ class Command(BaseCommand):
 
         main_menu.save()
 
-    def get_or_import_image(self, path: str, title: str):
+    def get_or_import_image(self, path: Path, title: str):
         """Get an existing image by title or import it from the given path."""
         Image = get_image_model()
         image = Image.objects.filter(title=title).first()
         if not image:
-            full_path = os.path.join(settings.BASE_DIR, path)
-            image = import_image(full_path, title)
+            image = import_image(path, title)
         return image
 
     def create_blog_index(self, home_page) -> BlogIndexPage:
@@ -192,7 +191,7 @@ class Command(BaseCommand):
         main_menu.items.insert(-1, ("megamenu", mega_menu_values))
         main_menu.save()
 
-    def create_form_page(self, slug: str, parent_page: ContentPage) -> None:  # type: ignore
+    def create_form_page(self, slug: str, parent_page: AbstractContentPage) -> None:
         """
         Creates a form page with all the different forms
         """
@@ -331,7 +330,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"Page {slug} created with id {form_page.id}"))
 
-    def create_common_blocks_page(self, parent_page: ContentPage) -> None:  # type: ignore
+    def create_common_blocks_page(self, parent_page: AbstractContentPage) -> None:
         """
         Creates a page showcasing all blocks in STREAMFIELD_COMMON_BLOCKS.
         """
@@ -1117,7 +1116,7 @@ class Command(BaseCommand):
         page = get_or_create_content_page(slug, title="Tous les blocs", body=body, parent_page=parent_page)
         self.stdout.write(self.style.SUCCESS(f"Page {slug} created with id {page.id}"))
 
-    def create_hero_blocks_page(self, home_page, parent_page: ContentPage) -> None:  # type: ignore
+    def create_hero_blocks_page(self, home_page, parent_page: AbstractContentPage) -> None:
         """
         Creates a parent hero_blocks page plus sub-pages for each hero type.
         """

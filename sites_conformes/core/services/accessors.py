@@ -8,6 +8,7 @@ They are idempotent: calling them twice doesn't create duplicates.
 """
 
 import sys
+from typing import cast
 
 import swapper
 from django.core.management.color import color_style
@@ -15,11 +16,12 @@ from django.utils.translation import gettext_lazy as _
 from wagtail.models import Collection, Page, PageViewRestriction
 
 from sites_conformes.core.constants import HEADER_FIELDS
-from sites_conformes.core.models import CatalogIndexPage
+from sites_conformes.core.models import AbstractContentPage, CatalogIndexPage
 from sites_conformes.core.utils import get_default_site
 from sites_conformes.menus.models import FooterBottomMenu, MainMenu
 
-ContentPage = swapper.load_model("sites_conformes_core", "ContentPage")
+# The swapped model always inherits from AbstractContentPage, which swapper can't tell the type checker
+ContentPage = cast(type[AbstractContentPage], swapper.load_model("sites_conformes_core", "ContentPage"))
 style = color_style()
 
 
@@ -40,7 +42,7 @@ def get_or_create_catalog_index_page(
     slug: str,
     title: str,
     body: list,
-    parent_page: Page | ContentPage | None = None,
+    parent_page: Page | AbstractContentPage | None = None,
     restriction_type: str | None = None,
     page_fields: dict | None = None,
 ) -> CatalogIndexPage:
@@ -106,10 +108,10 @@ def get_or_create_content_page(
     slug: str,
     title: str,
     body: list,
-    parent_page: Page | ContentPage | CatalogIndexPage | None = None,
+    parent_page: Page | AbstractContentPage | CatalogIndexPage | None = None,
     restriction_type: str | None = None,
     page_fields: dict | None = None,
-) -> ContentPage:
+) -> AbstractContentPage:
     """
     Get a ContentPage if it exists, or creates it instead.
 

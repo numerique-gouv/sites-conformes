@@ -3,6 +3,7 @@ import os
 from django.core.management.base import BaseCommand
 from wagtail.images import get_image_model
 
+from sites_conformes.core.constants import PACKAGE_STATIC_DIR
 from sites_conformes.core.services.accessors import get_or_create_collection
 from sites_conformes.core.utils import import_image, overwrite_image
 
@@ -12,8 +13,6 @@ Image = get_image_model()
 class Command(BaseCommand):
     help = """
     Import all illustration images for block template.
-
-    Should only be launched if the statics have been collected at least once.
     """
 
     def add_arguments(self, parser):
@@ -27,7 +26,7 @@ class Command(BaseCommand):
         verbosity = int(kwargs.get("verbosity", 1))
         force_update = kwargs.get("force")
 
-        image_root = "staticfiles/illustration/"
+        image_root = PACKAGE_STATIC_DIR / "illustration"
         files = os.listdir(image_root)
         files.sort()
 

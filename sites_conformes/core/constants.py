@@ -1,4 +1,12 @@
+from pathlib import Path
+
 from django.utils.translation import gettext_lazy as _
+
+# Paths of the files shipped with the package, resolved from the package itself so that
+# they don't depend on the current directory, on `BASE_DIR` or on `collectstatic`
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
+PACKAGE_STATIC_DIR = PACKAGE_DIR / "static"
+PAGE_TEMPLATES_ROOT = PACKAGE_DIR / "core" / "page_templates"
 
 HEADER_FIELDS = [
     "header_image",
@@ -258,17 +266,16 @@ IMAGE_GRID_SIZE = [("80", _("Small (80px)")), ("140", _("Medium (140px)")), ("20
 
 # Image example for templates
 EXAMPLE_IMAGE_BANNER_TITLE = "Banner Sites Faciles Dimitri Iakymuk Unsplash"
-EXAMPLE_IMAGE_BANNER_PATH = "sites_conformes/static/illustration/Banner-Sites-Faciles-Dimitri-Iakymuk-unsplash.jpg"
+EXAMPLE_IMAGE_BANNER_PATH = PACKAGE_STATIC_DIR / "illustration/Banner-Sites-Faciles-Dimitri-Iakymuk-unsplash.jpg"
 
 EXAMPLE_IMAGE_WOMAN_TITLE = "Illustration Sites Faciles Femme Ordinateur"
-EXAMPLE_IMAGE_WOMAN_PATH = "sites_conformes/static/illustration/illustration-sites-faciles-femme-ordinateur.png"
+EXAMPLE_IMAGE_WOMAN_PATH = PACKAGE_STATIC_DIR / "illustration/illustration-sites-faciles-femme-ordinateur.png"
 
 EXAMPLE_IMAGE_MAN_TITLE = "Illustration Sites Faciles Homme Nuages"
-EXAMPLE_IMAGE_MAN_PATH = "sites_conformes/static/illustration/illustration-sites-faciles-homme-nuages.png"
-
+EXAMPLE_IMAGE_MAN_PATH = PACKAGE_STATIC_DIR / "illustration/illustration-sites-faciles-homme-nuages.png"
 
 EXAMPLE_IMAGE_PLACEHOLDER_TITLE = "Placeholder Sites Faciles"
-EXAMPLE_IMAGE_PLACEHOLDER_PATH = "sites_conformes/static/illustration/Placeholder-Sites-Faciles.png"
+EXAMPLE_IMAGE_PLACEHOLDER_PATH = PACKAGE_STATIC_DIR / "illustration/Placeholder-Sites-Faciles.png"
 
 EXAMPLE_IMAGE_ERROR_TITLE = "Technical Error"
-EXAMPLE_IMAGE_ERROR_PATH = "sites_conformes/static/artwork/technical-error.svg"
+EXAMPLE_IMAGE_ERROR_PATH = PACKAGE_STATIC_DIR / "artwork/technical-error.svg"
