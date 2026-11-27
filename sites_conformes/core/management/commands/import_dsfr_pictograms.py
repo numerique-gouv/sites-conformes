@@ -1,6 +1,7 @@
 import os
 
-from django.core.management.base import BaseCommand
+from django.contrib.staticfiles import finders
+from django.core.management.base import BaseCommand, CommandError
 from wagtail.images import get_image_model
 
 from sites_conformes.core.services.accessors import get_or_create_collection
@@ -12,8 +13,6 @@ Image = get_image_model()
 class Command(BaseCommand):
     help = """
     Import all the pictograms from the DSFR.
-
-    Should only be launched if the statics have been collected at least once.
     """
 
     def add_arguments(self, parser):
@@ -27,7 +26,11 @@ class Command(BaseCommand):
         verbosity = int(kwargs.get("verbosity", 1))
         force_update = kwargs.get("force")
 
-        picto_root = "staticfiles/dsfr/dist/artwork/pictograms/"
+        # Found through the static files finders, as the pictograms are provided by django-dsfr
+        picto_root = finders.find("dsfr/dist/artwork/pictograms")
+        # find() only returns a list when called with find_all=True
+        if not isinstance(picto_root, str):
+            raise CommandError("The DSFR pictograms were not found in the static files.")
         picto_folders = os.listdir(picto_root)
         picto_folders.sort()
 

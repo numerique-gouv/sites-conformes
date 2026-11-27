@@ -11,14 +11,26 @@ from django.test import SimpleTestCase, TestCase
 from wagtail.models import Page
 from wagtail.test.utils import WagtailPageTestCase
 
+import sites_conformes
+from sites_conformes.core.constants import PAGE_TEMPLATES_ROOT
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.services.import_export import (
+    IMAGES_FOLDER,
+    TEMPLATES_DATA_FILE,
     ExportPage,
     ImportExportImages,
     ImportPages,
     remove_block_ids,
     update_streamfield_image_ids,
 )
+
+
+class PageTemplatesPathTestCase(SimpleTestCase):
+    def test_page_templates_are_found_in_the_package(self):
+        package_root = Path(sites_conformes.__file__).resolve().parent
+        self.assertTrue(PAGE_TEMPLATES_ROOT.is_relative_to(package_root))
+        self.assertTrue(TEMPLATES_DATA_FILE.is_file())
+        self.assertTrue(IMAGES_FOLDER.is_dir())
 
 
 class ImportPagesTestCase(WagtailPageTestCase):

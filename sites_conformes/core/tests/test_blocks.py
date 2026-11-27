@@ -11,7 +11,11 @@ from wagtail.test.utils import WagtailPageTestCase
 from sites_conformes.blog.models import BlogEntryPage, BlogIndexPage, Category
 from sites_conformes.core.blocks.basics import CenteredImageBlock
 from sites_conformes.core.blocks.heros import HeroBackgroundImageBlock, HeroImageAndTextBlock
-from sites_conformes.core.constants import EXAMPLE_IMAGE_BANNER_TITLE, EXAMPLE_IMAGE_ERROR_PATH, EXAMPLE_IMAGE_MAN_PATH
+from sites_conformes.core.constants import (
+    EXAMPLE_IMAGE_BANNER_TITLE,
+    EXAMPLE_IMAGE_ERROR_PATH,
+    EXAMPLE_IMAGE_MAN_PATH,
+)
 from sites_conformes.core.models import ContentPage
 from sites_conformes.core.utils import import_image
 from sites_conformes.events.models import EventEntryPage, EventsIndexPage

@@ -6,6 +6,7 @@ live in `sites_conformes.core.services.accessors` to avoid circular imports.
 """
 
 from io import BytesIO
+from pathlib import Path
 
 from django.core.files.images import ImageFile
 from dsfr.constants import IMAGE_RATIOS
@@ -15,7 +16,7 @@ from wagtail.models import Site
 Image = get_image_model()
 
 
-def import_image(full_file_path: str, title: str):
+def import_image(full_file_path: str | Path, title: str):
     """
     Import an image to the Wagtail medias based on its full path and return it.
 
@@ -31,7 +32,7 @@ def import_image(full_file_path: str, title: str):
         return image
 
 
-def overwrite_image(image, full_file_path: str, title: str):
+def overwrite_image(image, full_file_path: str | Path, title: str):
     """
     Overwrites the file for a Wagtail image instance,
     keeping the same database record and ID.
